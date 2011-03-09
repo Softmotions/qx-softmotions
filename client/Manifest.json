@@ -1,0 +1,34 @@
+{
+    "info" :
+    {
+        "name" : "sm",
+
+        "summary" : "Softmotions qooxdoo libs",
+        "description" : "Softmotions qooxdoo libs",
+
+        "homepage" : "http://uis.nsu.ru/",
+
+        "license" : "Copyright (c) 2011 Softmotions  All Rights Reserved.",
+
+        "authors" :
+                [
+                    {
+                        "name" : "Adamansky Anton (adam)",
+                        "email" : "anton@adamansky.com"
+                    }
+                ],
+
+        "version" : "trunk"
+    },
+
+    "provides" :
+    {
+        "namespace"   : "sm",
+        "encoding"    : "utf-8",
+        "class"       : "source/class",
+        "resource"    : "source/resource",
+        "translation" : "source/translation",
+        "type"        : "library"
+    }
+}
+
