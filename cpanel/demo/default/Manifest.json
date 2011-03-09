@@ -1,0 +1,38 @@
+{
+  "info" : 
+  {
+    "name" : "CollapsablePanel Demo",
+
+    "summary" : "CollapsablePanel Demo",
+    "description" : "This is a skeleton for a qooxdoo contribution demo.",
+    
+    "homepage" : "http://demo.qooxdoo.org/contrib/collapsablePanel",
+
+    "license" : "LGPL/EPL",
+    "authors" : 
+    [
+      {
+        "name" : "Matthew Gregory",
+        "email" : "matthew@nogsnet.com"
+      },
+      {
+        "name" : "Christian Boulanger (cboulanger)",
+        "email" : "info@bibliograph.org"
+      }
+    ],
+
+    "version" : "trunk",
+    "qooxdoo-versions": ["1.0", "1.1", "1.2"]
+  },
+  
+  "provides" : 
+  {
+    "namespace"   : "collapsablepanel.demo",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation",
+    "type"        : "application"
+  }
+}
+

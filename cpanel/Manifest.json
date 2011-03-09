@@ -1,0 +1,38 @@
+{
+  "info" : 
+  {
+    "name" : "collapsablePanel",
+
+    "summary" : "CollapsablePanel Widget",
+    "description" : "A widget that allows to collapse and expand certain sections within a panel and comes with a choice of appearances.",
+    
+    "homepage" : "http://contrib.qooxdoo.org/project/collapsablePanel",
+
+    "license" : "LGPL/EPL",
+    "authors" : 
+    [
+      {
+        "name" : "Matthew Gregory",
+        "email" : "matthew@nogsnet.com"
+      },
+      {
+        "name" : "Christian Boulanger (cboulanger)",
+        "email" : "info@bibliograph.org"
+      }
+    ],
+
+    "version" : "trunk",
+    "qooxdoo-versions": ["1.0", "1.1", "1.2"]
+  },
+  
+  "provides" : 
+  {
+    "namespace"   : "collapsablepanel",
+    "encoding"    : "utf-8",
+    "class"       : "source/class",
+    "resource"    : "source/resource",
+    "translation" : "source/translation",
+    "type"        : "contribution"
+  }
+}
+
