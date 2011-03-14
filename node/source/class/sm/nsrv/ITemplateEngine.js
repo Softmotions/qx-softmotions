@@ -10,8 +10,9 @@ qx.Interface.define("sm.nsrv.ITemplateEngine", {
          * @param path
          * @return {Object} Template object
          */
-        createTemplate : function(path) {
+        createTemplate : function(path, cb) {
             this.assertString(path, "Template path shoud be specified");
+            this.assertFunction(cb);
         },
 
         /**
@@ -19,7 +20,7 @@ qx.Interface.define("sm.nsrv.ITemplateEngine", {
          * @param template
          * @param output
          */
-        mergeTemplate : function(template, res, ctx, headers) {
+        mergeTemplate : function(template, req, res, ctx, headers) {
             this.assertObject(template);
             this.assertObject(res);
         }

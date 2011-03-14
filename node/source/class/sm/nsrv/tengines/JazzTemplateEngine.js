@@ -12,6 +12,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
         this.__path = $$node.require("path");
         this.__util = $$node.require("util");
         this.__jazz = $$node.require("jazz");
+
         //temlate cache
         this.__tcache = {};
     },
@@ -28,12 +29,12 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
         __util : null,
         __jazz : null,
 
-        createTemplate : function(path) {
+
+        createTemplate : function(path, cb) {
             var exists = this.__path.existsSync(path);
             var stat = exists ? this.__fs.statSync(path) : null;
             if (!exists || !stat.isFile()) {
-                return {"path" : path,
-                    "notfound" : true};
+                cb(null, {"path" : path, "notfound" : true});
             }
 
             //checking the cache
@@ -50,7 +51,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
                         qx.log.Logger.debug(this, "Cached template fetched: " + path);
                     }
-                    return cached;
+                    cb(null, cached);
                 }
             }
 
@@ -63,21 +64,27 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 "jazz" : jazzTemplate};
 
             this.__tcache[path] = template;
-            return template;
+            cb(null, template);
         },
 
-        mergeTemplate : function(template, res, ctx, headers) {
+        mergeTemplate : function(template, req, res, ctx, headers) {
             var tjazz = template["jazz"];
             if (!tjazz || template["notfound"]) {
                 res.sendNotFound(headers);
                 return;
             }
-            ctx["__ctype__"] = function(ctype, cb) {
-                if (ctype) {
-                    headers["Content-Type"] = ctype;
-                }
-                cb();
+
+            ctx["__ctx__"] = ctx;
+            ctx["__req__"] = req;
+            ctx["__res__"] = res;
+            ctx["__headers__"] = headers;
+            ctx["__ctype__"] = function(_ctype, _cb) {
+                sm.nsrv.tengines.JazzCtxLib.ctype(headers, _ctype, _cb);
             };
+            ctx["__include__"] = function(_path, _cb) {
+                sm.nsrv.tengines.JazzCtxLib.include(this, req, _path, _cb);
+            };
+
             tjazz.eval(ctx, function(data) {
                 res.writeHead((res.statusCode || 200), headers);
                 res.end(data);

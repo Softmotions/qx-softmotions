@@ -292,8 +292,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 tengine = this.self(arguments).__tengines["*"]; //use sm.nsrv.tengines.StaticTemplateEngine
             }
 
-            var t = tengine.createTemplate(path);
-
             //guess content-type
             var ctype = null;
             if (ext) {
@@ -312,8 +310,15 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
             }
 
-            //Async rest of request
-            tengine.mergeTemplate(t, res, ctx, headers);
+            var me = this;
+            tengine.createTemplate(path, function(err, template) {
+                if (err) {
+                    qx.log.Logger.error(me, "Create template failed: " + err);
+                    res.sendError();
+                    return;
+                }
+                tengine.mergeTemplate(template, req, res, ctx, headers);
+            });
         },
 
         /**
@@ -383,7 +388,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Flush message headers into response
          */
         __messageHeaders : function(res) {
-        
+
             if (!qx.lang.Type.isArray(res.messages)) {
                 return 0; //no messages found
             }
@@ -467,7 +472,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 res.writeHead(403, headers);
                 res.end();
             };
-
+            res.sendError = function(headers) {
+                headers = headers || {};
+                qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
+                res.writeHead(500, headers);
+                res.end();
+            };
             res.sendOk = function(headers) {
                 headers = headers || {};
                 qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });

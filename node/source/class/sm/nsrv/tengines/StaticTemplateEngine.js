@@ -26,7 +26,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
         __util : null,
 
 
-        createTemplate : function(path) {
+        createTemplate : function(path, cb) {
             var notfound = (!this.__path.existsSync(path) || !this.__fs.statSync(path).isFile());
             var ext = this.__path.extname(path);
             if (ext && ext != "") {
@@ -38,12 +38,13 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
             if (ctype == null) {
                 ctype = sm.nsrv.HTTPUtils.getCType("bin");
             }
-            return {"path" : path,
+            var template = {"path" : path,
                 "notfound" : notfound,
                 "ctype" : ctype};
+            cb(null, template);
         },
 
-        mergeTemplate : function(template, res, ctx, headers) {
+        mergeTemplate : function(template, req, res, ctx, headers) {
             var me = this;
             qx.lang.Object.carefullyMergeWith(headers, {
                 "Content-Type": template["ctype"]
