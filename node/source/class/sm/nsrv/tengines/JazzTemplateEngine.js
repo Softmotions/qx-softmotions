@@ -31,40 +31,48 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
 
         createTemplate : function(path, cb) {
-            var exists = this.__path.existsSync(path);
-            var stat = exists ? this.__fs.statSync(path) : null;
-            if (!exists || !stat.isFile()) {
-                cb(null, {"path" : path, "notfound" : true});
-            }
-
-            //checking the cache
-            var cached = this.__tcache[path];
-            if (cached) {
-                if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
-                    if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
-                        qx.log.Logger.debug(this, "Invalidate cache: " + path);
-                    }
-                    cached = null;
-                    delete this.__tcache[path];
+            var me = this;
+            me.__path.exists(path, function(exists) {
+                if (!exists) {
+                    cb(null, {"path" : path, "notfound" : true});
+                    return;
                 }
-                if (cached) {
-                    if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
-                        qx.log.Logger.debug(this, "Cached template fetched: " + path);
+                me.__fs.stat(path, function(err, stat) {
+                    if (err || !stat.isFile()) {
+                        cb(null, {"path" : path, "notfound" : true});
+                        return;
                     }
-                    cb(null, cached);
-                }
-            }
+                    //checking the cache
+                    var cached = me.__tcache[path];
+                    if (cached) {
+                        if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
+                            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                                qx.log.Logger.debug(this, "Invalidate cache: " + path);
+                            }
+                            cached = null;
+                            delete me.__tcache[path];
+                        }
+                        if (cached) {
+                            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                                qx.log.Logger.debug(this, "Cached template fetched: " + path);
+                            }
+                            cb(null, cached);
+                            return;
+                        }
+                    }
 
-            var fdata = this.__fs.readFileSync(path, "utf8");
-            var jazzTemplate = this.__jazz.compile(fdata);
+                    var fdata = me.__fs.readFileSync(path, "utf8");
+                    var jazzTemplate = me.__jazz.compile(fdata);
 
-            var template = {"path" : path,
-                "mtime" : stat.mtime.getTime(),
-                "fsize" : stat.size,
-                "jazz" : jazzTemplate};
+                    var template = {"path" : path,
+                        "mtime" : stat.mtime.getTime(),
+                        "fsize" : stat.size,
+                        "jazz" : jazzTemplate};
 
-            this.__tcache[path] = template;
-            cb(null, template);
+                    me.__tcache[path] = template;
+                    cb(null, template);
+                });
+            });
         },
 
         mergeTemplate : function(template, req, res, ctx, headers) {

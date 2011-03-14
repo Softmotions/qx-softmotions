@@ -16,18 +16,27 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
     members :
     {
 
-        //Nodejs fs module
         __fs : null,
-
-        //Nodejs path module
         __path : null,
-
-        //Nodejs util module
         __util : null,
 
 
         createTemplate : function(path, cb) {
-            var notfound = (!this.__path.existsSync(path) || !this.__fs.statSync(path).isFile());
+            var me = this;
+            me.__path.exists(path, function(exists) {
+                if (!exists) {
+                    cb(null, {"path" : path, "notfound" : true, "ctype" : me.__getCType(path)});
+                    return;
+                }
+                me.__fs.stat(path, function(err, stat) {
+                    cb(null, {"path" : path,
+                        "notfound" : (err || !stat.isFile()),
+                        "ctype" : me.__getCType(path)});
+                });
+            });
+        },
+
+        __getCType : function(path) {
             var ext = this.__path.extname(path);
             if (ext && ext != "") {
                 ext = ext.substring(1);
@@ -38,10 +47,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
             if (ctype == null) {
                 ctype = sm.nsrv.HTTPUtils.getCType("bin");
             }
-            var template = {"path" : path,
-                "notfound" : notfound,
-                "ctype" : ctype};
-            cb(null, template);
+            return ctype;
         },
 
         mergeTemplate : function(template, req, res, ctx, headers) {
