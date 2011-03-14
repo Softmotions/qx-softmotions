@@ -23,11 +23,20 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
         },
 
         /**
-         * Completely response with JSON object
+         * Response completely with JSON object
          */
         writeJSONObject : function(jsonObj, resp, ctx) {
             this.writeHead(resp, ctx, 200, { "Content-Type": "application/json" });
             resp.end(JSON.stringify(jsonObj));
+            ctx({"terminated" : true});
+        },
+
+        /**
+         * Response completely with string data
+         */
+        writeString : function(data, resp, ctx, ctype) {
+            this.writeHead(resp, ctx, 200, { "Content-Type": ctype ? ctype : "text/plain" });
+            resp.end(data);
             ctx({"terminated" : true});
         }
     }

@@ -11,6 +11,10 @@ qx.Class.define("sm.nsrv.test.TestJazzLibsExecutor", {
     {
         __jzInclude : function(req, resp, ctx) {
             ctx({path : "include_main.jz"});
+        },
+
+        __jzInner : function(req, resp, ctx) {
+
         }
 
     },
@@ -20,7 +24,14 @@ qx.Class.define("sm.nsrv.test.TestJazzLibsExecutor", {
         "/jzInclude" : {
             webapp : "jazz",
             handler : "__jzInclude"
+        },
+
+        "$layout1_inc1.jz" : {
+            webapp : "jazz",
+            handler : "__jzInner"
         }
+
+
     },
 
     destruct : function() {
