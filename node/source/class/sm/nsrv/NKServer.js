@@ -111,8 +111,8 @@ qx.Class.define("sm.nsrv.NKServer", {
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
                 chandlers[i] = vhost(ve.getVHostName(), ve.createConnectServer());
-            }
-            this.__server = new connect.Server(chandlers);
+            }            
+            this.__server = new connect.HTTPServer(chandlers);
             this.__server.listen(port, host);
         },
 
