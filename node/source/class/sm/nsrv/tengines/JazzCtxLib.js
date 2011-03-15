@@ -188,7 +188,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                             res.messages.push(msg);
                         }
                         if (ires.statusCode != 200) {
-                            qx.log.Logger.warn(me, "Embedded statusCode is not OK: " + ires.statusCode +
+                            qx.log.Logger.warn(me, "_irequest_() statusCode is not OK: " + ires.statusCode +
                                     ", path: " + ireq.url);
                         }
 

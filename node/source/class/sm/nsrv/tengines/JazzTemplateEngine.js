@@ -109,7 +109,6 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     res.sendNotFound(headers);
                     return;
                 }
-                //qx.log.Logger.info("RMSGS=" + res.messages.join(", ") + "| res.internal=" + res.internal);
                 ctx.collectMessageHeaders(true);
                 qx.lang.Object.carefullyMergeWith(res.headers, headers);
                 res.writeHead((res.statusCode || 200), res.headers);
