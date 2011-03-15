@@ -75,12 +75,12 @@ qx.Class.define("sm.nsrv.test.TestNodeServerExecutor", {
          * Test GET request params
          */
         __requestParams : function(req, resp, ctx) {
-            //qx.log.Logger.info("fields=" + qx.util.Json.stringify(req.form.fields));
+            //qx.log.Logger.info("fields=" + qx.util.Json.stringify(req.params));
             var params = [];
-            for (var k in req.form.fields) {
+            for (var k in req.params) {
                 params.push({
                     "name" : k,
-                    "val" : req.form.fields[k]
+                    "val" : req.params[k]
                 });
             }
             ctx["params"] = params;

@@ -105,15 +105,13 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     method : "GET",
                     headers : req.headers,
                     httpVersion : "1.0",
-                    form : {
-                        fields : {}
-                    }
+                    params : {}
                     //todo stream methods?
                 };
 
                 if (params) {
                     for (var p in params) {
-                        ireq.form.fields[p] = params[p];
+                        ireq.params[p] = params[p];
                     }
                 }
 

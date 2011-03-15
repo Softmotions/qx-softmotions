@@ -14,8 +14,8 @@ qx.Class.define("sm.nsrv.test.TestJazzLibsExecutor", {
         },
 
         __jzIRequest : function(req, resp, ctx) {
-            ctx["irp"] = req.form.fields["irp"];
-            ctx["irpq"] = req.form.fields["irpq"];
+            ctx["irp"] = req.params["irp"];
+            ctx["irpq"] = req.params["irpq"];
             resp.messages.push(new sm.nsrv.Message("fcbd66cf179f4d0aa6aff49c55c1653a", false));
             ctx();
         },

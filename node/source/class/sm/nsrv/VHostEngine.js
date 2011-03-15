@@ -550,25 +550,17 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     qx.lang.Object.mergeWith(form, fopts);
                 }
                 form.parse(req, function(err, fields, files) {
-                    form.fields = fields;
+                    req.params = fields;
                     form.files = files;
                     next(err);
                 });
             } else if (req.method == "GET") {
-                req.form = req.form || {};
+                req.params = req.params || {};
                 var qs = req.info.query;
                 if (qs) {
-                    if (req.form.fields) {
-                        qx.lang.Object.mergeWith(req.form.fields, this.__querystring.parse(qs), false);
-                    } else {
-                        req.form.fields = this.__querystring.parse(qs);
-                    }
-                }
-                if (!req.form.fields) {
-                    req.form.fields = {};
+                    qx.lang.Object.mergeWith(req.params, this.__querystring.parse(qs), false);
                 }
                 next();
-
             } else {
                 //todo other requests forbidden?
                 res.sendForbidden();
