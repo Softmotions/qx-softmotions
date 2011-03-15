@@ -38,9 +38,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (path.length > 0 && path.charAt(0) != '/') {
                     path = '/' + path;
                 }
-                var req = ctx["__req__"];
-                var res = ctx["__res__"];
-                var headers = ctx["__headers__"];
+                var req = ctx["_req_"];
+                var res = ctx["_res_"];
+                var headers = ctx["_headers_"];
                 path = req.info.webapp["docRoot"] + path;
                 te.createTemplate(path, function(err, template) {
                     if (err) {
@@ -90,9 +90,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 }
 
                 var me = this;
-                var req = ctx["__req__"];
-                var res = ctx["__res__"];
-                var headers = ctx["__headers__"];
+                var req = ctx["_req_"];
+                var res = ctx["_res_"];
+                var headers = ctx["_headers_"];
 
                 var url = path;
                 if (path.length > 0 && path.charAt(0) != '/') {
@@ -126,7 +126,11 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                     messages : [],
 
+                    internal : true,
+
                     __data : [],
+
+                    __end : false,
 
                     writeContinue : function() {
                         throw new Error("Unsupported opreation: writeContinue()");
@@ -167,12 +171,22 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     },
 
                     end : function(chunk, encoding) {
+                        if (ires.__end) { //End already called
+                            qx.log.Logger.warn(me, "resp.end() called twice!");
+                            return;
+                        }
+                        ires.__end = true;
                         if (chunk != null && chunk != undefined) {
                             ires.write(chunk, encoding);
                         }
 
-                        //todo merge headers
-
+                        for (var i = 0; i < ires.messages.length; ++i) {
+                            var msg = ires.messages[i];
+                            if (ires.statusCode != 500 && msg.isError()) {
+                                ires.statusCode = 500; //Mark as err
+                            }
+                            res.messages.push(msg);
+                        }
                         if (ires.statusCode != 200) {
                             qx.log.Logger.warn(me, "Embedded statusCode is not OK: " + ires.statusCode +
                                     ", path: " + ireq.url);

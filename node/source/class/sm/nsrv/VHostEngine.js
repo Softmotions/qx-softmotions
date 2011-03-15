@@ -346,9 +346,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             /**
              * Return true if found message errors
              */
-            ctx.collectMessageHeaders = function() {
+            ctx.collectMessageHeaders = function(ignoreScode) {
                 var errC = me.__messageHeaders(res);
-                if (errC > 0) {
+                if (errC > 0 && !ignoreScode) {
                     //todo review status code
                     res.statusCode = 500;
                     return true;
@@ -393,8 +393,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Flush message headers into response
          */
         __messageHeaders : function(res) {
-
-            if (!qx.lang.Type.isArray(res.messages)) {
+            //skip saving message headers in internal responses
+            if (res.internal == true || !qx.lang.Type.isArray(res.messages)) {
                 return 0; //no messages found
             }
             if (!res.headers) {
@@ -412,6 +412,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 } else {
                     ++nerrC;
                 }
+            }
+            if (errC > 0 || nerrC > 0) {
+                res.messages = []; //Reset msg array
             }
             return errC;
         },

@@ -82,17 +82,17 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 cb(true, null);
                 return;
             }
-            ctx["__ctx__"] = ctx;
-            ctx["__req__"] = req;
-            ctx["__res__"] = res;
-            ctx["__headers__"] = headers;
-            ctx["__ctype__"] = function(_ctype, _cb) {
+            ctx["_ctx_"] = ctx;
+            ctx["_req_"] = req;
+            ctx["_res_"] = res;
+            ctx["_headers_"] = headers;
+            ctx["_ctype_"] = function(_ctype, _cb) {
                 sm.nsrv.tengines.JazzCtxLib.ctype(headers, _ctype, _cb);
             };
-            ctx["__include__"] = function(_path, _cb) {
+            ctx["_include_"] = function(_path, _cb) {
                 sm.nsrv.tengines.JazzCtxLib.include(vhe, me, ctx, _path, _cb);
             };
-            ctx["__irequest__"] = function() {
+            ctx["_irequest_"] = function() {
                 var _path = arguments[0];
                 var _params = arguments.length > 2 ? arguments[1] : {};
                 var _cb = arguments.length > 2 ? arguments[2] : arguments[1];
@@ -109,7 +109,10 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     res.sendNotFound(headers);
                     return;
                 }
-                res.writeHead((res.statusCode || 200), headers);
+                //qx.log.Logger.info("RMSGS=" + res.messages.join(", ") + "| res.internal=" + res.internal);
+                ctx.collectMessageHeaders(true);
+                qx.lang.Object.carefullyMergeWith(res.headers, headers);
+                res.writeHead((res.statusCode || 200), res.headers);
                 res.end(data);
             });
         }
