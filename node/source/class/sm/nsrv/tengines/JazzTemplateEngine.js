@@ -89,6 +89,9 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             ctx["_ctype_"] = function(_ctype, _cb) {
                 sm.nsrv.tengines.JazzCtxLib.ctype(headers, _ctype, _cb);
             };
+            ctx["_param_"] = function(_pname, _cb) {
+                _cb(req.params[_pname]);
+            };
             ctx["_include_"] = function(_path, _cb) {
                 sm.nsrv.tengines.JazzCtxLib.include(vhe, me, ctx, _path, _cb);
             };
