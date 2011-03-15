@@ -17,11 +17,17 @@ qx.Interface.define("sm.nsrv.ITemplateEngine", {
 
         /**
          * Performs template merging
-         * @param template
-         * @param output
+         * @param {sm.nsrv.VHostEngine} VHost engine
+         * @param {Object} Template object created in {@link #createTemplate()}
+         * @param {Request} Http request
+         * @param {Response} Http response
+         * @param {Map} Request context
+         * @param {Map} Http request headers
          */
-        mergeTemplate : function(template, req, res, ctx, headers) {
+        mergeTemplate : function(vhe, template, req, res, ctx, headers) {
+            this.assertObject(vhe);
             this.assertObject(template);
+            this.assertObject(req);
             this.assertObject(res);
         }
     }

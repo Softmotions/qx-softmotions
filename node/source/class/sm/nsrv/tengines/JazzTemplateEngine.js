@@ -75,7 +75,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             });
         },
 
-        mergeTemplateInternal : function(template, req, res, ctx, headers, cb) {
+        mergeTemplateInternal : function(vhe, template, req, res, ctx, headers, cb) {
             var me = this;
             var tjazz = template["jazz"];
             if (!tjazz || template["notfound"]) {
@@ -90,15 +90,21 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 sm.nsrv.tengines.JazzCtxLib.ctype(headers, _ctype, _cb);
             };
             ctx["__include__"] = function(_path, _cb) {
-                sm.nsrv.tengines.JazzCtxLib.include(me, ctx, _path, _cb);
+                sm.nsrv.tengines.JazzCtxLib.include(vhe, me, ctx, _path, _cb);
+            };
+            ctx["__irequest__"] = function() {
+                var _path = arguments[0];
+                var _params = arguments.length > 2 ? arguments[1] : {};
+                var _cb = arguments.length > 2 ? arguments[2] : arguments[1];
+                sm.nsrv.tengines.JazzCtxLib.irequest(vhe, me, ctx, _path, _params, _cb);
             };
             tjazz.eval(ctx, function(data) {
                 cb(false, data);
             });
         },
 
-        mergeTemplate : function(template, req, res, ctx, headers) {
-            this.mergeTemplateInternal(template, req, res, ctx, headers, function(nf, data) {
+        mergeTemplate : function(vhe, template, req, res, ctx, headers) {
+            this.mergeTemplateInternal(vhe, template, req, res, ctx, headers, function(nf, data) {
                 if (nf) { //Notfound
                     res.sendNotFound(headers);
                     return;

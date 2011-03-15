@@ -13,8 +13,15 @@ qx.Class.define("sm.nsrv.test.TestJazzLibsExecutor", {
             ctx({path : "include_main.jz"});
         },
 
-        __jzInner : function(req, resp, ctx) {
+        __jzIRequest : function(req, resp, ctx) {
+            ctx["irp"] = req.form.fields["irp"];
+            ctx["irpq"] = req.form.fields["irpq"];
+            ctx();
+        },
 
+        __jzIRequest2 : function(req, resp, ctx) {
+            qx.log.Logger.info("__jzIRequest2!!!");
+            ctx();
         }
 
     },
@@ -26,9 +33,14 @@ qx.Class.define("sm.nsrv.test.TestJazzLibsExecutor", {
             handler : "__jzInclude"
         },
 
-        "$layout1_inc1.jz" : {
+        "/layout1_inc1.jz" : {
             webapp : "jazz",
-            handler : "__jzInner"
+            handler : "__jzIRequest"
+        },
+
+        "/layout2.jz" : {
+            webapp : "jazz",
+            handler : "__jzIRequest2"
         }
 
 

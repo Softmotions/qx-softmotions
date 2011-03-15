@@ -50,7 +50,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
             return ctype;
         },
 
-        mergeTemplate : function(template, req, res, ctx, headers) {
+        mergeTemplate : function(vhe, template, req, res, ctx, headers) {
             var me = this;
             qx.lang.Object.carefullyMergeWith(headers, {
                 "Content-Type": template["ctype"]

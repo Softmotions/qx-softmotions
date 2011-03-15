@@ -48,6 +48,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __handlers : null,
 
         /**
+         * Current connect server
+         */
+        __server : null,
+
+        /**
          * Returns virtual host name
          * @return {String}
          */
@@ -317,7 +322,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     res.sendError();
                     return;
                 }
-                tengine.mergeTemplate(template, req, res, ctx, headers);
+                tengine.mergeTemplate(me, template, req, res, ctx, headers);
             });
         },
 
@@ -455,10 +460,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __initRequestHandler : function(req, res, next) {
 
             //Response messages
-            res.messages = [];
+            res.messages = res.messages || [];
 
             //Response headers to be merged
-            res.headers = {};
+            res.headers = res.headers || {};
 
             res.sendNotFound = function(headers) {
                 headers = headers || {};
@@ -508,6 +513,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (~info.pathname.indexOf("..")) { //Simple security checking
                 return res.sendForbidden(res);
             }
+
             var wapps = this.__config["webapps"];
             for (var i = 0; i < wapps.length; ++i) {
                 var wa = wapps[i];
@@ -546,11 +552,16 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     next(err);
                 });
             } else if (req.method == "GET") {
-                req.form = {};
+                req.form = req.form || {};
                 var qs = req.info.query;
                 if (qs) {
-                    req.form.fields = this.__querystring.parse(qs);
-                } else {
+                    if (req.form.fields) {
+                        qx.lang.Object.mergeWith(req.form.fields, this.__querystring.parse(qs), false);
+                    } else {
+                        req.form.fields = this.__querystring.parse(qs);
+                    }
+                }
+                if (!req.form.fields) {
                     req.form.fields = {};
                 }
                 next();
@@ -568,10 +579,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * @return {Server} Connect server
          */
         createConnectServer : function() {
-
             var me = this;
             var connect = $$node.require("connect");
-            return connect.createServer(
+            this.__server = connect.createServer(
                     function (req, res, next) {
                         me.__initRequestHandler(req, res, next);
                     },
@@ -584,12 +594,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     function (err, req, res, next) {
                         me.__handleError(err, req, res, next);
                     });
+
+            return this.__server;
+        },
+
+
+        /**
+         * Handle raw server request
+         */
+        handle : function(req, res, cb) {
+            this.__server.handle(req, res, cb);
         }
     },
 
     destruct : function() {
         this.__config = this.__handlers = this.__vhostName = null;
         this.__path = this.__url = this.__formidable = this.__querystring = null;
+        this.__server = null;
         //this._disposeObjects("__field_name");
     },
 
