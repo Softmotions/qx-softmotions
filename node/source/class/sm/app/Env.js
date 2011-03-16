@@ -44,20 +44,14 @@ qx.Class.define("sm.app.Env", {
 
         appName : {
             check : "String",
-            init : "Application"
-        },
-
-        /**
-         * Environment root relative to envBase
-         */
-        envDir : {
-            check : "String",
-            init : ".softmotions"
+            init : "Application",
+            nullable : false
         },
 
         envSubdirs : {
             check : "Array",
-            init : []
+            init : [],
+            nullable : false
         },
 
         /**
@@ -65,7 +59,8 @@ qx.Class.define("sm.app.Env", {
          */
         tmplDir : {
             check : "String",
-            init : "tmpl"
+            init : "tmpl",
+            nullable : false
         }
     },
 
@@ -83,32 +78,28 @@ qx.Class.define("sm.app.Env", {
         this.__jsonConfigCache = {};
 
         var fs = this.__lfsutils.FileSeparator;
-        this.setEnvDir(envBase + fs + this.getEnvDir() + fs);
+        this.__envBase = envBase + fs;
         this.setTmplDir(appBase + fs + this.getTmplDir() + fs);
 
-        this.__options = options || {};
-        this._openEnv(!!this.__options["create"]);
-
+        this._options = options || {};
+        this._openEnv(!!this._options["create"]);
     },
 
     members :
     {
 
         /**
-         * sm.mongo.Mongo
-         */
-        __mongo : null,
-
-        /**
          * Env options
          */
-        __options : null,
-
+        _options : null,
 
         /**
          * Config cache search
          */
         __jsonConfigCache : null,
+
+
+        __envBase : null,
 
 
         //lib refs
@@ -119,6 +110,11 @@ qx.Class.define("sm.app.Env", {
         __lfsutils : null,
         //eof lib refs
 
+
+
+        getEnvBase : function() {
+            return this.__envBase;
+        },
 
         /**
          * Returns env configuration
@@ -145,7 +141,7 @@ qx.Class.define("sm.app.Env", {
                 return c;
             }
             var fname = name + ".json";
-            var cpath = this.__envRoot + fname;
+            var cpath = this.__envBase + fname;
             if (!this.__lpath.existsSync(cpath)) {
                 var tpath = this.getTmplDir() + fname;
                 if (this.__lpath.existsSync(tpath)) {
@@ -167,12 +163,13 @@ qx.Class.define("sm.app.Env", {
          * @param object Javascript to be stored in file as Json
          */
         setJSONConfig : function(name, object) {
+            var me = this;
             var fname = name + ".json";
-            var cpath = this.__envRoot + fname;
+            var cpath = this.__envBase + fname;
             this.__jsonConfigCache[name] = object;
-            //todo async?
-            this.__lfs.writeFileSync(cpath, qx.util.Json.stringify(object, true), "utf8");
-            this.fireDataEvent("configChanged", name);
+            this.__lfs.writeFile(cpath, qx.util.Json.stringify(object, true), "utf8", function() {
+                me.fireDataEvent("configChanged", name);
+            });
         },
 
         __readFileJSONTemplate : function(path) {
@@ -193,35 +190,37 @@ qx.Class.define("sm.app.Env", {
          */
         _openEnv : function(create) {
 
-            var er = this.getEnvDir();
+            qx.log.Logger.info(this, this.getAppName(), "Env root dir:" + this.__envBase);
+            qx.log.Logger.info(this, this.getAppName(), "Templates dir: " + this.getTmplDir());
 
-            qx.log.Logger.info("Env root dir: " + er);
-            qx.log.Logger.info("Templates dir: " + this.getTmplDir());
-
-            
             //env root checking
-            if (!this.__lpath.existsSync(er)) {
+            if (!this.__lpath.existsSync(this.__envBase)) {
                 if (!create) {
-                    throw new Error(this.getAppName() + " environment: " + er + " does not exists");
+                    throw new Error(this.getAppName() + " Env dir: " + this.__envBase + " does not exists");
                 } else {
-                    qx.log.Logger.info("Creating new " + this.getAppName() + " environment: " + er);
-                    this.__lfsutils.mkdirsSync(er);
-                    
-
+                    qx.log.Logger.warn(this, this.getAppName(), "Creating env: " + this.__envBase);
+                    this.__lfsutils.mkdirsSync(this.__envBase);
                 }
             }
-            this._configChanged();
-            this.addListener("configChanged", function(ev) {
-                if (ev.getData() == "config") {
-                    qx.log.Logger.warn("Synchronizing with changed configuration (config.json)");
-                    this._configChanged();
-                }
-            }, this);
-        }
 
+            var edirs = this.getEnvSubdirs();
+            for (var i = 0; i < edirs.length; ++i) {
+                var ed = this.__envBase + edirs[i];
+                if (!this.__lpath.existsSync(ed)) {
+                    this.__lfsutils.mkdirsSync(ed);
+                }
+            }
+        },
+
+        close : function() {
+            this.__jsonConfigCache = {};
+        }
     },
 
     destruct : function() {
-        //this._disposeObjects("__field_name");                                
+        //this._disposeObjects("__field_name");
+        this.close();
+        this.__envBase = null;
+        this.__lpath = this.__lfs = this.__lfsutils = null;
     }
 });
