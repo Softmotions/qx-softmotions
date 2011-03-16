@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python">
+      <configuration sdkName="Python 2.6.5 (/usr/bin/python2.6)" />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo">
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/application" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/component" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/documentation" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/tool/data/apidoc" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/tool/data/icon" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/tool/data/publish" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/tool/doc" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../../JavaSoft/qooxdoo-trunk/qooxdoo/tool/test" />
+    </content>
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 2.6.5 (/usr/bin/python2.6) interpreter library" level="application" />
+  </component>
+</module>
+

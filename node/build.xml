@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build-debug" name="qx-softmotions-node">
+
+    <import file="../common.xml"/>
+    <property file="build.properties"/>
+
+    <target name="build-debug">
+    </target>
+    
+</project>
