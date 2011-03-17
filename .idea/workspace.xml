@@ -2,53 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="f2581a16-e481-4dab-aa74-ecd1ef174ecb" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/node/utils/fsutils.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/MExecutor.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/MExecutor.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/tengines/JazzCtxLib.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/post.html" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/VHostEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.iml" afterPath="$PROJECT_DIR$/main.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/node/utils/regexp.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/config.json" afterPath="$PROJECT_DIR$/node/config.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/include_main.jz" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/mongo/Collection.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/mongo/Collection.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/tengines/StaticTemplateEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/StaticTemplateEngine.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/mongo/MongoConfig.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/mongo/MongoConfig.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/test/TestQooxdooClass1.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/test1/params.jz" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/resource/.stub" afterPath="$PROJECT_DIR$/node/qxoo/resource/.stub" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/Manifest.json" afterPath="$PROJECT_DIR$/node/Manifest.json" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/utils/test-fs-utils.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/qooxdoo-server.diff" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/HTTPUtils.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/HTTPUtils.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/test1/hello.jz" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/test1/hello.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/layout1.jz" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/test/TestJazzLibsExecutor.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestJazzLibsExecutor.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/node.iml" afterPath="$PROJECT_DIR$/node/node.iml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/NKServer.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/NKServer.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/qooxdoo/test-qooxdoo-integration.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/app/Env.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/app/Env.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/qooxdoo-client.diff" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/build.xml" afterPath="$PROJECT_DIR$/node/build.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/log/appender/Node.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/log/appender/Node.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build-globals.properties" afterPath="$PROJECT_DIR$/build-globals.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/build.properties" afterPath="$PROJECT_DIR$/node/build.properties" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/qxoo.loader.tmpl.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/layout1_inc1.jz" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/tengines/JazzTemplateEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/layout1_inc2.jz" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/translation/.stub" afterPath="$PROJECT_DIR$/node/qxoo/translation/.stub" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/ITemplateEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/ITemplateEngine.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/Message.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/Message.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/mongo/Query.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/mongo/Query.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/nsrv/test/TestNodeServerExecutor.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestNodeServerExecutor.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/include_child.jz" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/lang/BaseError.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/lang/BaseError.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/node/source/class/sm/mongo/Mongo.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/mongo/Mongo.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/mongo/test-sm-mongo.js" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="qx-softmotions.iws" />
@@ -108,10 +63,10 @@
   <component name="FileColors" enabled="true" enabledForTabs="true" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="build.xml" pinned="true" current="false" current-in-tab="false">
+      <file leaf-file-name="build.xml" pinned="true" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/node/build.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="0" selection-end="98" vertical-scroll-proportion="-1.2727273">
+            <state line="34" column="66" selection-start="1221" selection-end="1221" vertical-scroll-proportion="0.6157827">
               <folding />
             </state>
           </provider>
@@ -162,15 +117,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="fsutils.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node/node/utils/fsutils.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="59" selection-start="27" selection-end="27" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="regexp.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node/node/utils/regexp.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -189,10 +135,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="build.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="0" selection-start="103" selection-end="103" vertical-scroll-proportion="0.035220128">
+            <state line="11" column="89" selection-start="335" selection-end="335" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test-sm-mongo.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/mongo/test-sm-mongo.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="18" column="35" selection-start="533" selection-end="533" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -311,6 +266,38 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="qx-softmotions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="qx-softmotions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="qx-softmotions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="node" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="qx-softmotions" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="node" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
             </PATH_ELEMENT>
@@ -344,54 +331,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="utils" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="qx-softmotions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="qooxdoo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="qx-softmotions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nksrv" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -427,45 +366,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="qxoo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="class" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sm" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="test" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="qx-softmotions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="node" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="qxoo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="class" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sm" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -509,6 +410,25 @@
     <option name="showLabels" value="true" />
   </component>
   <component name="RunManager">
+    <configuration default="true" type="PythonUnitTestConfigurationType" factoryName="Python's unittest">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <envs />
+      <module name="main" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="Remote" factoryName="Remote">
       <option name="USE_SOCKET_TRANSPORT" value="true" />
       <option name="SERVER_MODE" value="false" />
@@ -519,6 +439,22 @@
         <option name="AntTarget" enabled="false" />
         <option name="BuildArtifacts" enabled="false" />
         <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <configuration default="true" type="py.test" factoryName="py.test">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <envs />
+      <module name="main" />
+      <option name="testToRun" value="" />
+      <option name="keywords" value="" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
       </method>
     </configuration>
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -696,13 +632,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="26" column="15" selection-start="516" selection-end="516" vertical-scroll-proportion="0.0">
@@ -787,13 +716,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node/build.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="0" selection-end="98" vertical-scroll-proportion="-1.2727273">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/common.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="31" column="49" selection-start="999" selection-end="999" vertical-scroll-proportion="-19.727272">
@@ -803,7 +725,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/build.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="0" selection-start="103" selection-end="103" vertical-scroll-proportion="0.035220128">
+        <state line="11" column="89" selection-start="335" selection-end="335" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/mongo/test-sm-mongo.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="35" selection-start="533" selection-end="533" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/build.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="66" selection-start="1221" selection-end="1221" vertical-scroll-proportion="0.6157827">
           <folding />
         </state>
       </provider>
