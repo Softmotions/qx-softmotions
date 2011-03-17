@@ -1,0 +1,4 @@
+
+{foreach p in params}
+    {p.name}={p.val}
+{end}

@@ -1,0 +1,171 @@
+Index: qooxdoo/framework/source/class/qx/Class.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 25135)
++++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
+@@ -213,6 +213,12 @@
+             this.__addMixin(clazz, config.include[i], false);
+           }
+         }
++
++        // Include web handlers
++        if (config.handlers)
++        {
++          this.__addWebHandlers(name, clazz, config.handlers);
++        }
+       }
+
+       // Process settings
+@@ -732,7 +738,8 @@
+         "variants"   : "object",    // Map
+         "events"     : "object",    // Map
+         "defer"      : "function",  // Function
+-        "destruct"   : "function"   // Function
++        "destruct"   : "function",  // Function
++        "handlers"   : "object"     // Map
+       },
+
+       "default" : null
+@@ -1086,6 +1093,32 @@
+     },
+
+
++      /**
++       * Attach web handlers
++       *
++       * @param clazz
++       * @param handlers
++       */
++    __addWebHandlers : function(name, clazz, handlers)
++    {
++        var proto = clazz.prototype;
++        proto["$$handlers"] = handlers;
++        for (var l in handlers)
++        {
++            var h = handlers[l];
++            if (!h)
++            {
++                throw new Error("Invalid web handlers config: '" + l + "' in class: '" + name + "'");
++            }
++            if (h.handler && !proto[h.handler])
++            {
++                throw new Error("Unknown web handler method: '" + h.handler + "' in class: '" + name + "'");
++            }
++        }
++
++    },
++
++
+     /**
+      * Attach properties to classes
+      *
+Index: qooxdoo/framework/source/class/qx/bom/client/Feature.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Feature.js	(revision 25135)
++++ qooxdoo/framework/source/class/qx/bom/client/Feature.js	(working copy)
+@@ -196,15 +196,7 @@
+         } else {
+           this.CSS_POINTER_EVENTS = true;
+         }
+-      }
+-
+-      var data = new Image();
+-      data.onload = data.onerror = function() {
+-        if (data.width == 1 && data.height == 1) {
+-          qx.bom.client.Feature.DATA_URL = true;
+-        }
+-      }
+-      data.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
++      }
+     },
+
+
+Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 25135)
++++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
+@@ -218,31 +218,8 @@
+       "webkit" : function(error)
+       {
+         if (error.stack) {
+-          /*
+-           * Chrome trace info comes in two flavors:
+-           * at [jsObject].function (fileUrl:line:char)
+-           * at fileUrl:line:char
+-           */
+-          var lineRe = /at (.*)/gm;
+-          var fileReParens = /\((.*?)(:[^\/].*)\)/;
+-          var fileRe = /(.*?)(:[^\/].*)/;
+-          var hit;
+-          var trace = [];
+-          while ((hit = lineRe.exec(error.stack)) != null) {
+-            var fileMatch = fileReParens.exec(hit[1]);
+-            if (!fileMatch) {
+-              fileMatch = fileRe.exec(hit[1]);
+-            }
+-
+-            if (fileMatch) {
+-              var className = this.__fileNameToClassName(fileMatch[1]);
+-              trace.push(className + fileMatch[2]);
+-            } else {
+-                trace.push(hit[1]);
+-            }
+-          }
+-
+-          return trace;
++          var trace = error.stack.split(/\n/);
++          return trace.length > 0 ? trace.slice(1) : trace;
+         }
+         else if (error.sourceURL && error.line) {
+           return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
+Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
+===================================================================
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 25135)
++++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
+@@ -147,7 +147,10 @@
+             temp = os.fdopen(fileDescriptor, "w")
+             temp.write("\n".join(clips))
+             temp.close()
+-            cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
++            #cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
++            cmd = montage_cmd % (orientation, " ".join(clips), combined)
++            #print "MOUNTAGE CMD %s" % cmd
++            #print "MOUNTAGE TMP %s" % tempPath
+             rc = os.system(cmd)
+             os.unlink(tempPath)
+             if rc != 0:
+Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
+===================================================================
+--- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 25135)
++++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
+@@ -92,8 +92,16 @@
+
+         for pos, classId in enumerate(classes):
+             self._console.progress(pos + 1, length)
+-            content.append( self.getCompiled(classId, variants, optimize, format) )
+-
++            fpath = self._classesObj[classId].path
++            content.append("\n//%s\n" % (classId))
++            if self._jobconf.get('compile-options/code/node_includes', False):
++                if classId.startswith("qx."):
++                    content.append( self.getCompiled(classId, variants, optimize, format) )
++                else:
++                    content.append("$$node.script.runInThisContext($$node.fs.readFileSync('%s'), '%s');" % (fpath, fpath))
++            else:
++                content.append( self.getCompiled(classId, variants, optimize, format) )
++
+         return u''.join(content)
+
+
+Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
+===================================================================
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 25135)
++++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
+@@ -214,6 +214,8 @@
+
+         # warn about unknown references
+         ignored_names = set()
++        ignored_names.add("$$node")
++        ignored_names.add("$$node.process")
+         # the current global ignore set is just the list of name spaces of the selected classes
+         for classid in result:
+             nsindex = classid.rfind(".")

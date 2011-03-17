@@ -23,9 +23,9 @@
     {
         "namespace"   : "sm",
         "encoding"    : "utf-8",
-        "class"       : "source/class",
-        "resource"    : "source/resource",
-        "translation" : "source/translation",
+        "class"       : "qxoo/class",
+        "resource"    : "qxoo/resource",
+        "translation" : "qxoo/translation",
         "type"        : "library"
     }
 }

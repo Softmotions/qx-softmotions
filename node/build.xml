@@ -1,10 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project default="build-debug" name="qx-softmotions-node">
+<project default="start-tests" name="qx-softmotions-node">
 
     <import file="../common.xml"/>
     <property file="build.properties"/>
 
-    <target name="build-debug">
+    <target name="clean" depends="common.clean">
     </target>
-    
+
+    <target name="build" depends="common.build.init">
+        <echo message="Build NKServer test distribution"/>
+        <mkdir dir="${dist.target}"/>
+        <mkdir dir="${test.dir}"/>
+
+        <property name="build.qoxdoo" value="${build.dir}/qxoo"/>
+        <copy todir="${build.qoxdoo}">
+            <fileset dir="${basedir}">
+                <include name="qxoo/**"/>
+                <include name="config.json"/>
+                <include name="Manifest.json"/>
+                <include name="generate.py"/>
+            </fileset>
+        </copy>
+        <copy todir="${test.dir}">
+            <fileset dir="test"/>
+        </copy>
+        <copy todir="${node.dir}">
+            <fileset dir="node"/>
+        </copy>
+        <replace dir="${build.qoxdoo}"
+                 encoding="utf-8"
+                 includes="config.json
+                           Manifest.json
+                           generate.py">
+            <replacefilter token="@@SRC_ROOT@@" value="${basedir}"/>
+            <replacefilter token="@@QOOXDOO_CACHE@@" value="${qooxdoo.cache}"/>
+            <replacefilter token="@@QOOXDOO_PATH@@" value="${qooxdoo.root}"/>
+            <replacefilter token="@@OUTPUT_DIR@@" value="${dist.target}"/>
+        </replace>
+        <chmod perm="u+x" dir="${build.qoxdoo}" includes="generate.py"/>
+
+        <exec executable="${python.exec}"
+              dir="${build.qoxdoo}"
+              spawn="false"
+              failonerror="true">
+            <arg value="${build.qoxdoo}/generate.py"/>
+            <!--<arg value="-v"/>-->
+            <arg value="nkserver"/>
+        </exec>
+    </target>
+
+    <target name="start-tests" depends="build">
+        <echo message="NODE_PATH: ${node.path}"/>
+        <delete dir="${test.dir}/env" failonerror="false"/>
+
+        <exec executable="${node.unit}" dir="${test.dir}" failonerror="true" spawn="false">
+            <env key="NODE_PATH" value="${node.path}"/>
+            <arg value="./qooxdoo"/>
+        </exec>
+
+
+        <exec executable="${node.unit}" dir="${test.dir}" failonerror="true" spawn="false">
+            <env key="NODE_PATH" value="${node.path}"/>
+            <arg value="./utils"/>
+        </exec>
+
+        <exec executable="${node.unit}" dir="${test.dir}" failonerror="true" spawn="false">
+            <env key="NODE_PATH" value="${node.path}"/>
+            <arg value="./nksrv/test-nsrv-generic.js"/>
+        </exec>
+    </target>
+
 </project>

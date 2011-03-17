@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="start-node-tests" name="qx-softmotions-node">
+
+    <target name="clean">
+        <ant antfile="build.xml" dir="node" target="clean"/>
+    </target>
+
+    <target name="start-node-tests">
+        <ant antfile="build.xml" dir="node" target="start-tests"/>
+    </target>
+
+</project>
