@@ -257,7 +257,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             //Save assembly instance
             aiStack.push(asm);
             this.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
-                aiStack.pop();
+                qx.lang.Array.remove(asm);
                 cb(data);
             });
         },
