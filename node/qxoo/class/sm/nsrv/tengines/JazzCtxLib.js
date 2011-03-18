@@ -75,10 +75,11 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          * @param te {sm.nsrv.tengines.JazzTemplateEngine} Template engine
          * @param ctx {Map} Request context
          * @param path {String} Requested path
-         * @param params {Map|null} Params map
+         * @param params {Map|null} Request params map
+         * @param ctxParams {Map|null} Embedded context params map
          * @param cb {Function} Callback: function(data)
          */
-        irequest : function(vhe, te, ctx, path, params, cb) {
+        irequest : function(vhe, te, ctx, path, params, ctxParams, cb) {
             var cbc = false;
             try {
 
@@ -112,6 +113,12 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (params) {
                     for (var p in params) {
                         ireq.params[p] = params[p];
+                    }
+                }
+
+                if (req.$$ctxParams) {
+                    for (var p in req.$$ctxParams) {
+                        ireq.$$ctxParams[p] = req.$$ctxParams[p];
                     }
                 }
 
@@ -200,7 +207,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 };
 
                 //Perform fake request
-                vhe.handle(ireq, ires, function(err) {
+                vhe.handle(ireq, ires, ctxParams, function(err) {
                     if (err) {
                         qx.log.Logger.error(me, err);
                         ires.sendError();
@@ -214,6 +221,70 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (!cbc) {
                     cb("");
                 }
+            }
+        },
+
+        /**
+         * Invoke assembly
+         */
+        assembly : function(vhe, te, ctx, name, params, ctxParams, cb) {
+            var asm = vhe.getAssembly(name);
+            if (!asm) {
+                qx.log.Logger.warn(this, "Missing assembly: '" + name + "'");
+                cb("");
+                return;
+            }
+            var core = asm["_core_"];
+            if (!core) {
+                qx.log.Logger.warn(this, "Missing core for assembly: '" + name + "'");
+                cb("");
+                return;
+            }
+            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                qx.log.Logger.debug("Assembly core: " + core);
+            }
+            if (!ctxParams) {
+                ctxParams = {};
+            }
+            var aiStack = ctxParams["_ai_"] = !qx.lang.Type.isArray(ctx["_ai_"]) || [];
+            for (var i = 0; i < aiStack.length; ++i) {
+                if (aiStack[i] == asm) {
+                    qx.log.Logger.warn(this, "Recursive assembly reference: " + name + "'");
+                    cb("");
+                    return;
+                }
+            }
+            //Save assembly instance
+            aiStack.push(asm);
+            this.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
+                aiStack.pop();
+                cb(data);
+            });
+        },
+
+
+        assemblyArg : function(vhe, te, ctx, name, def, cb) {
+            var aiStack = ctx["_ai_"];
+            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                qx.core.Assert.assertArray(aiStack, "No assembly stack found");
+                qx.core.Assert.assert(aiStack.length > 0, "Assembly stack is empty");
+            }
+            var asm = aiStack[aiStack.length - 1];
+            var val = asm[name];
+            if (val == undefined) {
+                val = def;
+            }
+            var req = ctx["_req_"];
+            if (val != undefined && val != null) {
+                if (qx.lang.Type.isString(val["_assembly_"])) {
+                    sm.nsrv.tengines.JazzCtxLib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
+                } else if (qx.lang.Type.isString(val["_irequest_"])) {
+                    sm.nsrv.tengines.JazzCtxLib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
+                } else {
+                    cb(val);
+                }
+            } else {
+                cb("");
             }
         }
     }

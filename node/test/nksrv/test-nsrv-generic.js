@@ -379,6 +379,25 @@ module.exports.testIRequest = function(test) {
 };
 
 
+module.exports.testAsm1 = function(test) {
+
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            qx.log.Logger.info("body=" + body);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
 module.exports.testShutdown = function(test) {
     test.ok(nserver);
     nserver.shutdown();

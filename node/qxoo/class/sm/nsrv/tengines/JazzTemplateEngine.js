@@ -97,9 +97,23 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             };
             ctx["_irequest_"] = function() {
                 var _path = arguments[0];
-                var _params = arguments.length > 2 ? arguments[1] : {};
-                var _cb = arguments.length > 2 ? arguments[2] : arguments[1];
-                sm.nsrv.tengines.JazzCtxLib.irequest(vhe, me, ctx, _path, _params, _cb);
+                var _params = arguments.length > 2 ? arguments[1] : null;
+                var _ctxParams = arguments.length > 3 ? arguments[2] : null;
+                var _cb = arguments[arguments.length - 1];
+                sm.nsrv.tengines.JazzCtxLib.irequest(vhe, me, ctx, _path, _params, _ctxParams, _cb);
+            };
+            ctx["_assembly_"] = function() {
+                var _name = arguments[0];
+                var _params = arguments.length > 2 ? arguments[1] : null;
+                var _ctxParams = arguments.length > 3 ? arguments[2] : null;
+                var _cb = arguments[arguments.length - 1];
+                sm.nsrv.tengines.JazzCtxLib.assembly(vhe, me, ctx, _name, _params, _ctxParams, _cb);
+            };
+            ctx["_A"] = function() {
+                var _name = arguments[0];
+                var _def = arguments.length > 2 ? arguments[1] : null;
+                var _cb = arguments[arguments.length - 1];
+                sm.nsrv.tengines.JazzCtxLib.assemblyArg(vhe, me, ctx, _name, _def, cb);
             };
             tjazz.eval(ctx, function(data) {
                 cb(false, data);

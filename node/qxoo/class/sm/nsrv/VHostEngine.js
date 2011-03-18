@@ -414,7 +414,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 ctx.collectMessageHeaders();
                 me.__renderTemplate(req, res, ctx, forward);
             };
-
             /**
              * Return true if found message errors
              */
@@ -428,6 +427,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     return false;
                 }
             };
+            if (req.$$ctxParams) {
+                for (var k in req.$$ctxParams) {
+                    if (ctx[k] == undefined) {
+                        ctx[k] = req.$$ctxParams[k];
+                    }
+                }
+            }
 
             var execCalled = false;
             if (hconf) { //found handlers
@@ -669,7 +675,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         /**
          * Handle raw server request
          */
-        handle : function(req, res, cb) {
+        handle : function(req, res, ctxParams, cb) {
+            if (ctxParams) {
+                if (qx.lang.type.isObject(req.$$ctxParams)) {
+                    qx.lang.Object.mergeWith(req.$$ctxParams, ctxParams);
+                } else {
+                    req.$$ctxParams = ctxParams;
+                }
+            }
             this.__server.handle(req, res, cb);
         }
     },
