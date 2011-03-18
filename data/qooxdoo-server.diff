@@ -2,7 +2,7 @@ Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
 --- qooxdoo/framework/source/class/qx/Class.js	(revision 25135)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
-@@ -213,6 +213,12 @@
+@@ -213,6 +213,18 @@
              this.__addMixin(clazz, config.include[i], false);
            }
          }
@@ -12,23 +12,30 @@ Index: qooxdoo/framework/source/class/qx/Class.js
 +        {
 +          this.__addWebHandlers(name, clazz, config.handlers);
 +        }
++
++        // Include web assembly
++        if (config.assembly)
++        {
++          this.__addWebAssembly(name, clazz, config.assembly);
++        }
        }
-
+ 
        // Process settings
-@@ -732,7 +738,8 @@
+@@ -732,7 +744,9 @@
          "variants"   : "object",    // Map
          "events"     : "object",    // Map
          "defer"      : "function",  // Function
 -        "destruct"   : "function"   // Function
 +        "destruct"   : "function",  // Function
-+        "handlers"   : "object"     // Map
++        "handlers"   : "object",     // Map
++        "assembly"   : "object"     // Map
        },
-
+ 
        "default" : null
-@@ -1086,6 +1093,32 @@
+@@ -1086,6 +1100,39 @@
      },
-
-
+ 
+ 
 +      /**
 +       * Attach web handlers
 +       *
@@ -54,6 +61,13 @@ Index: qooxdoo/framework/source/class/qx/Class.js
 +
 +    },
 +
++    __addWebAssembly : function(name, clazz, assembly) 
++    {
++        var proto = clazz.prototype;
++        proto["$$assembly"] = assembly;
++
++    },
++
 +
      /**
       * Attach properties to classes
@@ -75,10 +89,10 @@ Index: qooxdoo/framework/source/class/qx/bom/client/Feature.js
 -        }
 -      }
 -      data.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-+      }
++      }      
      },
-
-
+ 
+ 
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
 --- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 25135)
@@ -102,7 +116,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 -            if (!fileMatch) {
 -              fileMatch = fileRe.exec(hit[1]);
 -            }
--
+-            
 -            if (fileMatch) {
 -              var className = this.__fileNameToClassName(fileMatch[1]);
 -              trace.push(className + fileMatch[2]);
@@ -110,11 +124,11 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 -                trace.push(hit[1]);
 -            }
 -          }
--
+-          
 -          return trace;
 +          var trace = error.stack.split(/\n/);
 +          return trace.length > 0 ? trace.slice(1) : trace;
-         }
+         } 
          else if (error.sourceURL && error.line) {
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
@@ -138,11 +152,11 @@ Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
 --- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 25135)
 +++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
 @@ -92,8 +92,16 @@
-
+         
          for pos, classId in enumerate(classes):
              self._console.progress(pos + 1, length)
 -            content.append( self.getCompiled(classId, variants, optimize, format) )
--
+-            
 +            fpath = self._classesObj[classId].path
 +            content.append("\n//%s\n" % (classId))
 +            if self._jobconf.get('compile-options/code/node_includes', False):
@@ -154,14 +168,14 @@ Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
 +                content.append( self.getCompiled(classId, variants, optimize, format) )
 +
          return u''.join(content)
-
-
+ 
+ 
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
 --- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 25135)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
 @@ -214,6 +214,8 @@
-
+ 
          # warn about unknown references
          ignored_names = set()
 +        ignored_names.add("$$node")

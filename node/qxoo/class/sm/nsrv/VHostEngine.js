@@ -48,6 +48,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __handlers : null,
 
         /**
+         * Web assembly config
+         */
+        __assembly : null,
+
+        /**
          * Current connect server
          */
         __server : null,
@@ -122,6 +127,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             this.__loadHandlers();
+            this.__loadAssembly();
         },
 
         /**
@@ -131,8 +137,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * @param id {String ?} if __null__ default webapp ID will be used
          * @return {Map}
          */
-        __getWebappConfig : function(id) {
+        __getWebappConfig : function(id, failIfNotfound) {
 
+            if (failIfNotfound == undefined) {
+                failIfNotfound = true;
+            }
             var me = this;
             var wapp = (function () {
                 if (id == null || id == undefined) {
@@ -152,7 +161,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             })();
-            if (!wapp) {
+            if (!wapp && failIfNotfound) {
                 throw new Error("No webapp config, for webapp ID: '" + id + "' please check configuration");
             }
             return wapp;
@@ -192,6 +201,69 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
             return ret;
         },
+
+        getAssembly : function(name) {
+            return this.__assembly[name];
+        },
+
+        /**
+         * Load web assembly
+         */
+        __loadAssembly : function() {
+
+            this.__assembly = {};
+
+            for (var k in qx.Bootstrap.$$registry) {
+                var clazz = qx.Bootstrap.$$registry[k];
+                if (!clazz || !clazz.prototype) {
+                    continue;
+                }
+                var assembly = clazz.prototype["$$assembly"];
+                if (!assembly) {
+                    continue;
+                }
+                var wappId = null;
+                for (var asn in assembly) {
+                    if (asn == "_webapp_") {
+                        wappId = assembly[asn];
+                    }
+                }
+                if (wappId) {
+                    qx.log.Logger.warn(this, "No webapp configured in assembly class: " + k);
+                }
+                var wc = this.__getWebappConfig(wappId, false);
+                if (!wc) {
+                    continue; //Now our webapp
+                }
+                for (var asn in assembly) {
+                    if (asn == "_webapp_") {
+                        continue;
+                    }
+                    if (this.__assembly[asn]) {
+                        qx.log.Logger.warn(this, "Found duplicated assembly item: '" + asn + "' class: " + k);
+                    }
+                    this.__assembly[asn] = assembly[asn];
+                }
+            }
+
+            //Postprocess assembly
+            for (var asn in this.__assembly) {
+                if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                    qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
+                            " [" + this.__vhostName + "]:[" + wappId + "]");
+                }
+                var asm = this.__assembly[asn];
+                for (var esm = (asm["_extends_"] ? this.__assembly[asm["_extends_"]] : null);
+                     esm; esm = (esm["_extends_"] ? this.__assembly[esm["_extends_"]] : null)) {
+                    qx.lang.Object.carefullyMergeWith(asm, esm);
+                }
+                if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                    qx.log.Logger.debug("Assembly '" + asn + "':\n" +
+                            qx.util.Json.stringify(asm, true));
+                }
+            }
+        },
+
 
         /**
          * Load request handlers index
@@ -248,7 +320,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         }
                         var hlSlot = this.__handlers[hl];
                         if (hlSlot) {
-                            qx.log.Logger.warn("Handler: '" + k + "#" + (hlSlot["handler"]) +
+                            qx.log.Logger.warn(this, "Handler: '" + k + "#" + (hlSlot["handler"]) +
                                     "()' replaced by: " + hconf["handler"] + "()");
                         }
                         hconf["$$class"] = k;
@@ -376,7 +448,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         report = e.isError();
                     }
                     if (report) {
-                        qx.log.Logger.warn("Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                        qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
                     }
                     next(e);
                     return;
