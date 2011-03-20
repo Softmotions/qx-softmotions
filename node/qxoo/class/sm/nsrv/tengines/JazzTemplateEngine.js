@@ -113,7 +113,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 var _name = arguments[0];
                 var _def = arguments.length > 2 ? arguments[1] : null;
                 var _cb = arguments[arguments.length - 1];
-                sm.nsrv.tengines.JazzCtxLib.assemblyArg(vhe, me, ctx, _name, _def, cb);
+                sm.nsrv.tengines.JazzCtxLib.assemblyArg(vhe, me, ctx, _name, _def, _cb);
             };
             tjazz.eval(ctx, function(data) {
                 cb(false, data);

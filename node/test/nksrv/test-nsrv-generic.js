@@ -388,7 +388,8 @@ module.exports.testAsm1 = function(test) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
         resp.on("data", function (body) {
-            qx.log.Logger.info("body=" + body);
+            test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
+            test.ok(body.indexOf("title=2ed14b4b2cd64707821f836361259a67") >= 0);
         });
         resp.on("end", function () {
             test.done();
