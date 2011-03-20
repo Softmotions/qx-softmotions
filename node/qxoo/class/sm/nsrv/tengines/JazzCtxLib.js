@@ -246,7 +246,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             if (!ctxParams) {
                 ctxParams = {};
             }
-            var aiStack = ctxParams["_ai_"] = !qx.lang.Type.isArray(ctx["_ai_"]) || [];
+            var aiStack = ctxParams["_astack_"] = qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : [];
             for (var i = 0; i < aiStack.length; ++i) {
                 if (aiStack[i] == asm) {
                     qx.log.Logger.warn(this, "Recursive assembly reference: " + name + "'");
@@ -254,22 +254,21 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     return;
                 }
             }
+            ctxParams["_asm_"] = asm;
             //Save assembly instance
             aiStack.push(asm);
             this.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
-                qx.lang.Array.remove(asm);
+                qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
                 cb(data);
             });
         },
 
 
         assemblyArg : function(vhe, te, ctx, name, def, cb) {
-            var aiStack = ctx["_ai_"];
+            var asm = ctx["_asm_"];
             if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
-                qx.core.Assert.assertArray(aiStack, "No assembly stack found");
-                qx.core.Assert.assert(aiStack.length > 0, "Assembly stack is empty");
+                qx.core.Assert.assert(!!asm, "Assembly is not in ctx");
             }
-            var asm = aiStack[aiStack.length - 1];
             var val = asm[name];
             if (val == undefined) {
                 val = def;

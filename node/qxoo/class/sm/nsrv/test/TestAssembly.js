@@ -5,7 +5,7 @@ qx.Class.define("sm.nsrv.test.TestAssembly", {
     {
         "_webapp_" : "jazz",
 
-        "base" : {
+        "test_base" : {
             "_core_" : "/jazz/asm/base.jz",
             "title" : "2ed14b4b2cd64707821f836361259a67"
 

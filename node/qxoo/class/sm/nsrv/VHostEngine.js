@@ -677,7 +677,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         handle : function(req, res, ctxParams, cb) {
             if (ctxParams) {
-                if (qx.lang.type.isObject(req.$$ctxParams)) {
+                if (qx.lang.Type.isObject(req.$$ctxParams)) {
                     qx.lang.Object.mergeWith(req.$$ctxParams, ctxParams);
                 } else {
                     req.$$ctxParams = ctxParams;
