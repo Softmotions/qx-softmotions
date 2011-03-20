@@ -117,6 +117,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 }
 
                 if (req.$$ctxParams) {
+                    ireq.$$ctxParams = {};
                     for (var p in req.$$ctxParams) {
                         ireq.$$ctxParams[p] = req.$$ctxParams[p];
                     }

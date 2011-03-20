@@ -4,10 +4,19 @@
     <bookmark url="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js" line="277" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="f2581a16-e481-4dab-aa74-ecd1ef174ecb" name="Default" comment="working on assembly engine">
+    <list default="true" readonly="true" id="f2581a16-e481-4dab-aa74-ecd1ef174ecb" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_asmref1.jz" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends2.jz" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke.jz" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base.jz" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends.jz" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/asmref1.jz" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" afterPath="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/ireq.jz" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_ireq.jz" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js" />
     </list>
     <ignored path="qx-softmotions.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -70,7 +79,7 @@
       <file leaf-file-name="VHostEngine.js" pinned="true" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="73" selection-start="132" selection-end="132" vertical-scroll-proportion="0.0">
+            <state line="260" column="16" selection-start="8619" selection-end="8619" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -79,25 +88,16 @@
       <file leaf-file-name="test-nsrv-generic.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="410" column="0" selection-start="13764" selection-end="13764" vertical-scroll-proportion="0.87697715">
+            <state line="472" column="51" selection-start="16424" selection-end="16424" vertical-scroll-proportion="0.5553539">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="invoke.jz" pinned="true" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke.jz">
+      <file leaf-file-name="invoke_base.jz" pinned="true" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base.jz">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="26" selection-start="25" selection-end="25" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="base.jz" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="20" selection-start="52" selection-end="52" vertical-scroll-proportion="0.0">
+            <state line="0" column="23" selection-start="23" selection-end="23" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -115,34 +115,7 @@
       <file leaf-file-name="JazzCtxLib.js" pinned="true" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="289" column="25" selection-start="10138" selection-end="10138" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Assert.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/core/Assert.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="129" column="4" selection-start="3818" selection-end="3818" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Array.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/lang/Array.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="342" column="4" selection-start="9360" selection-end="9360" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Object.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/lang/Object.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="237" column="4" selection-start="6351" selection-end="6351" vertical-scroll-proportion="0.0">
+            <state line="273" column="22" selection-start="9500" selection-end="9500" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -151,7 +124,61 @@
       <file leaf-file-name="TestAssembly.js" pinned="true" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="6" column="36" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0">
+            <state line="38" column="51" selection-start="1175" selection-end="1175" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TestNodeServerExecutor.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestNodeServerExecutor.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="78" column="61" selection-start="2419" selection-end="2419" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ireq.jz" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/ireq.jz">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="21" selection-start="17" selection-end="17" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="invoke_ireq.jz" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_ireq.jz">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="invoke_asmref1.jz" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_asmref1.jz">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="28" selection-start="28" selection-end="28" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="asmref1.jz" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/asmref1.jz">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="24" selection-start="36" selection-end="36" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="invoke_base_extends.jz" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends.jz">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -171,21 +198,21 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/assembly.jz" />
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm_layout.jz" />
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm_core_footer.jz" />
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/core_footer.jz" />
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/core_base.jz" />
-        <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssemblyExecutor.js" />
         <option value="$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/Class.js" />
         <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base.jz" />
         <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_content.jz" />
-        <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js" />
         <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke.jz" />
-        <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js" />
-        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz" />
         <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends.jz" />
+        <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends2.jz" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_asmref1.jz" />
         <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/asmref1.jz" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/ireq.jz" />
+        <option value="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js" />
+        <option value="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_ireq.jz" />
         <option value="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" />
       </list>
     </option>
@@ -592,22 +619,22 @@
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32750398" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1978022" sideWeight="0.66190475" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.58809525" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21615385" sideWeight="0.34653464" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19344933" sideWeight="0.0" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18833163" sideWeight="0.66136724" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Regex" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3279703" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="true" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.58809525" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -666,41 +693,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/Class.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1130" column="25" selection-start="33787" selection-end="33797" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/core/Object.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="39" selection-start="116" selection-end="116" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssemblyExecutor.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="5" selection-start="207" selection-end="207" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/Bootstrap.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="615" column="4" selection-start="16772" selection-end="16772" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/lang/Type.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="31" selection-start="1819" selection-end="1819" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke.jz">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="26" selection-start="25" selection-end="25" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/core/Assert.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="129" column="4" selection-start="3818" selection-end="3818" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../../JavaSoft/qooxdoo-trunk/qooxdoo/framework/source/class/qx/lang/Array.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="342" column="4" selection-start="9360" selection-end="9360" vertical-scroll-proportion="0.0" />
@@ -711,21 +703,32 @@
         <state line="237" column="4" selection-start="6351" selection-end="6351" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz">
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends2.jz">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="20" selection-start="52" selection-end="52" vertical-scroll-proportion="0.0">
+        <state line="0" column="31" selection-start="31" selection-end="31" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="36" selection-start="128" selection-end="128" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="73" selection-start="132" selection-end="132" vertical-scroll-proportion="0.0" />
+        <state line="260" column="16" selection-start="8619" selection-end="8619" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/base.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="12" selection-start="97" selection-end="97" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base_extends.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js">
@@ -735,16 +738,65 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestNodeServerExecutor.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="78" column="61" selection-start="2419" selection-end="2419" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzCtxLib.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="289" column="25" selection-start="10138" selection-end="10138" vertical-scroll-proportion="0.0">
+        <state line="273" column="22" selection-start="9500" selection-end="9500" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/ireq.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="21" selection-start="17" selection-end="17" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_base.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="23" selection-start="23" selection-end="23" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_ireq.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="13" selection-start="13" selection-end="13" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/asmref1.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="24" selection-start="36" selection-end="36" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/test/nksrv/webapps/jazz/asm/invoke_asmref1.jz">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="28" selection-start="28" selection-end="28" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node/qxoo/class/sm/nsrv/test/TestAssembly.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="51" selection-start="1175" selection-end="1175" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="410" column="0" selection-start="13764" selection-end="13764" vertical-scroll-proportion="0.87697715">
+        <state line="472" column="51" selection-start="16424" selection-end="16424" vertical-scroll-proportion="0.5553539">
           <folding />
         </state>
       </provider>

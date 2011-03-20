@@ -382,7 +382,7 @@ module.exports.testIRequest = function(test) {
 module.exports.testAsm1 = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
-    var req = client.request("GET", "/jazz/asm/invoke.jz",
+    var req = client.request("GET", "/jazz/asm/invoke_base.jz",
                              {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
@@ -390,6 +390,91 @@ module.exports.testAsm1 = function(test) {
         resp.on("data", function (body) {
             test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
             test.ok(body.indexOf("title=2ed14b4b2cd64707821f836361259a67") >= 0);
+            test.ok(body.indexOf("arg1=957244b210c64aa4ab852c8c1ccadd4f") >= 0);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports.testAsmExtends1 = function(test) {
+
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke_base_extends.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
+            test.ok(body.indexOf("title=6cd22fa775f947e8a5daa17f09ba5329") >= 0);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports.testAsmExtends2 = function(test) {
+
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke_base_extends2.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
+            test.ok(body.indexOf("title=307862e1ca624500a1893c09d0096ba7") >= 0);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports.testAsmRef = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke_asmref1.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            //from ref1
+            test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
+            test.ok(body.indexOf("title=2ed14b4b2cd64707821f836361259a67") >= 0);
+            test.ok(body.indexOf("arg1=957244b210c64aa4ab852c8c1ccadd4f") >= 0);
+            test.ok(body.indexOf("ctxp1=c0b2e5c12951412d8ac19f968ed78575") >= 0);
+            test.ok(body.indexOf("ctxp2=c065232c925345a8bfb9d18e0038db42") >= 0);
+            //from ref2
+            test.ok(body.indexOf("ctxp1=9ab3f67e7a634e49b5096a195ee4d6f6") >= 0);
+            test.ok(body.indexOf("ctxp2=d01ab03bc8054a6eb9bc0504139ca813") >= 0);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports.testIreqRef = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke_ireq.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            test.ok(body.indexOf("p1=83702b502d5c46b89655ee26dffb3fe7"));
         });
         resp.on("end", function () {
             test.done();
