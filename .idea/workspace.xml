@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="f2581a16-e481-4dab-aa74-ecd1ef174ecb" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/node/test/nksrv/webapps/jazz/jzfail.jz" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" afterPath="$PROJECT_DIR$/node/test/nksrv/test-nsrv-generic.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/tengines/JazzTemplateEngine.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js" afterPath="$PROJECT_DIR$/node/qxoo/class/sm/nsrv/VHostEngine.js" />
     </list>
     <ignored path="qx-softmotions.iws" />
     <ignored path=".idea/workspace.xml" />
