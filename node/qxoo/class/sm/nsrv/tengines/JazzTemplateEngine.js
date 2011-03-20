@@ -62,7 +62,13 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     }
 
                     var fdata = me.__fs.readFileSync(path, "utf8");
-                    var jazzTemplate = me.__jazz.compile(fdata);
+                    var jazzTemplate;
+                    try {
+                        jazzTemplate = me.__jazz.compile(fdata);
+                    } catch(e) {
+                        cb(e, null);
+                        return;
+                    }
 
                     var template = {"path" : path,
                         "mtime" : stat.mtime.getTime(),

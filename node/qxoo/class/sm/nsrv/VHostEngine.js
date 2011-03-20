@@ -390,7 +390,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var me = this;
             tengine.createTemplate(path, function(err, template) {
                 if (err) {
-                    qx.log.Logger.error(me, "Create template failed: " + err);
+                    qx.log.Logger.error(me, "Failed template, path: " + path, err);
                     res.sendError();
                     return;
                 }

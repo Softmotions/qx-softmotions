@@ -229,6 +229,20 @@ module.exports.testJazz = function(test) {
     req.end();
 };
 
+
+module.exports.testJazzFail = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/jzfail.jz",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 500);
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
 module.exports.testExceptionMsgErr = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloExceptionMsgErr",
