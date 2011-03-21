@@ -253,10 +253,26 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
+                if (asm["_ctx_provider_"]) {
+                    asm["_ctx_provider_stack_"] = [asm["_ctx_provider_"]];
+                }
                 for (var esm = (asm["_extends_"] ? this.__assembly[asm["_extends_"]] : null);
                      esm; esm = (esm["_extends_"] ? this.__assembly[esm["_extends_"]] : null)) {
+                    //Context provider staff 
+                    if (qx.lang.Type.isFunction(esm["_ctx_provider_"])) {
+                        var ep = esm["_ctx_provider_"];
+                        var pstack = asm["_ctx_provider_stack_"];
+                        if (!qx.lang.Type.isArray(pstack)) {
+                            pstack = asm["_ctx_provider_stack_"] = [];
+                        }
+                        if (pstack.indexOf(ep) == -1) {
+                            pstack.unshift(ep);
+                        }
+                    }
+                    //Merge assembly props
                     qx.lang.Object.carefullyMergeWith(asm, esm);
                 }
+                delete asm["_ctx_provider_"];
                 if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
                             qx.util.Json.stringify(asm, true));

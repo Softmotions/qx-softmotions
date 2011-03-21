@@ -256,6 +256,10 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 }
             }
             ctxParams["_asm_"] = asm;
+
+            var req = ctx["_req_"];
+            sm.nsrv.tengines.JazzCtxLib.__populateAsmCtxParams(req, asm, ctxParams);
+
             //Save assembly instance
             aiStack.push(asm);
             this.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
@@ -274,14 +278,15 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             if (val == undefined) {
                 val = def;
             }
+            var jclib = sm.nsrv.tengines.JazzCtxLib;
             var req = ctx["_req_"];
             if (val != undefined && val != null) {
                 if (val["_assembly_"]) {
-                    sm.nsrv.tengines.JazzCtxLib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
+                    jclib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
                 } else if (val["_irequest_"]) {
-                    sm.nsrv.tengines.JazzCtxLib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
+                    jclib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
                 } else if (val["_include_"]) {
-                    sm.nsrv.tengines.JazzCtxLib.include(vhe, te, ctx, val["_include_"], cb);
+                    jclib.include(vhe, te, ctx, val["_include_"], cb);
                 } else if ((typeof val) == "function") {
                     val.call(val, req, ctx, asm, cb);
                 } else {
@@ -289,6 +294,16 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 }
             } else {
                 cb("");
+            }
+        },
+
+        __populateAsmCtxParams : function(req, asm, ctxParams) {
+            var pstack = asm["_ctx_provider_stack_"];
+            if (pstack) {
+                for (var i = 0; i < pstack.length; ++i) {
+                    var cp = pstack[i];
+                    cp.call(cp, req, asm, ctxParams);
+                }
             }
         }
     }
