@@ -44,6 +44,9 @@ qx.Class.define("sm.nsrv.test.TestAssembly", {
             "_core_" : "/jazz/asm/ireq.jz",
             "ireq" : {
                 "_irequest_" : "/test/getRequestParams?p1=83702b502d5c46b89655ee26dffb3fe7"
+            },
+            "inc1" : {
+                "_include_" : "include_child.jz"
             }
         },
 

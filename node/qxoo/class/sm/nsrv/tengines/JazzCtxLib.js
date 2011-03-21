@@ -276,10 +276,12 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             }
             var req = ctx["_req_"];
             if (val != undefined && val != null) {
-                if (qx.lang.Type.isString(val["_assembly_"])) {
+                if (val["_assembly_"]) {
                     sm.nsrv.tengines.JazzCtxLib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
-                } else if (qx.lang.Type.isString(val["_irequest_"])) {
+                } else if (val["_irequest_"]) {
                     sm.nsrv.tengines.JazzCtxLib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
+                } else if (val["_include_"]) {
+                    sm.nsrv.tengines.JazzCtxLib.include(vhe, te, ctx, val["_include_"], cb);
                 } else if ((typeof val) == "function") {
                     val.call(val, req, asm, cb);
                 } else {

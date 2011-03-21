@@ -488,7 +488,8 @@ module.exports.testAsmIreqRef = function(test) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
         resp.on("data", function (body) {
-            test.ok(body.indexOf("p1=83702b502d5c46b89655ee26dffb3fe7"));
+            test.ok(body.indexOf("p1=83702b502d5c46b89655ee26dffb3fe7") >= 0);
+            test.ok(body.indexOf("inc1=e18715b8e2c94ef785b5033f3a2c83c0") >= 0);
         });
         resp.on("end", function () {
             test.done();
