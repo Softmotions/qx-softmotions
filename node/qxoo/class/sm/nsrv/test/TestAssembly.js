@@ -45,6 +45,14 @@ qx.Class.define("sm.nsrv.test.TestAssembly", {
             "ireq" : {
                 "_irequest_" : "/test/getRequestParams?p1=83702b502d5c46b89655ee26dffb3fe7"
             }
+        },
+
+        "test_func" : {
+            "_core_" : "/jazz/asm/func.jz",
+            "myfunc" : function(req, asm, cb) {
+                cb("p1=" + req.params["p1"]);
+            }
         }
+
     }
 });

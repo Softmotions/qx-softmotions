@@ -643,6 +643,22 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 //todo other requests forbidden?
                 res.sendForbidden();
             }
+            if (!req.outerParams) {
+                req.outerParams = req.params;
+            }
+            req.stripParams = function(prefix) {
+                var res = {};
+                for (var k in req.outerParams) {
+                    if (prefix && prefix.length > 0) {
+                        if (k.indexOf(prefix) == 0) {
+                            res[k.substring(prefix.length)] = req.outerParams[k];
+                        }
+                    } else {
+                        res[k] = req.outerParams[k];
+                    }
+                }
+                return res;
+            }
         },
 
         /**
@@ -676,6 +692,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Handle raw server request
          */
         handle : function(req, res, ctxParams, cb) {
+            req.internal = res.internal = true;
             if (ctxParams) {
                 if (qx.lang.Type.isObject(req.$$ctxParams)) {
                     qx.lang.Object.mergeWith(req.$$ctxParams, ctxParams);

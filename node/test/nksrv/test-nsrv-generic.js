@@ -480,7 +480,7 @@ module.exports.testAsmRef = function(test) {
 };
 
 
-module.exports.testIreqRef = function(test) {
+module.exports.testAsmIreqRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_ireq.jz",
                              {"host": "127.0.0.1"});
@@ -489,6 +489,24 @@ module.exports.testIreqRef = function(test) {
         test.equal(resp.statusCode, 200);
         resp.on("data", function (body) {
             test.ok(body.indexOf("p1=83702b502d5c46b89655ee26dffb3fe7"));
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports.testAsmFuncAndReq = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/jazz/asm/invoke_func.jz?test_func.p1=dbe965819a2b4563947b56db1a862407",
+                             {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        resp.on("data", function (body) {
+            test.ok(body.indexOf("p1=dbe965819a2b4563947b56db1a862407") >= 0)
         });
         resp.on("end", function () {
             test.done();

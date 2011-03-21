@@ -1,0 +1,1 @@
+{_assembly_("test_func", @_strip_("test_func."))}

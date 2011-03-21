@@ -106,7 +106,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     method : "GET",
                     headers : req.headers,
                     httpVersion : "1.0",
-                    params : {}
+                    params : {},
+                    outerParams : req.outerParams,
+                    stripParams : req.stripParams
                     //todo stream methods?
                 };
 
@@ -131,8 +133,6 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     headers : {},
 
                     messages : [],
-
-                    internal : true,
 
                     __data : [],
 
@@ -280,6 +280,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     sm.nsrv.tengines.JazzCtxLib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
                 } else if (qx.lang.Type.isString(val["_irequest_"])) {
                     sm.nsrv.tengines.JazzCtxLib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
+                } else if ((typeof val) == "function") {
+                    val.call(val, req, asm, cb);
                 } else {
                     cb(val);
                 }
