@@ -16,11 +16,11 @@ qx.Class.define("sm.app.Env", {
          * Register default env instance
          */
         registerDefault : function(env) {
-            sm.app.DEFAULT = env;
+            sm.app.Env.DEFAULT = env;
         },
 
         getDefault : function() {
-            if (!sm.app.DEFAULT) {
+            if (!sm.app.Env.DEFAULT) {
                 throw new Error("Default environment is not registered");
             }
             return sm.app.Env.DEFAULT;

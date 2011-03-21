@@ -283,7 +283,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 } else if (val["_include_"]) {
                     sm.nsrv.tengines.JazzCtxLib.include(vhe, te, ctx, val["_include_"], cb);
                 } else if ((typeof val) == "function") {
-                    val.call(val, req, asm, cb);
+                    val.call(val, req, ctx, asm, cb);
                 } else {
                     cb(val);
                 }

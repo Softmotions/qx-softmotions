@@ -52,7 +52,7 @@ qx.Class.define("sm.nsrv.test.TestAssembly", {
 
         "test_func" : {
             "_core_" : "/jazz/asm/func.jz",
-            "myfunc" : function(req, asm, cb) {
+            "myfunc" : function(req, ctx, asm, cb) {
                 cb("p1=" + req.params["p1"]);
             }
         }
