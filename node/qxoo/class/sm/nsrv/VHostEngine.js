@@ -228,7 +228,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         wappId = assembly[asn];
                     }
                 }
-                if (wappId) {
+                if (!wappId) {
                     qx.log.Logger.warn(this, "No webapp configured in assembly class: " + k);
                 }
                 var wc = this.__getWebappConfig(wappId, false);
