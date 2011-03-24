@@ -104,7 +104,7 @@ qx.Class.define("uploadwidget.UploadButton",
                         __mouseUpListenerId: null,
 
                         // overridden
-                        capture : qx.core.Variant.select("qx.client",
+                        capture : qx.core.Environment.select("qx.client",
                                                          {
                                                              "mshtml" : function() {
                                                                  this.__mouseUpListenerId = this.getApplicationRoot().addListenerOnce("mouseup", this._onMouseUp, this);
@@ -117,7 +117,7 @@ qx.Class.define("uploadwidget.UploadButton",
 
 
                         // overridden
-                        releaseCapture : qx.core.Variant.select("qx.client",
+                        releaseCapture : qx.core.Environment.select("qx.client",
                                                                 {
                                                                     "mshtml" : qx.lang.Function.empty,
 
