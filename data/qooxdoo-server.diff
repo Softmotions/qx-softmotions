@@ -1,8 +1,8 @@
 Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/Class.js	(revision 25135)
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 26019)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
-@@ -213,6 +213,18 @@
+@@ -216,6 +216,18 @@
              this.__addMixin(clazz, config.include[i], false);
            }
          }
@@ -20,8 +20,8 @@ Index: qooxdoo/framework/source/class/qx/Class.js
 +        }
        }
  
-       // Process settings
-@@ -732,7 +744,9 @@
+       // Process environment
+@@ -758,7 +770,9 @@
          "variants"   : "object",    // Map
          "events"     : "object",    // Map
          "defer"      : "function",  // Function
@@ -32,7 +32,7 @@ Index: qooxdoo/framework/source/class/qx/Class.js
        },
  
        "default" : null
-@@ -1086,6 +1100,39 @@
+@@ -1126,6 +1140,39 @@
      },
  
  
@@ -72,31 +72,387 @@ Index: qooxdoo/framework/source/class/qx/Class.js
      /**
       * Attach properties to classes
       *
-Index: qooxdoo/framework/source/class/qx/bom/client/Feature.js
+Index: qooxdoo/framework/source/class/qx/core/Environment.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Feature.js	(revision 25135)
-+++ qooxdoo/framework/source/class/qx/bom/client/Feature.js	(working copy)
-@@ -196,15 +196,7 @@
-         } else {
-           this.CSS_POINTER_EVENTS = true;
+--- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/core/Environment.js	(working copy)
+@@ -458,72 +458,72 @@
+       // plugin
+       // /////////////////////////////////////////
+       if (this.useCheck("plugin.gears")) {
+-        this._checks["plugin.gears"] = qx.bom.client.Plugin.getGears;
++        this._checks["plugin.gears"] = false;//qx.bom.client.Plugin.getGears;
+       }
+ 
+       if (this.useCheck("plugin.quicktime")) {
+-        this._checks["plugin.quicktime"] = qx.bom.client.Plugin.getQuicktime;
++        this._checks["plugin.quicktime"] = false;//qx.bom.client.Plugin.getQuicktime;
+       }
+       if (this.useCheck("plugin.quicktime.version")) {
+-        this._checks["plugin.quicktime.version"] = qx.bom.client.Plugin.getQuicktimeVersion;
++        this._checks["plugin.quicktime.version"] = "";//qx.bom.client.Plugin.getQuicktimeVersion;
+       }
+ 
+       if (this.useCheck("plugin.windowsmedia")) {
+-        this._checks["plugin.windowsmedia"] = qx.bom.client.Plugin.getWindowsMedia;
++        this._checks["plugin.windowsmedia"] = "";//qx.bom.client.Plugin.getWindowsMedia;
+       }
+       if (this.useCheck("plugin.windowsmedia.version")) {
+-        this._checks["plugin.windowsmedia.version"] = qx.bom.client.Plugin.getWindowsMediaVersion;
++        this._checks["plugin.windowsmedia.version"] = "";//qx.bom.client.Plugin.getWindowsMediaVersion;
+       }
+ 
+       if (this.useCheck("plugin.divx")) {
+-        this._checks["plugin.divx"] = qx.bom.client.Plugin.getDivX;
++        this._checks["plugin.divx"] = false;//qx.bom.client.Plugin.getDivX;
+       }
+       if (this.useCheck("plugin.divx.version")) {
+-        this._checks["plugin.divx.version"] = qx.bom.client.Plugin.getDivXVersion;
++        this._checks["plugin.divx.version"] = "";//qx.bom.client.Plugin.getDivXVersion;
+       }
+ 
+       if (this.useCheck("plugin.silverlight")) {
+-        this._checks["plugin.silverlight"] = qx.bom.client.Plugin.getSilverlight;
++        this._checks["plugin.silverlight"] = false;//qx.bom.client.Plugin.getSilverlight;
+       }
+       if (this.useCheck("plugin.silverlight.version")) {
+-        this._checks["plugin.silverlight.version"] = qx.bom.client.Plugin.getSilverlightVersion;
++        this._checks["plugin.silverlight.version"] = "";//qx.bom.client.Plugin.getSilverlightVersion;
+       }
+ 
+       if (this.useCheck("plugin.flash")) {
+-        this._checks["plugin.flash"] = qx.bom.client.Flash.isAvailable;
++        this._checks["plugin.flash"] = false;//qx.bom.client.Flash.isAvailable;
+       }
+       if (this.useCheck("plugin.flash.version")) {
+-        this._checks["plugin.flash.version"] = qx.bom.client.Flash.getVersion;
++        this._checks["plugin.flash.version"] = "";//qx.bom.client.Flash.getVersion;
+       }
+       if (this.useCheck("plugin.flash.express")) {
+-        this._checks["plugin.flash.express"] = qx.bom.client.Flash.getExpressInstall;
++        this._checks["plugin.flash.express"] = false;//qx.bom.client.Flash.getExpressInstall;
+       }
+       if (this.useCheck("plugin.flash.strictsecurity")) {
+-        this._checks["plugin.flash.strictsecurity"] = qx.bom.client.Flash.getStrictSecurityModel;
++        this._checks["plugin.flash.strictsecurity"] = false;//qx.bom.client.Flash.getStrictSecurityModel;
+       }
+ 
+       // /////////////////////////////////////////
+       // IO
+       // /////////////////////////////////////////
+       if (this.useCheck("io.maxrequests")) {
+-        this._checks["io.maxrequests"] = qx.bom.client.Transport.getMaxConcurrentRequestCount;
++        this._checks["io.maxrequests"] = 1;//qx.bom.client.Transport.getMaxConcurrentRequestCount;
+       }
+       if (this.useCheck("io.ssl")) {
+-        this._checks["io.ssl"] = qx.bom.client.Transport.getSsl;
++        this._checks["io.ssl"] = false;//qx.bom.client.Transport.getSsl;
+       }
+       if (this.useCheck("io.xhr")) {
+-        this._checks["io.xhr"] = qx.bom.client.Transport.getXmlHttpRequest;
++        this._checks["io.xhr"] = false;//qx.bom.client.Transport.getXmlHttpRequest;
+       }
+ 
+       // /////////////////////////////////////////
+       // EVENTS
+       // /////////////////////////////////////////
+       if (this.useCheck("event.touch")) {
+-        this._checks["event.touch"] = qx.bom.client.Event.getTouch;
++        this._checks["event.touch"] = false;//qx.bom.client.Event.getTouch;
+       }
+ 
+       if (this.useCheck("event.pointer")) {
+-        this._checks["event.pointer"] = qx.bom.client.Event.getPointer;
++        this._checks["event.pointer"] = false;//qx.bom.client.Event.getPointer;
+       }
+ 
+       // /////////////////////////////////////////
+@@ -541,93 +541,93 @@
+         this._checks["html.webworker"] = qx.bom.client.Html.getWebWorker;
+       }
+       if (this.useCheck("html.geolocation")) {
+-        this._checks["html.geolocation"] = qx.bom.client.Html.getGeoLocation;
++        this._checks["html.geolocation"] = false;//qx.bom.client.Html.getGeoLocation;
+       }
+       if (this.useCheck("html.audio")) {
+-        this._checks["html.audio"] = qx.bom.client.Html.getAudio;
++        this._checks["html.audio"] = false;//qx.bom.client.Html.getAudio;
+       }
+       if (this.useCheck("html.video")) {
+-        this._checks["html.video"] = qx.bom.client.Html.getVideo;
++        this._checks["html.video"] = false;//qx.bom.client.Html.getVideo;
+       }
+       if (this.useCheck("html.video.ogg")) {
+-        this._checks["html.video.ogg"] = qx.bom.client.Html.getVideoOgg;
++        this._checks["html.video.ogg"] = false;//qx.bom.client.Html.getVideoOgg;
+       }
+       if (this.useCheck("html.video.h264")) {
+-        this._checks["html.video.h264"] = qx.bom.client.Html.getVideoH264;
++        this._checks["html.video.h264"] = false;//qx.bom.client.Html.getVideoH264;
+       }
+       if (this.useCheck("html.video.webm")) {
+-        this._checks["html.video.webm"] = qx.bom.client.Html.getVideoWebm;
++        this._checks["html.video.webm"] = false;//qx.bom.client.Html.getVideoWebm;
+       }
+       if (this.useCheck("html.storage.local")) {
+-        this._checks["html.storage.local"] = qx.bom.client.Html.getLocalStorage;
++        this._checks["html.storage.local"] = false;//qx.bom.client.Html.getLocalStorage;
+       }
+       if (this.useCheck("html.storage.session")) {
+-        this._checks["html.storage.session"] = qx.bom.client.Html.getSessionStorage;
++        this._checks["html.storage.session"] = false;//qx.bom.client.Html.getSessionStorage;
+       }
+       if (this.useCheck("html.classlist")) {
+-        this._checks["html.classlist"] = qx.bom.client.Html.getClassList;
++        this._checks["html.classlist"] = false;//qx.bom.client.Html.getClassList;
+       }
+ 
+       if (this.useCheck("html.xpath")) {
+-        this._checks["html.xpath"] = qx.bom.client.Html.getXPath;
++        this._checks["html.xpath"] = false;//qx.bom.client.Html.getXPath;
+       }
+       if (this.useCheck("html.xul")) {
+-        this._checks["html.xul"] = qx.bom.client.Html.getXul;
++        this._checks["html.xul"] = false;//qx.bom.client.Html.getXul;
+       }
+ 
+       if (this.useCheck("html.canvas")) {
+-        this._checks["html.canvas"] = qx.bom.client.Html.getCanvas;
++        this._checks["html.canvas"] = false;//qx.bom.client.Html.getCanvas;
+       }
+       if (this.useCheck("html.svg")) {
+-        this._checks["html.svg"] = qx.bom.client.Html.getSvg;
++        this._checks["html.svg"] = false;//qx.bom.client.Html.getSvg;
+       }
+       if (this.useCheck("html.vml")) {
+-        this._checks["html.vml"] = qx.bom.client.Html.getVml;
++        this._checks["html.vml"] = false;//qx.bom.client.Html.getVml;
+       }
+       if (this.useCheck("html.dataurl")) {
+-        this._asyncChecks["html.dataurl"] = qx.bom.client.Html.getDataUrl;
++        this._asyncChecks["html.dataurl"] = false;//qx.bom.client.Html.getDataUrl;
+       }
+ 
+       // /////////////////////////////////////////
+       // CSS
+       // /////////////////////////////////////////
+       if (this.useCheck("css.textoverflow")) {
+-        this._checks["css.textoverflow"] = qx.bom.client.Css.getTextOverflow;
++        this._checks["css.textoverflow"] = false;//qx.bom.client.Css.getTextOverflow;
+       }
+ 
+       if (this.useCheck("css.placeholder")) {
+-        this._checks["css.placeholder"] = qx.bom.client.Css.getPlaceholder;
++        this._checks["css.placeholder"] = false;//qx.bom.client.Css.getPlaceholder;
+       }
+ 
+       if (this.useCheck("css.borderradius")) {
+-        this._checks["css.borderradius"] = qx.bom.client.Css.getBorderRadius;
++        this._checks["css.borderradius"] = false;//qx.bom.client.Css.getBorderRadius;
+       }
+ 
+       if (this.useCheck("css.boxshadow")) {
+-        this._checks["css.boxshadow"] = qx.bom.client.Css.getBoxShadow;
++        this._checks["css.boxshadow"] = false;//qx.bom.client.Css.getBoxShadow;
+       }
+ 
+       if (this.useCheck("css.gradients")) {
+-        this._checks["css.gradients"] = qx.bom.client.Css.getGradients;
++        this._checks["css.gradients"] = false;//qx.bom.client.Css.getGradients;
+       }
+ 
+       if (this.useCheck("css.boxmodel")) {
+-        this._checks["css.boxmodel"] = qx.bom.client.Css.getBoxModel;
++        this._checks["css.boxmodel"] = false;//qx.bom.client.Css.getBoxModel;
+       }
+ 
+       if (this.useCheck("css.translate3d")) {
+-        this._checks["css.translate3d"] = qx.bom.client.Css.getTranslate3d;
++        this._checks["css.translate3d"] = false;//qx.bom.client.Css.getTranslate3d;
+       }
+ 
+       // /////////////////////////////////////////
+       // PHONEGAP
+       // /////////////////////////////////////////
+       if (this.useCheck("phonegap")) {
+-        this._checks["phonegap"] = qx.bom.client.PhoneGap.getPhoneGap;
++        this._checks["phonegap"] = false;//qx.bom.client.PhoneGap.getPhoneGap;
+       }
+ 
+       if (this.useCheck("phonegap.notification")) {
+-        this._checks["phonegap.notification"] = qx.bom.client.PhoneGap.getNotification;
++        this._checks["phonegap.notification"] = false;//qx.bom.client.PhoneGap.getNotification;
+       }
+     }
+   },
+Index: qooxdoo/framework/source/class/qx/core/Assert.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/core/Assert.js	(working copy)
+@@ -79,7 +79,7 @@
+       {
+         var err = new qx.core.AssertionError(comment, msg);
+         if (this.__logError) {
+-          qx.Bootstrap.error("Stack trace: \n" + err.getStackTrace());
++          qx.Bootstrap.error("Stack trace: \n" + (err.getStackTrace() ? err.getStackTrace().join("\n") : null));
          }
--      }
--
--      var data = new Image();
--      data.onload = data.onerror = function() {
--        if (data.width == 1 && data.height == 1) {
--          qx.bom.client.Feature.DATA_URL = true;
--        }
--      }
--      data.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-+      }      
-     },
- 
- 
+         throw err;
+       } else {
+Index: qooxdoo/framework/source/class/qx/bom/client/Engine.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Engine.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Engine.js	(working copy)
+@@ -300,11 +300,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/Browser.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Browser.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Browser.js	(working copy)
+@@ -238,11 +238,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/Platform.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Platform.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Platform.js	(working copy)
+@@ -126,11 +126,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/System.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/System.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/System.js	(working copy)
+@@ -361,11 +361,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/Version.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Version.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Version.js	(working copy)
+@@ -232,11 +232,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/Flash.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Flash.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Flash.js	(working copy)
+@@ -321,11 +321,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
+Index: qooxdoo/framework/source/class/qx/bom/client/Locale.js
+===================================================================
+--- qooxdoo/framework/source/class/qx/bom/client/Locale.js	(revision 26019)
++++ qooxdoo/framework/source/class/qx/bom/client/Locale.js	(working copy)
+@@ -135,11 +135,11 @@
+       if (statics.__defineGetter__) {
+         var constantValue = statics[keys[i]];
+         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
+-          qx.Bootstrap.warn(
++          /*qx.Bootstrap.warn(
+             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
+             "Plese check the API documentation of qx.core.Environemt.\n" +
+             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
+-          );
++          );*/
+           return c;
+         }, statics, keys[i], constantValue));
+       }
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 25135)
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26019)
 +++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
+@@ -92,12 +92,12 @@
+         }
+       },
+ 
+-      "mshtml|webkit" : function()
++      "mshtml" : function()
+       {
+         return this.getStackTraceFromCaller(arguments);
+-      },
++      },     
+ 
+-      "opera" : function()
++      "opera|webkit" : function()
+       {
+         var foo;
+         try {
+@@ -107,7 +107,7 @@
+         catch (ex)
+         {
+           var trace = this.getStackTraceFromError(ex);
+-          qx.lang.Array.removeAt(trace, 0)
++          qx.lang.Array.removeAt(trace, 0);
+           return trace;
+         }
+         return [];
 @@ -218,31 +218,8 @@
        "webkit" : function(error)
        {
@@ -116,7 +472,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 -            if (!fileMatch) {
 -              fileMatch = fileRe.exec(hit[1]);
 -            }
--            
+-
 -            if (fileMatch) {
 -              var className = this.__fileNameToClassName(fileMatch[1]);
 -              trace.push(className + fileMatch[2]);
@@ -124,34 +480,32 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 -                trace.push(hit[1]);
 -            }
 -          }
--          
+-
 -          return trace;
-+          var trace = error.stack.split(/\n/);
-+          return trace.length > 0 ? trace.slice(1) : trace;
-         } 
++            var trace =  error.stack.split(/\n/);
++            return trace.length > 0 ? trace.slice(1) : trace;
+         }
          else if (error.sourceURL && error.line) {
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 25135)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26019)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
-@@ -147,7 +147,10 @@
-             temp = os.fdopen(fileDescriptor, "w")
-             temp.write("\n".join(clips))
-             temp.close()
--            cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
-+            #cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
-+            cmd = montage_cmd % (orientation, " ".join(clips), combined)
-+            #print "MOUNTAGE CMD %s" % cmd
-+            #print "MOUNTAGE TMP %s" % tempPath
-             rc = os.system(cmd)
-             os.unlink(tempPath)
-             if rc != 0:
+@@ -153,7 +153,8 @@
+         temp = os.fdopen(fileDescriptor, "w")
+         temp.write("\n".join(clips))
+         temp.close()
+-        cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
++        #cmd = montage_cmd % (orientation, "@" + os.path.basename(tempPath), combined)
++        cmd = montage_cmd % (orientation, " ".join(clips), combined)
+         rc = os.system(cmd)
+         os.unlink(tempPath)
+         if rc != 0:
 Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 25135)
+--- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26019)
 +++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
-@@ -92,8 +92,16 @@
+@@ -97,8 +97,16 @@
          
          for pos, classId in enumerate(classes):
              self._console.progress(pos + 1, length)
@@ -172,9 +526,9 @@ Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
  
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 25135)
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26019)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
-@@ -214,6 +214,8 @@
+@@ -222,6 +222,8 @@
  
          # warn about unknown references
          ignored_names = set()

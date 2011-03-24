@@ -7,10 +7,12 @@ if (!window.navigator) window.navigator = {
   product: "",
   cpuClass: "",
   language: "en",
-  userLanguage: "en"
+  userLanguage: "en",
+  platform: ["linux", "sunos", "freebsd"].indexOf(process.platform) ? "Linux" : "Windows"
 };
 
 if (!window.qx) window.qx = {};
+qx.$$start = new Date();
 
 if (!this.qxsettings) qxsettings = {};
 var settings = %{Settings};
@@ -20,19 +22,26 @@ if (!window.qxvariants) qxvariants = {};
 var variants = %{Variants};
 for (var k in variants) qxvariants[k] = variants[k];
 
+if (!qx.$$environment) qx.$$environment = {};
+var envinfo = %{EnvSettings};
+for (var k in envinfo) qx.$$environment[k] = envinfo[k];
+
 qx.$$packageData = {};
 qx.$$loader = {};
 
-if (!window.location) {
-    window.location = "localhost";
-}
-if (!window.document) {
-    window.document = {
-        location : "localhost",
-        documentElement : {style : {}},
-        createElement : function(){return {}}
-    };
-}
+
+window.document = {
+    location : {
+        toString : function() {
+            return "localhost"
+        },
+        search : "?"
+    },
+    documentElement : {style : {}},
+    createElement : function(){return {}}
+};
+window.location = window.document.location;
+//todo window.Worker
 
 if (!window.$$node) window.$$node = {};
 $$node.script = process.binding('evals').Script;
@@ -46,7 +55,6 @@ $$node.console = console;
 window.execScript = function(data) {
     return $$node.script.runInThisContext(data, "eval");
 }
-
 })();
 
 %{BootPart}

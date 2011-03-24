@@ -241,7 +241,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 cb("");
                 return;
             }
-            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                 qx.log.Logger.debug("Assembly core: " + core);
             }
             if (!ctxParams) {
@@ -271,7 +271,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
         assemblyArg : function(vhe, te, ctx, name, def, cb) {
             var asm = ctx["_asm_"];
-            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                 qx.core.Assert.assert(!!asm, "Assembly is not in ctx");
             }
             var val = asm[name];

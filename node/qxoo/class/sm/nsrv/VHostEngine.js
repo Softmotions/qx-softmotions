@@ -122,7 +122,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return (w2["context"].length - w1["context"].length);
             });
 
-            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                 qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.util.Json.stringify(this.__config));
             }
 
@@ -248,7 +248,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             //Postprocess assembly
             for (var asn in this.__assembly) {
-                if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
                             " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
@@ -273,7 +273,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     qx.lang.Object.carefullyMergeWith(asm, esm);
                 }
                 delete asm["_ctx_provider_"];
-                if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
                             qx.util.Json.stringify(asm, true));
                 }
@@ -330,7 +330,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             cpath += "/";
                         }
                         hl = (cpath + hl);
-                        if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                        if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
                                     "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
@@ -361,7 +361,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                 qx.log.Logger.debug("Forward: " + qx.util.Json.stringify(forward));
             }
 
@@ -399,7 +399,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": ctype });
 
             //write template
-            if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                 qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
             }
 
@@ -458,7 +458,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 if (!qx.lang.Type.isFunction(exec)) {
                     throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
                 }
-                if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+                if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
                     qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
                 }
                 try {
@@ -587,7 +587,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 res.end();
             };
 
-            if (qx.core.Variant.isSet("sm.nsrv.access-control-allow", "on")) {
+            if (qx.core.Environment.get("sm.nsrv.access-control-allow") == "on") {
                 var hset = {"Access-Control-Allow-Origin" : "*"};
                 var rh = req.headers["access-control-request-headers"];
                 if (rh) {

@@ -5,7 +5,7 @@ var http = require("http");
 
 var cwd = process.cwd();
 //nodejs appender
-/*if (qx.core.Variant.isSet("sm.nsrv.debug", "on")) {
+/*if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
  qx.log.Logger.setLevel("debug");
  } else {
  qx.log.Logger.setLevel("info");
