@@ -1,6 +1,6 @@
 Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/Class.js	(revision 26019)
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 26096)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
 @@ -216,6 +216,18 @@
              this.__addMixin(clazz, config.include[i], false);
@@ -74,9 +74,9 @@ Index: qooxdoo/framework/source/class/qx/Class.js
       *
 Index: qooxdoo/framework/source/class/qx/core/Environment.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26019)
+--- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26096)
 +++ qooxdoo/framework/source/class/qx/core/Environment.js	(working copy)
-@@ -458,72 +458,72 @@
+@@ -827,72 +827,72 @@
        // plugin
        // /////////////////////////////////////////
        if (this.useCheck("plugin.gears")) {
@@ -167,7 +167,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        // /////////////////////////////////////////
-@@ -541,93 +541,93 @@
+@@ -910,93 +910,93 @@
          this._checks["html.webworker"] = qx.bom.client.Html.getWebWorker;
        }
        if (this.useCheck("html.geolocation")) {
@@ -287,7 +287,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
    },
 Index: qooxdoo/framework/source/class/qx/core/Assert.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26019)
+--- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26096)
 +++ qooxdoo/framework/source/class/qx/core/Assert.js	(working copy)
 @@ -79,7 +79,7 @@
        {
@@ -298,135 +298,9 @@ Index: qooxdoo/framework/source/class/qx/core/Assert.js
          }
          throw err;
        } else {
-Index: qooxdoo/framework/source/class/qx/bom/client/Engine.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Engine.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Engine.js	(working copy)
-@@ -300,11 +300,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/Browser.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Browser.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Browser.js	(working copy)
-@@ -238,11 +238,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/Platform.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Platform.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Platform.js	(working copy)
-@@ -126,11 +126,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/System.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/System.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/System.js	(working copy)
-@@ -361,11 +361,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/Version.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Version.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Version.js	(working copy)
-@@ -232,11 +232,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/Flash.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Flash.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Flash.js	(working copy)
-@@ -321,11 +321,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
-Index: qooxdoo/framework/source/class/qx/bom/client/Locale.js
-===================================================================
---- qooxdoo/framework/source/class/qx/bom/client/Locale.js	(revision 26019)
-+++ qooxdoo/framework/source/class/qx/bom/client/Locale.js	(working copy)
-@@ -135,11 +135,11 @@
-       if (statics.__defineGetter__) {
-         var constantValue = statics[keys[i]];
-         statics.__defineGetter__(keys[i], qx.Bootstrap.bind(function(key, c) {
--          qx.Bootstrap.warn(
-+          /*qx.Bootstrap.warn(
-             "The constant '"+ key + "' of '" + statics.classname + "'is deprecated: " +
-             "Plese check the API documentation of qx.core.Environemt.\n" +
-             "Trace:" + qx.dev.StackTrace.getStackTrace().join("\n")
--          );
-+          );*/
-           return c;
-         }, statics, keys[i], constantValue));
-       }
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26019)
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26096)
 +++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
 @@ -92,12 +92,12 @@
          }
@@ -489,7 +363,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26019)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26096)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
 @@ -153,7 +153,8 @@
          temp = os.fdopen(fileDescriptor, "w")
@@ -503,7 +377,7 @@ Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
          if rc != 0:
 Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26019)
+--- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26096)
 +++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
 @@ -97,8 +97,16 @@
          
@@ -526,7 +400,7 @@ Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
  
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26019)
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26096)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
 @@ -222,6 +222,8 @@
  
