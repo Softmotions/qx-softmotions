@@ -46,14 +46,14 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     var cached = me.__tcache[path];
                     if (cached) {
                         if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
-                            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
+                            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                                 qx.log.Logger.debug(this, "Invalidate cache: " + path);
                             }
                             cached = null;
                             delete me.__tcache[path];
                         }
                         if (cached) {
-                            if (qx.core.Environment.get("sm.nsrv.debug") == "on") {
+                            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                                 qx.log.Logger.debug(this, "Cached template fetched: " + path);
                             }
                             cb(null, cached);

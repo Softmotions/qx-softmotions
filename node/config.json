@@ -55,10 +55,10 @@
                         "sm.test.*"
                     ],
 
-            "variants" :
+            "environment" :
             {
-                "qx.debug" : ["on"],
-                "qx.aspects" : ["off"]
+                "qx.debug" : true,
+                "qx.aspects" : false
             },
 
             "settings" :
@@ -99,10 +99,10 @@
                         "sm.nsrv.*"
                     ],
 
-            "variants" :
+            "environment" :
             {
-                "sm.nsrv.debug" : ["on"],
-                "sm.nsrv.access-control-allow" : ["on"]
+                "sm.nsrv.debug" : true,
+                "sm.nsrv.access-control-allow" : true
             },
 
             "compile-options" :
