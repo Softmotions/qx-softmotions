@@ -38,6 +38,14 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             this.writeHead(resp, ctx, 200, { "Content-Type": ctype ? ctype : "text/plain" });
             resp.end(data);
             ctx({"terminated" : true});
+        },
+
+
+        /**
+         * Return default env
+         */
+        getDefaultEnv : function() {
+            return sm.app.Env.getDefault();
         }
     }
 });

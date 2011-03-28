@@ -43,6 +43,10 @@ qx.Class.define("sm.mongo.Collection", {
         __callQueue : null,
 
 
+        getName : function() {
+            return this.__name;
+        },
+
 
         /**
          * Drop the collection
@@ -108,6 +112,14 @@ qx.Class.define("sm.mongo.Collection", {
          */
         createQuery : function (query, options) {
             return new sm.mongo.Query(this, query, options);
+        },
+
+
+        /**
+         * Find one
+         */
+        findOne : function(queryObject, options, callback) {
+            this._applyNativeMethod("findOne", arguments);
         },
 
         ensureIndex : function(spec, unique, callback) {

@@ -109,11 +109,32 @@ qx.Class.define("sm.mongo.Mongo", {
             return this.__cinfo;
         },
 
+        getDB : function() {
+            return this.__db;
+        },
+
+        dereference : function(dbref, cb) {
+            return this.__db.dereference(dbref, cb);
+        },
+
+        toDBRef : function(namespace, oid, db) {
+            return new this.__db.bson_serializer.DBRef(namespace, oid, db);
+        },
+
+        toObjectID : function(oid) {
+            if (this._lib_mongo.BSONNative && (oid instanceof this._lib_mongo.BSONNative.ObjectID)) {
+                return oid;
+            } else if (this._lib_mongo.BSONPure && (oid instanceof this._lib_mongo.BSONPure.ObjectID)) {
+                return oid;
+            } else {
+                return this.__db.bson_serializer.ObjectID(oid);
+            }
+        },
+
         /**
          * Open mongodb connection
          */
         open : function(callback) {
-
             if (this.isConnected()) {
                 try {
                     if (callback) {

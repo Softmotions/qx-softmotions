@@ -6,6 +6,45 @@ var l_path = require("path");
 var l_regexp = require("utils/regexp");
 
 
+//todo perform locking, need c++ addon
+var fLock = false;
+var writeFileLock = module.exports.writeFileLock = function(path, data, enc, cb) {
+    if (fLock) {
+        process.nextTick(function() {
+            writeFileLock(path, data, enc, cb);
+        });
+        return;
+    }
+    l_fs.writeFile(path, data, enc, function(err) {
+        fLock = false;
+        if (cb) cb(err);
+    });
+};
+
+var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
+    if (fLock) {
+        process.nextTick(function() {
+            readFileLock(path, cb);
+        });
+        return;
+    }
+    l_fs.readFile(path, enc, function(err, data) {
+        fLock = false;
+        if (cb) cb(err, data);
+    });
+};
+
+var readFileLockSync = module.exports.readFileLockSync = function(path, enc) {
+    //todo perform locking, need c++ addon
+    return l_fs.readFileSync(path, enc);
+};
+
+var writeFileLockSync = module.exports.writeFileLockSync = function(path, data, enc) {
+    //todo perform locking, need c++ addon
+    return l_fs.writeFileSync(path, data, enc);
+};
+
+
 /**
  * Creates directory with its parents
  * @param dirname {String} Full dirname
@@ -151,7 +190,7 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
                     }
                 }
             }
-            
+
         } finally { //
             qx.lang.Array.remove(inodes, fstat.ino);
             if (inodes.length == 0 && fcallback) {

@@ -173,23 +173,22 @@ qx.Class.define("sm.app.Env", {
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
             this.__jsonConfigCache[name] = object;
-            this.__lfs.writeFile(cpath, qx.util.Json.stringify(object, true), "utf8", function() {
+            this.__lfsutils.writeFileLock(cpath, qx.util.Json.stringify(object, true), "utf8", function() {
                 me.fireDataEvent("configChanged", name);
             });
         },
 
         __readFileJSONTemplate : function(path) {
-            var fdata = this.__lfs.readFileSync(path, "utf8");
+            var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
             //todo use template engine!!!
-            var data = fdata.replace("${install_path}", $$node.process.cwd());
+            var data = fdata.replace(/\$\{install_path\}/g, $$node.process.cwd());
             return qx.util.Json.parse(data);
         },
 
         __readFileJSON : function(path) {
-            var fdata = this.__lfs.readFileSync(path, "utf8");
+            var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
             return qx.util.Json.parse(fdata);
         },
-
 
         /**
          * Open environment
