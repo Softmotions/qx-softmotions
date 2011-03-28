@@ -127,7 +127,7 @@ qx.Class.define("sm.mongo.Mongo", {
             } else if (this._lib_mongo.BSONPure && (oid instanceof this._lib_mongo.BSONPure.ObjectID)) {
                 return oid;
             } else {
-                return this.__db.bson_serializer.ObjectID(oid);
+                return new this.__db.bson_serializer.ObjectID(oid);
             }
         },
 
