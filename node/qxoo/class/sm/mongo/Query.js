@@ -36,6 +36,30 @@ qx.Class.define("sm.mongo.Query", {
          */
         __callbacks : null,
 
+        updateQuery : function(qspec) {
+            if (this.__query) {
+                qx.lang.Object.mergeWith(this.__query, qspec);
+            } else {
+                this.__query = qx.lang.Object.clone(qspec);
+            }
+        },
+
+        updateOptions : function(ospec) {
+            if (this.__options) {
+                qx.lang.Object.mergeWith(this.__options, ospec);
+            } else {
+                this.__options = qx.lang.Object.clone(ospec);
+            }
+        },
+
+        getQuery : function() {
+            return this.__query;
+        },
+
+        getCollection : function() {
+            return this.__collection;
+        },
+
         //      Fetch callbacks
 
         first  : function(callback) {
@@ -89,6 +113,21 @@ qx.Class.define("sm.mongo.Query", {
                     me.__streamRecords(cursor.streamRecords(me.__options), callback);
                 }
             ]);
+        },
+
+        findOne : function(callback) {
+            this.__collection._applyNativeMethod("findOne", [
+                this.__query,
+                this.__options,
+                callback
+            ]);
+        },
+
+        dumpQuery : function() {
+            return qx.util.Json.stringify({
+                query : this.__query,
+                options : this.__options
+            });
         },
 
         /**
