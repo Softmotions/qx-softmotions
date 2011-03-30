@@ -118,7 +118,7 @@ qx.Class.define("sm.mongo.Mongo", {
         },
 
         toDBRef : function(namespace, oid, db) {
-            return new this.__db.bson_serializer.DBRef(namespace, oid, db);
+            return new this.__db.bson_serializer.DBRef(namespace, this.toObjectID(oid), db);
         },
 
         toObjectID : function(oid) {
