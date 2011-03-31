@@ -206,6 +206,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return this.__assembly[name];
         },
 
+        getAssemblyMap : function() {
+            return this.__assembly ? this.__assembly : {};
+        },
+
         /**
          * Load web assembly
          */
@@ -430,7 +434,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 ctx.collectMessageHeaders();
                 me.__renderTemplate(req, res, ctx, forward);
             };
+
+            ctx._vhost_engine_ = this;
+
             /**
+             * Stores messages into response headers
              * Return true if found message errors
              */
             ctx.collectMessageHeaders = function(ignoreScode) {
@@ -487,6 +495,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Flush message headers into response
          */
         __messageHeaders : function(res) {
+
             //skip saving message headers in internal responses
             if (res.internal == true || !qx.lang.Type.isArray(res.messages)) {
                 return 0; //no messages found
