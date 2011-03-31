@@ -40,6 +40,12 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             ctx({"terminated" : true});
         },
 
+        writeMessage : function(resp, ctx, msg, isErr, ctype, data) {
+            resp.messages.push(new sm.nsrv.Message(msg, !!isErr));
+            this.writeHead(resp, ctx, null, { "Content-Type": ctype ? ctype : "text/plain" });
+            resp.end(data ? data : "");
+            ctx({"terminated" : true});
+        },
 
         /**
          * Return default env
