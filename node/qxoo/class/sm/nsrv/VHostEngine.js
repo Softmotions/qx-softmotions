@@ -562,29 +562,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //Response headers to be merged
             res.headers = res.headers || {};
 
-            res.sendNotFound = function(headers) {
+            res.sendSCode = function(scode, headers, data) {
                 headers = headers || {};
                 qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                res.writeHead(404, headers);
-                res.end();
+                res.writeHead(scode, headers);
+                res.end((typeof(data) === "string") ? data : "");
             };
-            res.sendForbidden = function(headers) {
-                headers = headers || {};
-                qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                res.writeHead(403, headers);
-                res.end();
+            res.sendNotFound = function(headers, data) {
+                res.sendSCode(404, headers, data);
             };
-            res.sendError = function(headers) {
-                headers = headers || {};
-                qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                res.writeHead(500, headers);
-                res.end();
+            res.sendForbidden = function(headers, data) {
+                res.sendSCode(403, headers, data);
             };
-            res.sendOk = function(headers) {
-                headers = headers || {};
-                qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                res.writeHead(200, headers);
-                res.end();
+            res.sendError = function(headers, data) {
+                res.sendSCode(500, headers, data);
+            };
+            res.sendOk = function(headers, data) {
+                res.sendSCode(200, headers, data);
             };
 
             if (qx.core.Environment.get("sm.nsrv.access-control-allow") == true) {
