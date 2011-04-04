@@ -40,11 +40,22 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             ctx({"terminated" : true});
         },
 
+        /**
+         * Write message to the response headers
+         */
         writeMessage : function(resp, ctx, msg, isErr, ctype, data) {
             resp.messages.push(new sm.nsrv.Message(msg, !!isErr));
             this.writeHead(resp, ctx, null, { "Content-Type": ctype ? ctype : "text/plain" });
             resp.end(data ? data : "");
             ctx({"terminated" : true});
+        },
+
+        /**
+         * Handle error, write error to the response headers
+         */
+        handleError : function(resp, ctx, err) {
+            qx.log.Logger.error(this, err);
+            this.writeMessage(resp, ctx, err.toString(), true);
         },
 
         /**
