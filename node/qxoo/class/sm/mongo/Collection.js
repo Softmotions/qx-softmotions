@@ -51,6 +51,10 @@ qx.Class.define("sm.mongo.Collection", {
             return this.__mongo.toDBRef(this.__name, oid, db);
         },
 
+        toObjectID : function(oid) {
+            return this.__mongo.toObjectID(oid);
+        },
+
 
         /**
          * Drop the collection
