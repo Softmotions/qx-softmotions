@@ -203,7 +203,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         },
 
         getAssembly : function(name) {
-            return this.__assembly[name];
+            return this.__assembly[name] ? this.__assembly[name] : {};
         },
 
         getAssemblyMap : function() {
