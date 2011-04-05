@@ -279,7 +279,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 delete asm["_ctx_provider_"];
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                            qx.util.Json.stringify(asm, true));
+                            JSON.stringify(asm, true));
                 }
             }
         },
