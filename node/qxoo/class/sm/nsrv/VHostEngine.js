@@ -59,6 +59,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __handlers : null,
 
+
+        /**
+         * Web handlers for regexp matching
+         */
+        __regexpHandlers : null,
+
         /**
          * Web assembly config
          */
@@ -330,6 +336,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __loadHandlers : function() {
 
             this.__handlers = {};
+            this.__regexpHandlers = [];
+
             var wapps = this.__config["webapps"];
             var wappsIds = {};
             for (var i = 0; i < wapps.length; ++i) {
@@ -377,14 +385,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
                                     "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
-                        var hlSlot = this.__handlers[hl];
-                        if (hlSlot) {
-                            qx.log.Logger.warn(this, "Handler: '" + k + "#" + (hlSlot["handler"]) +
-                                    "()' replaced by: " + hconf["handler"] + "()");
+
+                        var reMatching = ("regexp" == hconf["matching"]);
+
+                        if (!reMatching) {
+                            var hlSlot = this.__handlers[hl];
+                            if (hlSlot) {
+                                qx.log.Logger.warn(this, "Handler: '" + k + "#" + (hlSlot["handler"]) +
+                                        "()' replaced by: " + hconf["handler"] + "()");
+                            }
+                            this.__handlers[hl] = hconf;
+                        } else {
+                            hconf["$$re"] = new RegExp(lArr[i]);
+                            this.__regexpHandlers.push(hconf);
                         }
+
                         hconf["$$class"] = k;
                         hconf["$$instance"] = hinstance;
-                        this.__handlers[hl] = hconf;
                     }
                 }
             }
@@ -464,7 +481,16 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             //trying to find handlers
             var hconf = this.__handlers[req.info.pathname];
-
+            if (!hconf) { //try to find regexp handler
+                var path = req.info.path;
+                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
+                    var rh = this.__regexpHandlers[i];
+                    if (rh["$$re"].test(path)) {
+                        hconf = rh;
+                        break;
+                    }
+                }
+            }
             var me = this;
             var ctx = function(forward) {
                 if (forward && forward["terminated"] == true) {
@@ -763,7 +789,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
     },
 
     destruct : function() {
-        this.__config = this.__handlers = this.__vhostName = null;
+        this.__config = this.__handlers = this.__regexpHandlers = this.__vhostName = null;
         this.__path = this.__url = this.__formidable = this.__querystring = null;
         this.__server = null;
         //this._disposeObjects("__field_name");
