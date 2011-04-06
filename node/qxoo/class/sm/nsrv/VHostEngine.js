@@ -6,6 +6,18 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
     statics :
     {
+        /**
+         * Array of extra assembly providers
+         */
+        __asmProvider : null,
+
+        registerAssemblyProvider : function(provider) {
+            if ((typeof provider) != "function") {
+                qx.log.Logger.warn(this, "Assembly provider must be a function()");
+                return;
+            }
+            this.__asmProvider = provider;
+        }
     },
 
     events :
@@ -202,11 +214,25 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return ret;
         },
 
-        getAssembly : function(name) {
-            return this.__assembly[name] ? this.__assembly[name] : {};
+        loadAssembly : function(name, cb) {
+            if ((typeof name) != "string") {
+                cb("Invalid assembly name: " + name, null);
+                return;
+            }
+            var asm = this.__assembly[name];
+            if (asm) {
+                cb(null, asm);
+                return;
+            }
+            var provider = this.self(arguments).__asmProvider;
+            if (!provider) {
+                cb("Assembly: " + name + " not found", null);
+                return;
+            }
+            provider(name, cb);
         },
 
-        getAssemblyMap : function() {
+        getBuiltInAssemblyMap : function() {
             return this.__assembly ? this.__assembly : {};
         },
 
@@ -278,9 +304,21 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     qx.lang.Object.carefullyMergeWith(asm, esm);
                 }
                 delete asm["_ctx_provider_"];
+
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
                             JSON.stringify(asm, true));
+                }
+            }
+
+            //Replace _extends_ string ref by real assembly instance
+            for (var asn in this.__assembly) {
+                var asm = this.__assembly[asn];
+                if (asm["_extends_"]) {
+                    asm["_extends_"] = this.__assembly[asm["_extends_"]];
+                }
+                if (asm["_extends_"] == asm) {
+                    delete asm["_extends_"];
                 }
             }
         },

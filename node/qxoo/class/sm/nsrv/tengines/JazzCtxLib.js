@@ -229,42 +229,44 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          * Invoke assembly
          */
         assembly : function(vhe, te, ctx, name, params, ctxParams, cb) {
-            var asm = vhe.getAssembly(name);
-            if (!asm) {
-                qx.log.Logger.warn(this, "Missing assembly: '" + name + "'");
-                cb("");
-                return;
-            }
-            var core = asm["_core_"];
-            if (!core) {
-                qx.log.Logger.warn(this, "Missing core for assembly: '" + name + "'");
-                cb("");
-                return;
-            }
-            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                qx.log.Logger.debug("Assembly core: " + core);
-            }
-            if (!ctxParams) {
-                ctxParams = {};
-            }
-            var aiStack = ctxParams["_astack_"] = qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : [];
-            for (var i = 0; i < aiStack.length; ++i) {
-                if (aiStack[i] == asm) {
-                    qx.log.Logger.warn(this, "Recursive assembly reference: " + name + "'");
+            var me = this;
+            vhe.loadAssembly(name, function(err, asm) {
+                if (err) {
+                    qx.log.Logger.error(me, err);
                     cb("");
                     return;
                 }
-            }
-            ctxParams["_asm_"] = asm;
+                var core = asm["_core_"];
+                if (!core) {
+                    qx.log.Logger.warn(me, "Missing core for assembly: '" + name + "'");
+                    cb("");
+                    return;
+                }
+                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                    qx.log.Logger.debug("Assembly core: " + core);
+                }
+                if (!ctxParams) {
+                    ctxParams = {};
+                }
+                var aiStack = ctxParams["_astack_"] = qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : [];
+                for (var i = 0; i < aiStack.length; ++i) {
+                    if (aiStack[i] == asm) {
+                        qx.log.Logger.warn(me, "Recursive assembly reference: " + name + "'");
+                        cb("");
+                        return;
+                    }
+                }
+                ctxParams["_asm_"] = asm;
 
-            var req = ctx["_req_"];
-            sm.nsrv.tengines.JazzCtxLib.__populateAsmCtxParams(req, asm, ctxParams);
+                var req = ctx["_req_"];
+                sm.nsrv.tengines.JazzCtxLib.__populateAsmCtxParams(req, asm, ctxParams);
 
-            //Save assembly instance
-            aiStack.push(asm);
-            this.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
-                qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
-                cb(data);
+                //Save assembly instance
+                aiStack.push(asm);
+                me.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
+                    qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
+                    cb(data);
+                });
             });
         },
 
