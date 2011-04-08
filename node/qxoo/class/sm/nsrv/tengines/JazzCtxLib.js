@@ -80,20 +80,27 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          * @param cb {Function} Callback: function(data)
          */
         irequest : function(vhe, te, ctx, path, params, ctxParams, cb) {
+            this.irequestExt(vhe, te, ctx, path, params, ctxParams, function(err, data) {
+                if (err) {
+                    qx.log.Logger.error(this, err);
+                }
+                cb(data != null ? data : "");
+            });
+        },
+
+        irequestExt : function(vhe, te, ctx, path, params, ctxParams, cb) {
             var cbc = false;
             try {
 
                 if (!qx.lang.Type.isString(path)) {
-                    qx.log.Logger.error(this, "irequest(), invalid path=" + path);
                     cbc = true;
-                    cb("");
+                    cb("irequest(), invalid path=" + path, null);
                     return;
                 }
 
                 var me = this;
                 var req = ctx["_req_"];
-                var res = ctx["_res_"];
-                var headers = ctx["_headers_"];
+                var res = ctx["_res_"];                
 
                 var url = path;
                 if (path.length > 0 && path.charAt(0) != '/') {
@@ -200,9 +207,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                         cbc = true;
                         if (ires.__data.length > 0) {
-                            cb(ires.__data.join(""));
+                            cb(null, ires.__data.join(""));
                         } else {
-                            cb("");
+                            cb(null, "");
                         }
                     }
                 };
@@ -218,9 +225,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 });
 
             } catch(e) {
-                qx.log.Logger.error(this, e);
                 if (!cbc) {
-                    cb("");
+                    cb(e, null);
                 }
             }
         },
@@ -229,22 +235,26 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          * Invoke assembly
          */
         assembly : function(vhe, te, ctx, name, params, ctxParams, cb) {
+            this.assemblyExt(vhe, te, ctx, name, params, ctxParams, function(err, data) {
+                if (err) {
+                    qx.log.Logger.error(this, err);
+                }
+                cb(data != null ? data : "");
+            })
+        },
+
+        assemblyExt : function(vhe, te, ctx, name, params, ctxParams, cb) {
             var me = this;
             vhe.loadAssembly(name, function(err, asm) {
                 if (err) {
-                    qx.log.Logger.error(me, err);
-                    cb("");
+                    cb(err, null);
                     return;
                 }
                 var core = asm["_core_"];
                 if (!core) {
-                    qx.log.Logger.warn(me, "Missing core for assembly: '" + name + "'");
-                    cb("");
+                    cb("Missing core for assembly: '" + name + "'", null);
                     return;
-                }
-                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                    qx.log.Logger.debug("Assembly core: " + core);
-                }
+                }               
                 if (!ctxParams) {
                     ctxParams = {};
                 }
@@ -252,7 +262,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 for (var i = 0; i < aiStack.length; ++i) {
                     if (aiStack[i] == asm) {
                         qx.log.Logger.warn(me, "Recursive assembly reference: " + name + "'");
-                        cb("");
+                        cb(null, "");
                         return;
                     }
                 }
@@ -263,9 +273,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                 //Save assembly instance
                 aiStack.push(asm);
-                me.irequest(vhe, te, ctx, core, params, ctxParams, function(data) {
+                me.irequestExt(vhe, te, ctx, core, params, ctxParams, function(err, data) {
                     qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
-                    cb(data);
+                    cb(err, data);
                 });
             });
         },

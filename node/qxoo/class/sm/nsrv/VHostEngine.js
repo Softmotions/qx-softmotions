@@ -407,6 +407,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
         },
 
+        getTemplateEngineForExt : function(ext) {
+            return this.self(arguments).__tengines[ext];
+        },
+
         /**
          * Render file template
          * @param req {http.ServerRequest}

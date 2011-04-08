@@ -53,9 +53,9 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
         /**
          * Handle error, write error to the response headers
          */
-        handleError : function(resp, ctx, err) {
+        handleError : function(resp, ctx, err, hide) {
             qx.log.Logger.error(this, err);
-            this.writeMessage(resp, ctx, err.toString(), true);
+            this.writeMessage(resp, ctx, hide ? "Error" : err.toString(), true);
         },
 
         /**
