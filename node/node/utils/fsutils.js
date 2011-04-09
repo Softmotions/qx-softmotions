@@ -244,7 +244,7 @@ DirectoryScanner.prototype.abort = function() {
  * Normalize ant path pattern
  */
 DirectoryScanner.prototype._normPattern = function(pattern) {
-    if (pattern == "") {
+    if (pattern === "") {
         return "**";
     }
     while (pattern.length > 0 && pattern.charAt(0) == FileSeparator) {
@@ -256,12 +256,12 @@ DirectoryScanner.prototype._normPattern = function(pattern) {
     var inMD = false; //if true we in **/pattern
     for (var i = 0; i < plist.length; ++i) {
         var pitem = plist[i];
-        if (pitem == "**") {
+        if (pitem === "**") {
             if (inMD) {
                 continue;
             }
             inMD = true;
-        } else if (pitem == "*" && inMD) {
+        } else if (pitem === "*" && inMD) {
             continue;
         } else {
             pitem = l_regexp.glob2Regexp(pitem);
@@ -327,7 +327,7 @@ DirectoryScanner.prototype.vote = function(farr, pattern, onlyPrefix) {
 
     //qx.log.Logger.warn("\nfarr=" + farr.join("|") + "\npatt=" + pattern.join("|"));
 
-    if (pattern.length == 1 && pattern[0] == "**") { //Simple case
+    if (pattern.length == 1 && pattern[0] === "**") { //Simple case
         return true;
     }
 
@@ -345,7 +345,7 @@ DirectoryScanner.prototype.vote = function(farr, pattern, onlyPrefix) {
         if (!pv) {
             return false;
         }
-        if (pv == "**") {
+        if (pv === "**") {
             if (expectNext == null && pattern.length > pInd + 1) {
                 expectNext = pattern[pInd + 1];
                 expectNextInd = pInd + 1;
@@ -366,7 +366,7 @@ DirectoryScanner.prototype.vote = function(farr, pattern, onlyPrefix) {
                 pInd += ((gotExpectNext) ? 1 : 2);
             }
         } else {
-            if (pv != "**") {
+            if (pv !== "**") {
                 ++pInd;
             }
         }
@@ -389,7 +389,7 @@ DirectoryScanner.prototype.match = function(val, pattern) {
     if (!this._rcache) {
         this._rcache = {};
     }
-    var lpattern = (pattern == "**") ? ".*" : pattern;
+    var lpattern = (pattern === "**") ? ".*" : pattern;
     var re = this._rcache[lpattern];
     if (!re) {
         re = new RegExp(lpattern, "i");
