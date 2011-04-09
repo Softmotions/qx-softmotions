@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 require("../../mediahouse-qxoo-server.js");
 
 var cwd = process.cwd();
@@ -16,7 +21,7 @@ module.exports.testEnvCreate = function(test) {
     test.ok(cfg["mongo"]);
     test.ok(cfg["mongo"]["db_name"]);
     test.ok(cfg["mongo"]["db_host"]);
-    test.ok(cfg["mongo"]["db_port"]);    
+    test.ok(cfg["mongo"]["db_port"]);
     test.done();
 
 };
@@ -88,11 +93,11 @@ module.exports.insertAndSelect = function(test) {
         //test.ifError(err);
     });
     coll.insert([
-        {"a" : "val1", "b" : 2},
-        {"a" : "val2", "b" : 2},
-        {"a" : "val3", "b" : 2},
-        {"a" : "val4", "b" : 3}
-    ]);
+                    {"a" : "val1", "b" : 2},
+                    {"a" : "val2", "b" : 2},
+                    {"a" : "val3", "b" : 2},
+                    {"a" : "val4", "b" : 3}
+                ]);
 
     var q = coll.createQuery({"b" : 2},
                              {"sort":[
@@ -102,22 +107,26 @@ module.exports.insertAndSelect = function(test) {
 
     var count = 0;
 
-    q.first(function(doc) {
-        test.ok(doc);
-        test.equal(doc["a"], "val3");
-    }).last(function(index, doc) {
-        test.ok(doc);
-        test.equal(doc["a"], "val1");
-    }).each(function(index, doc) {
-        test.ok(doc);
-        test.ok(doc["_id"]);
-        test.ok(index >= 0);
-        ++count;
-    }).all(function(size, items) {
-        test.ok(items);
-        test.ok(size == items.length);
-        test.equal(items.length, 3);
-    }).exec(function(err) {
+    q.first(
+            function(doc) {
+                test.ok(doc);
+                test.equal(doc["a"], "val3");
+            }).last(
+            function(index, doc) {
+                test.ok(doc);
+                test.equal(doc["a"], "val1");
+            }).each(
+            function(index, doc) {
+                test.ok(doc);
+                test.ok(doc["_id"]);
+                test.ok(index >= 0);
+                ++count;
+            }).all(
+            function(size, items) {
+                test.ok(items);
+                test.ok(size == items.length);
+                test.equal(items.length, 3);
+            }).exec(function(err) {
         test.ifError(err);
         test.equal(count, 3);
         test.done();

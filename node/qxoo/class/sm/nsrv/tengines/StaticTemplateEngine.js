@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * Render template as static file
  */

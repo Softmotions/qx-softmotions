@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 // Various filesystem utils
 
 
@@ -85,7 +90,7 @@ module.exports.mkdirsSync = function (dirname, mode) {
 /**
  * Current file separator
  */
-const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
+        const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
 module.exports.FileSeparator = FileSeparator;
 
 

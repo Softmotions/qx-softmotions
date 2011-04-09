@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * NodeJS MVC server
  */
@@ -111,7 +116,7 @@ qx.Class.define("sm.nsrv.NKServer", {
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
                 chandlers[i] = vhost(ve.getVHostName(), ve.createConnectServer());
-            }            
+            }
             this.__server = new connect.HTTPServer(chandlers);
             this.__server.listen(port, host);
         },

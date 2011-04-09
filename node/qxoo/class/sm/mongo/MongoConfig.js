@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * Manage sm.mongo.Mongo instance as provided by
  * configuration object:

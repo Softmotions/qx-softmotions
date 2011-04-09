@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * Mongo query
  */
@@ -125,9 +130,9 @@ qx.Class.define("sm.mongo.Query", {
 
         dumpQuery : function() {
             return qx.util.Json.stringify({
-                query : this.__query,
-                options : this.__options
-            });
+                                              query : this.__query,
+                                              options : this.__options
+                                          });
         },
 
         /**

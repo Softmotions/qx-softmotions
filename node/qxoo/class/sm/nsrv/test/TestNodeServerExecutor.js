@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 qx.Class.define("sm.nsrv.test.TestNodeServerExecutor", {
     extend  : qx.core.Object,
 
@@ -79,9 +84,9 @@ qx.Class.define("sm.nsrv.test.TestNodeServerExecutor", {
             var params = [];
             for (var k in req.params) {
                 params.push({
-                    "name" : k,
-                    "val" : req.params[k]
-                });
+                                "name" : k,
+                                "val" : req.params[k]
+                            });
             }
             ctx["params"] = params;
             ctx({path : "params.jz"});

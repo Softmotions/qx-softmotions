@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * Mongo collection
  */
@@ -149,9 +154,10 @@ qx.Class.define("sm.mongo.Collection", {
             var indexName = indexes.join("_");
             var icoll = this.__mongo.collection("system.indexes");
             var indData = null;
-            icoll.createQuery({"name" : indexName}).first(function(data) {
-                indData = data;
-            }).exec(function(err) {
+            icoll.createQuery({"name" : indexName}).first(
+                    function(data) {
+                        indData = data;
+                    }).exec(function(err) {
                 if (err || indData) {
                     if (callback) {
                         callback(err, false);
