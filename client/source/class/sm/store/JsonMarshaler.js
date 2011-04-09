@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 qx.Class.define("sm.store.JsonMarshaler", {
     extend  : qx.data.marshal.Json,
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 /**
  * Расширенный контроллер списка,
  * учитывать в модели данных выбранные (selected) элементы

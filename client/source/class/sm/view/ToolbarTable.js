@@ -1,8 +1,10 @@
 /*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
  */
 
 /*
- Учебная группа (список группы)
+ * Таблица + тулбар
  */
 qx.Class.define("sm.view.ToolbarTable", {
     extend  : qx.ui.container.Composite,

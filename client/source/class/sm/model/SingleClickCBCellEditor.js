@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
+ * All Rights Reserved.
+ */
+
 qx.Class.define("sm.model.SingleClickCBCellEditor", {
 
     extend : qx.core.Object,
@@ -10,15 +15,15 @@ qx.Class.define("sm.model.SingleClickCBCellEditor", {
         //overriden
         createCellEditor : function(cellInfo) {
             var editor = new qx.ui.container.Composite(new qx.ui.layout.HBox().set({
-                alignX: "center",
-                alignY: "middle"
-            })).set({
-                focusable: true
-            });
+                                                                                       alignX: "center",
+                                                                                       alignY: "middle"
+                                                                                   })).set({
+                                                                                               focusable: true
+                                                                                           });
 
             var checkbox = new qx.ui.form.CheckBox().set({
-                value: !cellInfo.value
-            });
+                                                             value: !cellInfo.value
+                                                         });
             editor.add(checkbox);
 
             // propagate focus
