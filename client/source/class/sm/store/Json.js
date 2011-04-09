@@ -14,7 +14,7 @@ qx.Class.define("sm.store.Json", {
         this.base(arguments);
 
         // store the marshaler
-        this._marshaler = (useModel == true || useModel == undefined) ? new sm.store.JsonMarshaler(delegate) : null;
+        this._marshaler = (useModel == true || useModel === undefined) ? new sm.store.JsonMarshaler(delegate) : null;
 
         if (url != null) {
             this.setUrl(url);

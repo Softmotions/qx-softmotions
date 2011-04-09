@@ -37,10 +37,10 @@ qx.Class.define("sm.conn.Actions", {
         },
 
         prepareRequest : function(name, params, handler, method, resptype) {
-            if (method == undefined) {
+            if (method == null) {
                 method = "GET";
             }
-            if (resptype == undefined) {
+            if (resptype == null) {
                 resptype = "text/plain";
             }
             var url = this.getUrl(name);

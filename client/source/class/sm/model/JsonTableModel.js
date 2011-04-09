@@ -37,15 +37,15 @@ qx.Class.define("sm.model.JsonTableModel", {
 
 
         _applyJsonData : function(data) {
-            if (data == null || data == undefined) {
-                this.warn("No data found in json model");
+            if (data == null) {
+                qx.log.Logger.warn(this, "No data found in json model");
                 return;
             }
             var colsSpec = null;
             if (this._columnsInitiated == false) {
                 colsSpec = data["columns"];
                 if (!colsSpec || !(colsSpec instanceof Array)) {
-                    this.warn("No columns found or invalid columns type in json data");
+                    qx.log.Logger.warn(this, "No columns found or invalid columns type in json data");
                     return;
                 }
                 var columns = [];
@@ -67,7 +67,7 @@ qx.Class.define("sm.model.JsonTableModel", {
 
             var items = data["items"];
             if (!items || !(items instanceof Array)) {
-                this.warn("No data found or invalid columns type in json data");
+                qx.log.Logger.warn(this, "No data found or invalid columns type in json data");
                 return;
             }
             var ditems = new Array(items.length);

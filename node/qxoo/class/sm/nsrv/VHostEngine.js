@@ -157,12 +157,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __getWebappConfig : function(id, failIfNotfound) {
 
-            if (failIfNotfound == undefined) {
+            if (failIfNotfound == null) {
                 failIfNotfound = true;
             }
             var me = this;
             var wapp = (function () {
-                if (id == null || id == undefined) {
+                if (id == null) {
                     id = me.__getDefaultWebappId();
                 }
                 if (id == null) {
@@ -208,7 +208,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __getHconfValue : function(hconf, key) {
             var ret = hconf[key];
-            if (ret == undefined) {
+            if (ret === undefined) {
                 var wapp = this.__getWebappConfig(hconf["webapp"]);
                 if (wapp["handlerDefaults"]) {
                     ret = wapp["handlerDefaults"][key];
@@ -286,7 +286,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                            " [" + this.__vhostName + "]:[" + wappId + "]");
+                                                " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -313,7 +313,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                            JSON.stringify(asm, true));
+                                                JSON.stringify(asm, true));
                 }
             }
 
@@ -383,7 +383,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                                    "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                                                        "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -522,7 +522,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             };
             if (req.$$ctxParams) {
                 for (var k in req.$$ctxParams) {
-                    if (ctx[k] == undefined) {
+                    if (ctx[k] === undefined) {
                         ctx[k] = req.$$ctxParams[k];
                     }
                 }

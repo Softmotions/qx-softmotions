@@ -16,12 +16,12 @@ qx.Class.define("sm.alert.AlertMessages", {
         this.base(arguments, caption);
         this.setLayout(new qx.ui.layout.VBox(10));
         this.set({
-            modal         : true,
-            showMinimize  : false,
-            showMaximize  : false,
-            allowMaximize : false,
-            width : 390
-        });
+                     modal         : true,
+                     showMinimize  : false,
+                     showMaximize  : false,
+                     allowMaximize : false,
+                     width : 390
+                 });
 
         this.__messages = {};
         this.__container = new qx.ui.container.Composite(new qx.ui.layout.VBox());
@@ -69,7 +69,7 @@ qx.Class.define("sm.alert.AlertMessages", {
                 return;
             }
             var msgs = this.__messages[caption];
-            if (msgs == null || msgs == undefined) {
+            if (msgs == null) {
                 msgs = new qx.ui.groupbox.GroupBox(caption);
                 msgs.setLayout(new qx.ui.layout.VBox());
                 this.__container.add(msgs);

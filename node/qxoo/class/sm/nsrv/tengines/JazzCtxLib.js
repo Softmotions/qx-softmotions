@@ -100,7 +100,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                 var me = this;
                 var req = ctx["_req_"];
-                var res = ctx["_res_"];                
+                var res = ctx["_res_"];
 
                 var url = path;
                 if (path.length > 0 && path.charAt(0) != '/') {
@@ -162,7 +162,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                     getHeader : function(hn) {
                         var ret = ires.headers[hn];
-                        if (ret == undefined) {
+                        if (ret == null) {
                             ret = res.getHeader(hn);
                         }
                         return ret;
@@ -254,7 +254,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (!core) {
                     cb("Missing core for assembly: '" + name + "'", null);
                     return;
-                }               
+                }
                 if (!ctxParams) {
                     ctxParams = {};
                 }
@@ -287,7 +287,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 qx.core.Assert.assert(!!asm, "Assembly is not in ctx");
             }
             var val = asm[name];
-            if (val == undefined) {
+            if (val === undefined) {
                 val = def;
             }
             var jclib = sm.nsrv.tengines.JazzCtxLib;

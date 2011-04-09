@@ -68,8 +68,8 @@ qx.Class.define("sm.ui.progress.ProgressPopup", {
         this.__lsnrs = [];
         this.setLayout(new qx.ui.layout.HBox(10).set({alignY : "middle"}));
         this.set({
-            "visibility" : "hidden"
-        });
+                     "visibility" : "hidden"
+                 });
 
         //we should be above all windows   
         var root = qx.core.Init.getApplication().getRoot();
@@ -89,9 +89,9 @@ qx.Class.define("sm.ui.progress.ProgressPopup", {
         this.getApplicationRoot().addListener("resize", function(e) {
             var bounds = this.getBounds();
             this.set({
-                marginTop: Math.round((qx.bom.Document.getHeight() - bounds.height) / 2),
-                marginLeft : Math.round((qx.bom.Document.getWidth() - bounds.width) / 2)
-            });
+                         marginTop: Math.round((qx.bom.Document.getHeight() - bounds.height) / 2),
+                         marginLeft : Math.round((qx.bom.Document.getWidth() - bounds.width) / 2)
+                     });
         }, this);
 
         /*
@@ -100,9 +100,9 @@ qx.Class.define("sm.ui.progress.ProgressPopup", {
         this.addListener("appear", function(e) {
             var bounds = this.getBounds();
             this.set({
-                marginTop: Math.round((qx.bom.Document.getHeight() - bounds.height) / 2),
-                marginLeft : Math.round((qx.bom.Document.getWidth() - bounds.width) / 2)
-            });
+                         marginTop: Math.round((qx.bom.Document.getHeight() - bounds.height) / 2),
+                         marginLeft : Math.round((qx.bom.Document.getWidth() - bounds.width) / 2)
+                     });
         }, this);
     },
 
@@ -156,7 +156,7 @@ qx.Class.define("sm.ui.progress.ProgressPopup", {
         },
 
         hide : function(reset) {
-            if (reset == null || reset == undefined) {
+            if (reset == null) {
                 reset = true;
             }
             if (!this.isVisible()) {
