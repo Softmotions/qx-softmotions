@@ -31,7 +31,7 @@ var config =
                         context : "/test",
                         docRoot : cwd + "/nksrv/webapps/test1",
                         handlerDefaults : {
-                            methods : ["get", "post"]
+                            methods : ["GET", "POST"]
                         }
                     },
                     {
@@ -39,7 +39,7 @@ var config =
                         context : "/test12",
                         docRoot : cwd + "/nksrv/webapps/test1",
                         handlerDefaults : {
-                            methods : ["get", "post"]
+                            methods : ["GET", "POST"]
                         }
                     },
 
@@ -51,8 +51,8 @@ var config =
 
                 ],
                 errorOptions : {
-                    showErrorMsg : true,
-                    messagesInHeaders : true
+                    showErrorMsg : false,    //Return errors in response body
+                    messagesInHeaders : true //Return errors in http resp headers
                 },
                 formdiableOptions : { //options for formidable nodejs module
                     keepExtensions : true,
