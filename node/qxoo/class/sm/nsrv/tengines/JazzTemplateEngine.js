@@ -98,7 +98,13 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             ctx["_res_"] = res;
             ctx["_headers_"] = headers;
             ctx["_ctype_"] = function(_ctype, _cb) {
-                sm.nsrv.tengines.JazzCtxLib.ctype(headers, _ctype, _cb);
+                sm.nsrv.tengines.JazzCtxLib.ctype(req, headers, _ctype, _cb);
+            };
+            ctx["_ctype_xhtml_"] = function(_cb) {
+                sm.nsrv.tengines.JazzCtxLib.ctype(req, headers,
+                                                  {"default" : "application/xhtml+xml; charset=UTF-8",
+                                                      "MSIE 7" : "text/html; charset=UTF-8",
+                                                      "MSIE 8" : "text/html; charset=UTF-8"}, _cb);
             };
             ctx["_strip_"] = function(prefix) {
                 return req.stripParams(prefix);

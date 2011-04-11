@@ -54,6 +54,22 @@ qx.Class.define("sm.nsrv.HTTPUtils", {
                 qx.lang.Object.mergeWith(resp.headers, headers);
             }
             resp.writeHead(scode, resp.headers);
+        },
+
+
+        selectForUserAgent : function(map, rheaders) {
+            var userAgent = rheaders["user-agent"];
+            if (userAgent != null) {
+                for (var k in map) {
+                    if (k === "default") {
+                        continue;
+                    }
+                    if (userAgent.indexOf(k) != -1) {
+                        return map[k];
+                    }
+                }
+            }
+            return map["default"];
         }
     },
 

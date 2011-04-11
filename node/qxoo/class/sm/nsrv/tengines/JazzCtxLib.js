@@ -10,13 +10,15 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
         /**
          * Setup content type to the response headers
          *
-         * @param headers
-         * @param ctype
-         * @param cb
          */
-        ctype : function(headers, ctype, cb) {
-            if (ctype) {
+        ctype : function(req, headers, ctype, cb) {
+            if ((typeof ctype) === "string") {
                 headers["Content-Type"] = ctype;
+            } else if ((typeof ctype) === "object") {
+                var hv = sm.nsrv.HTTPUtils.selectForUserAgent(ctype, req.headers);
+                if (hv != null) {
+                    headers["Content-Type"] = hv;
+                }
             }
             cb();
         },
