@@ -62,8 +62,10 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             if (err instanceof qx.locale.LocalizedString) {
                 err = err.toString();
             }
-            qx.log.Logger.error(this, err);
-            this.writeMessage(resp, ctx, hide ? "Error" : err.toString(), true);
+            if (err != null) {
+                qx.log.Logger.error(this, err);
+            }
+            this.writeMessage(resp, ctx, (hide || err == null) ? "Ошибка" : err.toString(), true);
         },
 
         /**

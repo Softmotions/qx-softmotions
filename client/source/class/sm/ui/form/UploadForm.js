@@ -3,6 +3,12 @@
  * All Rights Reserved.
  */
 
+/*
+ #asset(sm/icons/misc/folder_add.png)
+ #asset(sm/icons/misc/folder_explore.png)
+ #asset(sm/icons/misc/cross16.png)
+ */
+
 /**
  * Модифицированная форма uploadwidget.UploadForm
  */
@@ -38,7 +44,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
         el.setAttribute("enctype", encoding || "multipart/form-data");
 
 
-        this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "uisws/icons/misc/folder_add.png");
+        this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "sm/icons/misc/folder_add.png");
         this.add(this.__addButton, {flex : 1});
 
         this.__addButton.addListener("execute", function() {
@@ -55,6 +61,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
         // заглушка для формы
         "input" : "qx.event.type.Data",
         "changeValue" : "qx.event.type.Data"
+
     },
 
     // --------------------------------------------------------------------------
@@ -79,10 +86,10 @@ qx.Class.define("sm.ui.form.UploadForm", {
         _addFileItem: function() {
             var formRow = new qx.ui.container.Composite(new qx.ui.layout.HBox());
 
-            var fileField = new uploadwidget.UploadField("fileupload", null, "uisws/icons/misc/folder_explore.png");
+            var fileField = new uploadwidget.UploadField("fileupload", null, "sm/icons/misc/folder_explore.png");
             formRow.add(fileField, {flex: 1});
 
-            var delFileItem = new qx.ui.form.Button(null, "uisws/icons/misc/cross16.png");
+            var delFileItem = new qx.ui.form.Button(null, "sm/icons/misc/cross16.png");
             delFileItem.setMarginLeft(5);
             formRow.add(delFileItem);
 
@@ -96,15 +103,16 @@ qx.Class.define("sm.ui.form.UploadForm", {
             if (this.__fileItemCount > 9) {
                 this.__addButton.setEnabled(false);
             }
+            this.fireDataEvent("changeValue", this.__fileItemCount);
         },
 
         _removeFileItem: function(element) {
             --this.__fileItemCount;
             this._remove(element);
-
             if (this.__fileItemCount <= 9) {
                 this.__addButton.setEnabled(true);
             }
+            this.fireDataEvent("changeValue", this.__fileItemCount);
         },
 
         /*
@@ -126,6 +134,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
 
         _onChangeContent : function(e) {
         }
+
+
     },
 
     /*

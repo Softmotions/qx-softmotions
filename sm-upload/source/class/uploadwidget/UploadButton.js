@@ -47,8 +47,9 @@ qx.Class.define("uploadwidget.UploadButton",
                             this.setFieldName(fieldName);
                         }
 
+
                         // Fix for bug #3027
-                        if (qx.bom.client.Engine.OPERA) {
+                        if (qx.core.Environment.get("engine.name") == "opera") {
                             this.setSelectable(true);
                         }
                     },
@@ -105,26 +106,26 @@ qx.Class.define("uploadwidget.UploadButton",
 
                         // overridden
                         capture : qx.core.Environment.select("engine.name",
-                                                         {
-                                                             "mshtml" : function() {
-                                                                 this.__mouseUpListenerId = this.getApplicationRoot().addListenerOnce("mouseup", this._onMouseUp, this);
-                                                             },
+                                                             {
+                                                                 "mshtml" : function() {
+                                                                     this.__mouseUpListenerId = this.getApplicationRoot().addListenerOnce("mouseup", this._onMouseUp, this);
+                                                                 },
 
-                                                             "default" : function() {
-                                                                 this.base(arguments);
-                                                             }
-                                                         }),
+                                                                 "default" : function() {
+                                                                     this.base(arguments);
+                                                                 }
+                                                             }),
 
 
                         // overridden
                         releaseCapture : qx.core.Environment.select("engine.name",
-                                                                {
-                                                                    "mshtml" : qx.lang.Function.empty,
+                                                                    {
+                                                                        "mshtml" : qx.lang.Function.empty,
 
-                                                                    "default" : function() {
-                                                                        this.base(arguments);
-                                                                    }
-                                                                }),
+                                                                        "default" : function() {
+                                                                            this.base(arguments);
+                                                                        }
+                                                                    }),
 
 
                         // ------------------------------------------------------------------------
@@ -212,7 +213,8 @@ qx.Class.define("uploadwidget.UploadButton",
                                         // the area of the upload button
                                         fontSize: '400px'
                                     };
-                                    if (qx.bom.client.Engine.MSHTML && qx.bom.client.Engine.VERSION < 9.0) {
+
+                                    if (qx.core.Environment.get("engine.name") == 'mshtml' && qx.core.Environment.get("engine.version") < 9.0) {
                                         css.filter = 'alpha(opacity=0)';
                                     }
 
