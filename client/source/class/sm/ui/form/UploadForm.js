@@ -86,7 +86,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
         _addFileItem: function() {
             var formRow = new qx.ui.container.Composite(new qx.ui.layout.HBox());
 
-            var fileField = new uploadwidget.UploadField("fileupload", null, "sm/icons/misc/folder_explore.png");
+            var fileName = "file" + this.__fileItemCount;
+            var fileField = new uploadwidget.UploadField(fileName, null, "sm/icons/misc/folder_explore.png");
             formRow.add(fileField, {flex: 1});
 
             var delFileItem = new qx.ui.form.Button(null, "sm/icons/misc/cross16.png");

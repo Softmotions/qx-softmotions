@@ -169,6 +169,27 @@ qx.Class.define("sm.mongo.Mongo", {
             });
         },
 
+
+        /**
+         * Open GridFS file
+         *
+         * @param fname{String}
+         * @param mode {String} Set the mode for this file. Available modes:
+         *     <ul>
+         *       <li>"r" - read only. This is the default mode.</li>
+         *       <li>"w" - write in truncate mode. Existing data will be overwriten</li>
+         *       <li>"w+" - write in edit mode.</li>
+         *     </ul>
+         * @param ctype {String} file content type
+         * @param cb {function(?Error, ?GridStore)}
+         */
+        openGridFile : function(fname, mode, ctype, cb) {
+            var gfile = new this._lib_mongo
+                    .GridStore(this.getDB(), fname, mode, ctype ? {chunk_type : ctype} : {});
+            gfile.open(cb);
+        },
+
+
         /**
          * Closes connection to mongo server
          */
