@@ -47,6 +47,9 @@ qx.Class.define("sm.mongo.Collection", {
          */
         __callQueue : null,
 
+        getMongo : function() {
+            return this.__mongo;
+        },
 
         getName : function() {
             return this.__name;

@@ -82,7 +82,6 @@ qx.Class.define("sm.app.Env", {
         qx.core.Assert.assertString(envBase);
         qx.core.Assert.assertString(appBase);
 
-        this.__lfs = $$node.require("fs");
         this.__lpath = $$node.require("path");
         this.__lfsutils = $$node.require("utils/fsutils");
 
@@ -114,8 +113,6 @@ qx.Class.define("sm.app.Env", {
 
 
         //lib refs
-        __lfs : null,
-
         __lpath : null,
 
         __lfsutils : null,
@@ -231,6 +228,6 @@ qx.Class.define("sm.app.Env", {
         //this._disposeObjects("__field_name");
         this.close();
         this.__envBase = null;
-        this.__lpath = this.__lfs = this.__lfsutils = null;
+        this.__lpath = this.__lfsutils = null;
     }
 });

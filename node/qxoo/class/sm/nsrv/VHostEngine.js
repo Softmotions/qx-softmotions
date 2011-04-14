@@ -35,7 +35,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
     construct : function(config) {
         //required libs
-        this.__fs = $$node.require("fs");
         this.__path = $$node.require("path");
         this.__url = $$node.require("url");
         this.__formidable = $$node.require("formidable");
@@ -134,7 +133,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 //check document root
                 var dr = wa["docRoot"];
-                if (!this.__path.existsSync(dr) || !this.__fs.statSync(dr).isDirectory()) {
+                if (!this.__path.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
                     throw new Error("The 'docRoot': " + wa["docRoot"] + " is not directory");
                 }
             }

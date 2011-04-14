@@ -13,7 +13,6 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
 
     construct : function() {
         this.base(arguments);
-        this.__fs = $$node.require("fs");
         this.__path = $$node.require("path");
         this.__util = $$node.require("util");
     },
@@ -21,7 +20,6 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
     members :
     {
 
-        __fs : null,
         __path : null,
         __util : null,
 
@@ -33,7 +31,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
                     cb(null, {"path" : path, "notfound" : true, "ctype" : me.__getCType(path)});
                     return;
                 }
-                me.__fs.stat(path, function(err, stat) {
+                $$node.fs.stat(path, function(err, stat) {
                     cb(null, {"path" : path,
                         "notfound" : (err || !stat.isFile()),
                         "ctype" : me.__getCType(path)});
@@ -65,7 +63,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
                 return;
             }
             res.writeHead((res.statusCode || 200), headers);
-            this.__util.pump(this.__fs.createReadStream(template["path"]), res, function(err) {
+            this.__util.pump($$node.fs.createReadStream(template["path"]), res, function(err) {
                 if (err) {
                     qx.log.Logger.error(me, "File read error: " + template["path"]);
                     throw err;
@@ -75,6 +73,6 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
     },
 
     destruct : function() {
-        this.__fs = this.__path = this.__util = null;
+        this.__path = this.__util = null;
     }
 });

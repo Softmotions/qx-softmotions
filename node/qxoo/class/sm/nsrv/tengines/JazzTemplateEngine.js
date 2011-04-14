@@ -13,7 +13,6 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
     construct : function() {
         this.base(arguments);
-        this.__fs = $$node.require("fs");
         this.__path = $$node.require("path");
         this.__util = $$node.require("util");
         this.__jazz = $$node.require("jazz");
@@ -29,7 +28,6 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
          */
         __tcache : null,
 
-        __fs : null,
         __path : null,
         __util : null,
         __jazz : null,
@@ -42,7 +40,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                     cb(null, {"path" : path, "notfound" : true});
                     return;
                 }
-                me.__fs.stat(path, function(err, stat) {
+                $$node.fs.stat(path, function(err, stat) {
                     if (err || !stat.isFile()) {
                         cb(null, {"path" : path, "notfound" : true});
                         return;
@@ -66,7 +64,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                         }
                     }
 
-                    var fdata = me.__fs.readFileSync(path, "utf8");
+                    var fdata = $$node.fs.readFileSync(path, "utf8");
                     var jazzTemplate;
                     try {
                         jazzTemplate = me.__jazz.compile(fdata);
@@ -155,6 +153,6 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
     },
 
     destruct : function() {
-        this.__fs = this.__util = this.__jazz = this.__path = this.__tcache = null;
+        this.__util = this.__jazz = this.__path = this.__tcache = null;
     }
 });

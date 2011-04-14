@@ -35,8 +35,9 @@ qx.Class.define("sm.ui.form.UploadForm", {
      */
     construct: function(name, url, encoding) {
         this.base(arguments, name, url, encoding);
-
         this.setLayout(new qx.ui.layout.VBox());
+
+        this.__uploadRows = [];
 
         // bugfix for IE8
         var el = this.getContentElement();
@@ -78,15 +79,15 @@ qx.Class.define("sm.ui.form.UploadForm", {
 
     members:
     {
-        __fileItemCount: 0,
-
         //__closeCmd : null,
         __addButton: null,
+
+        __uploadRows: null,
 
         _addFileItem: function() {
             var formRow = new qx.ui.container.Composite(new qx.ui.layout.HBox());
 
-            var fileName = "file" + this.__fileItemCount;
+            var fileName = "file" + this.__uploadRows.length;
             var fileField = new uploadwidget.UploadField(fileName, null, "sm/icons/misc/folder_explore.png");
             formRow.add(fileField, {flex: 1});
 
@@ -95,25 +96,40 @@ qx.Class.define("sm.ui.form.UploadForm", {
             formRow.add(delFileItem);
 
             this.addBefore(formRow, this.__addButton);
-            ++this.__fileItemCount;
+            this.__uploadRows.push(formRow);
 
             delFileItem.addListener("execute", function() {
                 this._removeFileItem(formRow);
             }, this);
 
-            if (this.__fileItemCount > 9) {
+            if (this.__uploadRows.length > 9) {
                 this.__addButton.setEnabled(false);
             }
-            this.fireDataEvent("changeValue", this.__fileItemCount);
+            this.fireDataEvent("changeValue", this.__uploadRows.length);
         },
 
         _removeFileItem: function(element) {
-            --this.__fileItemCount;
+            qx.lang.Array.remove(this.__uploadRows, element);
             this._remove(element);
-            if (this.__fileItemCount <= 9) {
+            if (this.__uploadRows.length <= 9) {
                 this.__addButton.setEnabled(true);
             }
-            this.fireDataEvent("changeValue", this.__fileItemCount);
+            this.fireDataEvent("changeValue", this.__uploadRows.length);
+        },
+
+
+        removeAllUploadRows : function() {
+            for (var i = 0; i < this.__uploadRows.length; ++i) {
+                if (this.__uploadRows[i]) {
+                    this._remove(this.__uploadRows[i]);
+                    this.__uploadRows[i] = null;
+                }
+            }
+            this.__uploadRows = [];
+            if (this.__uploadRows.length <= 9) {
+                this.__addButton.setEnabled(true);
+            }
+            this.fireDataEvent("changeValue", this.__uploadRows.length);
         },
 
         /*

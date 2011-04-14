@@ -1,6 +1,6 @@
 Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/Class.js	(revision 26096)
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 26651)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
 @@ -216,6 +216,18 @@
              this.__addMixin(clazz, config.include[i], false);
@@ -74,9 +74,9 @@ Index: qooxdoo/framework/source/class/qx/Class.js
       *
 Index: qooxdoo/framework/source/class/qx/core/Environment.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26096)
+--- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26651)
 +++ qooxdoo/framework/source/class/qx/core/Environment.js	(working copy)
-@@ -827,72 +827,72 @@
+@@ -868,72 +868,72 @@
        // plugin
        // /////////////////////////////////////////
        if (this.useCheck("plugin.gears")) {
@@ -167,7 +167,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        // /////////////////////////////////////////
-@@ -910,93 +910,93 @@
+@@ -951,10 +951,10 @@
          this._checks["html.webworker"] = qx.bom.client.Html.getWebWorker;
        }
        if (this.useCheck("html.geolocation")) {
@@ -177,6 +177,11 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        if (this.useCheck("html.audio")) {
 -        this._checks["html.audio"] = qx.bom.client.Html.getAudio;
 +        this._checks["html.audio"] = false;//qx.bom.client.Html.getAudio;
+       }
+       if (this.useCheck("html.audio.ogg")) {
+         this._checks["html.audio.ogg"] = qx.bom.client.Html.getAudioOgg;
+@@ -972,87 +972,87 @@
+         this._checks["html.audio.aif"] = qx.bom.client.Html.getAudioAif;
        }
        if (this.useCheck("html.video")) {
 -        this._checks["html.video"] = qx.bom.client.Html.getVideo;
@@ -287,7 +292,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
    },
 Index: qooxdoo/framework/source/class/qx/core/Assert.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26096)
+--- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26651)
 +++ qooxdoo/framework/source/class/qx/core/Assert.js	(working copy)
 @@ -79,7 +79,7 @@
        {
@@ -300,7 +305,7 @@ Index: qooxdoo/framework/source/class/qx/core/Assert.js
        } else {
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26096)
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26651)
 +++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
 @@ -92,12 +92,12 @@
          }
@@ -363,7 +368,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26096)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26651)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
 @@ -153,7 +153,8 @@
          temp = os.fdopen(fileDescriptor, "w")
@@ -377,7 +382,7 @@ Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
          if rc != 0:
 Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26096)
+--- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26651)
 +++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
 @@ -97,8 +97,16 @@
          
@@ -400,14 +405,15 @@ Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
  
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26096)
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26651)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
-@@ -222,6 +222,8 @@
+@@ -222,6 +222,9 @@
  
          # warn about unknown references
          ignored_names = set()
 +        ignored_names.add("$$node")
 +        ignored_names.add("$$node.process")
++	ignored_names.add("$$node.fs")
          # the current global ignore set is just the list of name spaces of the selected classes
          for classid in result:
              nsindex = classid.rfind(".")

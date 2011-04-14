@@ -185,8 +185,29 @@ qx.Class.define("sm.mongo.Mongo", {
          */
         openGridFile : function(fname, mode, ctype, cb) {
             var gfile = new this._lib_mongo
-                    .GridStore(this.getDB(), fname, mode, ctype ? {chunk_type : ctype} : {});
+                    .GridStore(this.getDB(), fname, mode, ctype ? {content_type : ctype} : {});
             gfile.open(cb);
+        },
+
+
+        /**
+         * Return instance of gridfs files meta collection
+         * Internal structure:
+         *        <pre><code>
+         *        {
+         *          '_id' : , // {number} id for this file
+         *          'filename' : , // {string} name for this file
+         *          'contentType' : , // {string} mime type for this file
+         *          'length' : , // {number} size of this file?
+         *          'chunksize' : , // {number} chunk size used by this file
+         *          'uploadDate' : , // {Date}
+         *          'aliases' : , // {array of string}
+         *          'metadata' : , // {string}
+         *        }
+         *        </code></pre>
+         */
+        gridFilesCollection : function() {
+            return this.collection(this._lib_mongo.GridStore.DEFAULT_ROOT_COLLECTION + ".files");
         },
 
 
