@@ -717,7 +717,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var form = req.form = new this.__formidable.IncomingForm();
                 var fopts = this.__config["formdiableOptions"];
                 if (fopts) {
-                    qx.lang.Object.mergeWith(form, fopts);
+                    qx.lang.Object.mergeWith(form, fopts, true);
                 }
                 form.parse(req, function(err, fields, files) {
                     req.params = fields;

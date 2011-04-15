@@ -103,7 +103,8 @@ qx.Class.define("uploadwidget.UploadForm", {
     events:
     {
         "sending"    : "qx.event.type.Event",
-        "completed"  : "qx.event.type.Event"
+        "completed"  : "qx.event.type.Event",
+        "completedResponse"  : "qx.event.type.Data"
     },
 
     // --------------------------------------------------------------------------
@@ -477,8 +478,7 @@ qx.Class.define("uploadwidget.UploadForm", {
          */
         _onReadyStateChange : function(e) {
             if (this.getIframeNode().readyState == "complete" && this.__isSent) {
-                this.fireEvent("completed");
-                delete this.__isSent;
+                this._completed();
             }
         },
 
@@ -492,8 +492,16 @@ qx.Class.define("uploadwidget.UploadForm", {
          */
         _onLoad : function(e) {
             if (this.__isSent) {
-                this.fireEvent("completed");
-                delete this.__isSent;
+                this._completed();
+            }
+        },
+
+        _completed : function() {
+            this.fireEvent("completed");
+            delete this.__isSent;
+            var resp = this.getIframeTextContent();
+            if (resp) {
+                this.fireDataEvent("completedResponse", resp);
             }
         }
     }
