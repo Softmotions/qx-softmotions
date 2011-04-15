@@ -6,7 +6,7 @@
 /*
  * Таблица + тулбар
  */
-qx.Class.define("sm.view.ToolbarTable", {
+qx.Class.define("sm.table.ToolbarTable", {
     extend  : qx.ui.container.Composite,
     type : "abstract",
 
