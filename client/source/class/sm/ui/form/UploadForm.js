@@ -44,9 +44,11 @@ qx.Class.define("sm.ui.form.UploadForm", {
         el.setAttribute("encoding", encoding || "multipart/form-data");
         el.setAttribute("enctype", encoding || "multipart/form-data");
 
-
+        var controlCont = this.__controlCont = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"})).set({marginTop : 5});
         this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "sm/icons/misc/folder_add.png");
-        this.add(this.__addButton, {flex : 1});
+        controlCont.add(this.__addButton, {flex : 1});
+
+        this.add(controlCont);
 
         this.__addButton.addListener("execute", function() {
             this._addFileItem();
@@ -80,6 +82,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
     members:
     {
         //__closeCmd : null,
+        __controlCont: null,
+
         __addButton: null,
 
         __uploadRows: null,
@@ -95,7 +99,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
             delFileItem.setMarginLeft(5);
             formRow.add(delFileItem);
 
-            this.addBefore(formRow, this.__addButton);
+            this.addBefore(formRow, this.__controlCont);
             this.__uploadRows.push(formRow);
 
             delFileItem.addListener("execute", function() {
@@ -106,6 +110,10 @@ qx.Class.define("sm.ui.form.UploadForm", {
                 this.__addButton.setEnabled(false);
             }
             this.fireDataEvent("changeValue", this.__uploadRows.length);
+        },
+
+        getControlContainer : function() {
+            return this.__controlCont;
         },
 
         _removeFileItem: function(element) {
@@ -161,7 +169,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
      ---------------------------------------------------------------------------
      */
     destruct : function() {
-        this._disposeObjects("__addButton");
+        this._disposeObjects("__addButton", "__controlCont");
         this.__fileItemCount = null;
     }
 });
