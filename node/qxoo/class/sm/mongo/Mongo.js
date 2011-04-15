@@ -212,6 +212,14 @@ qx.Class.define("sm.mongo.Mongo", {
 
 
         /**
+         * Return GridStore instance
+         */
+        gridStore : function() {
+            return this._lib_mongo.GridStore;
+        },
+
+
+        /**
          * Closes connection to mongo server
          */
         close : function() {

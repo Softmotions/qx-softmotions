@@ -69,10 +69,10 @@ qx.Class.define("dialog.Dialog",
                          */
                         alert : function(message, callback, context) {
                             (new dialog.Alert({
-                                "message"     : message,
-                                "callback"    : callback || null,
-                                "context"     : context || null
-                            })).show();
+                                                  "message"     : message,
+                                                  "callback"    : callback || null,
+                                                  "context"     : context || null
+                                              })).show();
                         },
 
                         /**
@@ -83,10 +83,10 @@ qx.Class.define("dialog.Dialog",
                          */
                         confirm : function(message, callback, context) {
                             (new dialog.Confirm({
-                                "message"     : message,
-                                "callback"    : callback || null,
-                                "context"     : context || null
-                            })).show();
+                                                    "message"     : message,
+                                                    "callback"    : callback || null,
+                                                    "context"     : context || null
+                                                })).show();
                         },
 
                         /**
@@ -97,10 +97,10 @@ qx.Class.define("dialog.Dialog",
                          */
                         prompt : function(message, callback, context) {
                             (new dialog.Prompt({
-                                "message"     : message,
-                                "callback"    : callback || null,
-                                "context"     : context || null
-                            })).show();
+                                                   "message"     : message,
+                                                   "callback"    : callback || null,
+                                                   "context"     : context || null
+                                               })).show();
                         },
 
                         /**
@@ -112,12 +112,12 @@ qx.Class.define("dialog.Dialog",
                          */
                         select : function(message, options, callback, context) {
                             (new dialog.Select({
-                                "message"     : message,
-                                "allowCancel" : true,
-                                "options"     : options,
-                                "callback"    : callback || null,
-                                "context"     : context || null
-                            })).show();
+                                                   "message"     : message,
+                                                   "allowCancel" : true,
+                                                   "options"     : options,
+                                                   "callback"    : callback || null,
+                                                   "context"     : context || null
+                                               })).show();
                         },
 
                         /**
@@ -129,12 +129,12 @@ qx.Class.define("dialog.Dialog",
                          */
                         form : function(message, formData, callback, context) {
                             (new dialog.Form({
-                                "message"    : message,
-                                "formData"    : formData,
-                                "allowCancel" : true,
-                                "callback"    : callback,
-                                "context"     : context || null
-                            })).show();
+                                                 "message"    : message,
+                                                 "formData"    : formData,
+                                                 "allowCancel" : true,
+                                                 "callback"    : callback,
+                                                 "context"     : context || null
+                                             })).show();
                         }
                     },
 
@@ -269,9 +269,9 @@ qx.Class.define("dialog.Dialog",
                          * basic settings
                          */
                         this.set({
-                            'visibility' : "hidden",
-                            'decorator'  : "shadow-popup"
-                        });
+                                     'visibility' : "hidden",
+                                     'decorator'  : "shadow-popup"
+                                 });
                         this.setLayout(new qx.ui.layout.Grow());
 
                         /*
@@ -302,9 +302,9 @@ qx.Class.define("dialog.Dialog",
                         this.getApplicationRoot().addListener("resize", function(e) {
                             var bounds = this.getBounds();
                             this.set({
-                                marginTop: Math.round(( qx.bom.Document.getHeight() - bounds.height ) / 2),
-                                marginLeft : Math.round(( qx.bom.Document.getWidth() - bounds.width) / 2)
-                            });
+                                         marginTop: Math.round(( qx.bom.Document.getHeight() - bounds.height ) / 2),
+                                         marginLeft : Math.round(( qx.bom.Document.getWidth() - bounds.width) / 2)
+                                     });
                         }, this);
 
                         /*
@@ -313,9 +313,9 @@ qx.Class.define("dialog.Dialog",
                         this.addListener("appear", function(e) {
                             var bounds = this.getBounds();
                             this.set({
-                                marginTop: Math.round(( qx.bom.Document.getHeight() - bounds.height ) / 2),
-                                marginLeft : Math.round(( qx.bom.Document.getWidth() - bounds.width) / 2)
-                            });
+                                         marginTop: Math.round(( qx.bom.Document.getHeight() - bounds.height ) / 2),
+                                         marginLeft : Math.round(( qx.bom.Document.getWidth() - bounds.width) / 2)
+                                     });
                         }, this);
 
                         /*
@@ -432,6 +432,18 @@ qx.Class.define("dialog.Dialog",
                                 root.setBlockerColor(this.getBlockerColor());
                                 root.blockContent(this.getZIndex() - 1);
                             }
+
+                            /*
+                             * make sure the dialog is above any opened window
+                             */
+                            var maxWindowZIndex = 1E5;
+                            var windows = root.getWindows();
+                            for (var i = 0; i < windows.length; i++) {
+                                var zIndex = windows[i].getZIndex();
+                                maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
+                            }
+                            this.setZIndex(maxWindowZIndex + 1);
+
                             this.setVisibility("visible");
                             this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
                             this.focus();
