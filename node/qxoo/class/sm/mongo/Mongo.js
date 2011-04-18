@@ -183,9 +183,9 @@ qx.Class.define("sm.mongo.Mongo", {
          * @param ctype {String} file content type
          * @param cb {function(?Error, ?GridStore)}
          */
-        openGridFile : function(fname, mode, ctype, cb) {
+        openGridFile : function(fname, mode, ctype, metadata, cb) {
             var gfile = new this._lib_mongo
-                    .GridStore(this.getDB(), fname, mode, ctype ? {content_type : ctype} : {});
+                    .GridStore(this.getDB(), fname, mode, {content_type : ctype, metadata : metadata});
             gfile.open(cb);
         },
 
