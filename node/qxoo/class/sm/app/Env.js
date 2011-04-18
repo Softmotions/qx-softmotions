@@ -119,9 +119,12 @@ qx.Class.define("sm.app.Env", {
         //eof lib refs
 
 
-
         getEnvBase : function() {
             return this.__envBase;
+        },
+
+        getEnvSubdir : function(dirName) {
+            return this.__envBase + dirName + this.__lfsutils.FileSeparator;
         },
 
         /**
