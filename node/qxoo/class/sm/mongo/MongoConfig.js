@@ -93,7 +93,7 @@ qx.Class.define("sm.mongo.MongoConfig", {
             this.__mongo = new sm.mongo.Mongo(mcfg["db_name"],
                                               mcfg["db_host"],
                                               mcfg["db_port"],
-                                              {native_parser : true}); //todo native configurable?
+                                              {native_parser : !!mcfg["native_parser"]});
             this.__mongo.open(
                     function(err) {
                         if (err) {
