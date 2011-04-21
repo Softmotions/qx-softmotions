@@ -63,7 +63,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __handlers : null,
 
-
         /**
          * Web handlers for regexp matching
          */
@@ -78,6 +77,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Current connect server
          */
         __server : null,
+
+        /**
+         * Security (by webapps)
+         */
+        __security : null,
 
         /**
          * Returns virtual host name
@@ -102,6 +106,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             var wappsIds = {};
             var wappsCtx = {};
+
+            this.__security = {};
 
             for (var i = 0; i < wapps.length; ++i) {
 
@@ -135,6 +141,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var dr = wa["docRoot"];
                 if (!this.__path.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
                     throw new Error("The 'docRoot': " + wa["docRoot"] + " is not directory");
+                }
+
+                // configure security
+                if (qx.lang.Type.isArray(wa["security"])) {
+                    var sconf = wa["security"];
+                    var security = this.__security[wa[id]] = {};
+                    var securityStore = security.__securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
+
+                    if (!qx.lang.Type.isArray(sconf["userProvider"]) && !qx.lang.Type.isString(sconf["userProvider"]["type"])) {
+                        throw new Error("Missing user provider type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+
+                    var uconf = sconf["userProvider"];
+                    var userProvider = security.__userProvider = new uconf["type"](uconf["options"]);
+
+                    if (!qx.lang.Type.isArray(sconf["auth"]) && !qx.lang.Type.isString(sconf["auth"]["type"])) {
+                        throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+
+                    var aconf = sconf["auth"];
+                    security.__filter = new aconf["type"](aconf["options"], userProvider, securityStore);
                 }
             }
 
@@ -532,7 +559,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
             }
 
-            var execCalled = false;
             if (hconf) { //found handlers
                 var hinst = hconf["$$instance"];
                 var exec = hinst[hconf["handler"]];
@@ -542,25 +568,46 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
                 }
-                try {
-                    exec.call(hinst, req, res, ctx);
-                    execCalled = true;
-                } catch(e) {
-                    var report = true;
-                    if (e instanceof sm.nsrv.Message) {
-                        report = e.isError();
+
+                var callback = function() {
+                    try {
+                        exec.call(hinst, req, res, ctx);
+                    } catch(e) {
+                        var report = true;
+                        if (e instanceof sm.nsrv.Message) {
+                            report = e.isError();
+                        }
+                        if (report) {
+                            qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                        }
+                        next(e);
                     }
-                    if (report) {
-                        qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
-                    }
-                    next(e);
-                    return;
+                };
+
+                // TODO: auth check
+                var security;
+                var secured = this.__getHconfValue(hconf, "secured");
+                var roles = this.__getHconfValue(hconf, "roles");
+                if (secured && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+                    security.__filter.authenticate(req, res, function(err) {
+                        if (qx.lang.Type.isArray(roles) || qx.lang.Type.isString(roles)) {
+                            if (req.isUserHasRoles(roles)) {
+                                callback();
+                            } else {
+                                res.sendForbidden();
+                            }
+                        } else {
+                            callback();
+                        }
+                    });
+                } else {
+                    callback();
                 }
+
+                return;
             }
 
-            if (!execCalled) { //Exec handler not called
-                ctx(null);
-            }
+            ctx(null);
         },
 
 
@@ -703,6 +750,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 res.sendNotFound();
                 return;
             }
+
+            // TODO: add method req.isUserHasRoles()
+            var security = info.webapp["id"];
+            req.isUserHasRoles = function(roles) {
+                return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : true;
+            };
 
             //Call next() element in chain
             next();
