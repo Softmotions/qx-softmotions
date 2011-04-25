@@ -10,21 +10,19 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
     construct: function(options) {
         this.base(arguments);
 
-        var idx;
+        var me = this;
 
         var roles = options.roles || [];
         this.__roles = [];
-        for(idx in roles) {
-            var role = roles[idx];
-            this.__roles[role.id] = role;
-        }
+        roles.forEach(function(role) {
+            me.__roles[role.id] = role;
+        });
 
         var users = options.users || [];
         this.__users = [];
-        for(idx in users) {
-            var user = users[idx];
-            this.__users[user.login] = { login: user.login, password: user.password, roles: user.roles || [] };
-        }
+        users.forEach(function(user) {
+            me.__users[user.login] = { login: user.login, password: user.password, roles: user.roles || [] };
+        });
     },
 
     members:

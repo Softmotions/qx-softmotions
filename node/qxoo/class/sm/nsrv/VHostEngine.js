@@ -587,18 +587,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var security;
                 var secured = this.__getHconfValue(hconf, "secured");
                 var roles = this.__getHconfValue(hconf, "roles");
-                if (secured && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
-                    security.__filter.authenticate(req, res, function(err) {
-                        if (qx.lang.Type.isArray(roles) || qx.lang.Type.isString(roles)) {
-                            if (req.isUserHasRoles(roles)) {
-                                callback();
+                if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+                    if (hconf["logout"]) {
+                        security.__securityStore.setUser(req, null);
+                        callback();
+                    } else {
+                        security.__filter.authenticate(req, res, function(err) {
+                            if (qx.lang.Type.isArray(roles) || qx.lang.Type.isString(roles)) {
+                                if (req.isUserHasRoles(roles)) {
+                                    callback();
+                                } else {
+                                    res.sendForbidden();
+                                }
                             } else {
-                                res.sendForbidden();
+                                callback();
                             }
-                        } else {
-                            callback();
-                        }
-                    });
+                        });
+                    }
                 } else {
                     callback();
                 }

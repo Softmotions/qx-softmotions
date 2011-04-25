@@ -26,9 +26,43 @@ qx.Class.define("sm.nsrv.test.TestSecurityExecutor", {
             secured: true
         },
 
+        "/roles/a": {
+            webapp : "testsecurity",
+            handler : "__content",
+            secured: true,
+            roles: ["a"]
+        },
+
+        "/roles/b": {
+            webapp : "testsecurity",
+            handler : "__content",
+            secured: true,
+            roles: ["b"]
+        },
+
+        "/roles/c": {
+            webapp : "testsecurity",
+            handler : "__content",
+            secured: true,
+            roles: ["c"]
+        },
+
+        "/roles/d": {
+            webapp : "testsecurity",
+            handler : "__content",
+            secured: true,
+            roles: ["a", "b"]
+        },
+
         "/unsecured" : {
             webapp : "testsecurity",
             handler : "__content"
+        },
+
+        "/logout" : {
+            webapp : "testsecurity",
+            handler : "__content",
+            logout: true
         }
     },
 
