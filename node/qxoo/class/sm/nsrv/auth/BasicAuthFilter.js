@@ -24,7 +24,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
 
         options = options || {};
 
-        this.__realmName = options.realName || 'NKServer';
+        this.__realmName = options.realmName || 'NKServer';
 
         this.__userProvider = userProvider;
         if (!this.__userProvider) {
@@ -49,23 +49,25 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
         authenticate: function(request, response, callback) {
             if (this.__securityStore.isAuthenticated(request)) {
                 this.success(request, response, callback);
-            } else if (request.headers[sm.nsrv.auth.BasicFilter.HEADER]) {
-                var header = request.headers[sm.nsrv.auth.BasicFilter.HEADER];
-                var match = header.match(sm.nsrv.auth.BasicFilter.HEADER_MATCH);
+            } else if (request.headers[sm.nsrv.auth.BasicAuthFilter.HEADER]) {
+                var header = request.headers[sm.nsrv.auth.BasicAuthFilter.HEADER];
+                var match = header.match(sm.nsrv.auth.BasicAuthFilter.HEADER_MATCH);
                 if (match != null) {
                     var details = match[1];
                     var parts = new Buffer(details, 'base64').toString().split(/:/);
                     var login = parts[0];
                     var password = parts[1];
 
-                    this.__userProvider.login(login, password, function(err, user) {
-                        if (!err && user) {
-                            this.__securityStore.setUser(request, user);
-                            this.success(request, response, callback);
-                        } else {
-                            this.failure(request, response, callback);
+                    this.__userProvider.login(login, password, (function(scope) {
+                        return function(err, user) {
+                            if (!err && user) {
+                                scope.__securityStore.setUser(request, user);
+                                scope.success(request, response, callback);
+                            } else {
+                                scope.failure(request, response, callback);
+                            }
                         }
-                    });
+                    })(this));
                 } else {
                     this.failure(request, response, callback);
                 }

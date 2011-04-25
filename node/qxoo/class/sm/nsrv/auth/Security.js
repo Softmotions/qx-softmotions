@@ -12,8 +12,9 @@ qx.Class.define("sm.nsrv.auth.Security", {
         getSecurity: function(options) {
             var key = options['key'] || 'general';
             if (!sm.nsrv.auth.Security.$$instances[key]) {
-                new sm.nsrv.auth.Security(options['key']);
+                sm.nsrv.auth.Security.$$instances[key] = new sm.nsrv.auth.Security(options['key']);
             }
+
             return sm.nsrv.auth.Security.$$instances[key];
         }
     },

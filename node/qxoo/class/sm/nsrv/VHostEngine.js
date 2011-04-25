@@ -144,19 +144,19 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
 
                 // configure security
-                if (qx.lang.Type.isArray(wa["security"])) {
+                if (wa["security"]) {
                     var sconf = wa["security"];
-                    var security = this.__security[wa[id]] = {};
+                    var security = this.__security[wa["id"]] = {};
                     var securityStore = security.__securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
 
-                    if (!qx.lang.Type.isArray(sconf["userProvider"]) && !qx.lang.Type.isString(sconf["userProvider"]["type"])) {
+                    if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
                         throw new Error("Missing user provider type in config: " + qx.util.Json.stringify(this.__config));
                     }
 
                     var uconf = sconf["userProvider"];
                     var userProvider = security.__userProvider = new uconf["type"](uconf["options"]);
 
-                    if (!qx.lang.Type.isArray(sconf["auth"]) && !qx.lang.Type.isString(sconf["auth"]["type"])) {
+                    if (!sconf["auth"] || !sconf["auth"]["type"]) {
                         throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
                     }
 
@@ -317,7 +317,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                                                " [" + this.__vhostName + "]:[" + wappId + "]");
+                                        " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -344,7 +344,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                                                JSON.stringify(asm, true));
+                                        JSON.stringify(asm, true));
                 }
             }
 
@@ -414,7 +414,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                                                        "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                                                "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -423,7 +423,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + k + "#" + (hlSlot["handler"]) +
-                                        "()' replaced by: " + hconf["handler"] + "()");
+                                                         "()' replaced by: " + hconf["handler"] + "()");
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -584,7 +584,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 };
 
-                // TODO: auth check
                 var security;
                 var secured = this.__getHconfValue(hconf, "secured");
                 var roles = this.__getHconfValue(hconf, "roles");
@@ -684,7 +683,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Initiate request
          */
         __initRequestHandler : function(req, res, next) {
-
+            var me = this;
             //Response messages
             res.messages = res.messages || [];
 
@@ -708,6 +707,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             };
             res.sendOk = function(headers, data) {
                 res.sendSCode(200, headers, data);
+            };
+            res._implicitHeader = function() {// TODO: for session compatibility
             };
 
             if (qx.core.Environment.get("sm.nsrv.access-control-allow") == true) {
@@ -751,8 +752,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            // TODO: add method req.isUserHasRoles()
-            var security = info.webapp["id"];
+            var security = this.__security[info.webapp["id"]];
             req.isUserHasRoles = function(roles) {
                 return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : true;
             };
@@ -816,6 +816,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var me = this;
             var connect = $$node.require("connect");
             this.__server = connect.createServer(
+                    connect.cookieParser(),
+                    connect.session({secret: "nkserver"}),
                     function (req, res, next) {
                         me.__initRequestHandler(req, res, next);
                     },
