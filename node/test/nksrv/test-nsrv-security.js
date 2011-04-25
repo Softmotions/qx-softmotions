@@ -23,6 +23,20 @@ process.on("uncaughtException", function (err) {
     qx.log.Logger.error(err);
 });
 
+var auth = {
+    basic: {
+        type: sm.nsrv.auth.BasicAuthFilter,
+        options: {
+            realmName: "NKServerTest"
+        }
+    },
+    digest: {
+        type: sm.nsrv.auth.DigestAuthFilter,
+        options: {
+            realmName: "NKServerTest"
+        }
+    }
+};
 
 var config =
         [
@@ -36,13 +50,7 @@ var config =
                         context : "/test",
                         docRoot : cwd + "/nksrv/webapps/security",
                         security: {
-                            securityKey: "basic",
-                            auth: {
-                                type: sm.nsrv.auth.BasicAuthFilter,
-                                options: {
-                                    realmName: "NKServerTest"
-                                }
-                            },
+                            auth: {},
                             userProvider: {
                                 type: sm.nsrv.auth.InMemoryUserProvider,
                                 options: {
@@ -90,6 +98,8 @@ process.on("SIGINT1", function () {
 
 
 module.exports.testStart = function(test) {
+    config[0].webapps[0].security.auth = auth.basic;
+    config[0].webapps[0].security.securityKey = "basic";
     nserver = new sm.nsrv.NKServer(config);
     nserver.startup(port, "127.0.0.1");
     test.done();

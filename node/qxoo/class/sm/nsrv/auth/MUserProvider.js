@@ -20,6 +20,7 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
                 }
             }
 
+            return result;
         }
     }
 });

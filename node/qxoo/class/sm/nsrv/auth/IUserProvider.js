@@ -6,10 +6,8 @@
 qx.Interface.define("sm.nsrv.auth.IUserProvider", {
     members :
     {
-        login: function(login, password, callback) {
-        },
-
-        getRolesList: function(callback) {
-        }
+        login: function(login, password, callback) {},
+        getAuthInfo: function(login, callback){},
+        getRolesList: function(callback) {}
     }
 });

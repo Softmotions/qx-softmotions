@@ -4,6 +4,7 @@
  */
 qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
     extend  : qx.core.Object,
+    implement: [sm.nsrv.auth.IAuthFilter],
 
     statics:
     {
@@ -44,7 +45,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
         __realmName: null,
         __userProvider: null,
         __ignoreFailure: null,
-        __security: null,
+        __securityStore: null,
 
         authenticate: function(request, response, callback) {
             if (this.__securityStore.isAuthenticated(request)) {
