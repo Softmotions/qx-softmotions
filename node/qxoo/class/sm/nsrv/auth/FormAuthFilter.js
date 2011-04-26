@@ -46,7 +46,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         __passwordParameter: null,
 
         authenticate: function(request, response, callback) {
-            if (this.__securityStore.isAuthenticated(request)) {
+            if (this.__securityStore.isAuthenticated(request) || request.info.pathname == this.__formUrl) {
                 this.success(request, response, callback);
             } else if (request.params[this.__actionParameter] && this.__actionName == request.params[this.__actionParameter]){
                 var login = request.params[this.__loginParameter];

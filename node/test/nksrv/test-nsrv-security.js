@@ -999,6 +999,42 @@ module.exports["Test unsecured resource: single request without auth (Form)"] = 
     req.end();
 };
 
+module.exports["Test login form: single request without auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/login", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test login form: single request with auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/login?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
 module.exports["Test secured resource: single request without auth (Form)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/secured", {"host": "127.0.0.1"});

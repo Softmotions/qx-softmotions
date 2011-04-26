@@ -756,8 +756,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             var security = this.__security[info.webapp["id"]];
+            req.isAuthenticated = function(roles) {
+                return security && security.__securityStore ? security.__securityStore.isAuthenticated(this) : false;
+            };
             req.isUserHasRoles = function(roles) {
-                return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : true;
+                return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : false;
             };
 
             //Call next() element in chain

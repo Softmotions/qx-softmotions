@@ -13,10 +13,10 @@ qx.Class.define("sm.nsrv.test.TestSecurityExecutor", {
 
     members :
     {
-//        __loginform: function(req, resp, ctx) {
-//            this.writeString("loginform", resp, ctx);
-//        },
-//
+        __loginform: function(req, resp, ctx) {
+            this.writeString("loginform", resp, ctx);
+        },
+
         __content: function(req, resp, ctx) {
             this.writeString("content", resp, ctx);
         }
@@ -24,11 +24,12 @@ qx.Class.define("sm.nsrv.test.TestSecurityExecutor", {
 
     handlers :
     {
-//        "/login": {
-//            webapp: "testsecurity",
-//            handler: "__loginform"
-//        },
-//
+        "/login": {
+            webapp: "testsecurity",
+            handler: "__loginform",
+            secured: true
+        },
+
         "/secured": {
             webapp: "testsecurity",
             handler: "__content",
