@@ -16,7 +16,7 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
             while (troleId = troles.pop()) {
                 if (trole = roles[troleId]) {
                     result.push(trole.id);
-                    trole.parent && troles.push(trole.parent);
+                    troles = trole.parent ? troles.concat(trole.parent) : troles;
                 }
             }
 

@@ -58,13 +58,15 @@ var config =
                                     roles: [
                                         {id: 'a'},
                                         {id: 'b'},
-                                        {id: 'c', parent: 'a'}
+                                        {id: 'c', parent: 'a'},
+                                        {id: 'f', parent: ['c', 'b']}
                                     ],
                                     users: [
                                         {/*dGVzdDp0ZXN0*/ login: 'test', password: 'test', roles: ['a']},
                                         {/*dGVzdDI6dGVzdA==*/ login: 'test2', password: 'test', roles: ['b']},
                                         {/*dGVzdDM6dGVzdA==*/ login: 'test3', password: 'test', roles: ['c']},
-                                        {/*dGVzdDQ6dGVzdA==*/ login: 'test4', password: 'test', roles: ['b', 'c']}
+                                        {/*dGVzdDQ6dGVzdA==*/ login: 'test4', password: 'test', roles: ['b', 'c']},
+                                        {/*dGVzdDU6dGVzdA==*/ login: 'test5', password: 'test', roles: ['f']}
                                     ]
                                 }
                             }
@@ -298,7 +300,8 @@ buildBasicRolesTests("Test access resource: required roles ['a'], user roles:",
                          { auth: "dGVzdDp0ZXN0", access: true, roles: "['a']" },
                          { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
                          { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
+                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
                      ]);
 
 buildBasicRolesTests("Test access resource: required roles ['b'], user roles:",
@@ -307,7 +310,8 @@ buildBasicRolesTests("Test access resource: required roles ['b'], user roles:",
                          { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
                          { auth: "dGVzdDI6dGVzdA==", access: true, roles: "['b']" },
                          { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
+                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
                      ]);
 
 buildBasicRolesTests("Test access resource: required roles ['c'], user roles:",
@@ -316,7 +320,8 @@ buildBasicRolesTests("Test access resource: required roles ['c'], user roles:",
                          { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
                          { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
                          { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
+                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
                      ]);
 
 buildBasicRolesTests("Test access resource: required roles ['a', 'b'], user roles:",
@@ -325,7 +330,8 @@ buildBasicRolesTests("Test access resource: required roles ['a', 'b'], user role
                          { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
                          { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
                          { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
+                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
                      ]);
 
 module.exports["Test logout after auth (Basic)"] = function(test) {
@@ -837,7 +843,8 @@ buildDigestRolesTests("Test access resource: required roles ['a'], user roles:",
                           { auth: {login: "test", password: "test"}, access: true, roles: "['a']" },
                           { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
                           { auth: {login: "test3", password: "test"}, access: true, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" }
+                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
+                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
                       ]);
 
 buildDigestRolesTests("Test access resource: required roles ['b'], user roles:",
@@ -846,7 +853,8 @@ buildDigestRolesTests("Test access resource: required roles ['b'], user roles:",
                           { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
                           { auth: {login: "test2", password: "test"}, access: true, roles: "['b']" },
                           { auth: {login: "test3", password: "test"}, access: false, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" }
+                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
+                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
                       ]);
 
 buildDigestRolesTests("Test access resource: required roles ['c'], user roles:",
@@ -855,7 +863,8 @@ buildDigestRolesTests("Test access resource: required roles ['c'], user roles:",
                           { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
                           { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
                           { auth: {login: "test3", password: "test"}, access: true, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" }
+                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
+                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
                       ]);
 
 buildDigestRolesTests("Test access resource: required roles ['a', 'b'], user roles:",
@@ -864,7 +873,8 @@ buildDigestRolesTests("Test access resource: required roles ['a', 'b'], user rol
                           { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
                           { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
                           { auth: {login: "test3", password: "test"}, access: false, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" }
+                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
+                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
                       ]);
 
 module.exports["Test logout after auth (Digest)"] = function(test) {
