@@ -109,11 +109,12 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                             // For RFC 2069 compatibility
                                             digest = scope.buildHash(ha1 + ':' + auth.nonce + ':' + ha2);
                                         } else {
-                                            if (auth.nc <= scope.__nonces[auth.nonce].count) {
+                                            var nonceCount = parseInt(auth.nc, 16);
+                                            if (nonceCount <= scope.__nonces[auth.nonce].count) {
                                                 scope.failure(request, response, callback);
                                                 return;
                                             }
-                                            scope.__nonces[auth.nonce].count = auth.nc;
+                                            scope.__nonces[auth.nonce].count = nonceCount;
                                             digest = scope.buildHash(ha1 + ':' + auth.nonce + ':' + auth.nc + ':' + auth.cnonce + ':' + auth.qop + ':' + ha2);
                                         }
 
