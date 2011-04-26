@@ -264,75 +264,60 @@ module.exports["Test secured resource: double request with auth and with cookie 
     req1.end();
 };
 
-var buildBasicRolesTests = function(name, resource, tests) {
-    var index = 0;
-
-    tests.forEach(function(tdata) {
-        module.exports[name + tdata.roles + " (Basic)"] = function(test) {
-            var client = http.createClient(port, "127.0.0.1");
-            var req = client.request("GET", resource, { "host": "127.0.0.1", "Authorization": "Basic " + tdata.auth });
-            req.on("response", function (resp) {
-                resp.setEncoding("utf8");
-                if (tdata.access) {
-                    test.equal(resp.statusCode, 200);
-                    test.ok(resp.headers["set-cookie"]);
-                    test.equal(resp.headers["content-type"], "text/plain");
-                    resp.on("data", function (body) {
-                        test.ok(body);
-                        test.ok(body.indexOf("content") >= 0);
-                    });
-                } else {
-                    test.equal(resp.statusCode, 403);
-                }
-                resp.on("end", function () {
-                    test.done();
+var buildBasicRolesTests = function(resources, users) {
+    resources.forEach(function(resource) {
+        users.forEach(function(user) {
+            var access = resource.roles.every(function(role) {
+                return user.roles.some(function(userRole) {
+                    return role == userRole;
                 });
             });
-            req.end();
-        }
 
+            var name = "Test access resource: " +
+                       "required roles [" + resource.roles.join(", ") + "], " +
+                       "user roles: [" + user.roles.join(", ") + "], " +
+                       "access: " + access;
+
+            module.exports[name + " (Basic)"] = function(test) {
+                var client = http.createClient(port, "127.0.0.1");
+                var req = client.request("GET", resource.resource, { "host": "127.0.0.1", "Authorization": "Basic " + user.auth });
+                req.on("response", function (resp) {
+                    resp.setEncoding("utf8");
+                    if (access) {
+                        test.equal(resp.statusCode, 200);
+                        test.ok(resp.headers["set-cookie"]);
+                        test.equal(resp.headers["content-type"], "text/plain");
+                        resp.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0);
+                        });
+                    } else {
+                        test.equal(resp.statusCode, 403);
+                    }
+                    resp.on("end", function () {
+                        test.done();
+                    });
+                });
+                req.end();
+            }
+
+        });
     });
 };
 
-buildBasicRolesTests("Test access resource: required roles ['a'], user roles:",
-                     "/test/roles/a",
-                     [
-                         { auth: "dGVzdDp0ZXN0", access: true, roles: "['a']" },
-                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
-                         { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
-                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
-                     ]);
-
-buildBasicRolesTests("Test access resource: required roles ['b'], user roles:",
-                     "/test/roles/b",
-                     [
-                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
-                         { auth: "dGVzdDI6dGVzdA==", access: true, roles: "['b']" },
-                         { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
-                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
-                     ]);
-
-buildBasicRolesTests("Test access resource: required roles ['c'], user roles:",
-                     "/test/roles/c",
-                     [
-                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
-                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
-                         { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
-                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
-                     ]);
-
-buildBasicRolesTests("Test access resource: required roles ['a', 'b'], user roles:",
-                     "/test/roles/d",
-                     [
-                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
-                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
-                         { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" },
-                         { auth: "dGVzdDU6dGVzdA==", access: true, roles: "['f', 'b', 'c', 'a']" }
-                     ]);
+buildBasicRolesTests([
+                          {resource: "/test/roles/a", roles: ['a']},
+                          {resource: "/test/roles/b", roles: ['b']},
+                          {resource: "/test/roles/c", roles: ['c']},
+                          {resource: "/test/roles/d", roles: ['a', 'b']}
+                      ],
+                      [
+                          {auth: "dGVzdDp0ZXN0", roles: ['a']},
+                          {auth: "dGVzdDI6dGVzdA==", roles: ['b']},
+                          {auth: "dGVzdDM6dGVzdA==", roles: ['c', 'a']},
+                          {auth: "dGVzdDQ6dGVzdA==", roles: ['b', 'c', 'a']},
+                          {auth: "dGVzdDU6dGVzdA==", roles: ['f', 'b', 'c', 'a']}
+                      ]);
 
 module.exports["Test logout after auth (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
@@ -784,97 +769,82 @@ module.exports["Test secured resource: double request with auth and with cookie 
     req1.end();
 };
 
-var buildDigestRolesTests = function(name, resource, tests) {
-    var index = 0;
-
-    tests.forEach(function(tdata) {
-        module.exports[name + tdata.roles + " (Digest)"] = function(test) {
-            var client = http.createClient(port, "127.0.0.1");
-            var req1 = client.request("GET", resource, { "host": "127.0.0.1"});
-            req1.on("response", function (resp1) {
-                resp1.setEncoding("utf8");
-                test.equal(resp1.statusCode, 401);
-                test.ok(resp1.headers["www-authenticate"]);
-                var match = resp1.headers["www-authenticate"].match(/^Digest\s+(.*)/);
-                test.ok(match);
-                resp1.on("end", function () {
-                    if (match) {
-                        var authreq = parseDigestHeaderString(match[1]);
-                        test.equal(authreq.realm, "NKServerTest");
-                        test.ok(authreq.nonce);
-                        test.equal(authreq.qop, "auth");
-                        test.ok(authreq.opaque);
-
-                        var auth = generateDigestAuth(authreq, resource, tdata.auth.login, tdata.auth.password);
-
-                        var req2 = client.request("GET", resource, {"host": "127.0.0.1", "Authorization": auth});
-                        req2.on("response", function (resp2) {
-                            resp2.setEncoding("utf8");
-                            if (tdata.access) {
-                                test.equal(resp2.statusCode, 200);
-                                test.ok(resp2.headers["set-cookie"]);
-                                test.equal(resp2.headers["content-type"], "text/plain");
-                                resp2.on("data", function (body) {
-                                    test.ok(body);
-                                    test.ok(body.indexOf("content") >= 0);
-                                });
-                            } else {
-                                test.equal(resp2.statusCode, 403);
-                            }
-                            resp2.on("end", function () {
-                                test.done();
-                            });
-                        });
-                        req2.end();
-                    } else {
-                        test.done();
-                    }
+var buildDigestRolesTests = function(resources, users) {
+    resources.forEach(function(resource) {
+        users.forEach(function(user) {
+            var access = resource.roles.every(function(role) {
+                return user.roles.some(function(userRole) {
+                    return role == userRole;
                 });
             });
-            req1.end();
-        }
+
+            var name = "Test access resource: " +
+                       "required roles [" + resource.roles.join(", ") + "], " +
+                       "user roles: [" + user.roles.join(", ") + "], " +
+                       "access: " + access;
+
+            module.exports[name + " (Digest)"] = function(test) {
+                var client = http.createClient(port, "127.0.0.1");
+                var req1 = client.request("GET", resource.resource, { "host": "127.0.0.1"});
+                req1.on("response", function (resp1) {
+                    resp1.setEncoding("utf8");
+                    test.equal(resp1.statusCode, 401);
+                    test.ok(resp1.headers["www-authenticate"]);
+                    var match = resp1.headers["www-authenticate"].match(/^Digest\s+(.*)/);
+                    test.ok(match);
+                    resp1.on("end", function () {
+                        if (match) {
+                            var authreq = parseDigestHeaderString(match[1]);
+                            test.equal(authreq.realm, "NKServerTest");
+                            test.ok(authreq.nonce);
+                            test.equal(authreq.qop, "auth");
+                            test.ok(authreq.opaque);
+
+                            var auth = generateDigestAuth(authreq, resource.resource, user.login, user.password);
+
+                            var req2 = client.request("GET", resource.resource, {"host": "127.0.0.1", "Authorization": auth});
+                            req2.on("response", function (resp2) {
+                                resp2.setEncoding("utf8");
+                                if (access) {
+                                    test.equal(resp2.statusCode, 200);
+                                    test.ok(resp2.headers["set-cookie"]);
+                                    test.equal(resp2.headers["content-type"], "text/plain");
+                                    resp2.on("data", function (body) {
+                                        test.ok(body);
+                                        test.ok(body.indexOf("content") >= 0);
+                                    });
+                                } else {
+                                    test.equal(resp2.statusCode, 403);
+                                }
+                                resp2.on("end", function () {
+                                    test.done();
+                                });
+                            });
+                            req2.end();
+                        } else {
+                            test.done();
+                        }
+                    });
+                });
+                req1.end();
+            }
+        });
     });
 };
 
 
-buildDigestRolesTests("Test access resource: required roles ['a'], user roles:",
-                      "/test/roles/a",
+buildDigestRolesTests([
+                          {resource: "/test/roles/a", roles: ['a']},
+                          {resource: "/test/roles/b", roles: ['b']},
+                          {resource: "/test/roles/c", roles: ['c']},
+                          {resource: "/test/roles/d", roles: ['a', 'b']}
+                      ],
                       [
-                          { auth: {login: "test", password: "test"}, access: true, roles: "['a']" },
-                          { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
-                          { auth: {login: "test3", password: "test"}, access: true, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
-                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
-                      ]);
-
-buildDigestRolesTests("Test access resource: required roles ['b'], user roles:",
-                      "/test/roles/b",
-                      [
-                          { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
-                          { auth: {login: "test2", password: "test"}, access: true, roles: "['b']" },
-                          { auth: {login: "test3", password: "test"}, access: false, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
-                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
-                      ]);
-
-buildDigestRolesTests("Test access resource: required roles ['c'], user roles:",
-                      "/test/roles/c",
-                      [
-                          { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
-                          { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
-                          { auth: {login: "test3", password: "test"}, access: true, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
-                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
-                      ]);
-
-buildDigestRolesTests("Test access resource: required roles ['a', 'b'], user roles:",
-                      "/test/roles/d",
-                      [
-                          { auth: {login: "test", password: "test"}, access: false, roles: "['a']" },
-                          { auth: {login: "test2", password: "test"}, access: false, roles: "['b']" },
-                          { auth: {login: "test3", password: "test"}, access: false, roles: "['c', 'a']" },
-                          { auth: {login: "test4", password: "test"}, access: true, roles: "['b', 'c', 'a']" },
-                          { auth: {login: "test5", password: "test"}, access: true, roles: "['f', 'b', 'c', 'a']" }
+                          {login: "test", password: "test", roles: ['a']},
+                          {login: "test2", password: "test", roles: ['b']},
+                          {login: "test3", password: "test", roles: ['c', 'a']},
+                          {login: "test4", password: "test", roles: ['b', 'c', 'a']},
+                          {login: "test5", password: "test", roles: ['f', 'b', 'c', 'a']}
                       ]);
 
 module.exports["Test logout after auth (Digest)"] = function(test) {
