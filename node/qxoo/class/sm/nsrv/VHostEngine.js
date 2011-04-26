@@ -771,25 +771,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Save request params
          */
         __populateRequestParams : function(req, res, next) {
-
-            if (sm.nsrv.HTTPUtils.isFormRequest(req)) {
-                var form = req.form = new this.__formidable.IncomingForm();
-                var fopts = this.__config["formdiableOptions"];
-                if (fopts) {
-                    qx.lang.Object.mergeWith(form, fopts, true);
-                }
-                form.parse(req, function(err, fields, files) {
-                    req.params = fields;
-                    form.files = files;
-                    next(err);
-                });
-            } else if (req.method == "GET") {
+            var qs;
+            var isFormRequest = sm.nsrv.HTTPUtils.isFormRequest(req);
+            if (req.method == "GET" || isFormRequest) {
                 req.params = req.params || {};
-                var qs = req.info.query;
-                if (qs) {
+                if (qs = req.info.query) {
                     qx.lang.Object.mergeWith(req.params, this.__querystring.parse(qs), false);
                 }
-                next();
+                if (isFormRequest) {
+                    var form = req.form = new this.__formidable.IncomingForm();
+                    var fopts = this.__config["formdiableOptions"];
+                    if (fopts) {
+                        qx.lang.Object.mergeWith(form, fopts, true);
+                    }
+                    form.parse(req, function(err, fields, files) {
+                        qx.lang.Object.mergeWith(req.params, fields, true);
+                        form.files = files;
+                        next(err);
+                    });
+                } else {
+                    next();
+                }
             } else {
                 //todo other requests forbidden?
                 res.sendForbidden();

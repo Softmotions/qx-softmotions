@@ -1064,8 +1064,7 @@ module.exports["Test secured resource: single request with bad auth (Form)"] = f
     req.end();
 };
 
-
-module.exports["Test secured resource: single request with auth (Form)"] = function(test) {
+module.exports["Test secured resource: single GET request with auth (Form)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/secured?action=login&login=test&password=test", {"host": "127.0.0.1"});
     req.on("response", function (resp) {
@@ -1080,6 +1079,44 @@ module.exports["Test secured resource: single request with auth (Form)"] = funct
             test.done();
         });
     });
+    req.end();
+};
+
+module.exports["Test secured resource: single POST request with auth  (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("POST", "/test/secured", {"host": "127.0.0.1", "content-type": "application/x-www-form-urlencoded"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.write("action=login&login=test&password=test");
+    req.end();
+};
+
+module.exports["Test secured resource: single combined request with auth  (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("POST", "/test/secured?action=login", {"host": "127.0.0.1", "content-type": "application/x-www-form-urlencoded"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.write("login=test&password=test");
     req.end();
 };
 
