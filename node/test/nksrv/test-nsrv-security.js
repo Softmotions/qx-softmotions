@@ -97,8 +97,9 @@ process.on("SIGINT1", function () {
     nserver.shutdown();
 });
 
+// BASIC AUTH tests
 
-module.exports.testBasicStart = function(test) {
+module.exports["Test startup server (Basic)"] = function(test) {
     config[0].webapps[0].security.auth = auth.basic;
     config[0].webapps[0].security.securityKey = "basic";
     nserver = new sm.nsrv.NKServer(config);
@@ -106,7 +107,7 @@ module.exports.testBasicStart = function(test) {
     test.done();
 };
 
-module.exports.testBasicUnsecuredRequest1 = function(test) {
+module.exports["Test unsecured resource: single request without auth (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/unsecured", {"host": "127.0.0.1"});
     req.on("response", function (resp) {
@@ -124,7 +125,25 @@ module.exports.testBasicUnsecuredRequest1 = function(test) {
     req.end();
 };
 
-module.exports.testBasicSecuredRequest1 = function(test) {
+module.exports["Test unsecured resource: single request with auth (Basic)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured", { "host": "127.0.0.1", "Authorization": "Basic dGVzdDp0ZXN0" });
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single request without auth (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/secured", {"host": "127.0.0.1"});
     req.on("response", function (resp) {
@@ -138,15 +157,9 @@ module.exports.testBasicSecuredRequest1 = function(test) {
     req.end();
 };
 
-module.exports.testBasicSecuredRequest2 = function(test) {
+module.exports["Test secured resource: single request with auth (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
-    var req = client.request("GET",
-                             "/test/secured",
-                             {
-                                 "host": "127.0.0.1",
-                                 "Authorization": "Basic dGVzdDp0ZXN0"
-                             }
-            );
+    var req = client.request("GET", "/test/secured", { "host": "127.0.0.1", "Authorization": "Basic dGVzdDp0ZXN0" });
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -163,15 +176,9 @@ module.exports.testBasicSecuredRequest2 = function(test) {
     req.end();
 };
 
-module.exports.testBasicSecuredRequest3 = function(test) {
+module.exports["Test secured resource: double request with auth, but without cookie (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
-    var req1 = client.request("GET",
-                              "/test/secured",
-                              {
-                                  "host": "127.0.0.1",
-                                  "Authorization": "Basic dGVzdDp0ZXN0"
-                              }
-            );
+    var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "Authorization": "Basic dGVzdDp0ZXN0" });
     req1.on("response", function (resp1) {
         resp1.setEncoding("utf8");
         test.equal(resp1.statusCode, 200);
@@ -197,20 +204,14 @@ module.exports.testBasicSecuredRequest3 = function(test) {
     req1.end();
 };
 
-module.exports.testBasicSecuredRequest4 = function(test) {
+module.exports["Test secured resource: double request with auth and with cookie (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
-    var req1 = client.request("GET",
-                              "/test/secured",
-                              {
-                                  "host": "127.0.0.1",
-                                  "Authorization": "Basic dGVzdDp0ZXN0"
-                              }
-            );
+    var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "Authorization": "Basic dGVzdDp0ZXN0" });
     req1.on("response", function (resp1) {
         resp1.setEncoding("utf8");
         test.equal(resp1.statusCode, 200);
         var cookie = "";
-        test.ok(resp1.headers["set-cookie"])
+        test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
             var cresp = resp1.headers["set-cookie"];
             cresp.forEach(function(item) {
@@ -223,13 +224,7 @@ module.exports.testBasicSecuredRequest4 = function(test) {
             test.ok(body.indexOf("content") >= 0)
         });
         resp1.on("end", function () {
-            var req2 = client.request("GET",
-                                      "/test/secured",
-                                      {
-                                          "host": "127.0.0.1",
-                                          "cookie": cookie
-                                      }
-                    );
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
             req2.on("response", function (resp2) {
                 resp2.setEncoding("utf8");
                 test.equal(resp2.statusCode, 200);
@@ -248,28 +243,23 @@ module.exports.testBasicSecuredRequest4 = function(test) {
     req1.end();
 };
 
-var buildBasicRolesTests = function(name, resource, users) {
+var buildBasicRolesTests = function(name, resource, tests) {
     var index = 0;
 
-    users.forEach(function(user) {
-        module.exports[name + (++index)] = function(test) {
+    tests.forEach(function(tdata) {
+        module.exports[name + tdata.roles] = function(test) {
             var client = http.createClient(port, "127.0.0.1");
-            var req = client.request("GET",
-                                     resource,
-                                     {
-                                         "host": "127.0.0.1",
-                                         "Authorization": "Basic " + user.auth
-                                     }
+            var req = client.request("GET", resource, { "host": "127.0.0.1", "Authorization": "Basic " + tdata.auth }
                     );
             req.on("response", function (resp) {
                 resp.setEncoding("utf8");
-                if (user.access) {
+                if (tdata.access) {
                     test.equal(resp.statusCode, 200);
                     test.ok(resp.headers["set-cookie"]);
                     test.equal(resp.headers["content-type"], "text/plain");
                     resp.on("data", function (body) {
                         test.ok(body);
-                        test.ok(body.indexOf("content") >= 0)
+                        test.ok(body.indexOf("content") >= 0);
                     });
                 } else {
                     test.equal(resp.statusCode, 403);
@@ -284,44 +274,63 @@ var buildBasicRolesTests = function(name, resource, users) {
     });
 };
 
-buildBasicRolesTests("testBasicRoleA",
+buildBasicRolesTests("Test access resource (Basic): required roles ['a'], user roles:",
                      "/test/roles/a",
                      [
-                         { auth: "dGVzdDp0ZXN0", access: true },
-                         { auth: "dGVzdDI6dGVzdA==", access: false },
-                         { auth: "dGVzdDM6dGVzdA==", access: true },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true }
+                         { auth: "dGVzdDp0ZXN0", access: true, roles: "['a']" },
+                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
+                         { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
                      ]);
 
-buildBasicRolesTests("testBasicRoleB",
+buildBasicRolesTests("Test access resource (Basic): required roles ['b'], user roles:",
                      "/test/roles/b",
                      [
-                         { auth: "dGVzdDp0ZXN0", access: false },
-                         { auth: "dGVzdDI6dGVzdA==", access: true },
-                         { auth: "dGVzdDM6dGVzdA==", access: false },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true }
+                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
+                         { auth: "dGVzdDI6dGVzdA==", access: true, roles: "['b']" },
+                         { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
                      ]);
 
-buildBasicRolesTests("testBasicRoleC",
+buildBasicRolesTests("Test access resource (Basic): required roles ['c'], user roles:",
                      "/test/roles/c",
                      [
-                         { auth: "dGVzdDp0ZXN0", access: false },
-                         { auth: "dGVzdDI6dGVzdA==", access: false },
-                         { auth: "dGVzdDM6dGVzdA==", access: true },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true }
+                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
+                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
+                         { auth: "dGVzdDM6dGVzdA==", access: true, roles: "['c', 'a']" },
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
                      ]);
 
-buildBasicRolesTests("testBasicRoleA&B",
+buildBasicRolesTests("Test access resource (Basic): required roles ['a', 'b'], user roles:",
                      "/test/roles/d",
                      [
-                         { auth: "dGVzdDp0ZXN0", access: false },
-                         { auth: "dGVzdDI6dGVzdA==", access: false },
-                         { auth: "dGVzdDM6dGVzdA==", access: false },
-                         { auth: "dGVzdDQ6dGVzdA==", access: true }
+                         { auth: "dGVzdDp0ZXN0", access: false, roles: "['a']" },
+                         { auth: "dGVzdDI6dGVzdA==", access: false, roles: "['b']" },
+                         { auth: "dGVzdDM6dGVzdA==", access: false, roles: "['c', 'a']" },
+                         { auth: "dGVzdDQ6dGVzdA==", access: true, roles: "['b', 'c', 'a']" }
                      ]);
 
-module.exports.testBasicShutdown = function(test) {
+module.exports["Tes shutdown server (Basic)"] = function(test) {
     test.ok(nserver);
     nserver.shutdown();
     test.done();
 };
+
+
+// DIGEST AUTH tests
+
+module.exports["Test startup server (Digest)"] = function(test) {
+    config[0].webapps[0].security.auth = auth.digest;
+    config[0].webapps[0].security.securityKey = "digest";
+    nserver = new sm.nsrv.NKServer(config);
+    nserver.startup(port, "127.0.0.1");
+    test.done();
+};
+
+
+module.exports["Test shutdown server (Digest)"] = function(test) {
+    test.ok(nserver);
+    nserver.shutdown();
+    test.done();
+};
+

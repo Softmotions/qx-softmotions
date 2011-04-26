@@ -70,12 +70,6 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                             (function(scope, auth) {
                                 return function(err, user) {
                                     if (!err && user) {
-                                        if (auth.algorithm == 'MD5-sess') {
-                                            // TODO: implement MD5-sess
-                                            scope.failure(request, response, callback);
-                                            return;
-                                        }
-
                                         if (auth.qop == 'auth-int') {
                                             // TODO: implement auth-int
                                             scope.failure(request, response, callback);
@@ -88,7 +82,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                                 // get HA1 from user provider
                                                 ha1 = user.digestPassword;
                                             } else {
-                                                this.failure(request, response, callback);
+                                                scope.failure(request, response, callback);
                                                 return;
                                             }
                                         } else {
@@ -96,9 +90,14 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                                 // calculate HA1
                                                 ha1 = scope.buildHash(user.login + ':' + scope.__realmName + ':' + user.plainPassword)
                                             } else {
-                                                this.failure(request, response, callback);
+                                                scope.failure(request, response, callback);
                                                 return;
                                             }
+                                        }
+
+                                        if (auth.algorithm == 'MD5-sess') {
+                                            // RFC 2617 (MD5-sess)
+                                            ha1 = scope.buildHash(ha1 + ':' + auth.nonce + ':' + auth.cnonce);
                                         }
 
                                         // calculate a2
