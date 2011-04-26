@@ -19,8 +19,9 @@ qx.Class.define("sm.nsrv.HTTPUtils", {
             return req.body === undefined
                     && (req.method === "POST"
                     || req.method === "PUT")
+                    && (req.headers["content-type"]
                     && (req.headers["content-type"].indexOf("multipart/form-data") >= 0
-                    || req.headers["content-type"].indexOf("urlencoded") >= 0);
+                    || req.headers["content-type"].indexOf("urlencoded") >= 0));
         },
 
 

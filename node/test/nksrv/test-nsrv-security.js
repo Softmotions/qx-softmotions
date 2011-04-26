@@ -98,7 +98,8 @@ var resources = [
     {resource: "/test/roles/a", roles: ['a']},
     {resource: "/test/roles/b", roles: ['b']},
     {resource: "/test/roles/c", roles: ['c']},
-    {resource: "/test/roles/d", roles: ['a', 'b']}
+    {resource: "/test/roles/d", roles: ['a', 'b']},
+    {resource: "/test/roles/e", roles: []}
 ];
 
 var users = [
@@ -1149,7 +1150,7 @@ module.exports["Test secured resource: double request with auth and with cookie 
     req1.end();
 };
 
-var buildFormRolesTests = function(resources, users) {
+var buildFormRolesTests = function(method, resources, users) {
     resources.forEach(function(resource) {
         users.forEach(function(user) {
             var access = resource.roles.every(function(role) {
@@ -1159,15 +1160,25 @@ var buildFormRolesTests = function(resources, users) {
             });
 
             var name = "Test access resource: " +
+                       "method: '" + method + "', " +
                        "required roles [" + resource.roles.join(", ") + "], " +
                        "user roles: [" + user.roles.join(", ") + "], " +
                        "access: " + access;
 
+            var headers = {"host": "127.0.0.1"};
+            var data = "";
+            var url = resource.resource;
+            if (method === "POST") {
+                headers["content-type"] = "application/x-www-form-urlencoded";
+                data += "action=login&login=" + user.login + "&password=" + user.password;
+            } else if (method === "GET") {
+                url += "?" + "action=login&login=" + user.login + "&password=" + user.password;
+            }
+            headers["content-length"] = data.length;
+
             module.exports[name + " (Form)"] = function(test) {
                 var client = http.createClient(port, "127.0.0.1");
-                var req = client.request("GET",
-                                         resource.resource + "?action=login&login=" + user.login + "&password=" + user.password,
-                                         { "host": "127.0.0.1"});
+                var req = client.request(method, url, headers);
                 req.on("response", function (resp) {
                     resp.setEncoding("utf8");
                     if (access) {
@@ -1185,6 +1196,7 @@ var buildFormRolesTests = function(resources, users) {
                         test.done();
                     });
                 });
+                req.write(data);
                 req.end();
             }
 
@@ -1192,7 +1204,8 @@ var buildFormRolesTests = function(resources, users) {
     });
 };
 
-buildFormRolesTests(resources, users);
+buildFormRolesTests("GET", resources, users);
+buildFormRolesTests("POST", resources, users);
 
 module.exports["Test logout after auth (Form)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
