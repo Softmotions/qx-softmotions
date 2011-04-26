@@ -675,9 +675,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (res.headers) {
                 qx.lang.Object.mergeWith(headers, res.headers);
             }
-            var body = (errOpts["showErrorMsg"] && !errOpts["messagesInHeaders"])
-                    ? err.toString()
-                    : "";
+            var body = (errOpts["showErrorMsg"] && !errOpts["messagesInHeaders"]) ? err.toString() : "";
             //todo review status code
             res.writeHead((message && errC == 0) ? 200 : 500, headers);
             res.end(body);

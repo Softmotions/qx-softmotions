@@ -5,6 +5,7 @@
 qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
     extend  : qx.core.Object,
     implement: [sm.nsrv.auth.IAuthFilter],
+    include : [sm.nsrv.auth.MAuthFilter],
 
     statics:
     {
@@ -41,7 +42,6 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
     {
         __realmName: null,
         __userProvider: null,
-        __ignoreFailure: null,
         __securityStore: null,
         __nonces: null,
         __nonceExpire: null,
@@ -134,18 +134,6 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                 }
             } else {
                 this.failure(request, response, callback);
-            }
-        },
-
-        success: function(request, response, callback) {
-            callback();
-        },
-
-        failure: function(request, response, callback) {
-            if (!this.__ignoreFailure) {
-                this.commence(request, response, null);
-            } else {
-                callback();
             }
         },
 

@@ -7,61 +7,70 @@ qx.Class.define("sm.nsrv.test.TestSecurityExecutor", {
     extend  : qx.core.Object,
     include : [sm.nsrv.MExecutor],
 
-    construct : function() {
+    construct: function() {
         this.base(arguments);
     },
 
     members :
     {
-        __content : function(req, resp, ctx) {
+//        __loginform: function(req, resp, ctx) {
+//            this.writeString("loginform", resp, ctx);
+//        },
+//
+        __content: function(req, resp, ctx) {
             this.writeString("content", resp, ctx);
         }
     },
 
     handlers :
     {
-        "/secured" : {
-            webapp : "testsecurity",
-            handler : "__content",
+//        "/login": {
+//            webapp: "testsecurity",
+//            handler: "__loginform"
+//        },
+//
+        "/secured": {
+            webapp: "testsecurity",
+            handler: "__content",
             secured: true
         },
 
         "/roles/a": {
-            webapp : "testsecurity",
-            handler : "__content",
+            webapp: "testsecurity",
+            handler: "__content",
             secured: true,
             roles: ["a"]
         },
 
         "/roles/b": {
-            webapp : "testsecurity",
-            handler : "__content",
+            webapp: "testsecurity",
+            handler: "__content",
             secured: true,
             roles: ["b"]
         },
 
         "/roles/c": {
-            webapp : "testsecurity",
-            handler : "__content",
+            webapp: "testsecurity",
+            handler: "__content",
             secured: true,
             roles: ["c"]
         },
 
         "/roles/d": {
-            webapp : "testsecurity",
-            handler : "__content",
+            webapp: "testsecurity",
+            handler: "__content",
             secured: true,
             roles: ["a", "b"]
         },
 
-        "/unsecured" : {
-            webapp : "testsecurity",
-            handler : "__content"
+        "/unsecured": {
+            webapp: "testsecurity",
+            handler: "__content"
         },
 
-        "/logout" : {
-            webapp : "testsecurity",
-            handler : "__content",
+        "/logout": {
+            webapp: "testsecurity",
+            handler: "__content",
             logout: true
         }
     },

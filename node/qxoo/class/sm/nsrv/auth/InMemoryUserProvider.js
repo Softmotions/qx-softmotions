@@ -31,12 +31,8 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
         __users: null,
 
         login: function(login, password, callback) {
-            var user = this.__users[login];
-            if (user) {
-                if (user.password != password) {
-                    callback(null, null);
-                }
-
+            var user = login ? this.__users[login] : null;
+            if (user && user.password == password) {
                 callback(null, {login: user.login, roles: this.getUserRoles(this.__roles, user.roles)});
             } else {
                 callback(null, null);

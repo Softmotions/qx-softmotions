@@ -5,6 +5,7 @@
 qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
     extend  : qx.core.Object,
     implement: [sm.nsrv.auth.IAuthFilter],
+    include : [sm.nsrv.auth.MAuthFilter],
 
     statics:
     {
@@ -44,7 +45,6 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
     {
         __realmName: null,
         __userProvider: null,
-        __ignoreFailure: null,
         __securityStore: null,
 
         authenticate: function(request, response, callback) {
@@ -74,18 +74,6 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
                 }
             } else {
                 this.failure(request, response, callback);
-            }
-        },
-
-        success: function(request, response, callback) {
-            callback();
-        },
-
-        failure: function(request, response, callback) {
-            if (!this.__ignoreFailure) {
-                this.commence(request, response, null);
-            } else {
-                callback();
             }
         },
 

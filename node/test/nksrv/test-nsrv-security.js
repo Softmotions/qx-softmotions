@@ -36,6 +36,12 @@ var auth = {
         options: {
             realmName: "NKServerTest"
         }
+    },
+    form: {
+        type: sm.nsrv.auth.FormAuthFilter,
+        options: {
+            formUrl: "/test/login"
+        }
     }
 };
 
@@ -87,6 +93,21 @@ var config =
                 }
             }
         ];
+
+var resources = [
+    {resource: "/test/roles/a", roles: ['a']},
+    {resource: "/test/roles/b", roles: ['b']},
+    {resource: "/test/roles/c", roles: ['c']},
+    {resource: "/test/roles/d", roles: ['a', 'b']}
+];
+
+var users = [
+    {auth: "dGVzdDp0ZXN0", login: "test", password: "test", roles: ['a']},
+    {auth: "dGVzdDI6dGVzdA==", login: "test2", password: "test", roles: ['b']},
+    {auth: "dGVzdDM6dGVzdA==", login: "test3", password: "test", roles: ['c', 'a']},
+    {auth: "dGVzdDQ6dGVzdA==", login: "test4", password: "test", roles: ['b', 'c', 'a']},
+    {auth: "dGVzdDU6dGVzdA==", login: "test5", password: "test", roles: ['f', 'b', 'c', 'a']}
+];
 
 var port = 3001;
 var nserver = null;
@@ -152,7 +173,7 @@ module.exports["Test secured resource: single request without auth (Basic)"] = f
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 401);
-        test.equal(resp.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+        test.equal(resp.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
         resp.on("end", function () {
             test.done();
         });
@@ -166,7 +187,7 @@ module.exports["Test secured resource: single request with bad auth (Basic)"] = 
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 401);
-        test.equal(resp.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+        test.equal(resp.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
         resp.on("data", function (body) {
             test.ok(body);
             test.ok(body.indexOf("content") >= 0)
@@ -214,7 +235,7 @@ module.exports["Test secured resource: double request with auth, but without coo
             req2.on("response", function (resp2) {
                 resp2.setEncoding("utf8");
                 test.equal(resp2.statusCode, 401);
-                test.equal(resp2.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+                test.equal(resp2.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
                 resp2.on("end", function () {
                     test.done();
                 });
@@ -305,19 +326,7 @@ var buildBasicRolesTests = function(resources, users) {
     });
 };
 
-buildBasicRolesTests([
-                          {resource: "/test/roles/a", roles: ['a']},
-                          {resource: "/test/roles/b", roles: ['b']},
-                          {resource: "/test/roles/c", roles: ['c']},
-                          {resource: "/test/roles/d", roles: ['a', 'b']}
-                      ],
-                      [
-                          {auth: "dGVzdDp0ZXN0", roles: ['a']},
-                          {auth: "dGVzdDI6dGVzdA==", roles: ['b']},
-                          {auth: "dGVzdDM6dGVzdA==", roles: ['c', 'a']},
-                          {auth: "dGVzdDQ6dGVzdA==", roles: ['b', 'c', 'a']},
-                          {auth: "dGVzdDU6dGVzdA==", roles: ['f', 'b', 'c', 'a']}
-                      ]);
+buildBasicRolesTests(resources, users);
 
 module.exports["Test logout after auth (Basic)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
@@ -363,7 +372,7 @@ module.exports["Test logout after auth (Basic)"] = function(test) {
                             req4.on("response", function (resp4) {
                                 resp4.setEncoding("utf8");
                                 test.equal(resp4.statusCode, 401);
-                                test.equal(resp4.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+                                test.equal(resp4.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
                                 resp4.on("end", function () {
                                     test.done();
                                 });
@@ -386,7 +395,7 @@ module.exports["Test logout without auth (Basic)"] = function(test) {
     req1.on("response", function (resp1) {
         resp1.setEncoding("utf8");
         test.equal(resp1.statusCode, 401);
-        test.equal(resp1.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+        test.equal(resp1.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
@@ -410,7 +419,7 @@ module.exports["Test logout without auth (Basic)"] = function(test) {
                     req3.on("response", function (resp3) {
                         resp3.setEncoding("utf8");
                         test.equal(resp3.statusCode, 401);
-                        test.equal(resp3.headers["www-authenticate"], "Basic realm=\"NKServerTest\"");
+                        test.equal(resp3.headers["www-authenticate"], "Basic realm=\"" + auth.basic.options.realmName + "\"");
                         resp3.on("end", function () {
                             test.done();
                         });
@@ -553,7 +562,7 @@ module.exports["Test secured resource: single request without auth (Digest)"] = 
         test.ok(match);
         if (match) {
             var authreq = parseDigestHeaderString(match[1]);
-            test.equal(authreq.realm, "NKServerTest");
+            test.equal(authreq.realm, auth.digest.options.realmName);
             test.ok(authreq.nonce);
             test.equal(authreq.qop, "auth");
             test.ok(authreq.opaque);
@@ -565,7 +574,7 @@ module.exports["Test secured resource: single request without auth (Digest)"] = 
     req.end();
 };
 
-module.exports["Test unsecured resource: single request with bad auth (Digest)"] = function(test) {
+module.exports["Test secured resource: single request with bad auth (Digest)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1"});
     req1.on("response", function (resp1) {
@@ -577,14 +586,14 @@ module.exports["Test unsecured resource: single request with bad auth (Digest)"]
         resp1.on("end", function () {
             if (match) {
                 var authreq = parseDigestHeaderString(match[1]);
-                test.equal(authreq.realm, "NKServerTest");
+                test.equal(authreq.realm, auth.digest.options.realmName);
                 test.ok(authreq.nonce);
                 test.equal(authreq.qop, "auth");
                 test.ok(authreq.opaque);
 
-                var auth = generateDigestAuth(authreq, "/test/secured", "test", "test2");
+                var dauth = generateDigestAuth(authreq, "/test/secured", "test", "test2");
 
-                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": auth});
+                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": dauth});
                 req2.on("response", function (resp2) {
                     resp2.setEncoding("utf8");
                     test.equal(resp2.statusCode, 401);
@@ -593,7 +602,7 @@ module.exports["Test unsecured resource: single request with bad auth (Digest)"]
                     test.ok(match);
                     if (match) {
                         var authreq = parseDigestHeaderString(match[1]);
-                        test.equal(authreq.realm, "NKServerTest");
+                        test.equal(authreq.realm, auth.digest.options.realmName);
                         test.ok(authreq.nonce);
                         test.equal(authreq.qop, "auth");
                         test.ok(authreq.opaque);
@@ -611,7 +620,7 @@ module.exports["Test unsecured resource: single request with bad auth (Digest)"]
     req1.end();
 };
 
-module.exports["Test unsecured resource: single request with auth (Digest)"] = function(test) {
+module.exports["Test secured resource: single request with auth (Digest)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1"});
     req1.on("response", function (resp1) {
@@ -623,14 +632,14 @@ module.exports["Test unsecured resource: single request with auth (Digest)"] = f
         resp1.on("end", function () {
             if (match) {
                 var authreq = parseDigestHeaderString(match[1]);
-                test.equal(authreq.realm, "NKServerTest");
+                test.equal(authreq.realm, auth.digest.options.realmName);
                 test.ok(authreq.nonce);
                 test.equal(authreq.qop, "auth");
                 test.ok(authreq.opaque);
 
-                var auth = generateDigestAuth(authreq, "/test/secured", "test", "test");
+                var dauth = generateDigestAuth(authreq, "/test/secured", "test", "test");
 
-                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": auth});
+                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": dauth});
                 req2.on("response", function (resp2) {
                     resp2.setEncoding("utf8");
                     test.equal(resp2.statusCode, 200);
@@ -665,14 +674,14 @@ module.exports["Test secured resource: double request with auth, but without coo
         resp1.on("end", function () {
             if (match) {
                 var authreq = parseDigestHeaderString(match[1]);
-                test.equal(authreq.realm, "NKServerTest");
+                test.equal(authreq.realm, auth.digest.options.realmName);
                 test.ok(authreq.nonce);
                 test.equal(authreq.qop, "auth");
                 test.ok(authreq.opaque);
 
-                var auth = generateDigestAuth(authreq, "/test/secured", "test", "test");
+                var dauth = generateDigestAuth(authreq, "/test/secured", "test", "test");
 
-                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": auth});
+                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "Authorization": dauth});
                 req2.on("response", function (resp2) {
                     resp2.setEncoding("utf8");
                     test.equal(resp2.statusCode, 200);
@@ -726,14 +735,14 @@ module.exports["Test secured resource: double request with auth and with cookie 
         resp1.on("end", function () {
             if (match) {
                 var authreq = parseDigestHeaderString(match[1]);
-                test.equal(authreq.realm, "NKServerTest");
+                test.equal(authreq.realm, auth.digest.options.realmName);
                 test.ok(authreq.nonce);
                 test.equal(authreq.qop, "auth");
                 test.ok(authreq.opaque);
 
-                var auth = generateDigestAuth(authreq, "/test/secured", "test", "test");
+                var dauth = generateDigestAuth(authreq, "/test/secured", "test", "test");
 
-                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "cookie": cookie, "Authorization": auth});
+                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "cookie": cookie, "Authorization": dauth});
                 req2.on("response", function (resp2) {
                     resp2.setEncoding("utf8");
                     test.equal(resp2.statusCode, 200);
@@ -795,14 +804,14 @@ var buildDigestRolesTests = function(resources, users) {
                     resp1.on("end", function () {
                         if (match) {
                             var authreq = parseDigestHeaderString(match[1]);
-                            test.equal(authreq.realm, "NKServerTest");
+                            test.equal(authreq.realm, auth.digest.options.realmName);
                             test.ok(authreq.nonce);
                             test.equal(authreq.qop, "auth");
                             test.ok(authreq.opaque);
 
-                            var auth = generateDigestAuth(authreq, resource.resource, user.login, user.password);
+                            var dauth = generateDigestAuth(authreq, resource.resource, user.login, user.password);
 
-                            var req2 = client.request("GET", resource.resource, {"host": "127.0.0.1", "Authorization": auth});
+                            var req2 = client.request("GET", resource.resource, {"host": "127.0.0.1", "Authorization": dauth});
                             req2.on("response", function (resp2) {
                                 resp2.setEncoding("utf8");
                                 if (access) {
@@ -833,19 +842,7 @@ var buildDigestRolesTests = function(resources, users) {
 };
 
 
-buildDigestRolesTests([
-                          {resource: "/test/roles/a", roles: ['a']},
-                          {resource: "/test/roles/b", roles: ['b']},
-                          {resource: "/test/roles/c", roles: ['c']},
-                          {resource: "/test/roles/d", roles: ['a', 'b']}
-                      ],
-                      [
-                          {login: "test", password: "test", roles: ['a']},
-                          {login: "test2", password: "test", roles: ['b']},
-                          {login: "test3", password: "test", roles: ['c', 'a']},
-                          {login: "test4", password: "test", roles: ['b', 'c', 'a']},
-                          {login: "test5", password: "test", roles: ['f', 'b', 'c', 'a']}
-                      ]);
+buildDigestRolesTests(resources, users);
 
 module.exports["Test logout after auth (Digest)"] = function(test) {
     var client = http.createClient(port, "127.0.0.1");
@@ -868,14 +865,14 @@ module.exports["Test logout after auth (Digest)"] = function(test) {
         resp1.on("end", function () {
             if (match) {
                 var authreq = parseDigestHeaderString(match[1]);
-                test.equal(authreq.realm, "NKServerTest");
+                test.equal(authreq.realm, auth.digest.options.realmName);
                 test.ok(authreq.nonce);
                 test.equal(authreq.qop, "auth");
                 test.ok(authreq.opaque);
 
-                var auth = generateDigestAuth(authreq, "/test/secured", "test", "test");
+                var dauth = generateDigestAuth(authreq, "/test/secured", "test", "test");
 
-                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "cookie": cookie, "Authorization": auth});
+                var req2 = client.request("GET", "/test/secured", {"host": "127.0.0.1", "cookie": cookie, "Authorization": dauth});
                 req2.on("response", function (resp2) {
                     resp2.setEncoding("utf8");
                     test.equal(resp2.statusCode, 200);
@@ -968,6 +965,305 @@ module.exports["Test logout without auth (Digest)"] = function(test) {
 };
 
 module.exports["Test shutdown server (Digest)"] = function(test) {
+    test.ok(nserver);
+    nserver.shutdown();
+    test.done();
+};
+
+
+// FORM AUTH tests
+
+module.exports["Test startup server (Form)"] = function(test) {
+    config[0].webapps[0].security.auth = auth.form;
+    config[0].webapps[0].security.securityKey = "form";
+    nserver = new sm.nsrv.NKServer(config);
+    nserver.startup(port, "127.0.0.1");
+    test.done();
+};
+
+module.exports["Test unsecured resource: single request without auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/unsecured", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single request without auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 302);
+        test.equal(resp.headers["location"], auth.form.options.formUrl);
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single request with bad auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured?action=login&login=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 302);
+        test.equal(resp.headers["location"], auth.form.options.formUrl);
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+
+module.exports["Test secured resource: single request with auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: double request with auth, but without cookie (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        test.equal(resp1.headers["content-type"], "text/plain");
+        test.ok(resp1.headers["set-cookie"]);
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1" });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 302);
+                test.equal(resp2.headers["location"], auth.form.options.formUrl);
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: double request with auth and with cookie (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            var cresp = resp1.headers["set-cookie"];
+            cresp.forEach(function(item) {
+                cookie += item.split(';')[0] + "; "
+            });
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+var buildFormRolesTests = function(resources, users) {
+    resources.forEach(function(resource) {
+        users.forEach(function(user) {
+            var access = resource.roles.every(function(role) {
+                return user.roles.some(function(userRole) {
+                    return role == userRole;
+                });
+            });
+
+            var name = "Test access resource: " +
+                       "required roles [" + resource.roles.join(", ") + "], " +
+                       "user roles: [" + user.roles.join(", ") + "], " +
+                       "access: " + access;
+
+            module.exports[name + " (Form)"] = function(test) {
+                var client = http.createClient(port, "127.0.0.1");
+                var req = client.request("GET",
+                                         resource.resource + "?action=login&login=" + user.login + "&password=" + user.password,
+                                         { "host": "127.0.0.1"});
+                req.on("response", function (resp) {
+                    resp.setEncoding("utf8");
+                    if (access) {
+                        test.equal(resp.statusCode, 200);
+                        test.ok(resp.headers["set-cookie"]);
+                        test.equal(resp.headers["content-type"], "text/plain");
+                        resp.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0);
+                        });
+                    } else {
+                        test.equal(resp.statusCode, 403);
+                    }
+                    resp.on("end", function () {
+                        test.done();
+                    });
+                });
+                req.end();
+            }
+
+        });
+    });
+};
+
+buildFormRolesTests(resources, users);
+
+module.exports["Test logout after auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            var cresp = resp1.headers["set-cookie"];
+            cresp.forEach(function(item) {
+                cookie += item.split(';')[0] + "; "
+            });
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 200);
+                        test.equal(resp3.headers["content-type"], "text/plain");
+                        resp3.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0)
+                        });
+                        resp3.on("end", function () {
+                            var req4 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                            req4.on("response", function (resp4) {
+                                resp4.setEncoding("utf8");
+                                test.equal(resp4.statusCode, 302);
+                                test.equal(resp4.headers["location"], auth.form.options.formUrl);
+                                resp4.on("end", function () {
+                                    test.done();
+                                });
+                            });
+                            req4.end();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test logout without auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 302);
+        test.equal(resp1.headers["location"], auth.form.options.formUrl);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            var cresp = resp1.headers["set-cookie"];
+            cresp.forEach(function(item) {
+                cookie += item.split(';')[0] + "; "
+            });
+        }
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 302);
+                        test.equal(resp3.headers["location"], auth.form.options.formUrl);
+                        resp3.on("end", function () {
+                            test.done();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test shutdown server (Form)"] = function(test) {
     test.ok(nserver);
     nserver.shutdown();
     test.done();
