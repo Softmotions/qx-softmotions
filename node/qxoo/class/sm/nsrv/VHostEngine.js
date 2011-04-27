@@ -63,7 +63,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __handlers : null,
 
-
         /**
          * Web handlers for regexp matching
          */
@@ -78,6 +77,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Current connect server
          */
         __server : null,
+
+        /**
+         * Security (by webapps)
+         */
+        __security : null,
 
         /**
          * Returns virtual host name
@@ -102,6 +106,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             var wappsIds = {};
             var wappsCtx = {};
+
+            this.__security = {};
 
             for (var i = 0; i < wapps.length; ++i) {
 
@@ -135,6 +141,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var dr = wa["docRoot"];
                 if (!this.__path.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
                     throw new Error("The 'docRoot': " + wa["docRoot"] + " is not directory");
+                }
+
+                // configure security
+                if (wa["security"]) {
+                    var sconf = wa["security"];
+                    var security = this.__security[wa["id"]] = {};
+                    var securityStore = security.__securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
+
+                    if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
+                        throw new Error("Missing user provider type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+
+                    var uconf = sconf["userProvider"];
+                    var userProvider = security.__userProvider = new uconf["type"](uconf["options"]);
+
+                    if (!sconf["auth"] || !sconf["auth"]["type"]) {
+                        throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+
+                    var aconf = sconf["auth"];
+                    security.__filter = new aconf["type"](aconf["options"], userProvider, securityStore);
                 }
             }
 
@@ -290,7 +317,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                                                " [" + this.__vhostName + "]:[" + wappId + "]");
+                                        " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -317,7 +344,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                                                JSON.stringify(asm, true));
+                                        JSON.stringify(asm, true));
                 }
             }
 
@@ -387,7 +414,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                                                        "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                                                "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -396,7 +423,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + k + "#" + (hlSlot["handler"]) +
-                                        "()' replaced by: " + hconf["handler"] + "()");
+                                                         "()' replaced by: " + hconf["handler"] + "()");
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -532,7 +559,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
             }
 
-            var execCalled = false;
             if (hconf) { //found handlers
                 var hinst = hconf["$$instance"];
                 var exec = hinst[hconf["handler"]];
@@ -542,25 +568,50 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
                 }
-                try {
-                    exec.call(hinst, req, res, ctx);
-                    execCalled = true;
-                } catch(e) {
-                    var report = true;
-                    if (e instanceof sm.nsrv.Message) {
-                        report = e.isError();
+
+                var callback = function() {
+                    try {
+                        exec.call(hinst, req, res, ctx);
+                    } catch(e) {
+                        var report = true;
+                        if (e instanceof sm.nsrv.Message) {
+                            report = e.isError();
+                        }
+                        if (report) {
+                            qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                        }
+                        next(e);
                     }
-                    if (report) {
-                        qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                };
+
+                var security;
+                var secured = this.__getHconfValue(hconf, "secured");
+                var roles = this.__getHconfValue(hconf, "roles");
+                if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+                    if (hconf["logout"]) {
+                        security.__securityStore.setUser(req, null);
+                        callback();
+                    } else {
+                        security.__filter.authenticate(req, res, function(err) {
+                            if (qx.lang.Type.isArray(roles) || qx.lang.Type.isString(roles)) {
+                                if (req.isUserHasRoles(roles)) {
+                                    callback();
+                                } else {
+                                    res.sendForbidden();
+                                }
+                            } else {
+                                callback();
+                            }
+                        });
                     }
-                    next(e);
-                    return;
+                } else {
+                    callback();
                 }
+
+                return;
             }
 
-            if (!execCalled) { //Exec handler not called
-                ctx(null);
-            }
+            ctx(null);
         },
 
 
@@ -624,9 +675,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (res.headers) {
                 qx.lang.Object.mergeWith(headers, res.headers);
             }
-            var body = (errOpts["showErrorMsg"] && !errOpts["messagesInHeaders"])
-                    ? err.toString()
-                    : "";
+            var body = (errOpts["showErrorMsg"] && !errOpts["messagesInHeaders"]) ? err.toString() : "";
             //todo review status code
             res.writeHead((message && errC == 0) ? 200 : 500, headers);
             res.end(body);
@@ -637,7 +686,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Initiate request
          */
         __initRequestHandler : function(req, res, next) {
-
+            var me = this;
             //Response messages
             res.messages = res.messages || [];
 
@@ -661,6 +710,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             };
             res.sendOk = function(headers, data) {
                 res.sendSCode(200, headers, data);
+            };
+            res._implicitHeader = function() {// TODO: for session compatibility
             };
 
             if (qx.core.Environment.get("sm.nsrv.access-control-allow") == true) {
@@ -704,6 +755,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
+            var security = this.__security[info.webapp["id"]];
+            req.isAuthenticated = function(roles) {
+                return security && security.__securityStore ? security.__securityStore.isAuthenticated(this) : false;
+            };
+            req.isUserHasRoles = function(roles) {
+                return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : false;
+            };
+
             //Call next() element in chain
             next();
         },
@@ -712,25 +771,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Save request params
          */
         __populateRequestParams : function(req, res, next) {
-
-            if (sm.nsrv.HTTPUtils.isFormRequest(req)) {
-                var form = req.form = new this.__formidable.IncomingForm();
-                var fopts = this.__config["formdiableOptions"];
-                if (fopts) {
-                    qx.lang.Object.mergeWith(form, fopts, true);
-                }
-                form.parse(req, function(err, fields, files) {
-                    req.params = fields;
-                    form.files = files;
-                    next(err);
-                });
-            } else if (req.method == "GET") {
+            var isFormRequest = sm.nsrv.HTTPUtils.isFormRequest(req);
+            if (req.method == "GET" || isFormRequest) {
                 req.params = req.params || {};
                 var qs = req.info.query;
                 if (qs) {
                     qx.lang.Object.mergeWith(req.params, this.__querystring.parse(qs), false);
                 }
-                next();
+                if (isFormRequest) {
+                    var form = req.form = new this.__formidable.IncomingForm();
+                    var fopts = this.__config["formdiableOptions"];
+                    if (fopts) {
+                        qx.lang.Object.mergeWith(form, fopts, true);
+                    }
+                    form.parse(req, function(err, fields, files) {
+                        qx.lang.Object.mergeWith(req.params, fields, true);
+                        form.files = files;
+                        next(err);
+                    });
+                } else {
+                    next();
+                }
             } else {
                 //todo other requests forbidden?
                 res.sendForbidden();
@@ -763,6 +824,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var me = this;
             var connect = $$node.require("connect");
             this.__server = connect.createServer(
+                    connect.cookieParser(),
+                    connect.session({secret: "nkserver"}),
                     function (req, res, next) {
                         me.__initRequestHandler(req, res, next);
                     },

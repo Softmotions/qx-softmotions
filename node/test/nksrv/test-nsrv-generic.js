@@ -351,6 +351,29 @@ module.exports.testPostParams = function(test) {
     req.end();
 };
 
+module.exports.testCombinedParams = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var data = "p1=647fd5149a8541e4a240833b7feea02f&p1=9725bc6748a14d5488ae54760248fd7b";
+    var req = client.request("POST", "/test/postRequestParams?p2=01b3c2272fe94a2f9bb8a21caa9fcef7",
+                             {"host": "127.0.0.1",
+                                 "Content-Type" : "application/x-www-form-urlencoded",
+                                 "Content-Length": data.length});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body.indexOf("p1=647fd5149a8541e4a240833b7feea02f,9725bc6748a14d5488ae54760248fd7b") >= 0);
+            test.ok(body.indexOf("p2=01b3c2272fe94a2f9bb8a21caa9fcef7") >= 0);
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.write(data);
+    req.end();
+};
+
 
 module.exports.testJazzInclude = function(test) {
 
@@ -458,7 +481,7 @@ module.exports.testAsmExtends2 = function(test) {
     req.end();
 };
 
-
+/*
 module.exports.testAsmRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_asmref1.jz",
@@ -483,7 +506,7 @@ module.exports.testAsmRef = function(test) {
     });
     req.end();
 };
-
+*/
 
 module.exports.testAsmIreqRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");

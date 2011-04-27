@@ -68,6 +68,11 @@
             <env key="NODE_PATH" value="${node.path}"/>
             <arg value="./nksrv/test-nsrv-generic.js"/>
         </exec>
+
+        <exec executable="${node.unit}" dir="${test.dir}" failonerror="true" spawn="false">
+            <env key="NODE_PATH" value="${node.path}"/>
+            <arg value="./nksrv/test-nsrv-security.js"/>
+        </exec>
     </target>
 
 </project>
