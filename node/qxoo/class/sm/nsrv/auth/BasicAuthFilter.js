@@ -2,6 +2,9 @@
  * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
  * All Rights Reserved.
  */
+/**
+ * Реализация фильтра авторизации, для авторизации по методу HTTP-Basic
+ */
 qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
     extend  : qx.core.Object,
     implement: [sm.nsrv.auth.IAuthFilter],
@@ -9,18 +12,24 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
 
     statics:
     {
+        /**
+         * Название заголовка запроса со строкой авторизации
+         */
         HEADER: 'authorization',
+        /**
+         * Шаблон для заголовка авторизации
+         */
         HEADER_MATCH: /^Basic\s(.*)/
     },
 
-    events:
-    {
-    },
-
-    properties:
-    {
-    },
-
+    /**
+     * @param options Опции фильтра:
+     *      <code>realmName</code>      - название области авторизации. По умолчанию <code>"NKServer"</code>
+     *      <code>ignoreFailure<code>   - следует ли игнорировать необходимость авторизации, то есть доступ неавторизованных пользователй к ресурсу.
+     *                                    По умолчанию <code>false</code>
+     * @param userProvider  менеджер пользователей
+     * @param securityStore хранилице авторизованных пользователей
+     */
     construct: function(options, userProvider, securityStore) {
         this.base(arguments);
 

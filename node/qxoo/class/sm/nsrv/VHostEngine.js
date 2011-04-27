@@ -771,11 +771,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * Save request params
          */
         __populateRequestParams : function(req, res, next) {
-            var qs;
             var isFormRequest = sm.nsrv.HTTPUtils.isFormRequest(req);
             if (req.method == "GET" || isFormRequest) {
                 req.params = req.params || {};
-                if (qs = req.info.query) {
+                var qs = req.info.query;
+                if (qs) {
                     qx.lang.Object.mergeWith(req.params, this.__querystring.parse(qs), false);
                 }
                 if (isFormRequest) {

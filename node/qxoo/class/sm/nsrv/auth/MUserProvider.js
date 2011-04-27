@@ -6,6 +6,11 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
 
     members:
     {
+        /**
+         * "Развязка" зависимостей ролей: построение на основании явно указанных ролей пользователя полного списка его ролей
+         * @param roles описание всех доступных в системе ролей: <code>{'id' : {id: 'id', parent: ['pid'...]} ...}</code>
+         * @param userRoles список явно укзанных ролей пользователя: <code>['roleId'...]</code>
+         */
         getUserRoles: function(roles, userRoles) {
             var result = [];
 

@@ -851,7 +851,6 @@ module.exports["Test logout after auth (Digest)"] = function(test) {
     req1.on("response", function (resp1) {
         resp1.setEncoding("utf8");
         test.equal(resp1.statusCode, 401);
-        test.ok(resp1.headers["set-cookie"]);
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
@@ -1034,6 +1033,80 @@ module.exports["Test login form: single request with auth (Form)"] = function(te
         });
     });
     req.end();
+};
+
+module.exports["Test login form: request secured resource after request login form without auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/login", {"host": "127.0.0.1"});
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            var cresp = resp1.headers["set-cookie"];
+            cresp.forEach(function(item) {
+                cookie += item.split(';')[0] + "; "
+            });
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 302);
+                test.equal(resp2.headers["location"], auth.form.options.formUrl);
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test login form: request secured resource after request login form with auth (Form)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/login?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            var cresp = resp1.headers["set-cookie"];
+            cresp.forEach(function(item) {
+                cookie += item.split(';')[0] + "; "
+            });
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
 };
 
 module.exports["Test secured resource: single request without auth (Form)"] = function(test) {

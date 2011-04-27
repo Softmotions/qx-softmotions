@@ -2,11 +2,22 @@
  * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
  * All Rights Reserved.
  */
+/**
+ * Пример менеджера пользователей
+ */
 qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
     extend  : qx.core.Object,
     include : [sm.nsrv.auth.MUserProvider],
     implement : [sm.nsrv.auth.IUserProvider],
 
+    /**
+     * @param options Опции менеджера пользователей:
+     *  {
+     *      roles: [{id: 'id', parent: ['parentId'...]}...],
+     *      users: [{login:'login', password: 'password', roles: ['roleId'...]}...]
+     *  }
+     *
+     */
     construct: function(options) {
         this.base(arguments);
 

@@ -2,6 +2,9 @@
  * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
  * All Rights Reserved.
  */
+/**
+ * Реализация фильтра авторизации, для авторизации по методу HTTP-Digest
+ */
 qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
     extend  : qx.core.Object,
     implement: [sm.nsrv.auth.IAuthFilter],
@@ -9,10 +12,26 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
 
     statics:
     {
+        /**
+         * Название заголовка запроса со строкой авторизации
+         */
         HEADER: 'authorization',
+        /**
+         * Шаблон для заголовка авторизации
+         */
         HEADER_MATCH: /^Digest\s(.*)/
     },
 
+    /**
+     * @param options Опции фильтра:
+     *      <code>realmName</code>      - название области авторизации. По умолчанию <code>"NKServer"</code>
+     *      <code>nonceExpire<code>     - время хранения уникальных ключей авторизации, генерируемых сервером (в миллисекундах). По умолчанию 30 минут
+     *      <code>opaque<code>          - дополнительная строка проверки авторизации. По умолчанию совпадает с <code>realmName</code>
+     *      <code>ignoreFailure<code>   - следует ли игнорировать необходимость авторизации, то есть доступ неавторизованных пользователй к ресурсу.
+     *                                    По умолчанию <code>false</code>
+     * @param userProvider  менеджер пользователей
+     * @param securityStore хранилице авторизованных пользователей
+     */
     construct: function(options, userProvider, securityStore) {
         this.base(arguments);
 
@@ -149,7 +168,8 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                     this.__nonceExpire,
                     nonce);
 
-            response.sendSCode(401, { 'WWW-Authenticate': 'Digest realm="' + this.__realmName + '", qop="auth", nonce="' + nonce + '", opaque="' + this.__opaque + '"' });
+            response.sendSCode(401,
+                               { 'WWW-Authenticate': 'Digest realm="' + this.__realmName + '", qop="auth", nonce="' + nonce + '", opaque="' + this.__opaque + '"' });
         },
 
         buildHash: function(data) {
