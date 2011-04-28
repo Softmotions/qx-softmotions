@@ -64,7 +64,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
                 var match = header.match(sm.nsrv.auth.BasicAuthFilter.HEADER_MATCH);
                 if (match != null) {
                     var details = match[1];
-                    var parts = new Buffer(details, 'base64').toString().split(/:/);
+                    var parts = new $$node.Buffer(details, 'base64').toString().split(/:/);
                     var login = parts[0];
                     var password = parts[1];
 

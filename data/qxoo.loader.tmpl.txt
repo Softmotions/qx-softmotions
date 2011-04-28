@@ -51,6 +51,7 @@ $$node.fs = require('fs');
 $$node.require = require;
 $$node.process = process;
 $$node.console = console;
+$$node.Buffer = Buffer;
 
 window.execScript = function(data) {
     return $$node.script.runInThisContext(data, "eval");
