@@ -257,6 +257,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     cb(err, null);
                     return;
                 }
+                var req = ctx["_req_"];
                 var core = asm["_core_"];
                 if (!core) {
                     cb("Missing core for assembly: '" + name + "'", null);
@@ -265,7 +266,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (!ctxParams) {
                     ctxParams = {};
                 }
-                var aiStack = ctxParams["_astack_"] = qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : [];
+                var aiStack = ctxParams["_astack_"] = [].concat(qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : []);
                 for (var i = 0; i < aiStack.length; ++i) {
                     if (aiStack[i] == asm) {
                         qx.log.Logger.warn(me, "Recursive assembly reference: " + name + "'");
@@ -275,13 +276,13 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 }
                 ctxParams["_asm_"] = asm;
 
-                var req = ctx["_req_"];
                 sm.nsrv.tengines.JazzCtxLib.__populateAsmCtxParams(req, asm, ctxParams);
 
                 //Save assembly instance
                 aiStack.push(asm);
                 me.irequestExt(vhe, te, ctx, core, params, ctxParams, function(err, data) {
-                    qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
+                    delete aiStack;
+//                    qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
                     cb(err, data);
                 });
             });

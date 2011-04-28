@@ -34,7 +34,8 @@ qx.Class.define("sm.nsrv.test.TestAssembly", {
                 "_ctxParams_" : {
                     "ctxp1" : "c0b2e5c12951412d8ac19f968ed78575",
                     "ctxp2" : "c065232c925345a8bfb9d18e0038db42"}},
-            "ref2" : {"_assembly_" : "test_asmref2"}
+            "ref2" : {"_assembly_" : "test_asmref2"},
+            "ref3" : {"_assembly_" : "test_asmref2"}
         },
 
         "test_asmref2" : {

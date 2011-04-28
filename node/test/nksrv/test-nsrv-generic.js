@@ -481,7 +481,6 @@ module.exports.testAsmExtends2 = function(test) {
     req.end();
 };
 
-/*
 module.exports.testAsmRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_asmref1.jz",
@@ -491,14 +490,17 @@ module.exports.testAsmRef = function(test) {
         test.equal(resp.statusCode, 200);
         resp.on("data", function (body) {
             //from ref1
-            test.ok(body.indexOf("9c95092379ee4586a9951b436281de11") >= 0);
+            test.ok(body.indexOf("ref1=9c95092379ee4586a9951b436281de11") == 0);
             test.ok(body.indexOf("title=2ed14b4b2cd64707821f836361259a67") >= 0);
             test.ok(body.indexOf("arg1=957244b210c64aa4ab852c8c1ccadd4f") >= 0);
             test.ok(body.indexOf("ctxp1=c0b2e5c12951412d8ac19f968ed78575") >= 0);
             test.ok(body.indexOf("ctxp2=c065232c925345a8bfb9d18e0038db42") >= 0);
             //from ref2
+            test.ok(body.indexOf("ref2=ref1=9c95092379ee4586a9951b436281de11") >= 0);
             test.ok(body.indexOf("ctxp1=9ab3f67e7a634e49b5096a195ee4d6f6") >= 0);
             test.ok(body.indexOf("ctxp2=d01ab03bc8054a6eb9bc0504139ca813") >= 0);
+            //from ref3
+            test.ok(body.indexOf("ref3=ref1=9c95092379ee4586a9951b436281de11") >= 0);
         });
         resp.on("end", function () {
             test.done();
@@ -506,7 +508,6 @@ module.exports.testAsmRef = function(test) {
     });
     req.end();
 };
-*/
 
 module.exports.testAsmIreqRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
