@@ -57,6 +57,7 @@ var config =
                         context : "/test",
                         docRoot : cwd + "/nksrv/webapps/security",
                         security: {
+                            securityKey: "general",
                             auth: {},
                             userProvider: {
                                 type: sm.nsrv.auth.InMemoryUserProvider,
