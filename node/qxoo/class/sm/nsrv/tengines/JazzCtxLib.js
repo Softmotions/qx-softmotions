@@ -122,7 +122,10 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     httpVersion : "1.0",
                     params : {},
                     outerParams : req.outerParams,
-                    stripParams : req.stripParams
+                    stripParams : req.stripParams,
+                    session : req.session,
+                    sessionID : req.sessionID,
+                    cookies : req.cookies
                     //todo stream methods?
                 };
 

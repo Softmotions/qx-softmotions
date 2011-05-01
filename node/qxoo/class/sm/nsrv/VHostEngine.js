@@ -621,7 +621,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __messageHeaders : function(res) {
 
             //skip saving message headers in internal responses
-            if (res.internal == true || !qx.lang.Type.isArray(res.messages)) {
+            if (res.internal === true || !qx.lang.Type.isArray(res.messages)) {
                 return 0; //no messages found
             }
             if (!res.headers) {
@@ -823,9 +823,26 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         createConnectServer : function() {
             var me = this;
             var connect = $$node.require("connect");
+
+
+            var cookieParser = connect.cookieParser();
+            var session = connect.session({secret: "nkserver"});
+
             this.__server = connect.createServer(
-                    connect.cookieParser(),
-                    connect.session({secret: "nkserver"}),
+                    function (req, res, next) {
+                        if (req.internal === true) {
+                            next()
+                        } else {
+                           cookieParser(req, res, next);
+                        }
+                    },
+                    function (req, res, next) {
+                        if (req.internal === true) {
+                            next()
+                        } else {
+                           session(req, res, next);
+                        }
+                    },
                     function (req, res, next) {
                         me.__initRequestHandler(req, res, next);
                     },
