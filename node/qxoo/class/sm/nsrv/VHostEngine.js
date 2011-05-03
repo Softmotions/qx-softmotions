@@ -154,14 +154,35 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
 
                     var uconf = sconf["userProvider"];
-                    var userProvider = security.__userProvider = new uconf["type"](uconf["options"]);
+                    var upName = uconf["type"];
+                    var upClass;
+                    if (qx.lang.Type.isString(upName)) {
+                        upClass = qx.Class.getByName(upName);
+                    } else if (qx.lang.Type.isFunction(upName)){
+                        upClass = upName;
+                    }
+                    if (!upClass || !qx.lang.Type.isFunction(upClass)) {
+                        throw new Error("Invalid user provider type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+
+                    var userProvider = security.__userProvider = new upClass(uconf["options"]);
 
                     if (!sconf["auth"] || !sconf["auth"]["type"]) {
                         throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
                     }
 
                     var aconf = sconf["auth"];
-                    security.__filter = new aconf["type"](aconf["options"], userProvider, securityStore);
+                    var aName = aconf["type"];
+                    var aClass;
+                    if (qx.lang.Type.isString(aName)) {
+                        aClass = qx.Class.getByName(aName);
+                    } else if (qx.lang.Type.isFunction(aName)){
+                        aClass = aName;
+                    }
+                    if (!aClass || !qx.lang.Type.isFunction(aClass)) {
+                        throw new Error("Invalid auth filter type in config: " + qx.util.Json.stringify(this.__config));
+                    }
+                    security.__filter = new aClass(aconf["options"], userProvider, securityStore);
                 }
             }
 
