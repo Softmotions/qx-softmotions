@@ -1450,3 +1450,20 @@ module.exports["Test shutdown server with string value of auth filter (Basic)"] 
     nserver.shutdown();
     test.done();
 };
+
+// tests with string value of auth filter and user provider types in config
+
+module.exports["Test startup server with string value of auth filter and user provider (Basic)"] = function(test) {
+    config[0].webapps[0].security.auth = auth.basicString;
+    config[0].webapps[0].security.userProvider.type = "sm.nsrv.auth.InMemoryUserProvider";
+    config[0].webapps[0].security.securityKey = "basicString";
+    nserver = new sm.nsrv.NKServer(config);
+    nserver.startup(port, "127.0.0.1");
+    test.done();
+};
+
+module.exports["Test shutdown server with string value of auth filter and user provider (Basic)"] = function(test) {
+    test.ok(nserver);
+    nserver.shutdown();
+    test.done();
+};
