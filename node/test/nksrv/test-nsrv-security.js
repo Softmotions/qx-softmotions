@@ -25,6 +25,12 @@ process.on("uncaughtException", function (err) {
 });
 
 var auth = {
+    basicString: {
+        type: "sm.nsrv.auth.BasicAuthFilter",
+        options: {
+            realmName: "NKServerTest"
+        }
+    },
     basic: {
         type: sm.nsrv.auth.BasicAuthFilter,
         options: {
@@ -1429,3 +1435,18 @@ module.exports["Test shutdown server (Form)"] = function(test) {
     test.done();
 };
 
+// tests with string value of auth filter type in config
+
+module.exports["Test startup server with string value of auth filter (Basic)"] = function(test) {
+    config[0].webapps[0].security.auth = auth.basicString;
+    config[0].webapps[0].security.securityKey = "basicString";
+    nserver = new sm.nsrv.NKServer(config);
+    nserver.startup(port, "127.0.0.1");
+    test.done();
+};
+
+module.exports["Test shutdown server with string value of auth filter (Basic)"] = function(test) {
+    test.ok(nserver);
+    nserver.shutdown();
+    test.done();
+};
