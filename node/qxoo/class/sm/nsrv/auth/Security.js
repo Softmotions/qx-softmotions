@@ -73,8 +73,7 @@ qx.Class.define("sm.nsrv.auth.Security", {
          * @return массив ролей, если пользователь аутентифицирован, [] (пустой массив) в противном случае
          */
         getRoles: function(req) {
-            var user = this.getUser(req) || {};
-            return user.roles || [];
+            return (this.getUser(req) || {}).roles || [];
         },
 
         /**
