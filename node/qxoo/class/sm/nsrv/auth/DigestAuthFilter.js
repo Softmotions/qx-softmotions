@@ -88,7 +88,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                             authinfo.username,
                             (function(scope, auth) {
                                 return function(err, user) {
-                                    if (!err && user) {
+                                    if (!err && user && user.user) {
                                         if (auth.qop == 'auth-int') {
                                             // TODO: implement auth-int
                                             scope.failure(request, response, callback);
@@ -138,7 +138,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                         }
 
                                         if (digest == auth.response) {
-                                            scope.__securityStore.setUser(request, user);
+                                            scope.__securityStore.setUser(request, user.user);
                                             scope.success(request, response, callback);
                                         } else {
                                             scope.failure(request, response, callback);
