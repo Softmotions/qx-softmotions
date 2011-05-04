@@ -85,17 +85,29 @@ qx.Class.define("sm.nsrv.auth.Security", {
                 roles = [ roles ];
             }
 
-            var user = this.getUser(req) || {};
-            if (user.roles) {
-                return roles.every(function(role) {
-                    return user.roles.some(function(userRole) {
-                        return role == userRole;
-                    });
+            var uroles = this.getRoles(req);
+            return roles.every(function(role) {
+                return uroles.some(function(userRole) {
+                    return role == userRole;
                 });
-            }
-            return false;
-        }
+            });
+        },
 
+        /**
+         * Проверка наличия хотя бы одной из указанных ролей у пользователя
+         */
+        inRoles: function(req, roles) {
+            if (qx.lang.Type.isString(roles)) {
+                roles = [ roles ];
+            }
+
+            var uroles = this.getRoles(req);
+            return roles.some(function(role) {
+                return uroles.some(function(userRole) {
+                    return role == userRole;
+                });
+            });
+        }
     },
 
     destruct: function() {
