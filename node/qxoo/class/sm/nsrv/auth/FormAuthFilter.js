@@ -6,8 +6,8 @@
  * Реализация фильтра авторизации, для авторизации c использованием формы
  */
 qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
-    extend : sm.nsrv.auth.MAuthFilter,
-    implement: [sm.nsrv.auth.IAuthFilter],
+    extend    : sm.nsrv.auth.AAuthFilter,
+    implement : [sm.nsrv.auth.IAuthFilter],
 
     /**
      * @param options Опции фильтра:

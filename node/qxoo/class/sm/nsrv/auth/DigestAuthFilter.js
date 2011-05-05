@@ -6,8 +6,8 @@
  * Реализация фильтра авторизации, для авторизации по методу HTTP-Digest
  */
 qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
-    extend : sm.nsrv.auth.MAuthFilter,
-    implement: [sm.nsrv.auth.IAuthFilter],
+    extend    : sm.nsrv.auth.AAuthFilter,
+    implement : [sm.nsrv.auth.IAuthFilter],
 
     statics:
     {
