@@ -151,6 +151,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         },
 
         __hash: function(user, validTo, secret) {
+            // TODO: надо что-нить хитрое встаивить в серединку хэша.
             return this.__crypto
                     .createHash('md5')
                     .update(user + ':' + ':' + validTo + ':' + secret)
