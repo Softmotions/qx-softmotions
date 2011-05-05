@@ -6,9 +6,8 @@
  * Реализация фильтра авторизации, для авторизации по методу HTTP-Digest
  */
 qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
-    extend  : qx.core.Object,
+    extend : sm.nsrv.auth.MAuthFilter,
     implement: [sm.nsrv.auth.IAuthFilter],
-    include : [sm.nsrv.auth.MAuthFilter],
 
     statics:
     {
@@ -33,26 +32,14 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
      * @param securityStore хранилице авторизованных пользователей
      */
     construct: function(options, userProvider, securityStore) {
-        this.base(arguments);
+        options = options || {};
+        this.base(arguments, options,  userProvider, securityStore);
 
         this.__crypto = $$node.require('crypto');
-
-        options = options || {};
 
         this.__realmName = options.realmName || 'NKServer';
         this.__nonceExpire = options.nonceExpire || 1800000;
         this.__opaque = this.buildHash(options.opaque || this.__realmName);
-
-        this.__userProvider = userProvider;
-        if (!this.__userProvider) {
-            throw new Error('UserProvider must be provided');
-        }
-        this.__securityStore = securityStore;
-
-        if (!this.__securityStore) {
-            throw new Error('SecurityStore must be provided');
-        }
-        this.__ignoreFailure = options.ignoreFailure || false;
 
         this.__nonces = {};
     },
@@ -60,8 +47,6 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
     members:
     {
         __realmName: null,
-        __userProvider: null,
-        __securityStore: null,
         __nonces: null,
         __nonceExpire: null,
 
@@ -138,8 +123,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                         }
 
                                         if (digest == auth.response) {
-                                            scope.__securityStore.setUser(request, user.user);
-                                            scope.success(request, response, callback);
+                                            scope.login(request, response, user.user, callback);
                                         } else {
                                             scope.failure(request, response, callback);
                                         }
@@ -240,8 +224,9 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
     },
 
     destruct: function() {
+        this.base(arguments);
         this.__crypto = null;
-        this.__realmName = this.__ignoreFailure = this.__nonceExpire = null;
-        this._disposeObjects('__userProvider', '__securityStore', '__nonces');
+        this.__realmName = this.__nonceExpire = null;
+        this._disposeObjects('__nonces');
     }
 });

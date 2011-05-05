@@ -6,9 +6,8 @@
  * Реализация фильтра авторизации, для авторизации по методу HTTP-Basic
  */
 qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
-    extend  : qx.core.Object,
+    extend : sm.nsrv.auth.MAuthFilter,
     implement: [sm.nsrv.auth.IAuthFilter],
-    include : [sm.nsrv.auth.MAuthFilter],
 
     statics:
     {
@@ -31,30 +30,15 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
      * @param securityStore хранилице авторизованных пользователей
      */
     construct: function(options, userProvider, securityStore) {
-        this.base(arguments);
-
         options = options || {};
+        this.base(arguments, options,  userProvider, securityStore);
 
         this.__realmName = options.realmName || 'NKServer';
-
-        this.__userProvider = userProvider;
-        if (!this.__userProvider) {
-            throw new Error('UserProvider must be provided');
-        }
-
-        this.__securityStore = securityStore;
-        if (!this.__securityStore) {
-            throw new Error('SecurityStore must be provided');
-        }
-
-        this.__ignoreFailure = options.ignoreFailure || false;
     },
 
     members:
     {
         __realmName: null,
-        __userProvider: null,
-        __securityStore: null,
 
         authenticate: function(request, response, callback) {
             if (this.__securityStore.isAuthenticated(request)) {
@@ -71,8 +55,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
                     this.__userProvider.login(login, password, (function(scope) {
                         return function(err, user) {
                             if (!err && user) {
-                                scope.__securityStore.setUser(request, user);
-                                scope.success(request, response, callback);
+                                scope.login(request, response, user, callback);
                             } else {
                                 scope.failure(request, response, callback);
                             }
@@ -92,7 +75,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
     },
 
     destruct: function() {
-        this.__realmName = this.__ignoreFailure = null;
-        this._disposeObjects('__userProvider', '__securityStore');
+        this.base(arguments);
+        this.__realmName = null;
     }
 });
