@@ -33,10 +33,10 @@ qx.Class.define("sm.table.ToolbarTable", {
 
     members :
     {
-        __table  : null,
+        _table  : null,
 
         getTable : function() {
-            return this.__table;
+            return this._table;
         },
 
         /**
@@ -89,20 +89,20 @@ qx.Class.define("sm.table.ToolbarTable", {
          */
         _reload : function() {
             var req = this._createRequest();
-            if (this.__table == null) {
+            if (this._table == null) {
                 var tm = this._createTableModel();
                 if (req) {
                     tm.setRequest(req);
                 }
-                this.__table = this._createTable(tm);
-                this.add(this.__table, {flex : 1})
+                this._table = this._createTable(tm);
+                this.add(this._table, {flex : 1})
             } else {
-                if (this.__table.isEditing()) {
-                    this.__table.stopEditing();
+                if (this._table.isEditing()) {
+                    this._table.stopEditing();
                 }
-                this.__table.getSelectionModel().resetSelection();
+                this._table.getSelectionModel().resetSelection();
                 if (req) {
-                    var tm = this.__table.getTableModel();
+                    var tm = this._table.getTableModel();
                     tm.setRequest(req);
                 }
             }
@@ -113,7 +113,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          * @param tableModel
          */
         _createTable : function(tableModel) {
-            return new sm.table.Table(tableModel, tableModel.getCustom())
+            return new sm.table.Table(tableModel, tableModel.getCustom());
         },
 
         /**
@@ -142,6 +142,6 @@ qx.Class.define("sm.table.ToolbarTable", {
     },
 
     destruct : function() {
-        this._disposeObjects("__table");
+        this._disposeObjects("_table");
     }
 })
