@@ -61,12 +61,13 @@ qx.Class.define("sm.model.JsonTableModel", {
                     columnsData[i] = cs["id"] ? cs["id"] : new String(i);
                 }
                 this.setColumns(columns, columnsData);
+
                 var tcm = new sm.model.JsonTableColumnModel(colsSpec);
                 this.__custom = {
                     tableColumnModel : function(obj) {
                         return tcm;
                     }
-                }
+                };
                 this._columnsInitiated = true;
             }
 

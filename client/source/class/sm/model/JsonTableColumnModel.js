@@ -34,13 +34,13 @@ qx.Class.define("sm.model.JsonTableColumnModel", {
 
             for (var i = 0; i < this._colsSpec.length; ++i) {
                 var cs = this._colsSpec[i];
-                if (cs["width"] != undefined) {
+                if (cs["width"] != null) {
                     scb.setWidth(i, cs["width"], cs["flex"]);
                 }
-                if (cs["maxWidth"] != undefined) {
+                if (cs["maxWidth"] != null) {
                     scb.setMaxWidth(i, cs["maxWidth"]);
                 }
-                if (cs["minWidth"] != undefined) {
+                if (cs["minWidth"] != null) {
                     scb.setMinWidth(i, cs["minWidth"]);
                 }
                 var type = cs["type"];
@@ -74,11 +74,14 @@ qx.Class.define("sm.model.JsonTableColumnModel", {
                             this.setCellEditorFactory(i, new sm.model.TextFieldCellEditor());
 
                     }
-                    var tmodel = table.getTableModel();
-                    tmodel.setColumnEditable(i, true);
+                    table.getTableModel().setColumnEditable(i, true);
                 }
 
-                if (cs["tooltip"] != undefined) {
+                if (cs["sortable"] != null) {
+                    table.getTableModel().setColumnSortable(i, !!cs["sortable"]);
+                }
+
+                if (cs["tooltip"] != null) {
                     this.setHeaderCellRenderer(i, new qx.ui.table.headerrenderer.Icon("", cs["tooltip"]));
                 }
 
