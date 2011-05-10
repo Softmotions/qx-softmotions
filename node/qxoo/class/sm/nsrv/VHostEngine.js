@@ -608,7 +608,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var security;
                 var secured = this.__getHconfValue(hconf, "secured");
                 var roles = this.__getHconfValue(hconf, "roles");
-                if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+                if (qx.core.Environment.get("sm.nsrv.security.suppress") != true && (secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
                     if (hconf["logout"]) {
                         security.__filter.logout(req, res, callback);
                     } else {
