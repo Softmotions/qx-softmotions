@@ -610,8 +610,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var roles = this.__getHconfValue(hconf, "roles");
                 if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
                     if (hconf["logout"]) {
-                        security.__securityStore.setUser(req, null);
-                        callback();
+                        security.__filter.logout(req, res, callback);
                     } else {
                         security.__filter.authenticate(req, res, function(err) {
                             if (qx.lang.Type.isArray(roles) || qx.lang.Type.isString(roles)) {

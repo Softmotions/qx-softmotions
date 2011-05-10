@@ -48,6 +48,15 @@ var auth = {
         options: {
             formUrl: "/test/login"
         }
+    },
+    form2: {
+        type: sm.nsrv.auth.FormAuthFilter,
+        options: {
+            formUrl: "/test/login",
+            rememberMe: {
+                cookieName: "_remember_cookie_"
+            }
+        }
     }
 };
 
@@ -128,6 +137,22 @@ process.on("exit", function () {
 process.on("SIGINT1", function () {
     nserver.shutdown();
 });
+
+var copycookies = function(header, only) {
+    var cookie = "";
+    only = only || [];
+    if (qx.lang.Type.isString(only)) {
+        only = [only];
+    }
+    header.forEach(function(item) {
+        var cdata = item.split(';')[0];
+        if (only.length < 1 || only.some(function(test){return cdata.indexOf(test) == 0})) {
+            cookie += cdata + "; "
+        }
+    });
+
+    return cookie;
+};
 
 // BASIC AUTH tests
 
@@ -263,10 +288,7 @@ module.exports["Test secured resource: double request with auth and with cookie 
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -345,10 +367,7 @@ module.exports["Test logout after auth (Basic)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -407,10 +426,7 @@ module.exports["Test logout without auth (Basic)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         resp1.on("end", function () {
             var req2 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
@@ -732,10 +748,7 @@ module.exports["Test secured resource: double request with auth and with cookie 
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.ok(resp1.headers["www-authenticate"]);
         var match = resp1.headers["www-authenticate"].match(/^Digest\s+(.*)/);
@@ -861,10 +874,7 @@ module.exports["Test logout after auth (Digest)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.ok(resp1.headers["www-authenticate"]);
         var match = resp1.headers["www-authenticate"].match(/^Digest\s+(.*)/);
@@ -934,10 +944,7 @@ module.exports["Test logout without auth (Digest)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.ok(resp1.headers["www-authenticate"]);
         test.ok(resp1.headers["www-authenticate"].match(/^Digest\s+(.*)/));
@@ -1051,10 +1058,7 @@ module.exports["Test login form: request secured resource after request login fo
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -1086,10 +1090,7 @@ module.exports["Test login form: request secured resource after request login fo
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -1237,10 +1238,7 @@ module.exports["Test secured resource: double request with auth and with cookie 
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -1333,10 +1331,7 @@ module.exports["Test logout after auth (Form)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         test.equal(resp1.headers["content-type"], "text/plain");
         resp1.on("data", function (body) {
@@ -1395,10 +1390,7 @@ module.exports["Test logout without auth (Form)"] = function(test) {
         var cookie = "";
         test.ok(resp1.headers["set-cookie"]);
         if (resp1.headers["set-cookie"]) {
-            var cresp = resp1.headers["set-cookie"];
-            cresp.forEach(function(item) {
-                cookie += item.split(';')[0] + "; "
-            });
+            cookie = copycookies(resp1.headers["set-cookie"]);
         }
         resp1.on("end", function () {
             var req2 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
@@ -1430,6 +1422,768 @@ module.exports["Test logout without auth (Form)"] = function(test) {
 };
 
 module.exports["Test shutdown server (Form)"] = function(test) {
+    test.ok(nserver);
+    nserver.shutdown();
+    test.done();
+};
+
+
+// FORM WITH REMEMBER AUTH tests
+
+module.exports["Test startup server (Form with remember)"] = function(test) {
+    config[0].webapps[0].security.auth = auth.form2;
+    config[0].webapps[0].security.securityKey = "form2";
+    nserver = new sm.nsrv.NKServer(config);
+    nserver.startup(port, "127.0.0.1");
+    test.done();
+};
+
+module.exports["Test unsecured resource: single request without auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/unsecured", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test login form: single request without auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/login", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test login form: single request with auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/login?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test login form: single request with remember-auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/login?action=login&login=test&password=test&rememberMe=true", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test login form: request secured resource after request login form without auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/login", {"host": "127.0.0.1"});
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 302);
+                test.equal(resp2.headers["location"], auth.form2.options.formUrl);
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test login form: request secured resource after request login form with auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/login?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test login form: request secured resource after request login form with remember-auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/login?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("loginform") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: single request without auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 302);
+        test.equal(resp.headers["location"], auth.form2.options.formUrl);
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single request with bad auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured?action=login&login=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 302);
+        test.equal(resp.headers["location"], auth.form2.options.formUrl);
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single GET request with auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured?action=login&login=test&password=test", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: single POST request with auth  (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("POST", "/test/secured", {"host": "127.0.0.1", "content-type": "application/x-www-form-urlencoded"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.write("action=login&login=test&password=test");
+    req.end();
+};
+
+module.exports["Test secured resource: single combined request with auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("POST", "/test/secured?action=login", {"host": "127.0.0.1", "content-type": "application/x-www-form-urlencoded"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.write("login=test&password=test");
+    req.end();
+};
+
+module.exports["Test secured resource: single GET request with remember-auth (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", {"host": "127.0.0.1"});
+    req.on("response", function (resp) {
+        resp.setEncoding("utf8");
+        test.equal(resp.statusCode, 200);
+        test.equal(resp.headers["content-type"], "text/plain");
+        resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp.on("end", function () {
+            test.done();
+        });
+    });
+    req.end();
+};
+
+module.exports["Test secured resource: double request with auth, but without cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        test.equal(resp1.headers["content-type"], "text/plain");
+        test.ok(resp1.headers["set-cookie"]);
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1" });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 302);
+                test.equal(resp2.headers["location"], auth.form2.options.formUrl);
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: double request with remember-auth, but without cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        test.equal(resp1.headers["content-type"], "text/plain");
+        test.ok(resp1.headers["set-cookie"]);
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1" });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 302);
+                test.equal(resp2.headers["location"], auth.form2.options.formUrl);
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: double request with auth and with cookies (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: double request with remember-auth and with only session cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test secured resource: double request with remember-auth and with only remember cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], auth.form2.options.rememberMe.cookieName);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    test.done();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+var buildForm2RolesTests = function(resources, users) {
+    users.forEach(function(user) {
+        var cookie = "";
+        module.exports["Test access resource: prepare remember cookie for user: " + user.login + " (Form with remember)"] = function(test) {
+            var client = http.createClient(port, "127.0.0.1");
+            var req1 = client.request("GET", "/test/secured?" + "action=login&login=" + user.login + "&password=" + user.password + "&rememberMe=true",
+                                      { "host": "127.0.0.1" });
+            req1.on("response", function (resp1) {
+                resp1.setEncoding("utf8");
+                test.equal(resp1.statusCode, 200);
+                test.ok(resp1.headers["set-cookie"]);
+                if (resp1.headers["set-cookie"]) {
+                    cookie = copycookies(resp1.headers["set-cookie"], auth.form2.options.rememberMe.cookieName);
+                }
+                test.equal(resp1.headers["content-type"], "text/plain");
+                resp1.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp1.on("end", function () {
+                    var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                    req2.on("response", function (resp2) {
+                        resp2.setEncoding("utf8");
+                        test.equal(resp2.statusCode, 200);
+                        test.equal(resp2.headers["content-type"], "text/plain");
+                        resp2.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0)
+                        });
+                        resp2.on("end", function () {
+                            test.done();
+                        });
+                    });
+                    req2.end();
+                });
+            });
+            req1.end();
+        };
+
+        resources.forEach(function(resource) {
+            var access = resource.roles.every(function(role) {
+                return user.roles.some(function(userRole) {
+                    return role == userRole;
+                });
+            });
+
+            var name = "Test access resource: " +
+                       "user roles: [" + user.roles.join(", ") + "], " +
+                       "required roles [" + resource.roles.join(", ") + "], " +
+                       "access: " + access;
+
+            module.exports[name + " (Form with remember)"] = function(test) {
+                var client = http.createClient(port, "127.0.0.1");
+                var req = client.request("GET", resource.resource, {"host": "127.0.0.1", "cookie": cookie});
+                req.on("response", function (resp) {
+                    resp.setEncoding("utf8");
+                    if (access) {
+                        test.equal(resp.statusCode, 200);
+                        test.ok(resp.headers["set-cookie"]);
+                        test.equal(resp.headers["content-type"], "text/plain");
+                        resp.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0);
+                        });
+                    } else {
+                        test.equal(resp.statusCode, 403);
+                    }
+                    resp.on("end", function () {
+                        test.done();
+                    });
+                });
+                req.end();
+            }
+
+        });
+    });
+};
+
+buildForm2RolesTests(resources, users);
+
+module.exports["Test logout after auth with only session cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 200);
+                        test.equal(resp3.headers["content-type"], "text/plain");
+                        resp3.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0)
+                        });
+                        resp3.on("end", function () {
+                            var req4 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                            req4.on("response", function (resp4) {
+                                resp4.setEncoding("utf8");
+                                test.equal(resp4.statusCode, 302);
+                                test.equal(resp4.headers["content-type"], "text/plain");
+                                test.equal(resp4.headers["location"], auth.form2.options.formUrl);
+                                resp4.on("end", function () {
+                                    test.done();
+                                });
+                            });
+                            req4.end();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test logout after remember-auth with only session cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 200);
+                        test.equal(resp3.headers["content-type"], "text/plain");
+                        test.ok(resp3.headers["set-cookie"]);
+                        resp3.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0)
+                        });
+                        resp3.on("end", function () {
+                            var req4 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                            req4.on("response", function (resp4) {
+                                resp4.setEncoding("utf8");
+                                test.equal(resp4.statusCode, 302);
+                                test.equal(resp4.headers["content-type"], "text/plain");
+                                test.equal(resp4.headers["location"], auth.form2.options.formUrl);
+                                resp4.on("end", function () {
+                                    test.done();
+                                });
+                            });
+                            req4.end();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test logout after remember-auth with cookies (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured?action=login&login=test&password=test&rememberMe=true", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 200);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"], ["connect.sid"]);
+        }
+        test.equal(resp1.headers["content-type"], "text/plain");
+        resp1.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("content") >= 0)
+        });
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 200);
+                        test.equal(resp3.headers["content-type"], "text/plain");
+                        test.ok(resp3.headers["set-cookie"]);
+                        if (resp3.headers["set-cookie"]) {
+                            cookie = copycookies(resp3.headers["set-cookie"], ["connect.sid"]);
+                        }
+                        resp3.on("data", function (body) {
+                            test.ok(body);
+                            test.ok(body.indexOf("content") >= 0)
+                        });
+                        resp3.on("end", function () {
+                            var req4 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                            req4.on("response", function (resp4) {
+                                resp4.setEncoding("utf8");
+                                test.equal(resp4.statusCode, 302);
+                                test.equal(resp4.headers["content-type"], "text/plain");
+                                test.equal(resp4.headers["location"], auth.form2.options.formUrl);
+                                resp4.on("end", function () {
+                                    test.done();
+                                });
+                            });
+                            req4.end();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test logout without auth with cookie (Form with remember)"] = function(test) {
+    var client = http.createClient(port, "127.0.0.1");
+    var req1 = client.request("GET", "/test/secured", { "host": "127.0.0.1" });
+    req1.on("response", function (resp1) {
+        resp1.setEncoding("utf8");
+        test.equal(resp1.statusCode, 302);
+        test.equal(resp1.headers["location"], auth.form2.options.formUrl);
+        var cookie = "";
+        test.ok(resp1.headers["set-cookie"]);
+        if (resp1.headers["set-cookie"]) {
+            cookie = copycookies(resp1.headers["set-cookie"]);
+        }
+        resp1.on("end", function () {
+            var req2 = client.request("GET", "/test/logout", { "host": "127.0.0.1", "cookie": cookie });
+            req2.on("response", function (resp2) {
+                resp2.setEncoding("utf8");
+                test.equal(resp2.statusCode, 200);
+                test.equal(resp2.headers["content-type"], "text/plain");
+                resp2.on("data", function (body) {
+                    test.ok(body);
+                    test.ok(body.indexOf("content") >= 0)
+                });
+                resp2.on("end", function () {
+                    var req3 = client.request("GET", "/test/secured", { "host": "127.0.0.1", "cookie": cookie });
+                    req3.on("response", function (resp3) {
+                        resp3.setEncoding("utf8");
+                        test.equal(resp3.statusCode, 302);
+                        test.equal(resp3.headers["location"], auth.form2.options.formUrl);
+                        resp3.on("end", function () {
+                            test.done();
+                        });
+                    });
+                    req3.end();
+                });
+            });
+            req2.end();
+        });
+    });
+    req1.end();
+};
+
+module.exports["Test shutdown server (Form with remember)"] = function(test) {
     test.ok(nserver);
     nserver.shutdown();
     test.done();

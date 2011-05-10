@@ -19,6 +19,14 @@ qx.Interface.define("sm.nsrv.auth.IAuthFilter", {
         authenticate: function(request, response, callback){},
 
         /**
+         * Выход пользователя из системы. <code>callback</code> вызывается всегда!
+         * @param request {ServerRequest}
+         * @param response {ServerResponse}
+         * @param callback
+         */
+        logout: function(request, response, callback){},
+
+        /**
          * Формирование ответа клиенту, в случае необходимости аутентификации (например, отправка кода ответа '401')
          * @param request {ServerRequest}
          * @param response {ServerResponse}
