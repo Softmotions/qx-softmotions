@@ -39,6 +39,14 @@ qx.Class.define("sm.table.ToolbarTable", {
             return this._table;
         },
 
+        getTableModel : function() {
+            return this.getTable().getTableModel();
+        },
+
+        getSelectionModel : function() {
+            return this.getTable().getSelectionModel();
+        },
+
         /**
          * Возвращает произвольные данные ассоциированные с выбранной строкой
          * таблицы
@@ -144,4 +152,4 @@ qx.Class.define("sm.table.ToolbarTable", {
     destruct : function() {
         this._disposeObjects("_table");
     }
-})
+});
