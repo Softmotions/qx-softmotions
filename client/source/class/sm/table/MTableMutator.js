@@ -18,26 +18,33 @@ qx.Mixin.define("sm.table.MTableMutator", {
     members :
     {
 
-        addRow : function(rowData, rowSpec) {
+        addRow : function(rowData, rowSpec, dataSpec) {
             var tm = this.getTableModel();
             var data = tm.getData();
             var found = false;
             for (var i = 0; i < data.length; ++i) {
                 var di = data[i];
-                if (di.rowData == rowData) {
-                    found = true;
-                    di = data[i] = qx.lang.Array.clone(rowSpec);
-                    break;
+                if ((typeof rowData) == "function") {
+                    if (rowData(di.rowData) == true) {
+                        found = true
+                        di = data[i] = qx.lang.Array.clone(rowSpec);
+                        break;
+                    }
+                } else {
+                    if (di.rowData == rowData) {
+                        found = true;
+                        di = data[i] = qx.lang.Array.clone(rowSpec);
+                        break;
+                    }
                 }
             }
             if (!found) {
                 var di = qx.lang.Array.clone(rowSpec);
-                di.rowData = rowData;
+                di.rowData = ((dataSpec != null || (typeof rowData) == "function") ? dataSpec : rowData);
                 data.push(di);
             }
             tm.setData(data);
         },
-
 
         removeRow : function(rowData) {
             var tm = this.getTableModel();
@@ -45,11 +52,23 @@ qx.Mixin.define("sm.table.MTableMutator", {
             var ind = -1;
             for (var i = 0; i < data.length; ++i) {
                 var di = data[i];
-                if (di.rowData == rowData) {
-                    ind = i;
-                    break;
+                if ((typeof rowData) == "function") {
+                    if (rowData(di.rowData) == true) {
+                        ind = i;
+                        break;
+                    }
+                } else {
+                    if (di.rowData == rowData) {
+                        ind = i;
+                        break;
+                    }
                 }
             }
+            this.removeRowByIndex(ind);
+        },
+
+        removeRowByIndex : function(ind) {
+            var tm = this.getTableModel();
             tm.removeRows(ind, 1);
         },
 
@@ -61,13 +80,29 @@ qx.Mixin.define("sm.table.MTableMutator", {
             var data = tm.getData();
             var ind = -1;
             for (var i = 0; i < data.length; ++i) {
-                if (data[i].rowData == rowData) {
-                    ind = i;
-                    break;
+                if ((typeof rowData) == "function") {
+                    if (rowData(data[i].rowData) == true) {
+                        ind = i;
+                        break;
+                    }
+                } else {
+                    if (data[i].rowData == rowData) {
+                        ind = i;
+                        break;
+                    }
                 }
             }
+            this.moveRowByIndex(ind, direction, moveSelection);
+        },
+
+        moveRowByIndex : function(ind, direction, moveSelection) {
+            if (direction != -1 && direction != 1) {
+                throw new Error("Direction argument must be either: -1 or 1");
+            }
+            var tm = this.getTableModel();
+            var data = tm.getData();
             //trivial case
-            if (ind == -1) {
+            if (ind == null || ind == -1) {
                 return;
             }
             //trivial case

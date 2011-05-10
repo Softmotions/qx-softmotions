@@ -55,6 +55,10 @@ qx.Class.define("sm.table.ToolbarTable", {
             return this.getRowData(this.getTable().getSelectionModel().getAnchorSelectionIndex());
         },
 
+        getSelectedRowIndex : function() {
+            return this.getTable().getSelectionModel().getAnchorSelectionIndex();
+        },
+
         /**
          * Возвращает значение ячейки по номеру столбца в выбранной строке
          */

@@ -21,11 +21,11 @@ qx.Class.define("sm.table.ToolbarLocalTable", {
         },
 
         //overriden
-        _reload : function() {
+        _reload : function(data) {
             var tm = null;
             if (this._table == null) {
                 tm = this._createTableModel();
-                this._setJsonTableData(tm);
+                this._setJsonTableData(tm, data);
                 this._table = this._createTable(tm);
                 this.add(this._table, {flex : 1})
             } else {
@@ -34,11 +34,11 @@ qx.Class.define("sm.table.ToolbarLocalTable", {
                     this._table.stopEditing();
                 }
                 this._table.getSelectionModel().resetSelection();
-                this._setJsonTableData(tm);
+                this._setJsonTableData(tm, data);
             }
         },
 
-        _setJsonTableData : function(tm) {
+        _setJsonTableData : function(tm, data) {
             throw new Error("Abstract method call");
         }
     }
