@@ -26,14 +26,16 @@ qx.Mixin.define("sm.table.MTableMutator", {
                 var di = data[i];
                 if ((typeof rowData) == "function") {
                     if (rowData(di.rowData) == true) {
-                        found = true
-                        di = data[i] = qx.lang.Array.clone(rowSpec);
+                        found = true;
+                        data[i] = qx.lang.Array.clone(rowSpec);
+                        data[i].rowData =  dataSpec != null ? dataSpec : di.rowData;
                         break;
                     }
                 } else {
                     if (di.rowData == rowData) {
                         found = true;
-                        di = data[i] = qx.lang.Array.clone(rowSpec);
+                        data[i] = qx.lang.Array.clone(rowSpec);
+                        data[i].rowData =  dataSpec != null ? dataSpec : di.rowData;
                         break;
                     }
                 }
