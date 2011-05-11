@@ -133,6 +133,28 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 var _cb = arguments[arguments.length - 1];
                 sm.nsrv.tengines.JazzCtxLib.assemblyArg(vhe, me, ctx, _name, _def, _cb);
             };
+            ctx["_utils_"] = {
+                /**
+                 * Transform given array into new array of blocks of size blocklen
+                 * @param arr Array to be transfomed
+                 * @param blocklen Block size
+                 */
+                split : function(arr, blocklen) {
+                    if (arr == null || arr.length == 0 || blocklen <= 0) {
+                        return [];
+                    }
+                    var ret = [];
+                    var block;
+                    for (var i = 0; i < arr.length; ++i) {
+                        if (i == 0 || block.length >= blocklen) {
+                            block = [];
+                            ret.push(block);
+                        }
+                        block.push(arr[i]);
+                    }
+                    return ret;
+                }
+            };
             tjazz.eval(ctx, function(data) {
                 cb(false, data);
             });
