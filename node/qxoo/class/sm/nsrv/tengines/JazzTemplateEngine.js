@@ -91,6 +91,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 cb(true, null);
                 return;
             }
+            ctx["_global_"] = window;
             ctx["_ctx_"] = ctx;
             ctx["_req_"] = req;
             ctx["_res_"] = res;
@@ -110,8 +111,11 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             ctx["_params_"] = function(_pname, _cb) {
                 _cb(req.params[_pname]);
             };
-            ctx["_include_"] = function(_path, _cb) {
-                sm.nsrv.tengines.JazzCtxLib.include(vhe, me, ctx, _path, _cb);
+            ctx["_include_"] = function() {
+                var _path = arguments[0];
+                var _ctxParams = arguments.length > 2 ? arguments[1] : null;
+                var _cb = arguments[arguments.length - 1];
+                sm.nsrv.tengines.JazzCtxLib.include(vhe, me, ctx, _path, _ctxParams, _cb);
             };
             ctx["_irequest_"] = function() {
                 var _path = arguments[0];

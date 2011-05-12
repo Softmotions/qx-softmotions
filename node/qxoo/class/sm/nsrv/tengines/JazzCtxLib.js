@@ -32,7 +32,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          * @param path {String} Requested path
          * @param cb {Function} Callback: function(data)
          */
-        include : function(vhe, te, ctx, path, cb) {
+        include : function(vhe, te, ctx, path, ctxParams, cb) {
             var cbc = false;
             try {
                 var me = this;
@@ -45,8 +45,21 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 if (path.length > 0 && path.charAt(0) != '/') {
                     path = '/' + path;
                 }
-                var req = ctx["_req_"];
-                var res = ctx["_res_"];
+
+                var wrappedCtx = ctx;
+                if (ctxParams != null) { //Clone context
+                    wrappedCtx = function() {
+                        return ctx.apply(this, arguments);
+                    };
+                    for (var key in ctx) {
+                        wrappedCtx[key] = ctx[key];
+                    }
+                    for (var key in ctxParams) {
+                        wrappedCtx[key] = ctxParams[key];
+                    }
+                }
+                var req = wrappedCtx["_req_"];
+                var res = wrappedCtx["_res_"];
                 var headers = ctx["_headers_"];
                 path = req.info.webapp["docRoot"] + path;
                 te.createTemplate(path, function(err, template) {
@@ -56,7 +69,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                         cb("");
                         return;
                     }
-                    te.mergeTemplateInternal(vhe, template, req, res, ctx, headers, function(nf, data) {
+                    te.mergeTemplateInternal(vhe, template, req, res, wrappedCtx, headers, function(nf, data) {
                         cbc = true;
                         if (nf) {
                             qx.log.Logger.warn(me, "Resource: '" + path + "' not found");
@@ -309,7 +322,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 } else if (val["_irequest_"]) {
                     jclib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
                 } else if (val["_include_"]) {
-                    jclib.include(vhe, te, ctx, val["_include_"], cb);
+                    jclib.include(vhe, te, ctx, val["_include_"], val["_ctxParams_"], cb);
                 } else if ((typeof val) == "function") {
                     val.call(val, req, ctx, asm, cb);
                 } else {
