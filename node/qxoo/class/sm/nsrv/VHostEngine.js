@@ -287,7 +287,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb("Assembly: " + name + " not found", null);
                 return;
             }
-            provider(this, name, cb);
+            try {
+                provider(this, name, cb);
+            } catch(e) {
+                cb(e, null);
+            }
         },
 
         getBuiltInAssemblyMap : function() {
