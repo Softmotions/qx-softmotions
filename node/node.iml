@@ -2,6 +2,9 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/test/data" />
+    </content>
     <content url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo">
       <excludeFolder url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo/application" />
       <excludeFolder url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo/component" />
@@ -12,9 +15,6 @@
       <excludeFolder url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo/tool/data/publish" />
       <excludeFolder url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo/tool/doc" />
       <excludeFolder url="file://O:/JavaSoft/qooxdoo-trunk/qooxdoo/tool/test" />
-    </content>
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/test/data" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
