@@ -157,6 +157,17 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                         block.push(arr[i]);
                     }
                     return ret;
+                },
+
+                /**
+                 * Access array element by index
+                 */
+                at : function(arr, ind, cb) {
+                    var ret = arr ? arr[ind] : null;
+                    if (cb) {
+                        cb(ret);
+                    }
+                    return ret;
                 }
             };
             tjazz.eval(ctx, function(data) {
