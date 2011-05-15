@@ -64,7 +64,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 path = req.info.webapp["docRoot"] + path;
                 te.createTemplate(path, function(err, template) {
                     if (err) {
-                        qx.log.Logger.error(me, err);
+                        qx.log.Logger.error(me, "Failed template, path: " + path, err);
                         cbc = true;
                         cb("");
                         return;
@@ -80,7 +80,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     });
                 });
             } catch(e) {
-                qx.log.Logger.error(this, e);
+                qx.log.Logger.error(this, path, e);
                 if (!cbc) {
                     cb("");
                 }
