@@ -333,6 +333,54 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             }
         },
 
+        utils : function() {
+
+            return {
+                /**
+                 * Transform given array into new array of blocks of size blocklen
+                 * @param arr Array to be transfomed
+                 * @param blocklen Block size
+                 */
+                split : function(arr, blocklen) {
+                    if (arr == null || arr.length == 0 || blocklen <= 0) {
+                        return [];
+                    }
+                    var ret = [];
+                    var block;
+                    for (var i = 0; i < arr.length; ++i) {
+                        if (i == 0 || block.length >= blocklen) {
+                            block = [];
+                            ret.push(block);
+                        }
+                        block.push(arr[i]);
+                    }
+                    return ret;
+                },
+
+                /**
+                 * Get link target from link spec:
+                 * <code>
+                 *  link_target|link_name
+                 * </code>
+                 *
+                 */
+                linkTarget : function(linkSpec, cb) {
+                    cb(linkSpec != null ? linkSpec.split("|")[0] : "");
+                },
+
+                /**
+                 * Get link name from link spec:
+                 * <code>
+                 *  link_target|link_name
+                 * </code>
+                 *
+                 */
+                linkName : function(linkSpec, cb) {
+                    cb(linkSpec != null ? linkSpec.split("|")[1] : "");
+                }
+            };
+        },
+
         __populateAsmCtxParams : function(req, asm, ctxParams) {
             var pstack = asm["_ctx_provider_stack_"];
             if (pstack) {
