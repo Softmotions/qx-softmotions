@@ -70,6 +70,10 @@ qx.Class.define("sm.ui.form.ButtonField", {
 
         __button : null,
 
+        _forwardStates : {
+            invalid : true
+        },
+
         // overridden
         addListener : function(type, listener, self, capture) {
             switch (type) {
