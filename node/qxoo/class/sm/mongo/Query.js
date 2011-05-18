@@ -128,6 +128,13 @@ qx.Class.define("sm.mongo.Query", {
             ]);
         },
 
+        count : function(callback) {
+            this.__collection._applyNativeMethod("count", [
+                this.__query,
+                callback
+            ]);
+        },
+
         dumpQuery : function() {
             return qx.util.Json.stringify({
                                               query : this.__query,
