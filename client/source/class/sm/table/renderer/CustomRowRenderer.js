@@ -6,7 +6,7 @@
 /**
  * CustomRowRenderer
  */
-qx.Class.define("sm.model.CustomRowRenderer", {
+qx.Class.define("sm.table.renderer.CustomRowRenderer", {
     extend : qx.core.Object,
     implement : qx.ui.table.IRowRenderer,
 
@@ -149,7 +149,7 @@ qx.Class.define("sm.model.CustomRowRenderer", {
          * @param height {Integer} The row's (border-box) height in pixel
          */
         getRowHeightStyle : function(height) {
-            if (qx.bom.client.Feature.CONTENT_BOX) {
+            if (qx.core.Environment.get("css.boxmodel") == "content") {
                 height -= this._insetY;
             }
 
