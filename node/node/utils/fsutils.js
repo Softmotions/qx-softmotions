@@ -90,7 +90,7 @@ module.exports.mkdirsSync = function (dirname, mode) {
 /**
  * Current file separator
  */
-        const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
+  const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
 module.exports.FileSeparator = FileSeparator;
 
 

@@ -9,8 +9,8 @@
  ************************************************************************ */
 
 qx.Theme.define("dialog.theme.classic.Decoration",
-                {
-                    decorations :
-                    {
-                    }
-                });
+  {
+      decorations :
+      {
+      }
+  });

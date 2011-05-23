@@ -4,28 +4,28 @@
  */
 
 qx.Class.define("sm.table.renderer.DateTimeCellRenderer", {
-    extend : qx.ui.table.cellrenderer.Default,
+      extend : qx.ui.table.cellrenderer.Default,
 
-    construct : function() {
-        this.base(arguments);
-        this.setUseAutoAlign(false);
-    },
+      construct : function() {
+          this.base(arguments);
+          this.setUseAutoAlign(false);
+      },
 
-    members :
-    {
+      members :
+      {
 
-        // overridden
-        _formatValue : function(cellInfo) {
-            if (cellInfo.value != null && (typeof cellInfo.value == "number")) {
-                return qx.util.format.DateFormat.getDateTimeInstance().format(new Date(cellInfo.value));
-            }
-            return this.base(arguments, cellInfo);
-        }
+          // overridden
+          _formatValue : function(cellInfo) {
+              if (cellInfo.value != null && (typeof cellInfo.value == "number")) {
+                  return qx.util.format.DateFormat.getDateTimeInstance().format(new Date(cellInfo.value));
+              }
+              return this.base(arguments, cellInfo);
+          }
 
-    },
+      },
 
-    destruct : function() {
-        //this._disposeObjects("__field_name");
-    }
-});
+      destruct : function() {
+          //this._disposeObjects("__field_name");
+      }
+  });
 

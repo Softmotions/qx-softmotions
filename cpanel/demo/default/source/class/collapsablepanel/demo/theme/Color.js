@@ -1,18 +1,18 @@
 /* ************************************************************************
 
-   Copyright:
+ Copyright:
 
-   License:
+ License:
 
-   Authors:
+ Authors:
 
-************************************************************************ */
+ ************************************************************************ */
 
 qx.Theme.define("collapsablepanel.demo.theme.Color",
-{
-  extend : qx.theme.modern.Color,
-
-  colors :
   {
-  }
-});
+      extend : qx.theme.modern.Color,
+
+      colors :
+      {
+      }
+  });

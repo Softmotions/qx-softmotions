@@ -25,63 +25,63 @@ process.on("uncaughtException", function (err) {
 
 
 var config =
-        [
-            //virtual hosts
-            {
-                vhost : "127.0.0.1",
-                defaultWebapp : "test",
-                webapps : [
-                    {
-                        id : "test",
-                        context : "/test",
-                        docRoot : cwd + "/nksrv/webapps/test1",
-                        handlerDefaults : {
-                            methods : ["GET", "POST"]
-                        }
-                    },
-                    {
-                        id : "test12",
-                        context : "/test12",
-                        docRoot : cwd + "/nksrv/webapps/test1",
-                        handlerDefaults : {
-                            methods : ["GET", "POST"]
-                        }
-                    },
+  [
+      //virtual hosts
+      {
+          vhost : "127.0.0.1",
+          defaultWebapp : "test",
+          webapps : [
+              {
+                  id : "test",
+                  context : "/test",
+                  docRoot : cwd + "/nksrv/webapps/test1",
+                  handlerDefaults : {
+                      methods : ["GET", "POST"]
+                  }
+              },
+              {
+                  id : "test12",
+                  context : "/test12",
+                  docRoot : cwd + "/nksrv/webapps/test1",
+                  handlerDefaults : {
+                      methods : ["GET", "POST"]
+                  }
+              },
 
-                    {
-                        id : "jazz",
-                        context : "/jazz",
-                        docRoot : cwd + "/nksrv/webapps/jazz"
-                    }
+              {
+                  id : "jazz",
+                  context : "/jazz",
+                  docRoot : cwd + "/nksrv/webapps/jazz"
+              }
 
-                ],
-                errorOptions : {
-                    showErrorMsg : false,    //Return errors in response body
-                    messagesInHeaders : true //Return errors in http resp headers
-                },
-                formdiableOptions : { //options for formidable nodejs module
-                    keepExtensions : true,
-                    uploadDir : "/tmp",
-                    maxFieldsSize :  2 * 1024 * 1024
-                }
-            },
+          ],
+          errorOptions : {
+              showErrorMsg : false,    //Return errors in response body
+              messagesInHeaders : true //Return errors in http resp headers
+          },
+          formdiableOptions : { //options for formidable nodejs module
+              keepExtensions : true,
+              uploadDir : "/tmp",
+              maxFieldsSize :  2 * 1024 * 1024
+          }
+      },
 
-            {
-                vhost : "localhost",
-                defaultWebapp : "test2",
-                webapps : [
-                    {
-                        id : "test2",
-                        context : "/test2",
-                        docRoot : cwd + "/nksrv/webapps/test1"
-                    }
-                ],
-                errorOptions : {
-                    showErrorMsg : true,
-                    messagesInHeaders : true
-                }
-            }
-        ];
+      {
+          vhost : "localhost",
+          defaultWebapp : "test2",
+          webapps : [
+              {
+                  id : "test2",
+                  context : "/test2",
+                  docRoot : cwd + "/nksrv/webapps/test1"
+              }
+          ],
+          errorOptions : {
+              showErrorMsg : true,
+              messagesInHeaders : true
+          }
+      }
+  ];
 
 
 var port = 3001;
@@ -106,7 +106,7 @@ module.exports.testStart = function(test) {
 module.exports.testSimpleRequest = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHello",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -125,7 +125,7 @@ module.exports.testSimpleRequest = function(test) {
 module.exports.testSimpleRequest2 = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHello3",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -144,7 +144,7 @@ module.exports.testSimpleRequest2 = function(test) {
 module.exports.testVHostNotFound = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHello",
-                             {"host": "localhost"});
+      {"host": "localhost"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 404);
@@ -161,7 +161,7 @@ module.exports.testVHostNotFound = function(test) {
 module.exports.testVHostNotFound2 = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test2/sayHello",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 404);
@@ -178,7 +178,7 @@ module.exports.testVHostNotFound2 = function(test) {
 module.exports.testVHost2 = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test2/sayHello",
-                             {"host": "localhost"});
+      {"host": "localhost"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -198,7 +198,7 @@ module.exports.testVHost2 = function(test) {
 module.exports.testTerminated = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloTerminated",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -218,7 +218,7 @@ module.exports.testTerminated = function(test) {
 module.exports.testJazz = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloJazz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -238,7 +238,7 @@ module.exports.testJazz = function(test) {
 module.exports.testJazzFail = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/jzfail.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 500);
@@ -251,7 +251,7 @@ module.exports.testJazzFail = function(test) {
 module.exports.testExceptionMsgErr = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloExceptionMsgErr",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 500);
@@ -269,7 +269,7 @@ module.exports.testExceptionMsgErr = function(test) {
 module.exports.testExceptionMsg = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloExceptionMsg",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -289,7 +289,7 @@ module.exports.testExceptionMsg = function(test) {
 module.exports.testMsg = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/sayHelloMsg",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 500);
@@ -311,7 +311,7 @@ module.exports.testMsg = function(test) {
 module.exports.testGetParams = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/test/getRequestParams?p1=096b5eb190f84d5687795eeafb8dc4e1&p1=f6880b5165c24dd298ad40c29ad994f7&p2=189e6a7c9e6b4f13b0cb5cbe8174a4c9",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -332,9 +332,9 @@ module.exports.testPostParams = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var data = "p1=647fd5149a8541e4a240833b7feea02f&p1=9725bc6748a14d5488ae54760248fd7b&p2=01b3c2272fe94a2f9bb8a21caa9fcef7";
     var req = client.request("POST", "/test/postRequestParams",
-                             {"host": "127.0.0.1",
-                                 "Content-Type" : "application/x-www-form-urlencoded",
-                                 "Content-Length": data.length});
+      {"host": "127.0.0.1",
+          "Content-Type" : "application/x-www-form-urlencoded",
+          "Content-Length": data.length});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -355,9 +355,9 @@ module.exports.testCombinedParams = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var data = "p1=647fd5149a8541e4a240833b7feea02f&p1=9725bc6748a14d5488ae54760248fd7b";
     var req = client.request("POST", "/test/postRequestParams?p2=01b3c2272fe94a2f9bb8a21caa9fcef7",
-                             {"host": "127.0.0.1",
-                                 "Content-Type" : "application/x-www-form-urlencoded",
-                                 "Content-Length": data.length});
+      {"host": "127.0.0.1",
+          "Content-Type" : "application/x-www-form-urlencoded",
+          "Content-Length": data.length});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -379,7 +379,7 @@ module.exports.testJazzInclude = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/jzInclude",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -399,7 +399,7 @@ module.exports.testIRequest = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/layout1.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -425,7 +425,7 @@ module.exports.testAsm1 = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_base.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -446,7 +446,7 @@ module.exports.testAsmExtends1 = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_base_extends.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -466,7 +466,7 @@ module.exports.testAsmExtends2 = function(test) {
 
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_base_extends2.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -484,7 +484,7 @@ module.exports.testAsmExtends2 = function(test) {
 module.exports.testAsmRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_asmref1.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -512,7 +512,7 @@ module.exports.testAsmRef = function(test) {
 module.exports.testAsmIreqRef = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_ireq.jz",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
@@ -531,7 +531,7 @@ module.exports.testAsmIreqRef = function(test) {
 module.exports.testAsmFuncAndReq = function(test) {
     var client = http.createClient(port, "127.0.0.1");
     var req = client.request("GET", "/jazz/asm/invoke_func.jz?test_func.p1=dbe965819a2b4563947b56db1a862407",
-                             {"host": "127.0.0.1"});
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);

@@ -9,8 +9,8 @@
  ************************************************************************ */
 
 qx.Theme.define("dialog.theme.classic.Appearance",
-                {
-                    appearances :
-                    {
-                    }
-                });
+  {
+      appearances :
+      {
+      }
+  });

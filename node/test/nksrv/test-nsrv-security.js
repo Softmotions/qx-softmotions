@@ -61,54 +61,54 @@ var auth = {
 };
 
 var config =
-        [
-            //virtual hosts
-            {
-                vhost : "127.0.0.1",
-                defaultWebapp : "testsecurity",
-                webapps : [
-                    {
-                        id : "testsecurity",
-                        context : "/test",
-                        docRoot : cwd + "/nksrv/webapps/security",
-                        security: {
-                            securityKey: "general",
-                            auth: {},
-                            userProvider: {
-                                type: sm.nsrv.auth.InMemoryUserProvider,
-                                options: {
-                                    roles: [
-                                        {id: 'a'},
-                                        {id: 'b'},
-                                        {id: 'c', parent: 'a'},
-                                        {id: 'f', parent: ['c', 'b']}
-                                    ],
-                                    users: [
-                                        {/*dGVzdDp0ZXN0*/ login: 'test', password: 'test', roles: ['a']},
-                                        {/*dGVzdDI6dGVzdA==*/ login: 'test2', password: 'test', roles: ['b']},
-                                        {/*dGVzdDM6dGVzdA==*/ login: 'test3', password: 'test', roles: ['c']},
-                                        {/*dGVzdDQ6dGVzdA==*/ login: 'test4', password: 'test', roles: ['b', 'c']},
-                                        {/*dGVzdDU6dGVzdA==*/ login: 'test5', password: 'test', roles: ['f']}
-                                    ]
-                                }
-                            }
-                        },
-                        handlerDefaults : {
-                            methods : ["GET", "POST"]
-                        }
-                    }
-                ],
-                errorOptions : {
-                    showErrorMsg : false,    //Return errors in response body
-                    messagesInHeaders : true //Return errors in http resp headers
-                },
-                formdiableOptions : { //options for formidable nodejs module
-                    keepExtensions : true,
-                    uploadDir : "/tmp",
-                    maxFieldsSize :  2 * 1024 * 1024
-                }
-            }
-        ];
+  [
+      //virtual hosts
+      {
+          vhost : "127.0.0.1",
+          defaultWebapp : "testsecurity",
+          webapps : [
+              {
+                  id : "testsecurity",
+                  context : "/test",
+                  docRoot : cwd + "/nksrv/webapps/security",
+                  security: {
+                      securityKey: "general",
+                      auth: {},
+                      userProvider: {
+                          type: sm.nsrv.auth.InMemoryUserProvider,
+                          options: {
+                              roles: [
+                                  {id: 'a'},
+                                  {id: 'b'},
+                                  {id: 'c', parent: 'a'},
+                                  {id: 'f', parent: ['c', 'b']}
+                              ],
+                              users: [
+                                  {/*dGVzdDp0ZXN0*/ login: 'test', password: 'test', roles: ['a']},
+                                  {/*dGVzdDI6dGVzdA==*/ login: 'test2', password: 'test', roles: ['b']},
+                                  {/*dGVzdDM6dGVzdA==*/ login: 'test3', password: 'test', roles: ['c']},
+                                  {/*dGVzdDQ6dGVzdA==*/ login: 'test4', password: 'test', roles: ['b', 'c']},
+                                  {/*dGVzdDU6dGVzdA==*/ login: 'test5', password: 'test', roles: ['f']}
+                              ]
+                          }
+                      }
+                  },
+                  handlerDefaults : {
+                      methods : ["GET", "POST"]
+                  }
+              }
+          ],
+          errorOptions : {
+              showErrorMsg : false,    //Return errors in response body
+              messagesInHeaders : true //Return errors in http resp headers
+          },
+          formdiableOptions : { //options for formidable nodejs module
+              keepExtensions : true,
+              uploadDir : "/tmp",
+              maxFieldsSize :  2 * 1024 * 1024
+          }
+      }
+  ];
 
 var resources = [
     {resource: "/test/roles/a", roles: ['a']},
@@ -146,7 +146,9 @@ var copycookies = function(header, only) {
     }
     header.forEach(function(item) {
         var cdata = item.split(';')[0];
-        if (only.length < 1 || only.some(function(test){return cdata.indexOf(test) == 0})) {
+        if (only.length < 1 || only.some(function(test) {
+            return cdata.indexOf(test) == 0
+        })) {
             cookie += cdata + "; "
         }
     });
@@ -325,9 +327,9 @@ var buildBasicRolesTests = function(resources, users) {
             });
 
             var name = "Test access resource: " +
-                       "required roles [" + resource.roles.join(", ") + "], " +
-                       "user roles: [" + user.roles.join(", ") + "], " +
-                       "access: " + access;
+              "required roles [" + resource.roles.join(", ") + "], " +
+              "user roles: [" + user.roles.join(", ") + "], " +
+              "access: " + access;
 
             module.exports[name + " (Basic)"] = function(test) {
                 var client = http.createClient(port, "127.0.0.1");
@@ -526,9 +528,9 @@ var parseDigestHeaderString = function (header) {
 
 var buildHash = function(str) {
     return crypto
-            .createHash('MD5')
-            .update(str)
-            .digest('hex');
+      .createHash('MD5')
+      .update(str)
+      .digest('hex');
 };
 
 var generateDigestAuth = function(authreq, resource, username, password) {
@@ -537,16 +539,16 @@ var generateDigestAuth = function(authreq, resource, username, password) {
     var dr = buildHash(ha1 + ":" + authreq.nonce + ":00000001:fcfdfefbfa:auth:" + ha2);
 
     return 'Digest ' +
-           'realm="' + authreq.realm + '", ' +
-           'username="' + username + '", ' +
-           'qop=auth, ' +
-           'uri="' + resource + '", ' +
-           'nonce="' + authreq.nonce + '", ' +
-           'nc=00000001, ' +
-           'cnonce="fcfdfefbfa", ' +
-           'algorithm="MD5", ' +
-           'response="' + dr + '", ' +
-           'opaque="' + authreq.opaque + '"';
+      'realm="' + authreq.realm + '", ' +
+      'username="' + username + '", ' +
+      'qop=auth, ' +
+      'uri="' + resource + '", ' +
+      'nonce="' + authreq.nonce + '", ' +
+      'nc=00000001, ' +
+      'cnonce="fcfdfefbfa", ' +
+      'algorithm="MD5", ' +
+      'response="' + dr + '", ' +
+      'opaque="' + authreq.opaque + '"';
 };
 
 module.exports["Test startup server (Digest)"] = function(test) {
@@ -809,9 +811,9 @@ var buildDigestRolesTests = function(resources, users) {
             });
 
             var name = "Test access resource: " +
-                       "required roles [" + resource.roles.join(", ") + "], " +
-                       "user roles: [" + user.roles.join(", ") + "], " +
-                       "access: " + access;
+              "required roles [" + resource.roles.join(", ") + "], " +
+              "user roles: [" + user.roles.join(", ") + "], " +
+              "access: " + access;
 
             module.exports[name + " (Digest)"] = function(test) {
                 var client = http.createClient(port, "127.0.0.1");
@@ -1275,10 +1277,10 @@ var buildFormRolesTests = function(method, resources, users) {
             });
 
             var name = "Test access resource: " +
-                       "method: '" + method + "', " +
-                       "required roles [" + resource.roles.join(", ") + "], " +
-                       "user roles: [" + user.roles.join(", ") + "], " +
-                       "access: " + access;
+              "method: '" + method + "', " +
+              "required roles [" + resource.roles.join(", ") + "], " +
+              "user roles: [" + user.roles.join(", ") + "], " +
+              "access: " + access;
 
             var headers = {"host": "127.0.0.1"};
             var data = "";
@@ -1886,7 +1888,7 @@ var buildForm2RolesTests = function(resources, users) {
         module.exports["Test access resource: prepare remember cookie for user: " + user.login + " (Form with remember)"] = function(test) {
             var client = http.createClient(port, "127.0.0.1");
             var req1 = client.request("GET", "/test/secured?" + "action=login&login=" + user.login + "&password=" + user.password + "&rememberMe=true",
-                                      { "host": "127.0.0.1" });
+              { "host": "127.0.0.1" });
             req1.on("response", function (resp1) {
                 resp1.setEncoding("utf8");
                 test.equal(resp1.statusCode, 200);
@@ -1927,9 +1929,9 @@ var buildForm2RolesTests = function(resources, users) {
             });
 
             var name = "Test access resource: " +
-                       "user roles: [" + user.roles.join(", ") + "], " +
-                       "required roles [" + resource.roles.join(", ") + "], " +
-                       "access: " + access;
+              "user roles: [" + user.roles.join(", ") + "], " +
+              "required roles [" + resource.roles.join(", ") + "], " +
+              "access: " + access;
 
             module.exports[name + " (Form with remember)"] = function(test) {
                 var client = http.createClient(port, "127.0.0.1");

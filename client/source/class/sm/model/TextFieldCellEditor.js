@@ -4,24 +4,24 @@
  */
 
 qx.Class.define("sm.model.TextFieldCellEditor", {
-    extend  : qx.ui.table.celleditor.TextField,
+      extend  : qx.ui.table.celleditor.TextField,
 
-    construct : function() {
-        this.base(arguments);
-    },
+      construct : function() {
+          this.base(arguments);
+      },
 
-    members :
-    {
+      members :
+      {
 
-        //overriden
-        getCellEditorValue : function(cellEditor) {
-            var val = this.base(arguments, cellEditor);
-            if (typeof cellEditor.originalValue == "number") {
-                if (isNaN(val)) {
-                    val = 0;
-                }
-            }
-            return val;
-        }
-    }
-});
+          //overriden
+          getCellEditorValue : function(cellEditor) {
+              var val = this.base(arguments, cellEditor);
+              if (typeof cellEditor.originalValue == "number") {
+                  if (isNaN(val)) {
+                      val = 0;
+                  }
+              }
+              return val;
+          }
+      }
+  });

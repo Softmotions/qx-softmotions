@@ -38,9 +38,9 @@ module.exports.startStopMongo = function(test) {
     test.ok(cfg);
 
     var mongo = new sm.mongo.Mongo(cfg["mongo"]["db_name"],
-                                   cfg["mongo"]["db_host"],
-                                   cfg["mongo"]["db_port"],
-                                   {native_parser : true});
+      cfg["mongo"]["db_host"],
+      cfg["mongo"]["db_port"],
+      {native_parser : true});
     test.ok(!mongo.isConnected());
 
     mongo.addListenerOnce("error", function(ev) {
@@ -72,9 +72,9 @@ module.exports.insertAndSelect = function(test) {
 
     var cfg = env.getConfig();
     var mongo = new sm.mongo.Mongo(cfg["mongo"]["db_name"],
-                                   cfg["mongo"]["db_host"],
-                                   cfg["mongo"]["db_port"],
-                                   {native_parser : true});
+      cfg["mongo"]["db_host"],
+      cfg["mongo"]["db_port"],
+      {native_parser : true});
 
     mongo.addListenerOnce("error", function(ev) {
         var edata = ev.getData();
@@ -93,43 +93,43 @@ module.exports.insertAndSelect = function(test) {
         //test.ifError(err);
     });
     coll.insert([
-                    {"a" : "val1", "b" : 2},
-                    {"a" : "val2", "b" : 2},
-                    {"a" : "val3", "b" : 2},
-                    {"a" : "val4", "b" : 3}
-                ]);
+        {"a" : "val1", "b" : 2},
+        {"a" : "val2", "b" : 2},
+        {"a" : "val3", "b" : 2},
+        {"a" : "val4", "b" : 3}
+    ]);
 
     var q = coll.createQuery({"b" : 2},
-                             {"sort":[
-                                 ["a", -1]
-                             ]});
+      {"sort":[
+          ["a", -1]
+      ]});
     test.ok(q instanceof sm.mongo.Query);
 
     var count = 0;
 
     q.first(
-            function(doc) {
-                test.ok(doc);
-                test.equal(doc["a"], "val3");
-            }).last(
-            function(index, doc) {
-                test.ok(doc);
-                test.equal(doc["a"], "val1");
-            }).each(
-            function(index, doc) {
-                test.ok(doc);
-                test.ok(doc["_id"]);
-                test.ok(index >= 0);
-                ++count;
-            }).all(
-            function(size, items) {
-                test.ok(items);
-                test.ok(size == items.length);
-                test.equal(items.length, 3);
-            }).exec(function(err) {
-        test.ifError(err);
-        test.equal(count, 3);
-        test.done();
-    });
+      function(doc) {
+          test.ok(doc);
+          test.equal(doc["a"], "val3");
+      }).last(
+      function(index, doc) {
+          test.ok(doc);
+          test.equal(doc["a"], "val1");
+      }).each(
+      function(index, doc) {
+          test.ok(doc);
+          test.ok(doc["_id"]);
+          test.ok(index >= 0);
+          ++count;
+      }).all(
+      function(size, items) {
+          test.ok(items);
+          test.ok(size == items.length);
+          test.equal(items.length, 3);
+      }).exec(function(err) {
+          test.ifError(err);
+          test.equal(count, 3);
+          test.done();
+      });
 };
 

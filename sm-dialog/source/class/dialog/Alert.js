@@ -25,70 +25,70 @@
  * A dialog that alerts the user to something.
  */
 qx.Class.define("dialog.Alert",
-                {
-                    extend : dialog.Dialog,
+  {
+      extend : dialog.Dialog,
 
-                    /*
-                     *****************************************************************************
-                     MEMBERS
-                     *****************************************************************************
-                     */
-                    members :
-                    {
+      /*
+       *****************************************************************************
+       MEMBERS
+       *****************************************************************************
+       */
+      members :
+      {
 
-                        /*
-                         ---------------------------------------------------------------------------
-                         WIDGET LAYOUT
-                         ---------------------------------------------------------------------------
-                         */
+          /*
+           ---------------------------------------------------------------------------
+           WIDGET LAYOUT
+           ---------------------------------------------------------------------------
+           */
 
-                        /**
-                         * Create the main content of the widget
-                         */
-                        _createWidgetContent : function() {
+          /**
+           * Create the main content of the widget
+           */
+          _createWidgetContent : function() {
 
-                            /*
-                             * groupbox
-                             */
-                            var groupboxContainer = new qx.ui.groupbox.GroupBox().set({
-                                contentPadding: [16, 16, 16, 16]
-                            });
-                            groupboxContainer.setLayout(new qx.ui.layout.VBox(10));
-                            this.add(groupboxContainer);
-
-                            var hbox = new qx.ui.container.Composite;
-                            hbox.setLayout(new qx.ui.layout.HBox(10));
-                            groupboxContainer.add(hbox);
-
-                            /*
-                             * add image
-                             */
-                            this._image = new qx.ui.basic.Image("icon/48/status/dialog-information.png");
-                            hbox.add(this._image);
-
-                            /*
-                             * Add message label
-                             */
-                            this._message = new qx.ui.basic.Label();
-                            this._message.setRich(true);
-                            this._message.setWidth(200);
-                            this._message.setAllowStretchX(true);
-                            hbox.add(this._message, {flex:1});
-
-                            /*
-                             * Ok Button
-                             */
-                            var okButton = this._createOkButton();
-
-                            /*
-                             * buttons pane
-                             */
-                            var buttonPane = new qx.ui.container.Composite;
-                            var bpLayout = new qx.ui.layout.HBox();
-                            bpLayout.setAlignX("center");
-                            buttonPane.setLayout(bpLayout);
-                            buttonPane.add(okButton);
-                            groupboxContainer.add(buttonPane);
-                        }
-                    }
+              /*
+               * groupbox
+               */
+              var groupboxContainer = new qx.ui.groupbox.GroupBox().set({
+                    contentPadding: [16, 16, 16, 16]
                 });
+              groupboxContainer.setLayout(new qx.ui.layout.VBox(10));
+              this.add(groupboxContainer);
+
+              var hbox = new qx.ui.container.Composite;
+              hbox.setLayout(new qx.ui.layout.HBox(10));
+              groupboxContainer.add(hbox);
+
+              /*
+               * add image
+               */
+              this._image = new qx.ui.basic.Image("icon/48/status/dialog-information.png");
+              hbox.add(this._image);
+
+              /*
+               * Add message label
+               */
+              this._message = new qx.ui.basic.Label();
+              this._message.setRich(true);
+              this._message.setWidth(200);
+              this._message.setAllowStretchX(true);
+              hbox.add(this._message, {flex:1});
+
+              /*
+               * Ok Button
+               */
+              var okButton = this._createOkButton();
+
+              /*
+               * buttons pane
+               */
+              var buttonPane = new qx.ui.container.Composite;
+              var bpLayout = new qx.ui.layout.HBox();
+              bpLayout.setAlignX("center");
+              buttonPane.setLayout(bpLayout);
+              buttonPane.add(okButton);
+              groupboxContainer.add(buttonPane);
+          }
+      }
+  });

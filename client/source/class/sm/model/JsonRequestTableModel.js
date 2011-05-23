@@ -9,36 +9,36 @@
  */
 
 qx.Class.define("sm.model.JsonRequestTableModel", {
-    extend  : sm.model.JsonTableModel,
+      extend  : sm.model.JsonTableModel,
 
-    construct : function() {
-        this.base(arguments);
-        this.__jsonStore = new sm.store.Json(null, false);
-        this.__jsonStore.addListener("loaded", this.__applyJsonRequestData, this);
-    },
+      construct : function() {
+          this.base(arguments);
+          this.__jsonStore = new sm.store.Json(null, false);
+          this.__jsonStore.addListener("loaded", this.__applyJsonRequestData, this);
+      },
 
-    members :
-    {
-        __jsonStore : null,
+      members :
+      {
+          __jsonStore : null,
 
-        __applyJsonRequestData : function(ev) {
-            var data = ev.getData();
-            this._applyJsonData(data);
-        },
+          __applyJsonRequestData : function(ev) {
+              var data = ev.getData();
+              this._applyJsonData(data);
+          },
 
-        setRequest : function(req) {
-            if (this._columnsInitiated == false) {
-                req.setAsynchronous(false);
-            }
-            this.__jsonStore.setRequest(req);
-        },
+          setRequest : function(req) {
+              if (this._columnsInitiated == false) {
+                  req.setAsynchronous(false);
+              }
+              this.__jsonStore.setRequest(req);
+          },
 
-        reload : function() {
-            this.__jsonStore.reload();
-        }
-    },
+          reload : function() {
+              this.__jsonStore.reload();
+          }
+      },
 
-    destruct : function() {
-        this._disposeObjects("__jsonStore");
-    }
-});
+      destruct : function() {
+          this._disposeObjects("__jsonStore");
+      }
+  });

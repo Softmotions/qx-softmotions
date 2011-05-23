@@ -1,4 +1,3 @@
-
 {foreach p in params}
-    {p.name}={p.val}
+{p.name}={p.val}
 {end}

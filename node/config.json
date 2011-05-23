@@ -21,7 +21,9 @@
 
         "qx-softmotions-base" :
         {
-            "cache" : { "compile" : "${CACHE}" },
+            "cache" : {
+                "compile" : "${CACHE}"
+            },
 
             "library" :
                     [
@@ -66,7 +68,9 @@
                 "qx.globalErrorHandling" : "off"
             },
 
-            "compile" : { "type" : "build" },
+            "compile" : {
+                "type" : "build"
+            },
 
             "compile-options" :
             {

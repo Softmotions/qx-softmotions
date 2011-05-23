@@ -1,18 +1,18 @@
 /* ************************************************************************
 
-   Copyright:
+ Copyright:
 
-   License:
+ License:
 
-   Authors:
+ Authors:
 
-************************************************************************ */
+ ************************************************************************ */
 
 qx.Theme.define("collapsablepanel.demo.theme.Font",
-{
-  extend : qx.theme.modern.Font,
-
-  fonts :
   {
-  }
-});
+      extend : qx.theme.modern.Font,
+
+      fonts :
+      {
+      }
+  });

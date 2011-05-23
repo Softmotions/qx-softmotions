@@ -23,10 +23,10 @@ module.exports.testDirectoryScanner = function(test) {
     }
 
     var ds = new fsutils.DirectoryScanner(
-            cwd, {
-        "includes" : ["data/SAMPLE*.AVI", "nksrv/webapps/test*1/**", "**/opr068DD.avi"],
-        "excludes" : ["**/*русские*"]
-    });
+      cwd, {
+          "includes" : ["data/SAMPLE*.AVI", "nksrv/webapps/test*1/**", "**/opr068DD.avi"],
+          "excludes" : ["**/*русские*"]
+      });
 
     test.equal(ds._normPattern(""), "**");
     test.equal(ds._normPattern("/**/test/**/test2/*/*/file*.txt"), "**/test/**/test2/.*/.*/file.*\\.txt");
@@ -61,7 +61,7 @@ module.exports.testDirectoryScanner = function(test) {
     test.ok(ds.vote(["src", "p1", "index.cpp"], ds._normPattern("src/*/*.cpp").split(fsutils.FileSeparator)));
     test.ok(!ds.vote(["nsrv", "nsrv-generic-tests.js"], ds._normPattern("nsrv/**/test1").split(fsutils.FileSeparator)));
     test.ok(ds.vote("/home/adam/Projects/softmotions/uis/dist/uisclient/.svn/props".split(fsutils.FileSeparator),
-                    ds._normPattern("**/.svn/**").split(fsutils.FileSeparator)));
+      ds._normPattern("**/.svn/**").split(fsutils.FileSeparator)));
 
 
     var scanned = {};

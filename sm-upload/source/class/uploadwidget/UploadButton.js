@@ -26,225 +26,225 @@
  *
  */
 qx.Class.define("uploadwidget.UploadButton",
-                {
-                    extend : qx.ui.form.Button,
+  {
+      extend : qx.ui.form.Button,
 
-                    // --------------------------------------------------------------------------
-                    // [Constructor]
-                    // --------------------------------------------------------------------------
+      // --------------------------------------------------------------------------
+      // [Constructor]
+      // --------------------------------------------------------------------------
 
-                    /**
-                     * @param fieldName {String} upload field name
-                     * @param label {String} button label
-                     * @param icon {String} icon path
-                     * @param command {Command} command instance to connect with
-                     */
+      /**
+       * @param fieldName {String} upload field name
+       * @param label {String} button label
+       * @param icon {String} icon path
+       * @param command {Command} command instance to connect with
+       */
 
-                    construct: function(fieldName, label, icon, command) {
-                        this.base(arguments, label, icon, command);
+      construct: function(fieldName, label, icon, command) {
+          this.base(arguments, label, icon, command);
 
-                        if (fieldName) {
-                            this.setFieldName(fieldName);
-                        }
-
-
-                        // Fix for bug #3027
-                        if (qx.core.Environment.get("engine.name") == "opera") {
-                            this.setSelectable(true);
-                        }
-                    },
-
-                    // --------------------------------------------------------------------------
-                    // [Properties]
-                    // --------------------------------------------------------------------------
-
-                    events: {
-                        changeFileName: 'qx.event.type.Data'
-                    },
-                    properties:
-                    {
-                        /**
-                         * The field name which is assigned to the form
-                         */
-                        fieldName :
-                        {
-                            check : "String",
-                            init : "",
-                            apply : "_applyFieldName"
-                        },
-
-                        /**
-                         * The value which is assigned to the form
-                         */
-                        fileName :
-                        {
-                            check : "String",
-                            init : "",
-                            apply : "_applyFileName"
-                        },
-
-                        /**
-                         * the size of the selected File. This may not work on all browsers. It does work
-                         * on FireFox and Chrome at least. So be prepared to get a 'Null' response.
-                         */
-                        fileSize: {
-                            check: "Integer",
-                            nullable : true,
-                            init: null
-                        }
-                    },
-
-                    // --------------------------------------------------------------------------
-                    // [Members]
-                    // --------------------------------------------------------------------------
-
-                    members :
-                    {
-
-                        __valueInputOnChange : false,
-                        __mouseUpListenerId: null,
-
-                        // overridden
-                        capture : qx.core.Environment.select("engine.name",
-                                                             {
-                                                                 "mshtml" : function() {
-                                                                     this.__mouseUpListenerId = this.getApplicationRoot().addListenerOnce("mouseup", this._onMouseUp, this);
-                                                                 },
-
-                                                                 "default" : function() {
-                                                                     this.base(arguments);
-                                                                 }
-                                                             }),
+          if (fieldName) {
+              this.setFieldName(fieldName);
+          }
 
 
-                        // overridden
-                        releaseCapture : qx.core.Environment.select("engine.name",
-                                                                    {
-                                                                        "mshtml" : qx.lang.Function.empty,
+          // Fix for bug #3027
+          if (qx.core.Environment.get("engine.name") == "opera") {
+              this.setSelectable(true);
+          }
+      },
 
-                                                                        "default" : function() {
-                                                                            this.base(arguments);
-                                                                        }
-                                                                    }),
+      // --------------------------------------------------------------------------
+      // [Properties]
+      // --------------------------------------------------------------------------
+
+      events: {
+          changeFileName: 'qx.event.type.Data'
+      },
+      properties:
+      {
+          /**
+           * The field name which is assigned to the form
+           */
+          fieldName :
+          {
+              check : "String",
+              init : "",
+              apply : "_applyFieldName"
+          },
+
+          /**
+           * The value which is assigned to the form
+           */
+          fileName :
+          {
+              check : "String",
+              init : "",
+              apply : "_applyFileName"
+          },
+
+          /**
+           * the size of the selected File. This may not work on all browsers. It does work
+           * on FireFox and Chrome at least. So be prepared to get a 'Null' response.
+           */
+          fileSize: {
+              check: "Integer",
+              nullable : true,
+              init: null
+          }
+      },
+
+      // --------------------------------------------------------------------------
+      // [Members]
+      // --------------------------------------------------------------------------
+
+      members :
+      {
+
+          __valueInputOnChange : false,
+          __mouseUpListenerId: null,
+
+          // overridden
+          capture : qx.core.Environment.select("engine.name",
+            {
+                "mshtml" : function() {
+                    this.__mouseUpListenerId = this.getApplicationRoot().addListenerOnce("mouseup", this._onMouseUp, this);
+                },
+
+                "default" : function() {
+                    this.base(arguments);
+                }
+            }),
 
 
-                        // ------------------------------------------------------------------------
-                        // [Modifiers]
-                        // ------------------------------------------------------------------------
+          // overridden
+          releaseCapture : qx.core.Environment.select("engine.name",
+            {
+                "mshtml" : qx.lang.Function.empty,
 
-                        /**
-                         * Modifies the name property of the hidden input type=file element.
-                         *
-                         * @type member
-                         * @param value {var} Current value
-                         * @param old {var} Previous value
-                         */
-                        _applyFieldName : function(value, old) {
-                            this.getChildControl('input').setAttribute("name", value, true);
-                        },
+                "default" : function() {
+                    this.base(arguments);
+                }
+            }),
 
 
-                        /**
-                         * Modifies the value property of the hidden input type=file element.
-                         * Only an empty string is accepted for clearing out the value of the
-                         * selected file.
-                         *
-                         * As a special case for IE the hidden input element is recreated because
-                         * setting the value is generally not allowed in IE.
-                         *
-                         * @type member
-                         * @param value {var} Current value
-                         * @param old {var} Previous value
-                         */
-                        _applyFileName : function(value, old) {
-                            if (this.__valueInputOnChange) {
-                                this.__valueInputOnChange = false;
-                            }
-                            else {
-                                throw new Error("You can not change the value if a fileName field. Reset the form instead by using  the .clear() method!");
-                            }
-                        },
+          // ------------------------------------------------------------------------
+          // [Modifiers]
+          // ------------------------------------------------------------------------
+
+          /**
+           * Modifies the name property of the hidden input type=file element.
+           *
+           * @type member
+           * @param value {var} Current value
+           * @param old {var} Previous value
+           */
+          _applyFieldName : function(value, old) {
+              this.getChildControl('input').setAttribute("name", value, true);
+          },
 
 
-                        /**
-                         * Apply the enabled property.
-                         *
-                         * @type member
-                         * @param value {Boolean} Current value
-                         * @param old {Boolean} Previous value
-                         */
-                        _applyEnabled : function(value, old) {
-                            // just move it behind the button, do not actually
-                            // disable it since this would stop any upload in progress
-                            this.getChildControl('input').setStyle('z-index', value ? this.getZIndex() + 11 : -10000);
-                            return this.base(arguments, value, old);
-                        },
+          /**
+           * Modifies the value property of the hidden input type=file element.
+           * Only an empty string is accepted for clearing out the value of the
+           * selected file.
+           *
+           * As a special case for IE the hidden input element is recreated because
+           * setting the value is generally not allowed in IE.
+           *
+           * @type member
+           * @param value {var} Current value
+           * @param old {var} Previous value
+           */
+          _applyFileName : function(value, old) {
+              if (this.__valueInputOnChange) {
+                  this.__valueInputOnChange = false;
+              }
+              else {
+                  throw new Error("You can not change the value if a fileName field. Reset the form instead by using  the .clear() method!");
+              }
+          },
 
-                        /**
-                         * Create the widget child controls.
-                         */
 
-                        _createChildControlImpl: function(id) {
-                            var control;
-                            switch (id) {
-                                case "input":
-                                    // styling the input[type=file]
-                                    // element is a bit tricky. Some browsers just ignore the normal
-                                    // css style input. Firefox is especially tricky in this regard.
-                                    // since we are providing our one look via the underlying qooxdoo
-                                    // button anyway, all we have todo is position the ff upload
-                                    // button over the button element. This is tricky in itself
-                                    // as the ff upload button consists of a text and a button element
-                                    // which are not css accessible themselfes. So the best we can do,
-                                    // is align to the top right corner of the upload widget and set its
-                                    // font so large that it will cover even realy large underlying buttons.
-                                    var css = {
-                                        position  : "absolute",
-                                        cursor    : "pointer",
-                                        hideFocus : "true",
-                                        zIndex: this.getZIndex() + 11,
-                                        opacity: 0,
-                                        // align to the top right hand corner
-                                        top: 0,
-                                        right: 0,
-                                        // ff ignores the width setting
-                                        // pick a realy large font size to get
-                                        // a huge button that covers
-                                        // the area of the upload button
-                                        fontSize: '400px'
-                                    };
+          /**
+           * Apply the enabled property.
+           *
+           * @type member
+           * @param value {Boolean} Current value
+           * @param old {Boolean} Previous value
+           */
+          _applyEnabled : function(value, old) {
+              // just move it behind the button, do not actually
+              // disable it since this would stop any upload in progress
+              this.getChildControl('input').setStyle('z-index', value ? this.getZIndex() + 11 : -10000);
+              return this.base(arguments, value, old);
+          },
 
-                                    if (qx.core.Environment.get("engine.name") == 'mshtml' && qx.core.Environment.get("engine.version") < 9.0) {
-                                        css.filter = 'alpha(opacity=0)';
-                                    }
+          /**
+           * Create the widget child controls.
+           */
 
-                                    control = new qx.html.Element('input', css, {
-                                        type : 'file',
-                                        name : this.getFieldName()
-                                    });
-                                    control.addListener("change", function(e) {
-                                        var controlDom = control.getDomElement();
-                                        this.__valueInputOnChange = true;
-                                        if (controlDom.files
-                                                && controlDom.files.length > 0) {
-                                            this.setFileSize(controlDom.files[0].fileSize);
-                                        }
-                                        var value = e.getData();
-                                        this.setFileName(value);
-                                        this.fireDataEvent('changeFileName', value);
-                                    }, this);
+          _createChildControlImpl: function(id) {
+              var control;
+              switch (id) {
+                  case "input":
+                      // styling the input[type=file]
+                      // element is a bit tricky. Some browsers just ignore the normal
+                      // css style input. Firefox is especially tricky in this regard.
+                      // since we are providing our one look via the underlying qooxdoo
+                      // button anyway, all we have todo is position the ff upload
+                      // button over the button element. This is tricky in itself
+                      // as the ff upload button consists of a text and a button element
+                      // which are not css accessible themselfes. So the best we can do,
+                      // is align to the top right corner of the upload widget and set its
+                      // font so large that it will cover even realy large underlying buttons.
+                      var css = {
+                          position  : "absolute",
+                          cursor    : "pointer",
+                          hideFocus : "true",
+                          zIndex: this.getZIndex() + 11,
+                          opacity: 0,
+                          // align to the top right hand corner
+                          top: 0,
+                          right: 0,
+                          // ff ignores the width setting
+                          // pick a realy large font size to get
+                          // a huge button that covers
+                          // the area of the upload button
+                          fontSize: '400px'
+                      };
 
-                                    this.getContainerElement().addAt(control, 0);
-                                    // qx.dom.Element.insertBegin(control,this.getContainerElement());
-                                    break;
-                            }
-                            return control || this.base(arguments, id);
-                        }
-                    },
+                      if (qx.core.Environment.get("engine.name") == 'mshtml' && qx.core.Environment.get("engine.version") < 9.0) {
+                          css.filter = 'alpha(opacity=0)';
+                      }
 
-                    destruct : function() {
-                        if (this.__mouseUpListenerId) {
-                            this.getApplicationRoot().removeListenerById(this.__mouseUpListenerId);
-                        }
-                    }
-                });
+                      control = new qx.html.Element('input', css, {
+                            type : 'file',
+                            name : this.getFieldName()
+                        });
+                      control.addListener("change", function(e) {
+                          var controlDom = control.getDomElement();
+                          this.__valueInputOnChange = true;
+                          if (controlDom.files
+                            && controlDom.files.length > 0) {
+                              this.setFileSize(controlDom.files[0].fileSize);
+                          }
+                          var value = e.getData();
+                          this.setFileName(value);
+                          this.fireDataEvent('changeFileName', value);
+                      }, this);
+
+                      this.getContainerElement().addAt(control, 0);
+                      // qx.dom.Element.insertBegin(control,this.getContainerElement());
+                      break;
+              }
+              return control || this.base(arguments, id);
+          }
+      },
+
+      destruct : function() {
+          if (this.__mouseUpListenerId) {
+              this.getApplicationRoot().removeListenerById(this.__mouseUpListenerId);
+          }
+      }
+  });
