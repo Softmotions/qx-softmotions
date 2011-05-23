@@ -16,8 +16,7 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
 
               var trole;
               var troleId;
-              var troles = [];
-              troles = troles.concat(userRoles || []);
+              var troles = [].concat(userRoles || []);
               while (troleId = troles.pop()) {
                   if (trole = roles[troleId]) {
                       result.push(trole.id);
