@@ -28,6 +28,7 @@ qx.Class.define("sm.table.ToolbarTable", {
           this.base(arguments);
           var layout = new qx.ui.layout.VBox();
           this.setLayout(layout);
+          this._initPrecedingWidgets();
           this.getChildControl("toolbar");
       },
 
@@ -94,6 +95,15 @@ qx.Class.define("sm.table.ToolbarTable", {
            */
           _createRequest : function() {
               return null;
+          },
+
+          /**
+           * Для наследников имеется возможность
+           * добавления дополнительных
+           * widget-ов перед toolbar элементом и таблицей
+           */
+          _initPrecedingWidgets : function() {
+
           },
 
           /**
