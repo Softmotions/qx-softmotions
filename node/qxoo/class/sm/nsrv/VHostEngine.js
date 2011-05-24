@@ -620,11 +620,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                           security.__filter.logout(req, res, callback);
                       } else {
                           security.__filter.authenticate(req, res, function(err) {
-                              if (req.isUserHasRoles(roles)) {
-                                  callback();
-                              } else {
+                              if (err || !req.isUserHasRoles(roles)) {
                                   res.sendForbidden();
+                                  return;
                               }
+                              callback();
                           });
                       }
                   } else {
