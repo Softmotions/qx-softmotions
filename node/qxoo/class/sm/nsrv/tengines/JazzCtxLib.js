@@ -136,10 +136,17 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       params : {},
                       outerParams : req.outerParams,
                       stripParams : req.stripParams,
+                      //session & cookies
                       session : req.session,
                       sessionID : req.sessionID,
-                      cookies : req.cookies
-                      //todo stream methods?
+                      cookies : req.cookies,
+                      //auth staff
+                      isAuthenticated : req.isAuthenticated,
+                      getUser : req.getUser,
+                      getUserId : req.getUserId,
+                      getUserRoles : req.getUserRoles,
+                      isUserHasRoles : req.isUserHasRoles,
+                      isUserInRoles : req.isUserInRoles
                   };
 
                   if (params) {

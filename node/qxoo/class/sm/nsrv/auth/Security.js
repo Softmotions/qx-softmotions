@@ -41,7 +41,7 @@ qx.Class.define("sm.nsrv.auth.Security", {
            * Проверка аутентификации пользователя
            */
           isAuthenticated: function(req) {
-              return this.getUser(req) != null;
+              return (this.getUser(req) != null);
           },
 
           /**

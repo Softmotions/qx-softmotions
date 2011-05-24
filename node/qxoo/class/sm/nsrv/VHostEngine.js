@@ -147,7 +147,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   if (wa["security"]) {
                       var sconf = wa["security"];
                       var security = this.__security[wa["id"]] = {};
-                      var securityStore = security.__securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
+                      var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
 
                       if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
                           throw new Error("Missing user provider type in config: " + qx.util.Json.stringify(this.__config));
@@ -165,7 +165,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                           throw new Error("Invalid user provider type in config: " + qx.util.Json.stringify(this.__config));
                       }
 
-                      var userProvider = security.__userProvider = new upClass(uconf["options"]);
+                      var userProvider = security._userProvider = new upClass(uconf["options"]);
 
                       if (!sconf["auth"] || !sconf["auth"]["type"]) {
                           throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
@@ -778,32 +778,36 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   return;
               }
 
-              var security = this.__security[info.webapp["id"]];
+              var security = this.__security[info.webapp.id];
               req.isAuthenticated = function() {
                   if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
                       return true;
                   } else {
-                      return security && security.__securityStore ? security.__securityStore.isAuthenticated(this) : false;
+                      return security && security._securityStore ? security._securityStore.isAuthenticated(this) : false;
                   }
               };
               req.getUser = function() {
-                  return security && security.__securityStore ? security.__securityStore.getUser(this) : {};
+                  return security && security._securityStore ? security._securityStore.getUser(this) : null;
+              };
+              req.getUserId = function() {
+                  var user = this.getUser();
+                  return user != null ? user.login : null;
               };
               req.getUserRoles = function() {
-                  return security && security.__securityStore ? security.__securityStore.getRoles(this) : [];
+                  return security && security._securityStore ? security._securityStore.getRoles(this) : [];
               };
               req.isUserHasRoles = function(roles) {
                   if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
                       return true;
                   } else {
-                      return security && security.__securityStore ? security.__securityStore.hasRoles(this, roles) : false;
+                      return security && security._securityStore ? security._securityStore.hasRoles(this, roles) : false;
                   }
               };
               req.isUserInRoles = function(roles) {
                   if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
                       return true;
                   } else {
-                      return security && security.__securityStore ? security.__securityStore.inRoles(this, roles) : false;
+                      return security && security._securityStore ? security._securityStore.inRoles(this, roles) : false;
                   }
               };
 

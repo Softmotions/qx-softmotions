@@ -60,12 +60,12 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
           authenticate: function(request, response, callback) {
               var doAuth = (function(me) {
                   return function() {
-                      if (me.__securityStore.isAuthenticated(request)) {
+                      if (me._securityStore.isAuthenticated(request)) {
                           me.success(request, response, callback);
                       } else if (request.params[me.__actionParameter] && me.__actionName == request.params[me.__actionParameter]) {
                           var login = request.params[me.__loginParameter];
                           var password = request.params[me.__passwordParameter];
-                          me.__userProvider.login(login, password, (function(scope) {
+                          me._userProvider.login(login, password, (function(scope) {
                               return function(err, user) {
                                   if (!err && user) {
                                       scope.login(request, response, user, callback);
@@ -104,12 +104,12 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
 
               var parts = new $$node.Buffer(token, 'base64').toString().split(/:/);
               if (parts[1] >= new Date()) {
-                  this.__userProvider.getAuthInfo(parts[0], (function(scope) {
+                  this._userProvider.getAuthInfo(parts[0], (function(scope) {
                       return function(err, user) {
                           if (!err && user && user.user) {
                               var hash = scope.__hash(user.login, parts[1], scope.__remember.secret);
                               if (hash === parts[2]) {
-                                  scope.__securityStore.setUser(request, user.user)
+                                  scope._securityStore.setUser(request, user.user)
                               }
                               callback();
                           }

@@ -15,32 +15,32 @@ qx.Class.define("sm.nsrv.auth.AAuthFilter", {
        * @param securityStore хранилице авторизованных пользователей
        */
       construct: function(options, userProvider, securityStore) {
-          this.__userProvider = userProvider;
-          if (!this.__userProvider) {
+          this._userProvider = userProvider;
+          if (!this._userProvider) {
               throw new Error('UserProvider must be provided');
           }
 
-          this.__securityStore = securityStore;
-          if (!this.__securityStore) {
+          this._securityStore = securityStore;
+          if (!this._securityStore) {
               throw new Error('SecurityStore must be provided');
           }
 
-          this.__ignoreFailure = options.ignoreFailure || false;
+          this._ignoreFailure = !!options["ignoreFailure"];
       },
 
       members:
       {
-          __userProvider: null,
-          __securityStore: null,
-          __ignoreFailure: null,
+          _userProvider: null,
+          _securityStore: null,
+          _ignoreFailure: false,
 
           login: function(request, response, user, callback) {
-              this.__securityStore.setUser(request, user);
+              this._securityStore.setUser(request, user);
               this.success(request, response, callback);
           },
 
           logout: function(request, response, callback) {
-              this.__securityStore.setUser(request, null);
+              this._securityStore.setUser(request, null);
               callback();
           },
 
@@ -49,7 +49,7 @@ qx.Class.define("sm.nsrv.auth.AAuthFilter", {
           },
 
           failure: function(request, response, callback) {
-              if (!this.__ignoreFailure) {
+              if (!this._ignoreFailure) {
                   this.commence(request, response, null);
               } else {
                   callback();
@@ -58,7 +58,6 @@ qx.Class.define("sm.nsrv.auth.AAuthFilter", {
       },
 
       destruct: function() {
-          this.__ignoreFailure = null;
-          this._disposeObjects('__userProvider', '__securityStore');
+          this._userProvider = this._securityStore = null;
       }
   });

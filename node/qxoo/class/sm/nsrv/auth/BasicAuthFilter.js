@@ -41,7 +41,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
           __realmName: null,
 
           authenticate: function(request, response, callback) {
-              if (this.__securityStore.isAuthenticated(request)) {
+              if (this._securityStore.isAuthenticated(request)) {
                   this.success(request, response, callback);
               } else if (request.headers[sm.nsrv.auth.BasicAuthFilter.HEADER]) {
                   var header = request.headers[sm.nsrv.auth.BasicAuthFilter.HEADER];
@@ -52,7 +52,7 @@ qx.Class.define("sm.nsrv.auth.BasicAuthFilter", {
                       var login = parts[0];
                       var password = parts[1];
 
-                      this.__userProvider.login(login, password, (function(scope) {
+                      this._userProvider.login(login, password, (function(scope) {
                           return function(err, user) {
                               if (!err && user) {
                                   scope.login(request, response, user, callback);

@@ -51,7 +51,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
           __nonceExpire: null,
 
           authenticate: function(request, response, callback) {
-              if (this.__securityStore.isAuthenticated(request)) {
+              if (this._securityStore.isAuthenticated(request)) {
                   this.success(request, response, callback);
               } else if (request.headers[sm.nsrv.auth.DigestAuthFilter.HEADER]) {
                   var header = request.headers[sm.nsrv.auth.DigestAuthFilter.HEADER];
@@ -69,7 +69,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                           return;
                       }
 
-                      this.__userProvider.getAuthInfo(
+                      this._userProvider.getAuthInfo(
                         authinfo.username,
                         (function(scope, auth) {
                             return function(err, user) {
