@@ -122,6 +122,21 @@ qx.Class.define("sm.app.AppState", {
               }
           },
 
+          userInRoles : function(role) {
+              if (role == null) {
+                  return false;
+              }
+              if (typeof role == "string") {
+                  return this.userHasRole(role);
+              }
+              for (var i = 0; i < role.length; ++i) {
+                  if (this.userHasRole(role[i])) {
+                      return true;
+                  }
+              }
+              return false;
+          },
+
           _applyJsonData : function(ev) {
               var data = ev.getData();
               if (data == null) {
