@@ -23,6 +23,11 @@ qx.Class.define("sm.ui.form.ButtonField", {
           /** Fired when the value was modified */
           "changeValue" : "qx.event.type.Data",
 
+          /**
+           * Fired when user data changed
+           */
+          "changeUserData" : "qx.event.type.Data",
+
           /** Fired when the enabled state was modified */
           "changeEnabled" : "qx.event.type.Data",
 
@@ -49,6 +54,14 @@ qx.Class.define("sm.ui.form.ButtonField", {
           focusable : {
               refine : true,
               init : true
+          },
+
+          /**
+           * Custom user data
+           */
+          userData : {
+              nullable : true,
+              event : "changeUserData"
           }
       },
 
@@ -69,6 +82,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
           __icon : null,
 
           __button : null,
+
 
           _forwardStates : {
               invalid : true
