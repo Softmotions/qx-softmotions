@@ -113,7 +113,13 @@ qx.Class.define("sm.app.AppState", {
 
           userHasRole : function(role) {
               var aroles = this._getStateConstant("roles");
-              return (aroles != null) ? aroles[role] == true : false;
+              if (qx.lang.Type.isArray(aroles)) {
+                  return aroles.indexOf(role) != -1;
+              } else if (aroles != null) {
+                  return !!aroles[role];
+              } else {
+                  return false;
+              }
           },
 
           _applyJsonData : function(ev) {
