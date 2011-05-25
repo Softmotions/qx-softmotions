@@ -21,8 +21,10 @@ qx.Class.define("sm.io.Request", {
           /**
            * Fired if request has finished
            * regardless its state
+           *
+           * data: error or null
            */
-          "finished" : "qx.event.type.Event"
+          "finished" : "qx.event.type.Data"
       },
 
       properties :
@@ -64,12 +66,12 @@ qx.Class.define("sm.io.Request", {
 
 
           _onaborted : function(e) {
-              this.fireEvent("finished");
+              this.fireDataEvent("finished", e);
               this.base(arguments, e);
           },
 
           _onfailed : function(e) {
-              this.fireEvent("finished");
+              this.fireDataEvent("finished", e);
               if (this.isShowMessages() == true) {
                   var got = this.__checkMessages(e);
                   if (!got) {
@@ -88,7 +90,7 @@ qx.Class.define("sm.io.Request", {
                       this.__onsuccess.call(this.__self, e);
                   }
               } finally {
-                  this.fireEvent("finished");
+                  this.fireDataEvent("finished", err == false ? null : err);
               }
               this.base(arguments, e);
           },
