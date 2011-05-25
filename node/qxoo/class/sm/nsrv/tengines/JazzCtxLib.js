@@ -289,7 +289,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   if (!ctxParams) {
                       ctxParams = {};
                   }
-                  var aiStack = ctxParams["_astack_"] = [].concat(qx.lang.Type.isArray(ctx["_astack_"]) ? ctx["_astack_"] : []);
+                  var aiStack = ctxParams["_astack_"] = ctx["_astack_"] != null ? [].concat(ctx["_astack_"]) : [];
                   for (var i = 0; i < aiStack.length; ++i) {
                       if (aiStack[i] == asm) {
                           qx.log.Logger.warn(me, "Recursive assembly reference: " + name + "'");
@@ -304,8 +304,6 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   //Save assembly instance
                   aiStack.push(asm);
                   me.irequestExt(vhe, te, ctx, core, params, ctxParams, function(err, data) {
-                      delete aiStack;
-//                    qx.lang.Array.remove(aiStack, asm); //Can't use asm.pop() due to async calls
                       cb(err, data);
                   });
               });
