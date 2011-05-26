@@ -42,7 +42,6 @@ qx.Class.define("sm.app.AppState", {
           this.__json.setRequest(req);
       },
 
-
       members :
       {
           __url : null,
@@ -51,7 +50,7 @@ qx.Class.define("sm.app.AppState", {
 
           /**
            * Устанавливает значение property объекта состояния текущего приложения
-           * @param props Объект свойств
+           * @param props {Object}
            */
           setStateProperties : function(props) {
               if (this.__stateObject == null) {
@@ -71,8 +70,30 @@ qx.Class.define("sm.app.AppState", {
           },
 
           /**
-           * Получение свойства состояния
-           * @param pname
+           * Set single state object property, it is more performant method than setStateProperties
+           * @param pname {String}
+           * @param pval {Object}
+           */
+          setStateProperty : function(pname, pval) {
+              if (this.__stateObject == null) {
+                  throw new Error("AppState must be synchronized before changing state props");
+              }
+              var sprops = this.__stateObject["properties"];
+              if (!sprops) {
+                  throw new Error("Invalid state object, 'properties' section must be presented");
+              }
+              var req = new sm.io.Request(this.__url, "POST", "application/json");
+              req.setParameter("_NSTATE_PROPERTY", pname);
+              req.setParameter("_NSTATE_PROPERTY_VAL", qx.util.Json.stringify(pval));
+              req.send(function() {
+                  sprops[pname] = pval;
+                  this.fireDataEvent("stateChanged", this.__stateObject);
+              }, this);
+          },
+
+          /**
+           * Get state property value
+           * @param pname {String}
            */
           getStateProperty : function(pname) {
               return  (this.__stateObject && this.__stateObject["properties"])
@@ -141,6 +162,7 @@ qx.Class.define("sm.app.AppState", {
               var data = ev.getData();
               if (data == null) {
                   this.warn("No data found in json model");
+                  this.fireDataEvent("stateChanged", this.__stateObject);
                   return;
               }
               this.__stateObject = data;
