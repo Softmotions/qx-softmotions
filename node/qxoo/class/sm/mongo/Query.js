@@ -65,23 +65,42 @@ qx.Class.define("sm.mongo.Query", {
               return this.__collection;
           },
 
-          //      Fetch callbacks
+          ///////////////////////////////////////////////////////////////////////////
+          //                          Query callbacks                              //
+          ///////////////////////////////////////////////////////////////////////////
 
+
+          /**
+           * First result
+           * @param callback {function(doc)}
+           */
           first  : function(callback) {
               this.__registerCallback("first", callback);
               return this;
           },
 
+          /**
+           * Last result
+           * @param callback {function(index, doc)}
+           */
           last  : function(callback) {
               this.__registerCallback("last", callback);
               return this;
           },
 
+          /**
+           * Iterate each document
+           * @param callback {function(index, doc)}
+           */
           each  : function(callback) {
               this.__registerCallback("each", callback);
               return this;
           },
 
+          /**
+           * All results
+           * @param callback {function(count, docArray)}
+           */
           all  : function(callback) {
               this.__registerCallback("all", callback);
               return this;
@@ -97,6 +116,7 @@ qx.Class.define("sm.mongo.Query", {
 
           /**
            * Executes query
+           * @param callback {function(err)}
            */
           exec : function(callback) {
               if (qx.lang.Object.isEmpty(this.__callbacks)) {
