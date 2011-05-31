@@ -79,6 +79,8 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
            */
           __vspec : null,
 
+          __cleanup : false,
+
           _checkIncludedColumns : function(val) {
               if (!qx.lang.Type.isArray(val)) {
                   return false;
@@ -150,8 +152,21 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
               return req;
           },
 
+          cleanup : function() {
+              this.__cleanup = true;
+              try {
+                  this.reloadData();
+              } finally {
+                  this.__cleanup = false;
+              }
+          },
+
           // overriden - called whenever the table requests the row count
           _loadRowCount : function() {
+              if (this.__cleanup == true) {
+                  this._onRowCountLoaded(0);
+                  return;
+              }
               var req = this.__buildViewSpecRequest(this.getRowcountUrl());
               if (!req) {
                   return 0;
@@ -170,6 +185,10 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
           // overriden
           _loadRowData : function(firstRow, lastRow) {
+              if (this.__cleanup == true) {
+                  this._onRowDataLoaded([]);
+                  return;
+              }
               var req = this.__buildViewSpecRequest(this.getRowdataUrl());
               if (!req) {
                   return;
