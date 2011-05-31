@@ -33,10 +33,11 @@ qx.Class.define("sm.ui.form.UploadForm", {
        * @param url {String} url for form submission ({@link #url}).
        * @param encoding {String} encoding for from submission. This is an instantiation only parameter and defaults to multipart/form-data
        */
-      construct: function(name, url, encoding) {
+      construct: function(name, url, encoding, options) {
           this.base(arguments, name, url, encoding);
           this.setLayout(new qx.ui.layout.VBox());
 
+          this.__options = options || {};
           this.__uploadRows = [];
 
           // bugfix for IE8
@@ -44,15 +45,22 @@ qx.Class.define("sm.ui.form.UploadForm", {
           el.setAttribute("encoding", encoding || "multipart/form-data");
           el.setAttribute("enctype", encoding || "multipart/form-data");
 
-          var controlCont = this.__controlCont = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"})).set({marginTop : 5});
-          this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "sm/icons/misc/folder_add.png");
-          controlCont.add(this.__addButton, {flex : 1});
-
+          var controlCont = this.__controlCont =
+            new qx.ui.container.Composite(new qx.ui.layout.HBox(5)
+              .set({alignX : "right"})).set({marginTop : 5});
           this.add(controlCont);
 
-          this.__addButton.addListener("execute", function() {
+          if (!this.__options ["singleUpload"]) {
+              this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "sm/icons/misc/folder_add.png");
+              controlCont.add(this.__addButton, {flex : 1});
+              this.add(controlCont);
+
+              this.__addButton.addListener("execute", function() {
+                  this._addFileItem();
+              }, this);
+          } else {
               this._addFileItem();
-          }, this);
+          }
       },
 
       // --------------------------------------------------------------------------
@@ -81,6 +89,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
 
       members:
       {
+          __options : null,
+
           //__closeCmd : null,
           __controlCont: null,
 
@@ -95,18 +105,20 @@ qx.Class.define("sm.ui.form.UploadForm", {
               var fileField = new uploadwidget.UploadField(fileName, null, "sm/icons/misc/folder_explore.png");
               formRow.add(fileField, {flex: 1});
 
-              var delFileItem = new qx.ui.form.Button(null, "sm/icons/misc/cross16.png");
-              delFileItem.setMarginLeft(5);
-              formRow.add(delFileItem);
+              if (!this.__options["singleUpload"]) {
+                  var delFileItem = new qx.ui.form.Button(null, "sm/icons/misc/cross16.png");
+                  delFileItem.setMarginLeft(5);
+                  delFileItem.addListener("execute", function() {
+                      this._removeFileItem(formRow);
+                  }, this);
+                  formRow.add(delFileItem);
+              }
 
               this.addBefore(formRow, this.__controlCont);
               this.__uploadRows.push(formRow);
 
-              delFileItem.addListener("execute", function() {
-                  this._removeFileItem(formRow);
-              }, this);
 
-              if (this.__uploadRows.length > 9) {
+              if (this.__addButton && this.__uploadRows.length > 9) {
                   this.__addButton.setEnabled(false);
               }
               this.fireDataEvent("changeValue", this.__uploadRows.length);
@@ -119,7 +131,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
           _removeFileItem: function(element) {
               qx.lang.Array.remove(this.__uploadRows, element);
               this._remove(element);
-              if (this.__uploadRows.length <= 9) {
+              if (this.__addButton && this.__uploadRows.length <= 9) {
                   this.__addButton.setEnabled(true);
               }
               this.fireDataEvent("changeValue", this.__uploadRows.length);
@@ -134,7 +146,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
                   }
               }
               this.__uploadRows = [];
-              if (this.__uploadRows.length <= 9) {
+              if (this.__addButton && this.__uploadRows.length <= 9) {
                   this.__addButton.setEnabled(true);
               }
               this.fireDataEvent("changeValue", this.__uploadRows.length);
@@ -143,7 +155,6 @@ qx.Class.define("sm.ui.form.UploadForm", {
           /*
            ---------------------------------------------------------------------------
            TEXTFIELD VALUE API
-           TODO - надо понять что должны делать эти методы, в контексте текущего использования компонента
            ---------------------------------------------------------------------------
            */
 
@@ -170,6 +181,6 @@ qx.Class.define("sm.ui.form.UploadForm", {
        */
       destruct : function() {
           this._disposeObjects("__addButton", "__controlCont");
-          this.__fileItemCount = null;
+          this.__options = null;
       }
   });
