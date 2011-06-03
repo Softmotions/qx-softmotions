@@ -124,7 +124,7 @@ qx.Class.define("sm.mongo.MongoConfig", {
                   return;
               }
               var coll = this.__mongo.collection(cname);
-              coll.ensureIndex(spec, !!cfg["unique"], cb);
+              coll.ensureIndex(spec, {"unique" : !!cfg["unique"], "sparse" : !!cfg["sparse"]}, cb);
           }
       },
 

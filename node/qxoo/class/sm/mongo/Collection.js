@@ -138,7 +138,7 @@ qx.Class.define("sm.mongo.Collection", {
               this._applyNativeMethod("findOne", arguments);
           },
 
-          ensureIndex : function(spec, unique, callback) {
+          ensureIndex : function(spec, options, callback) {
 
               //todo
               //todo Ensure index didnt work with mongodb-native 0.8.1 !!!
@@ -167,7 +167,7 @@ qx.Class.define("sm.mongo.Collection", {
                         }
                         return;
                     }
-                    me._applyNativeMethod("createIndex", [spec, !!unique, function(err) {
+                    me._applyNativeMethod("createIndex", [spec, options, function(err) {
                         if (callback) {
                             callback(err, true);
                         }
