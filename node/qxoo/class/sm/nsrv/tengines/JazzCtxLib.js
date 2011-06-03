@@ -275,7 +275,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
           assemblyExt : function(vhe, te, ctx, name, params, ctxParams, cb) {
               var me = this;
-              vhe.loadAssembly(name, function(err, asm) {
+              vhe.loadAssembly(name, function(err, asm, asmCtxParams) {
                   if (err) {
                       cb(err, null);
                       return;
@@ -286,7 +286,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       cb("Missing core for assembly: '" + name + "'", null);
                       return;
                   }
-                  if (!ctxParams) {
+                  if (ctxParams == null) {
                       ctxParams = {};
                   }
                   var aiStack = ctxParams["_astack_"] = ctx["_astack_"] != null ? [].concat(ctx["_astack_"]) : [];
@@ -298,6 +298,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       }
                   }
                   ctxParams["_asm_"] = asm;
+                  if (asmCtxParams != null) {
+                      qx.lang.Object.carefullyMergeWith(ctxParams, asmCtxParams);
+                  }
 
                   sm.nsrv.tengines.JazzCtxLib.__populateAsmCtxParams(req, asm, ctxParams);
 

@@ -279,7 +279,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
               var asm = this.__assembly[name];
               if (asm) {
-                  cb(null, asm);
+                  cb(null, asm, null);
                   return;
               }
               var provider = this.self(arguments).__asmProvider;
