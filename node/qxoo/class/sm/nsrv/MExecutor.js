@@ -57,12 +57,18 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
 
           /**
            * Handle error, write error to the response headers
+           *
+           * @param resp {HTTP Response}
+           * @param ctx  {Object} Request context
+           * @param err  {Object|String|LocalizedString?null} Error object
+           * @param hide {Boolean?false} If true: do not inform user about this error
+           * @param syshide {Boolean?true} If true: do not log this error
            */
-          handleError : function(resp, ctx, err, hide) {
+          handleError : function(resp, ctx, err, hide, syshide) {
               if (err instanceof qx.locale.LocalizedString) {
                   err = err.toString();
               }
-              if (err != null) {
+              if (err != null && !syshide) {
                   qx.log.Logger.error(this, err);
               }
               this.writeMessage(resp, ctx, (hide || err == null) ? "Ошибка" : err.toString(), true);
