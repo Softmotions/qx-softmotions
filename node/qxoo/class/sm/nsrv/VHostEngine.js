@@ -774,7 +774,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
 
               if (!info.webapp) { //No webapp found, abort
-                  res.sendNotFound();
+                  if (info.pathname == "/" && this.__config["rootRedirect"]) { //if root redirect defined
+                      res.sendSCode(301, {"Location" : this.__config["rootRedirect"]});
+                  } else {
+                      res.sendNotFound();
+                  }
                   return;
               }
 
@@ -871,10 +875,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           createConnectServer : function() {
               var me = this;
               var connect = $$node.require("connect");
-
+              var conf = this.__config;
 
               var cookieParser = connect.cookieParser();
-              var session = connect.session({secret: "nkserver"});
+              var session = connect.session({secret: (conf["sessionSecret"] || "5bb1097b24bd420a82ef4e916e864a48")});
 
               this.__server = connect.createServer(
                 function (req, res, next) {
