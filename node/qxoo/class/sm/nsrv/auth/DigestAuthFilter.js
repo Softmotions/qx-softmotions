@@ -82,7 +82,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
 
                                     var ha1;
                                     if (user.realmName) {
-                                        if (user.realmName == scope && user.digestPassword) {
+                                        if (user.realmName == scope.__realmName && user.digestPassword) {
                                             // get HA1 from user provider
                                             ha1 = user.digestPassword;
                                         } else {
