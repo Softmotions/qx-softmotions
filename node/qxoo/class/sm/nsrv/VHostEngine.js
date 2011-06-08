@@ -363,7 +363,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                           }
                       }
                       //Merge assembly props
+                      var name = asm["name"]; //do not extend name attr
                       qx.lang.Object.carefullyMergeWith(asm, esm);
+                      asm["name"] = name;
                   }
                   delete asm["_ctx_provider_"];
 
