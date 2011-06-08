@@ -122,6 +122,21 @@ qx.Class.define("sm.mongo.Collection", {
 
 
           /**
+           * Distinct elements in collection
+           */
+          distinct : function(key, query, callback) {
+              this._applyNativeMethod("distinct", arguments);
+          },
+
+
+          /**
+           * Group
+           */
+          group : function(keys, condition, initial, reduce, command, callback) {
+              this._applyNativeMethod("group", arguments);
+          },
+
+          /**
            * Query collection
            *
            * Async
