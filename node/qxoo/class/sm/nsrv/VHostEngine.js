@@ -708,6 +708,41 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           },
 
           /**
+           * Handle response status code. Write to response data by specified path.
+           */
+          __handleResponseSCode : function(req, res, scode, headers) {
+              var path;
+              var webapp = req.info.webapp;
+              if (!webapp || !webapp.statusPages || !(path = webapp.statusPages["" + scode])) {
+                  qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
+                  res.writeHead(scode, headers);
+                  res.end("");
+                  return;
+              }
+
+              if (path.length > 0 && path.charAt(0) != '/') {
+                  path = '/' + path;
+              }
+              path = webapp["docRoot"] + path;
+
+              var tengine = this.self(arguments).__tengines["*"]; //use sm.nsrv.tengines.StaticTemplateEngine
+
+              var me = this;
+              tengine.createTemplate(path, function(err, template) {
+                  if (err || template["notfound"]) {
+                      qx.log.Logger.error(me, "Failed status page: " + path, err || "");
+                      qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
+                      res.writeHead(scode, headers);
+                      res.end("");
+                      return;
+                  }
+                  res.statusCode = scode;
+                  qx.lang.Object.mergeWith(headers, { "Content-Type": template["ctype"] }, true);
+                  tengine.mergeTemplate(me, template, req, res, {}, headers);
+              });
+          },
+
+          /**
            * Initiate request
            */
           __initRequestHandler : function(req, res, next) {
@@ -720,9 +755,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
               res.sendSCode = function(scode, headers, data) {
                   headers = headers || {};
-                  qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                  res.writeHead(scode, headers);
-                  res.end((typeof(data) === "string") ? data : "");
+                  if (data) {
+                      qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
+                      res.writeHead(scode, headers);
+                      res.end((typeof(data) === "string") ? data : "");
+                  } else {
+                      me.__handleResponseSCode(req, res, scode, headers);
+                  }
               };
               res.sendNotFound = function(headers, data) {
                   res.sendSCode(404, headers, data);

@@ -73,8 +73,9 @@ module.exports.testDirectoryScanner = function(test) {
     }, function() {
 
         var fnames = qx.lang.Object.getKeys(scanned);
-        test.equal(fnames.length, 5);
+        test.equal(fnames.length, 6);
 
+        test.ok(fnames.indexOf("/nksrv/webapps/test1/404.txt") >= 0);
         test.ok(fnames.indexOf("/nksrv/webapps/test1/hello.jz") >= 0);
         test.ok(fnames.indexOf("/nksrv/webapps/test1/params.jz") >= 0);
         test.ok(fnames.indexOf("/nksrv/webapps/test1/hello.txt") >= 0);

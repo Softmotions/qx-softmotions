@@ -37,6 +37,9 @@ var config =
                   docRoot : cwd + "/nksrv/webapps/test1",
                   handlerDefaults : {
                       methods : ["GET", "POST"]
+                  },
+                  statusPages : {
+                      404 : "404.txt"
                   }
               },
               {
@@ -143,13 +146,15 @@ module.exports.testSimpleRequest2 = function(test) {
 
 module.exports.testVHostNotFound = function(test) {
     var client = http.createClient(port, "127.0.0.1");
-    var req = client.request("GET", "/test/sayHello",
-      {"host": "localhost"});
+    var req = client.request("GET", "/test/sayHello404",
+      {"host": "127.0.0.1"});
     req.on("response", function (resp) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 404);
         test.equal(resp.headers["content-type"], "text/plain");
         resp.on("data", function (body) {
+            test.ok(body);
+            test.ok(body.indexOf("not found error page") == 0);
         });
         resp.on("end", function () {
             test.done();
