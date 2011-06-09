@@ -47,6 +47,7 @@ qx.Class.define("sm.mongo.Query", {
               } else {
                   this.__query = qx.lang.Object.clone(qspec);
               }
+              return this;
           },
 
           updateOptions : function(ospec) {
@@ -55,6 +56,7 @@ qx.Class.define("sm.mongo.Query", {
               } else {
                   this.__options = qx.lang.Object.clone(ospec);
               }
+              return this;
           },
 
           getQuery : function() {
