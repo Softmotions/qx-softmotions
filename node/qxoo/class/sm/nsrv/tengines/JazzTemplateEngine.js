@@ -84,11 +84,21 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
               });
           },
 
+          /**
+           *
+           * @param vhe
+           * @param template
+           * @param req
+           * @param res
+           * @param ctx
+           * @param headers
+           * @param cb {function(notfound{Boolean}, error{Error}, data{String})}
+           */
           mergeTemplateInternal : function(vhe, template, req, res, ctx, headers, cb) {
               var me = this;
               var tjazz = template["jazz"];
               if (!tjazz || template["notfound"]) {
-                  cb(true, null);
+                  cb(true, null, null);
                   return;
               }
               ctx["_global_"] = window;
@@ -139,15 +149,25 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
               };
               ctx["_utils_"] = sm.nsrv.tengines.JazzCtxLib.utils();
 
-              tjazz.eval(ctx, function(data) {
-                  cb(false, data);
-              });
+              try {
+                  tjazz.eval(ctx, function(data) {
+                      cb(false, null, data);
+                  });
+              } catch(err) {
+                  qx.log.Logger.error(me, "Jazz template merging failed! Path: " + template["path"], err);
+                  cb(null, err, null);
+              }
           },
 
           mergeTemplate : function(vhe, template, req, res, ctx, headers) {
-              this.mergeTemplateInternal(vhe, template, req, res, ctx, headers, function(nf, data) {
+              var me = this;
+              this.mergeTemplateInternal(vhe, template, req, res, ctx, headers, function(nf, err, data) {
                   if (nf) { //Notfound
                       res.sendNotFound(headers);
+                      return;
+                  }
+                  if (err) {
+                      res.sendError();
                       return;
                   }
                   ctx.collectMessageHeaders(true);

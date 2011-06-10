@@ -69,10 +69,14 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                           cb("");
                           return;
                       }
-                      te.mergeTemplateInternal(vhe, template, req, res, wrappedCtx, headers, function(nf, data) {
+                      te.mergeTemplateInternal(vhe, template, req, res, wrappedCtx, headers, function(nf, err, data) {
                           cbc = true;
                           if (nf) {
                               qx.log.Logger.warn(me, "Resource: '" + path + "' not found");
+                              cb("");
+                              return;
+                          }
+                          if (err) { //error was reported
                               cb("");
                               return;
                           }
