@@ -55,6 +55,10 @@ qx.Class.define("sm.mongo.Collection", {
               return this.__name;
           },
 
+          toCode : function(code, scope) {
+              return this.__mongo.toCode(code, scope);
+          },
+
           toDBRef : function(oid, db) {
               return this.__mongo.toDBRef(this.__name, oid, db);
           },

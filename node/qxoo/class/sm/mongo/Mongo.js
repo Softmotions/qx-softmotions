@@ -122,6 +122,14 @@ qx.Class.define("sm.mongo.Mongo", {
               return this.__db.dereference(dbref, cb);
           },
 
+
+          /**
+           * Code constructor
+           */
+          toCode : function(code, scope) {
+              return new this.__db.bson_serializer.Code(code, scope);
+          },
+
           toDBRef : function(namespace, oid, db) {
               return new this.__db.bson_serializer.DBRef(namespace, this.toObjectID(oid), db);
           },
