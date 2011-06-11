@@ -80,7 +80,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               cb("");
                               return;
                           }
-                          cb(data);
+                          cb(data, {escaping : false});
                       });
                   });
               } catch(e) {
@@ -108,7 +108,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   if (err) {
                       qx.log.Logger.error(this, err);
                   }
-                  cb(data != null ? data : "");
+                  cb(data != null ? data : "", {escaping : false});
               });
           },
 
@@ -273,7 +273,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   if (err) {
                       qx.log.Logger.error(this, err);
                   }
-                  cb(data != null ? data : "");
+                  cb(data != null ? data : "", {escaping : false});
               })
           },
 

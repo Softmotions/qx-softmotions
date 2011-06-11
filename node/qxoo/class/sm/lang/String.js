@@ -49,6 +49,38 @@ qx.Class.define("sm.lang.String", {
 
           isEmpty : function(str) {
               return (str == null || str == "");
+          },
+
+
+          XML_ENTRY_MAP : {
+              34: "quot", // " - double-quote
+              38: "amp",  // &
+              60: "lt",   // <
+              62: "gt",   // >
+              39: "apos"  // XML apostrophe
+          },
+
+          /**
+           * Escape XML String
+           * @param str {String} to be escaped
+           */
+          escapeXML : function(str) {
+              if (typeof str !== "string") {
+                  return str;
+              }
+              var entity;
+              var result = [];
+              for (var i = 0, l = str.length; i < l; i++) {
+                  var chr = str.charAt(i);
+                  var code = chr.charCodeAt(0);
+                  if (this.XML_ENTRY_MAP[code]) {
+                      entity = "&" + this.XML_ENTRY_MAP[code] + ";";
+                  } else {
+                      entity = chr;
+                  }
+                  result.push(entity);
+              }
+              return result.join("");
           }
 
       },

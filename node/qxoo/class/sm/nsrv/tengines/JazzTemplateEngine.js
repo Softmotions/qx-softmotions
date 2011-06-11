@@ -150,9 +150,17 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
               ctx["_utils_"] = sm.nsrv.tengines.JazzCtxLib.utils();
 
               try {
-                  tjazz.eval(ctx, function(data) {
-                      cb(false, null, data);
-                  });
+                  tjazz.process(ctx,
+                    function(data, opts, dynamic) { //Mediator todo FIXME XHTML mediator hardcoded!!!
+                        if (data == null || !dynamic || (opts && opts["escaping"] === false)) {
+                            return data;
+                        }
+                        //qx.log.Logger.info("Escape data: " + data + " esc=" + sm.lang.String.escapeXML(data));
+                        return sm.lang.String.escapeXML(data);
+                    }, function(data) { //Data
+                        cb(false, null, data);
+                    }
+                  );
               } catch(err) {
                   qx.log.Logger.error(me, "Jazz template merging failed! Path: " + template["path"], err);
                   cb(null, err, null);
