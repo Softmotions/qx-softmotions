@@ -392,8 +392,11 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   },
 
 
+                  /**
+                   * Escape argument as URI component
+                   */
                   escapeUrl : function(data, cb) {
-                      cb(encodeURIComponent(data));
+                      cb(data != null ? encodeURIComponent(data) : "");
                   }
               };
           },
