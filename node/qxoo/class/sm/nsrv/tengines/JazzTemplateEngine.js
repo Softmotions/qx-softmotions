@@ -35,52 +35,46 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
           createTemplate : function(path, cb) {
               var me = this;
-              me.__path.exists(path, function(exists) {
-                  if (!exists) {
+              $$node.fs.stat(path, function(err, stat) {
+                  if (err || !stat.isFile()) {
                       cb(null, {"path" : path, "notfound" : true});
                       return;
                   }
-                  $$node.fs.stat(path, function(err, stat) {
-                      if (err || !stat.isFile()) {
-                          cb(null, {"path" : path, "notfound" : true});
-                          return;
+                  //checking the cache
+                  var cached = me.__tcache[path];
+                  if (cached) {
+                      if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
+                          if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                              qx.log.Logger.debug(this, "Invalidate cache: " + path);
+                          }
+                          cached = null;
+                          delete me.__tcache[path];
                       }
-                      //checking the cache
-                      var cached = me.__tcache[path];
                       if (cached) {
-                          if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
-                              if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                                  qx.log.Logger.debug(this, "Invalidate cache: " + path);
-                              }
-                              cached = null;
-                              delete me.__tcache[path];
+                          if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                              qx.log.Logger.debug(this, "Cached template fetched: " + path);
                           }
-                          if (cached) {
-                              if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                                  qx.log.Logger.debug(this, "Cached template fetched: " + path);
-                              }
-                              cb(null, cached);
-                              return;
-                          }
-                      }
-
-                      var fdata = $$node.fs.readFileSync(path, "utf8");
-                      var jazzTemplate;
-                      try {
-                          jazzTemplate = me.__jazz.compile(fdata);
-                      } catch(e) {
-                          cb(e, null);
+                          cb(null, cached);
                           return;
                       }
+                  }
 
-                      var template = {"path" : path,
-                          "mtime" : stat.mtime.getTime(),
-                          "fsize" : stat.size,
-                          "jazz" : jazzTemplate};
+                  var fdata = $$node.fs.readFileSync(path, "utf8");
+                  var jazzTemplate;
+                  try {
+                      jazzTemplate = me.__jazz.compile(fdata);
+                  } catch(e) {
+                      cb(e, null);
+                      return;
+                  }
 
-                      me.__tcache[path] = template;
-                      cb(null, template);
-                  });
+                  var template = {"path" : path,
+                      "mtime" : stat.mtime.getTime(),
+                      "fsize" : stat.size,
+                      "jazz" : jazzTemplate};
+
+                  me.__tcache[path] = template;
+                  cb(null, template);
               });
           },
 

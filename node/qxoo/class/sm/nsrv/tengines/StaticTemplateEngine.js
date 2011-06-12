@@ -14,7 +14,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
       construct : function() {
           this.base(arguments);
           this.__path = $$node.require("path");
-          this.__util = $$node.require("util");
+          this.__io = $$node.require("utils/io");
       },
 
       members :
@@ -26,16 +26,16 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
 
           createTemplate : function(path, cb) {
               var me = this;
-              me.__path.exists(path, function(exists) {
-                  if (!exists) {
+              $$node.fs.open(path, "r", null, function(err, fd) {
+                  if (err) {
                       cb(null, {"path" : path, "notfound" : true, "ctype" : me.__getCType(path)});
                       return;
                   }
-                  $$node.fs.stat(path, function(err, stat) {
-                      cb(null, {"path" : path,
-                            "notfound" : (err || !stat.isFile()),
-                            "ctype" : me.__getCType(path)});
-                  });
+                  cb(null, {"path" : path,
+                        "fd" : fd,
+                        "notfound" : false,
+                        "ctype" : me.__getCType(path)});
+
               });
           },
 
@@ -63,10 +63,14 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
                   return;
               }
               res.writeHead((res.statusCode || 200), headers);
-              this.__util.pump($$node.fs.createReadStream(template["path"]), res, function(err) {
+              var rs = $$node.fs.createReadStream(template["path"], {fd : template["fd"]});
+              $$node.process.nextTick(function() { //small hack =)
+                  rs.emit("open", rs.fd);
+                  rs._read();
+              });
+              this.__io.responseHTTPump(rs, res, function(err) {
                   if (err) {
                       qx.log.Logger.error(me, "File read error: " + template["path"]);
-                      throw err;
                   }
               });
           }

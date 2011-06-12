@@ -31,7 +31,7 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                   this.handleError(resp, ctx, "Invalid request");
                   return;
               }
-              var util = $$node.require("util");
+              var io = $$node.require("utils/io");
               var mongo = sm.app.Env.getDefault().getMongo();
               var me = this;
 
@@ -42,7 +42,7 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                   }
                   me.writeHead(resp, ctx, 200, { "Content-Type": gfile.contentType });
                   var stream = gfile.stream(true);
-                  util.pump(stream, resp, function(err) {
+                  io.responseHTTPump(stream, resp, function(err) {
                       if (err) {
                           qx.log.Logger.error(me, err);
                       }
