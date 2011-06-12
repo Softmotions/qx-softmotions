@@ -389,6 +389,11 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                    */
                   linkName : function(linkSpec, cb) {
                       cb(linkSpec != null ? linkSpec.split("|")[1] : "");
+                  },
+
+
+                  escapeUrl : function(data, cb) {
+                      cb(encodeURIComponent(data));
                   }
               };
           },
