@@ -70,7 +70,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
               });
               this.__io.responseHTTPump(rs, res, function(err) {
                   if (err) {
-                      qx.log.Logger.error(me, "File read error: " + template["path"], err);
+                      qx.log.Logger.error(me, "File pumping error: " + template["path"], err);
                   }
               });
           }
