@@ -1,8 +1,8 @@
 Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/Class.js	(revision 26651)
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 27350)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
-@@ -216,6 +216,18 @@
+@@ -210,6 +210,18 @@
              this.__addMixin(clazz, config.include[i], false);
            }
          }
@@ -21,8 +21,8 @@ Index: qooxdoo/framework/source/class/qx/Class.js
        }
  
        // Process environment
-@@ -758,7 +770,9 @@
-         "variants"   : "object",    // Map
+@@ -720,7 +732,9 @@
+         "environment"   : "object", // Map
          "events"     : "object",    // Map
          "defer"      : "function",  // Function
 -        "destruct"   : "function"   // Function
@@ -32,7 +32,7 @@ Index: qooxdoo/framework/source/class/qx/Class.js
        },
  
        "default" : null
-@@ -1126,6 +1140,39 @@
+@@ -1086,6 +1100,39 @@
      },
  
  
@@ -74,9 +74,9 @@ Index: qooxdoo/framework/source/class/qx/Class.js
       *
 Index: qooxdoo/framework/source/class/qx/core/Environment.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 26651)
+--- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 27350)
 +++ qooxdoo/framework/source/class/qx/core/Environment.js	(working copy)
-@@ -868,72 +868,72 @@
+@@ -805,48 +805,48 @@
        // plugin
        // /////////////////////////////////////////
        if (this.useCheck("plugin.gears")) {
@@ -137,7 +137,8 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
 +        this._checks["plugin.flash.strictsecurity"] = false;//qx.bom.client.Flash.getStrictSecurityModel;
        }
  
-       // /////////////////////////////////////////
+       if (this.useCheck("plugin.pdf")) {
+@@ -860,24 +860,24 @@
        // IO
        // /////////////////////////////////////////
        if (this.useCheck("io.maxrequests")) {
@@ -167,8 +168,8 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        // /////////////////////////////////////////
-@@ -951,10 +951,10 @@
-         this._checks["html.webworker"] = qx.bom.client.Html.getWebWorker;
+@@ -898,10 +898,10 @@
+         this._checks["html.filereader"] = qx.bom.client.Html.getFileReader;
        }
        if (this.useCheck("html.geolocation")) {
 -        this._checks["html.geolocation"] = qx.bom.client.Html.getGeoLocation;
@@ -180,7 +181,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
        if (this.useCheck("html.audio.ogg")) {
          this._checks["html.audio.ogg"] = qx.bom.client.Html.getAudioOgg;
-@@ -972,87 +972,87 @@
+@@ -919,76 +919,76 @@
          this._checks["html.audio.aif"] = qx.bom.client.Html.getAudioAif;
        }
        if (this.useCheck("html.video")) {
@@ -276,7 +277,8 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
 +        this._checks["css.translate3d"] = false;//qx.bom.client.Css.getTranslate3d;
        }
  
-       // /////////////////////////////////////////
+       if (this.useCheck("css.rgba")) {
+@@ -999,11 +999,11 @@
        // PHONEGAP
        // /////////////////////////////////////////
        if (this.useCheck("phonegap")) {
@@ -292,7 +294,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
    },
 Index: qooxdoo/framework/source/class/qx/core/Assert.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 26651)
+--- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 27350)
 +++ qooxdoo/framework/source/class/qx/core/Assert.js	(working copy)
 @@ -79,7 +79,7 @@
        {
@@ -305,7 +307,7 @@ Index: qooxdoo/framework/source/class/qx/core/Assert.js
        } else {
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 26651)
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 27350)
 +++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
 @@ -92,12 +92,12 @@
          }
@@ -368,7 +370,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26651)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 27350)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
 @@ -153,7 +153,8 @@
          temp = os.fdopen(fileDescriptor, "w")
@@ -380,40 +382,40 @@ Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
          rc = os.system(cmd)
          os.unlink(tempPath)
          if rc != 0:
-Index: qooxdoo/tool/pylib/generator/code/TreeCompiler.py
+Index: qooxdoo/tool/pylib/generator/code/CodeGenerator.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(revision 26651)
-+++ qooxdoo/tool/pylib/generator/code/TreeCompiler.py	(working copy)
-@@ -97,8 +97,16 @@
-         
-         for pos, classId in enumerate(classes):
-             self._console.progress(pos + 1, length)
--            content.append( self.getCompiled(classId, variants, optimize, format) )
--            
-+            fpath = self._classesObj[classId].path
-+            content.append("\n//%s\n" % (classId))
-+            if self._jobconf.get('compile-options/code/node_includes', False):
-+                if classId.startswith("qx."):
-+                    content.append( self.getCompiled(classId, variants, optimize, format) )
-+                else:
-+                    content.append("$$node.script.runInThisContext($$node.fs.readFileSync('%s'), '%s');" % (fpath, fpath))
-+            else:
-+                content.append( self.getCompiled(classId, variants, optimize, format) )
-+
-         return u''.join(content)
+--- qooxdoo/tool/pylib/generator/code/CodeGenerator.py	(revision 27350)
++++ qooxdoo/tool/pylib/generator/code/CodeGenerator.py	(working copy)
+@@ -394,8 +394,17 @@
  
+         def compileClasses(classList, compConf, log_progress=lambda:None):
+             result = []
++            nodeInc = self._job.get("compile-options/code/node_includes", False)
+             for clazz in classList:
+-                result.append(clazz.getCode(compConf))
++                fpath = clazz.path
++                result.append("\n//%s\n" % (clazz.id))
++                if nodeInc:
++                    if clazz.id.startswith("qx."):
++                        result.append(clazz.getCode(compConf))
++                    else:
++                        result.append("$$node.script.runInThisContext($$node.fs.readFileSync('%s'), '%s');" % (fpath, fpath))
++                else:
++                    result.append(clazz.getCode(compConf))
+                 log_progress()
+             return u''.join(result)
  
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 26651)
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 27350)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
-@@ -222,6 +222,9 @@
- 
-         # warn about unknown references
+@@ -195,6 +195,9 @@
+         warn_deps = []
+         logInfos = self._console.getLevel() == "info"
          ignored_names = set()
 +        ignored_names.add("$$node")
 +        ignored_names.add("$$node.process")
-+	ignored_names.add("$$node.fs")
-         # the current global ignore set is just the list of name spaces of the selected classes
-         for classid in result:
-             nsindex = classid.rfind(".")
++        ignored_names.add("$$node.fs")
+ 
+         # No dependency calculation
+         if len(includeWithDeps) == 0:
