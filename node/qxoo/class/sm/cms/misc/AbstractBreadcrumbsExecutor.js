@@ -76,28 +76,58 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
               var config = sm.app.Env.getDefault().getConfig();
               var news_root = config["urls"] ? config["urls"]["news"] : null;
 
-
-              var breadcrumbs = [];
-              ctx["breadcrumbs"] = breadcrumbs;
-              var newsbc = {
-                  name : this.tr("Новости"),
-                  link : news_root || "",
-                  published : !!news_root
+              var finish = function() {
+                  if (page.refpage && page.refpage.oid) {
+                      var me = this;
+                      var pmgr = sm.cms.page.PageMgr;
+                      var coll = pmgr.getColl();
+                      coll.findOne({_id : coll.toObjectID(page.refpage.oid)}, {fields : {name : 1}}, function(err, doc) {
+                          if (err) {
+                              me.handleError(resp, ctx, err);
+                              return;
+                          }
+                          ctx["first_breadcrumb"] = {
+                              name : doc["name"],
+                              link : "/exp/p" + doc["_id"]
+                          };
+                          ctx();
+                      });
+                  } else {
+                      ctx();
+                  }
               };
-              if (page.refpage && page.refpage.oid) {
-                  newsbc.link = newsbc.link + "?refpage=" + page.refpage.oid;
-              }
-              breadcrumbs.push(newsbc);
 
               var df = sm.cms.util.DateTimeHelper.DDMMYYYY_FMT;
 
-              ctx["last_breadcrumb"] = {
+              var breadcrumbs = [];
+              var newsbc = {
+                  published : !!news_root,
+                  name : this.tr("Новости"),
+                  link : news_root || ""
+              };
+
+              var lastbc = {
+                  published : !!news_root,
                   name : page["category"] ? page["category"] : "",
-                  published : false,
+                  link : news_root || "",
                   date : page["mdate"] ? df.format(new Date(parseInt(page["mdate"]))) : null
               };
 
-              ctx();
+              if (news_root) {
+                  if (page.refpage && page.refpage.oid) {
+                      lastbc.link = newsbc.link = (newsbc.link + "?refpage=" + page.refpage.oid);
+                      lastbc.link = lastbc.link + "&cats=" + encodeURIComponent(lastbc.name);
+                  } else {
+                      lastbc.link = lastbc.link + "?cats=" + encodeURIComponent(lastbc.name);
+                  }
+              }
+
+              breadcrumbs.push(newsbc);
+
+              ctx["breadcrumbs"] = breadcrumbs;
+              ctx["last_breadcrumb"] = lastbc;
+
+              finish();
           }
       },
 
