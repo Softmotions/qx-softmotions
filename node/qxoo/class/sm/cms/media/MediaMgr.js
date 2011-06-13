@@ -63,6 +63,40 @@ qx.Class.define("sm.cms.media.MediaMgr", {
               addHierarchy(nodeId);
           },
 
+
+          /**
+           * Get node by path
+           * @param path {Array} path array with names
+           * @param fields {Object?null} Mongodb fields specification
+           * @param cb {function(err, {Object} nodde)}
+           */
+          fetchNodeByNamePath : function(path, fields, cb) {
+              if (path.constructor !== Array || path.length == 0) {
+                  cb("Invalid path argument", null);
+                  return;
+              }
+              var coll = this.getColl();
+              var cind = 0;
+              var fetchLvl = function(ind, parent) {
+                  var name = path[ind];
+                  var qs = {
+                      name : name,
+                      parent : (parent != null) ? coll.toDBRef(parent["_id"]) : {$exists : false}};
+                  coll.findOne(qs, {fields : fields}, function(err, doc) {
+                      if (err) {
+                          cb(err, null);
+                          return;
+                      }
+                      if (++cind == path.length || doc == null) {
+                          cb(null, doc);
+                          return;
+                      }
+                      fetchLvl(cind, doc);
+                  });
+              };
+              fetchLvl(cind, null);
+          },
+
           /**
            * Remove node.
            * Fired event sm.cms.Events#mediaRemoved
