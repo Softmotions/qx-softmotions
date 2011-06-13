@@ -10,6 +10,26 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
       extend  : qx.core.Object,
       implement : [sm.nsrv.ITemplateEngine],
 
+      properties :
+      {
+          /**
+           * Whenever escape XML during template generation
+           */
+          "escapeXML" : {
+              check : "Boolean",
+              init : true
+          },
+
+          /**
+           * Time period (ms) within it filestat will not be checked,
+           * last fetched stat and cached value of template will be used
+           */
+          "statTrustPeriod" : {
+              check : "Integer",
+              init : 3000 //3sec
+          }
+      },
+
 
       construct : function() {
           this.base(arguments);
@@ -34,14 +54,22 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
 
           createTemplate : function(path, cb) {
+
               var me = this;
+              var cached = me.__tcache[path];
+              var now = new Date().getTime();
+
+              if (cached != null && now - cached.ttime <= this.getStatTrustPeriod()) {
+                  cb(null, cached);
+                  return;
+              }
+
               $$node.fs.stat(path, function(err, stat) {
                   if (err || !stat.isFile()) {
                       cb(null, {"path" : path, "notfound" : true});
                       return;
                   }
                   //checking the cache
-                  var cached = me.__tcache[path];
                   if (cached) {
                       if (cached.mtime != stat.mtime.getTime() || cached.fsize != stat.size) {
                           if (qx.core.Environment.get("sm.nsrv.debug") == true) {
@@ -54,6 +82,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                           if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                               qx.log.Logger.debug(this, "Cached template fetched: " + path);
                           }
+                          cached.ttime = now;
                           cb(null, cached);
                           return;
                       }
@@ -71,7 +100,9 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                   var template = {"path" : path,
                       "mtime" : stat.mtime.getTime(),
                       "fsize" : stat.size,
-                      "jazz" : jazzTemplate};
+                      "jazz" : jazzTemplate,
+                      "ttime" : now //todo a bit inaccurate time
+                  };
 
                   me.__tcache[path] = template;
                   cb(null, template);
@@ -145,11 +176,10 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
               try {
                   tjazz.process(ctx,
-                    function(data, opts, dynamic) { //Mediator todo FIXME XHTML mediator hardcoded!!!
-                        if (data == null || !dynamic || (opts && opts["escaping"] === false)) {
+                    function(data, opts, dynamic) { //Mediator todo XHTML mediator hardcoded!
+                        if (data == null || !dynamic || (opts && opts["escaping"] === false) || me.getEscapeXML() == false) {
                             return data;
                         }
-                        //qx.log.Logger.info("Escape data: " + data + " esc=" + sm.lang.String.escapeXML(data));
                         return sm.lang.String.escapeXML(data);
                     }, function(data) { //Data
                         cb(false, null, data);

@@ -6,7 +6,7 @@
 
 /**
  * Agressive pump into writeStream, used to pump into HTTP response stream
- * due to some strange io bugs under havy loads with standard util.pupm()
+ * due to some strange io bugs under havy loads with standard util.pump()
  */
 module.exports.responseHTTPump = function(readStream, writeStream, callback) {
     var callbackCalled = false;

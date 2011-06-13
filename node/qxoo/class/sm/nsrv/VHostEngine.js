@@ -59,6 +59,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           __config : null,
 
           /**
+           * Template engines
+           */
+          __tengines : null,
+
+          /**
            * Web handlers storage
            */
           __handlers : null,
@@ -95,6 +100,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
               this.__config = config;
               this.__vhostName = this.__config["vhost"];
+
+
+              this.__tengines = {
+                  "*" : new sm.nsrv.tengines.StaticTemplateEngine(),
+                  "jz" : new sm.nsrv.tengines.JazzTemplateEngine()
+              };
+
+              if (config["templateOptions"] != null) {
+                  var topts = config["templateOptions"];
+                  for (var tn in this.__tengines) {
+                      var te = this.__tengines[tn];
+                      if (te.classname == null) {
+                          continue;
+                      }
+                      var to = topts[te.classname];
+                      if (to) {
+                          te.set(to);
+                      }
+                  }
+              }
+
 
               if (!this.__vhostName) {
                   throw new Error("Invalid vhost config: " + qx.util.Json.stringify(this.__config));
@@ -466,7 +492,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           },
 
           getTemplateEngineForExt : function(ext) {
-              return this.self(arguments).__tengines[ext];
+              return this.__tengines[ext];
           },
 
           /**
@@ -502,9 +528,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               } else {
                   ext = null;
               }
-              var tengine = this.self(arguments).__tengines[ext];
+              var tengine = this.__tengines[ext];
               if (!tengine) {
-                  tengine = this.self(arguments).__tengines["*"]; //use sm.nsrv.tengines.StaticTemplateEngine
+                  tengine = this.__tengines["*"]; //use sm.nsrv.tengines.StaticTemplateEngine
               }
 
               //guess content-type
@@ -938,12 +964,5 @@ qx.Class.define("sm.nsrv.VHostEngine", {
       },
 
       defer : function(statics) {
-          /**
-           * List of template engines
-           */
-          statics.__tengines = {
-              "*" : new sm.nsrv.tengines.StaticTemplateEngine(),
-              "jz" : new sm.nsrv.tengines.JazzTemplateEngine()
-          };
       }
   });

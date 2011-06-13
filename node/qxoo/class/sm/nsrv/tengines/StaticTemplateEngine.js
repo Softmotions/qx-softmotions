@@ -66,7 +66,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
               var rs = $$node.fs.createReadStream(template["path"], {fd : template["fd"]});
               $$node.process.nextTick(function() { //small hack =)
                   rs.emit("open", rs.fd);
-                  rs._read();
+                  rs.resume();
               });
               this.__io.responseHTTPump(rs, res, function(err) {
                   if (err) {
