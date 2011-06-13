@@ -546,6 +546,24 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               var headers = qx.lang.Object.clone(res.headers);
               qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": ctype });
 
+              if (req.info.webapp["headers"] != null) { //Apply custom headers by pattern matching
+                  var cheaders = req.info.webapp["headers"];
+                  for (var hk in cheaders) {
+                      var hspec = cheaders[hk];
+                      if (hspec.$$re === undefined) {
+                          hspec.$$re = new RegExp(hk);
+                      }
+                      if (hspec.$$re.test(req.info.path)) {
+                          for (var hname in hspec) {
+                              if (hname == "$$re" || headers[hname] != null) {
+                                  continue;
+                              }
+                              headers[hname] = hspec[hname];
+                          }
+                      }
+                  }
+              }
+
               //write template
               if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                   qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
@@ -613,6 +631,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
 
               if (hconf) { //found handlers
+
                   var hinst = hconf["$$instance"];
                   var exec = hinst[hconf["handler"]];
                   if (!qx.lang.Type.isFunction(exec)) {
