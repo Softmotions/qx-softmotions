@@ -102,25 +102,52 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               this.__vhostName = this.__config["vhost"];
 
 
+              var teArr = [ //list of custom template engines
+                  new sm.nsrv.tengines.JazzTemplateEngine()
+              ];
+
+
               this.__tengines = {
-                  "*" : new sm.nsrv.tengines.StaticTemplateEngine(),
-                  "jz" : new sm.nsrv.tengines.JazzTemplateEngine()
+                  "*" : new sm.nsrv.tengines.StaticTemplateEngine() //hardcoded for any file types
               };
 
-              if (config["templateOptions"] != null) {
-                  var topts = config["templateOptions"];
-                  for (var tn in this.__tengines) {
-                      var te = this.__tengines[tn];
-                      if (te.classname == null) {
+              for (var i = 0; i < teArr.length; ++i) { //Process custom template engines
+
+                  qx.core.Assert.assertInterface(teArr[i], sm.nsrv.ITemplateEngine,
+                    "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
+
+                  if (config["templateOptions"] != null) {
+                      var topts = config["templateOptions"];
+                      var to = topts[teArr[i].classname];
+                      if (to) {
+                          teArr[i].set(to);
+                      }
+                  }
+
+                  //Register engine for extensions
+                  var ext = teArr[i].getExtensions();
+                  if (typeof ext === "string") {
+                      ext = [ext];
+                  } else if (ext.constructor != Array) {
+                      continue; //unknown extension type
+                  }
+                  qx.log.Logger.info("Template engine: '" + teArr[i].classname + "' registered for extensions: " + JSON.stringify(ext));
+                  for (var j = 0; j < ext.length; ++j) {
+                      var sext = ext[j];
+                      if (typeof sext !== "string") {
                           continue;
                       }
-                      var to = topts[te.classname];
-                      if (to) {
-                          te.set(to);
+                      if (sext.charAt(0) == ".") {
+                          sext = sext.substring(1);
+                      }
+                      if (sext.length == 0) {
+                          continue;
+                      }
+                      if (this.__tengines[sext] === undefined) {
+                          this.__tengines[sext] = teArr[i];
                       }
                   }
               }
-
 
               if (!this.__vhostName) {
                   throw new Error("Invalid vhost config: " + qx.util.Json.stringify(this.__config));

@@ -12,6 +12,12 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
 
       properties :
       {
+
+          "extensions" : {
+               check : "Array",
+               init : ["jz"]
+          },
+
           /**
            * Whenever escape XML during template generation
            */

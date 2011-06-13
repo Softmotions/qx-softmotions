@@ -10,6 +10,18 @@ qx.Interface.define("sm.nsrv.ITemplateEngine", {
 
       members :
       {
+
+
+          /**
+           * Return array of file extension applicable
+           * for this template renderer
+           * @return {Array|String}
+           */
+          getExtensions : function () {
+
+          },
+
+
           /**
            * Create template object for path
            * @param path

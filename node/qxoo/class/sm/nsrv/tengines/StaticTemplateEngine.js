@@ -17,6 +17,14 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
           this.__io = $$node.require("utils/io");
       },
 
+      properties :
+      {
+          "extensions" : {
+              check : "String",
+              init : "*"
+          }
+      },
+
       members :
       {
 
