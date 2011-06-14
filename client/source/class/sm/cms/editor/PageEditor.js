@@ -293,6 +293,9 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                   case "textfield" :
                       res = new sm.cms.editor.TextFieldEditor(edOptions);
                       break;
+                  case "singleselect" :
+                      res = new sm.cms.editor.SelectBoxEditor(edOptions);
+                      break;
                   default :
                       res = this._handleUnknownEditor(edName, edOptions);
                       break;
