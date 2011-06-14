@@ -143,7 +143,7 @@ qx.Class.define("sm.cms.Application", {
                   if (pinfo) {
                       pinfo.setEditEnabled(false);
                   }
-                  pedit.setPage(pid, function() {
+                  pedit.setPage(pid, null, function() {
                       rStack.showWidget("pageEditor");
                   });
               };

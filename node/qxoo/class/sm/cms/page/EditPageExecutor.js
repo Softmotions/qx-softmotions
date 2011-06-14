@@ -181,19 +181,30 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   var res = doc ? doc : {};
 
                   var finish = function() {
-                      res["_editable"] = false;
+                      res["_editable_"] = false;
                       if (res["owner"] == uid) {
-                          res["_editable"] = true;
+                          res["_editable_"] = true;
                       } else if (res["access"] && qx.lang.Type.isArray(res["access"]["edit"])) {
-                          res["_editable"] = (res["access"]["edit"].indexOf(uid) != -1);
+                          res["_editable_"] = (res["access"]["edit"].indexOf(uid) != -1);
                       }
-                      if (!res["_editable"]) { //last chance
-                          res["_editable"] = req.isUserInRoles(["admin", "structure.admin"]);
+                      if (!res["_editable_"]) { //last chance
+                          res["_editable_"] = req.isUserInRoles(["admin", "structure.admin"]);
                       }
                       delete res["access"]; //Always disable access field
                       delete res["owner"];  //Always disable owner field
 
-                      me.writeJSONObject(res, resp, ctx);
+                      if (doc["asm"] && req.params["_news_"]) { //Want to get news options
+                          ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
+                              if (err) {
+                                  me.handleError(resp, ctx, err);
+                                  return;
+                              }
+                              res["_news_"] = asm["_news_"];
+                              me.writeJSONObject(res, resp, ctx);
+                          });
+                      } else {
+                          me.writeJSONObject(res, resp, ctx);
+                      }
                   };
 
                   if (!doc["asm"] || !doc["attrs"]) {

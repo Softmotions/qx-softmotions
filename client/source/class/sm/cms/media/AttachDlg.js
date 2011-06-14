@@ -118,8 +118,8 @@ qx.Class.define("sm.cms.media.AttachDlg", {
 
 
           var changeTableSelection = function() {
-              var sm = me.__table.getSelectionModel();
-              var sind = sm.getAnchorSelectionIndex();
+              var sModel = me.__table.getSelectionModel();
+              var sind = sModel.getAnchorSelectionIndex();
               if (sind >= 0 || sm.getSelectedCount() > 0) {
                   var tmrow = tm.getData()[sind];
                   if (tmrow[1] && tmrow[1].indexOf("image/") == 0) {

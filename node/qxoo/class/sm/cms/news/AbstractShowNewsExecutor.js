@@ -59,7 +59,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
           /**
            * First bunch of news attached to current page
            */
-          _in_page_news : function(req, resp, ctx) {
+          _in_page_news : function(req, resp, ctx, limit) {
 
               var page = ctx["_page_"];
               if (!page) {
@@ -70,7 +70,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
               this._fetch_news_list(req, resp, ctx,
                 {"refpage" : page["_id"],
                     "queryOpts" : {
-                        "limit" : 8
+                        "limit" : limit != null ? limit : 8
                     }});
           },
 

@@ -47,8 +47,10 @@ qx.Class.define("sm.cms.editor.PageEditor", {
           this._opts = opts = opts || {};
           this._grefs = [];
 
-          if (opts["tmplCategory"]) {
+          if (opts["tmplCategory"] != null) {
               this._tmplCategory = opts["tmplCategory"];
+          } else {
+              this._opts["tmplCategory"] = null;
           }
 
           var header = new qx.ui.container.Composite(new qx.ui.layout.VBox(5)).set({margin : 10});
@@ -123,19 +125,19 @@ qx.Class.define("sm.cms.editor.PageEditor", {
           _opts : null,
 
 
-          setPageInfo : function(pageInfo, cb) {
+          setPageInfo : function(pageInfo, opts, cb) {
               qx.core.Assert.assertObject(pageInfo);
               this._pageInfo = pageInfo;
               this._grefs["hdr.pageName"].setValue(pageInfo["name"]);
-              this._loadPageTemplates(cb);
+              this._loadPageTemplates(opts, cb);
           },
 
-          setPage : function(pageRef, cb) {
+          setPage : function(pageRef, opts, cb) {
               qx.core.Assert.assertString(pageRef);
               var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.info"), "GET", "application/json");
               req.setParameter("ref", pageRef);
               req.send(function(resp) {
-                  this.setPageInfo(resp.getContent(), cb);
+                  this.setPageInfo(resp.getContent(), opts, cb);
               }, this);
           },
 
@@ -146,13 +148,8 @@ qx.Class.define("sm.cms.editor.PageEditor", {
               }
           },
 
-          _loadPageTemplates : function(cb) {
-              var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
-
-              if (this._tmplCategory != null) {
-                  req.setParameter("category", this._tmplCategory, false);
-              }
-
+          _loadPageTemplates : function(opts, cb) {
+              opts = opts || {};
               var tselect = this._grefs["hdr.templates"];
               var tselectItems = tselect._getItems();
               var me = this;
@@ -175,9 +172,22 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                       cb();
                   }
               };
-              if (tselectItems.length == 0) { //Загружаем шаблоны только один раз
+              var refresh = (tselectItems.length == 0); //if true templates list will be reloaded
+              if (opts["tmplCategory"] != null && opts["tmplCategory"] != this._tmplCategory) {
+                  this._tmplCategory = opts["tmplCategory"];
+                  refresh = true;
+              } else {
+                  refresh = refresh || (this._opts["tmplCategory"] != this._tmplCategory);
+                  this._tmplCategory = this._opts["tmplCategory"];
+              }
+              if (refresh) { //Reload templates
+                  var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
+                  if (this._tmplCategory != null) {
+                      req.setParameter("category", this._tmplCategory, false);
+                  }
                   req.send(function(resp) {
-                      tselect.add(new qx.ui.form.ListItem("Шаблон не выбран/страница не существует", null, {}));
+                      tselect.removeAll();
+                      tselect.add(new qx.ui.form.ListItem(this.tr("Шаблон не выбран/страница не существует"), null, {}));
                       var respTemplates = resp.getContent();
                       if (qx.lang.Type.isArray(respTemplates)) {
                           for (var i = 0; i < respTemplates.length; ++i) {

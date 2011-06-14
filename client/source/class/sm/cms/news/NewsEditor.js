@@ -44,10 +44,11 @@ qx.Class.define("sm.cms.news.NewsEditor", {
           __newsCats : null,
 
 
-          setPageInfo : function(pageInfo, cb, callBase) {
+          setPageInfo : function(pageInfo, opts, cb, callBase) {
+              opts = opts || {};
               var me = this;
               if (callBase == true) {
-                  this.base(arguments, pageInfo, cb);
+                  this.base(arguments, pageInfo, opts, cb);
                   return;
               }
               if (pageInfo == null) {
@@ -55,21 +56,25 @@ qx.Class.define("sm.cms.news.NewsEditor", {
               }
               if (pageInfo != null && pageInfo["refpage"] != null && pageInfo["refpage"]["$id"]) {
                   var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.info"), "GET", "application/json");
-                  req.setParameter("ref", pageInfo["refpage"]["$id"]);
-                  req.setParameter("include", ["asm", "attrs.newscats"]); //todo here is some magic bug in mongodb driver
+                  req.setParameter("ref", pageInfo["refpage"]["$id"], false);
+                  req.setParameter("include", ["asm", "attrs.newscats"], false);
+                  req.setParameter("_news_", true, false);
                   req.send(function(resp) {
                       me.__newsCats = [];
                       var res = resp.getContent();
+                      if (res && res["_news_"]) {
+                          opts["tmplCategory"] = res["_news_"]["news_pages_category"];
+                      }
                       if (res && res["attrs"] && res["attrs"]["newscats"]) {
                           var ncats = res["attrs"]["newscats"];
                           if (qx.lang.Type.isArray(ncats.value)) {
                               me.__newsCats = ncats.value;
                           }
                       }
-                      me.setPageInfo(pageInfo, cb, true);
+                      me.setPageInfo(pageInfo, opts, cb, true);
                   })
               } else {
-                  me.setPageInfo(pageInfo, cb, true);
+                  me.setPageInfo(pageInfo, opts, cb, true);
               }
           },
 
@@ -92,7 +97,7 @@ qx.Class.define("sm.cms.news.NewsEditor", {
           __editnews : function(ev) {
               var me = this;
               var pid = ev.getData();
-              this.setPage(pid, function() {
+              this.setPage(pid, {}, function() {
                   me.fireEvent("activatePanel");
               });
           },
@@ -114,7 +119,7 @@ qx.Class.define("sm.cms.news.NewsEditor", {
                 "GET", "application/json");
               req.send(function(resp) {
                   var doc = resp.getContent();
-                  this.setPage(doc["_id"], function() {
+                  this.setPage(doc["_id"], {}, function() {
                       me.fireEvent("activatePanel");
                   });
               }, this);

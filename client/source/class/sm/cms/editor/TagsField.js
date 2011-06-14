@@ -16,6 +16,7 @@ qx.Class.define("sm.cms.editor.TagsField", {
           options = options || {};
           this._maxCount = options["maxCount"] || 10;
           this._maxLength = options["maxLength"] || 15;
+          this._default = options["default"];
           if (options["placeholder"]) {
               this.setPlaceholder(options["placeholder"]);
           }
@@ -23,11 +24,16 @@ qx.Class.define("sm.cms.editor.TagsField", {
 
       members :
       {
+
+          _default : null,
           _maxCount : null,
           _maxLength : null,
 
           // overridden
           setValue : function(value) {
+              if (value == null || value == "" || value.length == 0) {
+                  value = this._default;
+              }
               if (qx.lang.Type.isString(value)) {
                   this.base(arguments, value);
               } else if (qx.lang.Type.isArray(value)) {
@@ -68,7 +74,7 @@ qx.Class.define("sm.cms.editor.TagsField", {
       },
 
       destruct : function() {
-          this._maxCount = this._maxLength = null;
+          this._maxCount = this._maxLength = this._default = null;
       }
   });
 

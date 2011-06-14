@@ -114,7 +114,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
                   status.show();
 
                   grefs["editButton"].setLabel(this.tr("Редактировать"));
-                  if (!pi["_editable"]) {
+                  if (!pi["_editable_"]) {
                       grefs["editButton"].exclude();
                   } else {
                       grefs["editButton"].show();
