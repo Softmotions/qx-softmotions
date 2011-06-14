@@ -30,9 +30,12 @@ qx.Class.define("sm.cms.news.NewsEditor", {
           }, this);
           this._grefs["save"].setLabel(this.tr("Сохранить и закончить"));
           this._grefs["hdr.hcont"].add(complete);
-          this.addListener("pageSaved", function() {
-              this.disposeForm();
-              ws.fireEvent("activatePanel");
+          this.addListener("pageSaved", function(ev) {
+              var preview = ev.getData();
+              if (!preview) {
+                  this.disposeForm();
+                  ws.fireEvent("activatePanel");
+              }
           });
           ws.addListener("newNews", this.__newnews, this);
           ws.addListener("editNews", this.__editnews, this);
@@ -47,6 +50,7 @@ qx.Class.define("sm.cms.news.NewsEditor", {
           setPageInfo : function(pageInfo, opts, cb, callBase) {
               opts = opts || {};
               var me = this;
+              qx.log.Logger.info(me, "setPageInfo!!! callBase=" + callBase + ", opts=" + qx.util.Json.stringify(opts));
               if (callBase == true) {
                   this.base(arguments, pageInfo, opts, cb);
                   return;

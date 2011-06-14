@@ -25,7 +25,10 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
       events :
       {
-          "pageSaved" : "qx.event.type.Event"
+          /**
+           * data: {Boolean} true if page saved for preview
+           */
+          "pageSaved" : "qx.event.type.Data"
       },
 
       properties :
@@ -86,7 +89,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
           el.addListener("execute", function() {
               this.__savePage(function() {
                   sm.cms.Application.alert(this.tr("Страница была успешно сохранена"));
-                  this.fireEvent("pageSaved");
+                  this.fireDataEvent("pageSaved");
               }, this);
           }, this);
           hcont.add(el, {flex : 0});
@@ -176,10 +179,11 @@ qx.Class.define("sm.cms.editor.PageEditor", {
               if (opts["tmplCategory"] != null && opts["tmplCategory"] != this._tmplCategory) {
                   this._tmplCategory = opts["tmplCategory"];
                   refresh = true;
-              } else {
-                  refresh = refresh || (this._opts["tmplCategory"] != this._tmplCategory);
+              } else if (opts["tmplCategory"] == null) { //reset to default
                   this._tmplCategory = this._opts["tmplCategory"];
+                  refresh = true;
               }
+              qx.log.Logger.info("this._tmplCategory=" + this._tmplCategory + ", refresh=" + refresh);
               if (refresh) { //Reload templates
                   var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
                   if (this._tmplCategory != null) {
@@ -348,7 +352,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                   qx.bom.Window.open(pp + this._pageInfo["_id"],
                     this.tr("Предпросмотр").toString() + " " + this._pageInfo["name"],
                     {}, false, false);
-                  this.fireEvent("pageSaved");
+                  this.fireDataEvent("pageSaved", true); //preview flag
               }, this);
           },
 
