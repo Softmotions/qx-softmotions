@@ -42,7 +42,10 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
 
                       qx.lang.Object.carefullyMergeWith(asm, parent);
 
-                      var attrs = doc["attrs"] || {};
+                      if (doc["attrs"] == null) {
+                          doc["attrs"] = {};
+                      }
+                      var attrs = doc["attrs"];
                       for (var an in attrs) {
                           var ameta = meta[an];
                           var av = attrs[an];

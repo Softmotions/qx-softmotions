@@ -420,7 +420,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                       qx.lang.Object.carefullyMergeWith(asm, esm);
                       asm["name"] = name;
                   }
-                  delete asm["_ctx_provider_"];
 
                   if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                       qx.log.Logger.debug("Assembly '" + asn + "':\n" +
@@ -428,14 +427,18 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   }
               }
 
-              //Replace _extends_ string ref by real assembly instance
               for (var asn in this.__assembly) {
+                  //Replace _extends_ string ref by real assembly instance
                   var asm = this.__assembly[asn];
                   if (asm["_extends_"]) {
                       asm["_extends_"] = this.__assembly[asm["_extends_"]];
                   }
                   if (asm["_extends_"] == asm) {
                       delete asm["_extends_"];
+                  }
+                  //Remove asm["_ctx_provider_"] as unnecessary
+                  if (asm["_ctx_provider_"] !== undefined) {
+                      delete asm["_ctx_provider_"];
                   }
               }
           },
