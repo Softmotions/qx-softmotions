@@ -21,6 +21,8 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                   sm.cms.tags.TagsMgr.updateStatistic(doc.attrs.tags["value"], doc.tags);
               }
 
+              //todo !!!!! nsu site specific code !!!!
+
               //If main page saved
               var isMain = (doc.attrs._main_page_ != null) && (doc.attrs._main_page_.value == true);
               if (isMain) {
@@ -40,6 +42,10 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                       qx.log.Logger.warn("Setting default headlinks to: " + qx.util.Json.stringify(nconf["headlinks"]));
                   }
                   env.setJSONConfig("navigation", nconf);
+
+                  var misc = env.getJSONConfig("misc");
+                  misc.main_style = (doc.attrs.style != null && doc.attrs.style.value != null ? doc.attrs.style.value : null);
+                  env.setJSONConfig("misc", misc);
 
                   // flush _main_page_ flag for all other "main" pages
                   var ncoll = sm.cms.page.PageMgr.getColl();
