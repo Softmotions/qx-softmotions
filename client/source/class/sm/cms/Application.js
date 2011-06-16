@@ -293,7 +293,7 @@ qx.Class.define("sm.cms.Application", {
               }
               //Разделы медиа
               if (nData.indexOf("media.") == 0) {
-                  if (sm.cms.Application.userInRoles(["admin", "config.admin", "media.admin"])) {
+                  if (sm.cms.Application.userInRoles(["config.admin", "media.admin"])) {
 
                       if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
                           bt = new qx.ui.menu.Button(this.tr("Добавить ресурсы"));

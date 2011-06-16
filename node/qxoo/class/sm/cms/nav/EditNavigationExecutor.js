@@ -10,9 +10,9 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
       statics :
       {
           CATEGORIES: [
-              {"path": "config", "label": "Конфигурация", "mgr" : sm.cms.nav.ConfigMgr, "roles": ["admin", "config.admin"]},
+              {"path": "config", "label": "Конфигурация", "mgr" : sm.cms.nav.ConfigMgr, "roles": ["config.admin"]},
               {"path": "pages", "label": "Страницы", "mgr" : sm.cms.page.PageMgr},
-              {"path": "media", "label": "Медиа", "mgr" : sm.cms.media.MediaMgr, "roles" : ["admin", "config.admin", "media.admin"]}
+              {"path": "media", "label": "Медиа", "mgr" : sm.cms.media.MediaMgr, "roles" : ["config.admin", "media.admin"]}
           ]
       },
 

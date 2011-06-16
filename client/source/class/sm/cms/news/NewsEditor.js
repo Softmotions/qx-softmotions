@@ -50,7 +50,6 @@ qx.Class.define("sm.cms.news.NewsEditor", {
           setPageInfo : function(pageInfo, opts, cb, callBase) {
               opts = opts || {};
               var me = this;
-              qx.log.Logger.info(me, "setPageInfo!!! callBase=" + callBase + ", opts=" + qx.util.Json.stringify(opts));
               if (callBase == true) {
                   this.base(arguments, pageInfo, opts, cb);
                   return;

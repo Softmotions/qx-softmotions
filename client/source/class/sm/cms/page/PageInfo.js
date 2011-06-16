@@ -135,7 +135,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
               var apps = sm.cms.Application.APP_STATE;
 
               if (pi["asm"] == null ||
-                (apps.getUserId() != pi["owner"] && !apps.userInRoles(["admin", "structure.admin", "users.admin"]))) {
+                (apps.getUserId() != pi["owner"] && !apps.userInRoles(["structure.admin", "users.admin"]))) {
                   at.hide();
                   return;
               }

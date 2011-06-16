@@ -188,7 +188,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                           res["_editable_"] = (res["access"]["edit"].indexOf(uid) != -1);
                       }
                       if (!res["_editable_"]) { //last chance
-                          res["_editable_"] = req.isUserInRoles(["admin", "structure.admin"]);
+                          res["_editable_"] = req.isUserInRoles(["structure.admin"]);
                       }
                       delete res["access"]; //Always disable access field
                       delete res["owner"];  //Always disable owner field
@@ -594,7 +594,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     }
                     //check access rights
                     var userId = req.getUserId();
-                    if ((doc.owner != userId || role == "owner") && !req.isUserInRoles(["admin", "users.admin", "structure.admin"])) {
+                    if ((doc.owner != userId || role == "owner") && !req.isUserInRoles(["users.admin", "structure.admin"])) {
                         qx.log.Logger.warn(this, "__page_update_acl()", "User denied", userId);
                         resp.sendForbidden();
                         return;

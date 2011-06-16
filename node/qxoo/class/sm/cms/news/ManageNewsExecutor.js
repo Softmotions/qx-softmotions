@@ -86,7 +86,7 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
                       roots[i] = mongo.toObjectID(roots[i]);
                   }
                   var aq = null;
-                  if (req.isUserInRoles(["admin", ["news.admin"]])) { //admin user
+                  if (req.isUserInRoles(["news.admin"])) { //admin user
                       aq = pmgr.getColl().createQuery();
                   } else { //casual user, needs to check access
                       aq = pmgr.getAcessPagesQuery(uid, "news");
