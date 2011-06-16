@@ -91,6 +91,7 @@ qx.Class.define("sm.cms.users.UsersPanel", {
                   dlg.close();
                   if (user == null || ind == null) {
                       this.__uselector.setViewSpec({login : doc["login"]});
+                      this.__uprops.setUser(null);
                   } else {
                       this.__uselector.setUserData(ind, doc);
                   }
