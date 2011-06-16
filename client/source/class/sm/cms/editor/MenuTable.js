@@ -47,8 +47,9 @@ qx.Class.define("sm.cms.editor.MenuTable", {
       {
       },
 
-      construct : function() {
+      construct : function(options) {
 
+          this.__options = options || {};
           this.__active_on_item = [];
 
           this.base(arguments);
@@ -65,6 +66,9 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
       members :
       {
+
+          __options : null,
+
           /**
            * List of widgets active on selected element
            */
@@ -159,7 +163,10 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           // add new menu link
           __manageLink : function() {
-              var dlg = new sm.cms.page.PageLinkDlg({"requireLinkName": true});
+              var dlg = new sm.cms.page.PageLinkDlg({
+                    "requireLinkName": true,
+                    "allowOuterLinks" : this.__options["allowOuterLinks"]
+                });
               dlg.addListener("pageSelected", function(ev) {
                   var data = ev.getData();
                   var ldata = {
@@ -170,6 +177,17 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                       return (odata["name"] == ldata["name"])
                   }, [ldata["name"], ldata["link"]], ldata);
 
+                  dlg.close();
+              }, this);
+              dlg.addListener("linkSelected", function(ev) {
+                  var data = ev.getData();
+                  var ldata = {
+                      "name" : data[1],
+                      "link" : data[0]
+                  };
+                  this.addRow(function(odata) {
+                      return (odata["name"] == ldata["name"])
+                  }, [ldata["name"], ldata["link"]], ldata);
 
                   dlg.close();
               }, this);
@@ -223,7 +241,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
       },
 
       destruct : function() {
-          this.__active_on_item = null;
+          this.__active_on_item = this.__options = null;
       }
   });
 

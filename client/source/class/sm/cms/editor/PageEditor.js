@@ -183,7 +183,6 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                   this._tmplCategory = this._opts["tmplCategory"];
                   refresh = true;
               }
-              qx.log.Logger.info("this._tmplCategory=" + this._tmplCategory + ", refresh=" + refresh);
               if (refresh) { //Reload templates
                   var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
                   if (this._tmplCategory != null) {

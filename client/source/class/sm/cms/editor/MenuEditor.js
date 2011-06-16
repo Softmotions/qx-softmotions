@@ -49,8 +49,12 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
 
           this.__options = options = options || {};
 
-          var view = this.__form = this.__mtable = new sm.cms.editor.MenuTable();
+          var view = this.__form = this.__mtable =
+            new sm.cms.editor.MenuTable({
+                  "allowOuterLinks" : !!options["allowOuterLinks"]
+              });
 
+          this.__allowOuterLinks = !!options["allowOuterLinks"];
           if (!options["main"]) {
               var form = this.__form = new qx.ui.form.Form();
 
