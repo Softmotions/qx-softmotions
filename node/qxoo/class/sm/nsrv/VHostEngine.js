@@ -891,6 +891,18 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                       return security && security._securityStore ? security._securityStore.inRoles(this, roles) : false;
                   }
               };
+              /**
+               * Array of all available security roles
+               * @see sm.nsrv.auth.IUserProvider#getRolesList
+               * @param cb {function(err, roles)}
+               */
+              req.allRoles = function(cb) {
+                  if (security != null && security._userProvider != null) {
+                      security._userProvider.getRolesList(cb);
+                  } else {
+                      cb(null, []);
+                  }
+              };
 
               //Call next() element in chain
               next();

@@ -49,14 +49,14 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
                 });
           },
 
-          getRolesList: function(callback) {
+          getRolesList : function(callback) {
               var env = sm.app.Env.getDefault();
-              var roles = {};
+              var roles = [];
               env.getMongo()
                 .collection(this.__rolesColl)
                 .createQuery()
                 .each(function(index, role) {
-                    roles[role.id] = role;
+                    roles.push(role);
                 })
                 .exec(function(err) {
                     callback(err, roles)
@@ -73,11 +73,11 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
           buildUserData: function(user, callback) {
               var result = {login: user.login};
               var me = this;
-              me.getRolesList(function(err, roles) {
+              me.getRolesList(function(err, allRoles) {
                   if (err) {
                       callback(err, null);
                   } else {
-                      result.roles = me.getUserRoles(roles || {}, user.roles);
+                      result.roles = me.resoleUserRoles(allRoles, user.roles);
                       callback(null, result);
                   }
               });

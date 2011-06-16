@@ -16,7 +16,6 @@ qx.Class.define("sm.cms.users.UserRolesTable", {
 
           __user : null,
 
-
           setUser : function(login) {
               if (login == null) {
                   this._reload([]);
@@ -37,7 +36,21 @@ qx.Class.define("sm.cms.users.UserRolesTable", {
               req.setParameter("ref", user, false);
               req.setParameter("role", roleId, false);
               req.setParameter("active", active, false);
-              req.send();
+              req.send(function(resp) {
+                  var roles = resp.getContent();
+                  var rindex = {};
+                  for (var i = 0; i < roles.length; ++i) {
+                      rindex[roles[i][0]] = roles[i];
+                  }
+                  var tm = this.getTableModel();
+                  var data = tm.getData();
+                  for (var r = 0; r < data.length; ++r) {
+                      var rname = data[r][0];
+                      if (rindex[rname] != null) {
+                          tm.setValue(2, r, rindex[rname][2]);
+                      }
+                  }
+              }, this);
           },
 
           ///////////////////////////////////////////////////////////////////////////
@@ -64,6 +77,15 @@ qx.Class.define("sm.cms.users.UserRolesTable", {
                   this.__saveUserRole(this.__user, role, data.value);
               }, this);
               table.set({statusBarVisible : false});
+
+              var rr = new sm.table.renderer.CustomRowRenderer();
+              rr.setBgColorInterceptor(qx.lang.Function.bind(function(rowInfo) {
+                  if (rowInfo.rowData[3] && rowInfo.rowData[2]) {
+                      return "#FFFF99";
+                  }
+                  return "white";
+              }, this));
+              table.setDataRowRenderer(rr);
               return table;
           },
 

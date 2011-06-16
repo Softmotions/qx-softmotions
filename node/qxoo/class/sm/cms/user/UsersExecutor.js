@@ -5,12 +5,13 @@
 
 qx.Class.define("sm.cms.user.UsersExecutor", {
       extend  : qx.core.Object,
-      include : [sm.nsrv.MExecutor],
+      include : [sm.nsrv.MExecutor, sm.nsrv.auth.MUserProvider, qx.locale.MTranslation],
 
       members :
       {
 
           __select_users : function(req, resp, ctx) {
+
               var me = this;
               var q = this.__build_basic_users_query(req.params);
               var rarr = [];
@@ -115,6 +116,7 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
           },
 
           __update_user_int : function(req, resp, ctx, create) {
+
               var params = req.params;
 
               if (sm.lang.String.isEmpty(params["login"]) ||
@@ -182,9 +184,11 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
                   this.handleError(resp, ctx, "Invalid request");
                   return;
               }
+
               var active = (req.params["active"] == "true");
               var me = this;
               var coll = sm.cms.user.UsersMgr.getColl();
+
               coll.update({"login" : login},
                 (active == true) ? {$addToSet : {"roles" : role}} : {$pull : {"roles" : role}},
                 {upsert: false, safe : true}, function(err, doc) {
@@ -192,12 +196,31 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
                         me.handleError(resp, ctx, err);
                         return;
                     }
+                    me.__select_user_roles_internal(req, {login : login, nodesc : true}, function(err, roles) {
+                        if (err) {
+                            me.handleError(resp, ctx, err);
+                            return;
+                        }
+                        var present = false;
+                        for (var i = 0; i < roles.length; ++i) {
+                            if (roles[i][0] == role) {
+                                present = roles[i][2]; //checked flag
+                                break;
+                            }
+                        }
+                        if (present && !active) { //Tryed to remove role but, other roles force it
+                            var msg = me.tr("Роль %1 не снята с пользователя, поскольку, другие явно назначенные роли предполагают ее наличие.", role);
+                            resp.messages.push(new sm.nsrv.Message(msg));
+                        }
 
-                    me.writeJSONObject({}, resp, ctx);
+                        me.writeJSONObject(roles, resp, ctx);
 
-                    //fire notification events
-                    sm.cms.Events.getInstance()
-                      .fireDataEvent(active ? "userAssignedToRole" : "roleRemovedFromUser", [login, role]);
+                        if (active) {
+                            sm.cms.Events.getInstance().fireDataEvent("userAssignedToRole", [login, role]);
+                        } else if (!active && !present) {
+                            sm.cms.Events.getInstance().fireDataEvent("roleRemovedFromUser", [login, role]);
+                        }
+                    });
                 });
           },
 
@@ -205,39 +228,68 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
            * Response: [roleId {String}, roleName {String}, assigned to user {Boolean}]
            */
           __select_user_roles : function(req, resp, ctx) {
+
               if (!qx.lang.Type.isString(req.params["ref"])) {
                   this.handleError(resp, ctx, "Invalid request");
                   return;
               }
               var me = this;
-              var env = sm.app.Env.getDefault();
-              var sconf = env.getJSONConfig("security");
-              var roles = sconf["roles"] || [];
-
-              var coll = sm.cms.user.UsersMgr.getColl();
-              coll.findOne({login : req.params["ref"]}, function(err, user) {
+              this.__select_user_roles_internal(req, {login : req.params["ref"]}, function(err, roles) {
                   if (err) {
                       me.handleError(resp, ctx, err);
                       return;
                   }
-                  if (!user) {
-                      this.handleError(resp, ctx, "Invalid request");
+                  me.writeJSONObject(roles, resp, ctx);
+              })
+          },
+
+          __select_user_roles_internal : function(req, opts, cb) {
+
+              if (opts["login"] == null) {
+                  cb("Invalid options", null);
+                  return;
+              }
+              var login = opts["login"];
+              var me = this;
+              var coll = sm.cms.user.UsersMgr.getColl();
+              coll.findOne({login : login}, function(err, user) {
+                  if (err) {
+                      cb(err, null);
                       return;
                   }
-                  var uroles = qx.lang.Type.isArray(user.roles) ? user.roles : [];
-                  var res = [];
-                  for (var i = 0; i < roles.length; ++i) {
-                      var rnode = roles[i];
-                      res.push([rnode[0], rnode[1], (uroles.indexOf(rnode[0]) != -1)]);
+                  if (!user) {
+                      cb("No user: " + login, null);
+                      return;
                   }
-                  me.writeJSONObject(res, resp, ctx);
+                  req.allRoles(function(err, allRoles) {
+                      if (err) {
+                          cb(err, null);
+                          return;
+                      }
+                      var res = [];
+                      var implicitRoles = (user.roles != null && user.roles.constructor === Array) ? user.roles : [];
+                      var userRoles = me.resoleUserRoles(allRoles, implicitRoles);
+                      for (var i = 0; i < allRoles.length; ++i) {
+                          var rnode = allRoles[i];
+                          res.push([rnode["id"],
+                              (rnode["desc"] != null && !opts["nodesc"] ? rnode["desc"] : ""),
+                              (userRoles.indexOf(rnode["id"]) != -1),
+                              (implicitRoles.indexOf(rnode["id"]) != -1)]);
+                      }
+                      cb(null, res);
+                  });
               });
           },
 
           __select_roles : function(req, resp, ctx) {
-              var env = sm.app.Env.getDefault();
-              var sconf = env.getJSONConfig("security");
-              this.writeJSONObject(sconf["roles"] || [], resp, ctx);
+              var me = this;
+              req.allRoles(function(err, allRoles) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  me.writeJSONObject(allRoles, resp, ctx);
+              });
           }
       },
 

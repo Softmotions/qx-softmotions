@@ -7,24 +7,52 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
       members:
       {
           /**
-           * "Развязка" зависимостей ролей: построение на основании явно указанных ролей пользователя полного списка его ролей
-           * @param roles описание всех доступных в системе ролей: <code>{'id' : {id: 'id', parent: ['pid'...]} ...}</code>
-           * @param userRoles список явно укзанных ролей пользователя: <code>['roleId'...]</code>
+           * Resolve user roles considering role dependencies.
+           *
+           * @param allRoles {Array} Array of all available roles, in same format as: IUserProvider#getRolesList
+           *        @see sm.nsrv.auth.IUserProvider#getRolesList
+           * @param userRoles {Array} Array of user's roles ID
+           *
+           * @throws Error if invalid argument was passed
            */
-          getUserRoles: function(roles, userRoles) {
-              var result = [];
-
-              var trole;
-              var troleId;
-              var troles = [].concat(userRoles || []);
-              while (troleId = troles.pop()) {
-                  if (trole = roles[troleId]) {
-                      result.push(trole.id);
-                      troles = trole.parent ? troles.concat(trole.parent) : troles;
-                  }
+          resoleUserRoles: function(allRoles, userRoles) {
+              if (allRoles == null || allRoles.constructor !== Array ||
+                userRoles == null || userRoles.constructor !== Array) {
+                  throw new Error("Invalid argruments");
               }
 
-              return result;
+              var collected = {};
+
+              var findRoleById = function(roleId) {
+                  for (var i = 0; i < allRoles.length; ++i) {
+                      if (allRoles[i].id == roleId) {
+                          return allRoles[i];
+                      }
+                  }
+                  return null;
+              };
+
+              var resolveRole = function(role) {
+                  if (role == null) {
+                      return;
+                  }
+                  if (collected[role.id] === undefined) {
+                      collected[role.id] = role;
+                      if (role.parent && role.parent.constructor === Array) {
+                          role.parent.forEach(function(prole) {
+                              if (typeof prole === "string" && prole != role.id) {
+                                  resolveRole(findRoleById(prole));
+                              }
+                          });
+                      }
+                  }
+              };
+
+              for (var i = 0; i < userRoles.length; ++i) {
+                  resolveRole(findRoleById(userRoles[i]));
+              }
+
+              return Object.keys(collected); //Array if ids of resolved roles
           }
       }
   });

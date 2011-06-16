@@ -51,7 +51,14 @@ qx.Interface.define("sm.nsrv.auth.IUserProvider", {
           },
 
           /**
-           * Возвращает список всех ролей в системе.
+           * Array of all available roles:
+           * Role element:
+           * <code>
+           *     id : {String}, //role ID,
+           *     parent : {Array}, //Array of parent role ids
+           *     desc : {String}  //Human readable role description
+           *
+           * </code>
            * @param callback <code>function(error, roles)</code>
            */
           getRolesList: function(callback) {

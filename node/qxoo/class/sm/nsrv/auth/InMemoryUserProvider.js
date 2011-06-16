@@ -10,24 +10,21 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
       include : [sm.nsrv.auth.MUserProvider],
       implement : [sm.nsrv.auth.IUserProvider],
 
-      /**
-       * @param options Опции менеджера пользователей:
-       *  {
-       *      roles: [{id: 'id', parent: ['parentId'...]}...],
-       *      users: [{login:'login', password: 'password', roles: ['roleId'...]}...]
-       *  }
-       *
-       */
+
       construct: function(options) {
           this.base(arguments);
 
           var me = this;
 
           var roles = options.roles || [];
-          this.__roles = {};
-          roles.forEach(function(role) {
-              me.__roles[role.id] = role;
-          });
+          this.__roles = [];
+          for (var i = 0; i < roles.length; ++i) {
+              if (typeof roles[i].parent === "string") {
+                  roles[i].parent = [roles[i].parent];
+              }
+              this.__roles.push(roles[i]);
+          }
+
 
           var users = options.users || [];
           this.__users = {};
@@ -44,7 +41,7 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
           login: function(login, password, callback) {
               var user = login ? this.__users[login] : null;
               if (user && user.password == password) {
-                  callback(null, {login: user.login, roles: this.getUserRoles(this.__roles, user.roles)});
+                  callback(null, {login: user.login, roles: this.resoleUserRoles(this.__roles, user.roles)});
               } else {
                   callback(null, null);
               }
@@ -55,13 +52,12 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
               if (!user) {
                   callback(null, null);
               }
-
-              callback(null,
-                {
-                    login: user.login,
-                    plainPassword: user.password,
-                    user: { login: user.login, roles: this.getUserRoles(this.__roles, user.roles)}
-                });
+              var ai = {
+                  login: user.login,
+                  plainPassword: user.password,
+                  user: { login: user.login, roles: this.resoleUserRoles(this.__roles, user.roles)}
+              };
+              callback(null, ai);
           },
 
           getRolesList: function(callback) {

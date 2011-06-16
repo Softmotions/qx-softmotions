@@ -150,7 +150,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       getUserId : req.getUserId,
                       getUserRoles : req.getUserRoles,
                       isUserHasRoles : req.isUserHasRoles,
-                      isUserInRoles : req.isUserInRoles
+                      isUserInRoles : req.isUserInRoles,
+                      allRoles : req.allRoles
                   };
 
                   if (params) {

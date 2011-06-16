@@ -25,18 +25,18 @@ qx.Class.define("sm.cms.auth.HybridUserProvider", {
 
       members :
       {
-
+          //overriden
           getRolesList: function(callback) {
               var env = sm.app.Env.getDefault();
               var sconf = env.getJSONConfig("security");
-              var roles = {};
+              var roles = [];
               if (sconf["roles"]) {
                   var qxtype = qx.lang.Type;
                   var sroles = sconf["roles"];
                   for (var i = 0; i < sroles.length; ++i) {
                       var r = sroles[i];
                       if (qxtype.isArray(r) && qxtype.isString(r[0])) {
-                          roles[r[0]] = {id : r[0], parent : (qxtype.isArray(r[2]) || null)};
+                          roles.push({id : r[0], parent : qxtype.isArray(r[2]) ? r[2] : null, desc : r[1]});
                       }
                   }
               }
