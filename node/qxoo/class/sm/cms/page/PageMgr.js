@@ -34,6 +34,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
       statics :
       {
+          tr : null, //qx.locale.Manager.tr
+
 
           TYPE_CATEGORY : 0,
 
@@ -58,27 +60,36 @@ qx.Class.define("sm.cms.page.PageMgr", {
           },
 
           rmNode : function(req, nodeId, cb) {
-              //todo check access rights
-              var mongo = this.__getMongo();
-              var coll = this.getColl();
-              coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
+              var me = this;
+              this.getPageAccessMask(req, nodeId, function(err, mask) {
                   if (err) {
                       cb(err);
                       return;
                   }
-                  if (!doc) {
-                      cb("Node not found!");
+                  if (mask.indexOf("d") == -1) {
+                      cb(me.tr("Недостаточно прав доступа для удаления страницы"));
                       return;
                   }
-                  coll.remove(doc, function(err) {
+                  var mongo = me.__getMongo();
+                  var coll = me.getColl();
+                  coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
                       if (err) {
                           cb(err);
                           return;
                       }
-                      var ee = sm.cms.Events.getInstance();
-                      ee.fireDataEvent("pageRemoved", doc);
-
-                      cb(null);
+                      if (!doc) {
+                          cb("Node not found!");
+                          return;
+                      }
+                      coll.remove(doc, function(err) {
+                          if (err) {
+                              cb(err);
+                              return;
+                          }
+                          var ee = sm.cms.Events.getInstance();
+                          ee.fireDataEvent("pageRemoved", doc);
+                          cb(null);
+                      });
                   });
               });
           },
@@ -95,6 +106,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   qx.core.Assert.assertString(node.name);
                   qx.core.Assert.assertNumber(node.type);
               }
+              var me = this;
               var coll = this.getColl();
               var q = this.getChildNodesQuery(parentId);
               q.updateQuery({"name" : node.name});
@@ -104,8 +116,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                       return;
                   }
                   if (doc) {
-                      // todo translate
-                      cb("Страница с именем: '" + node.name + "' уже существует", null);
+                      cb(me.tr("Страница с именем: %1 уже существует", node.name), null);
                       return;
                   }
 
@@ -145,11 +156,21 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param name {String} new node name
            */
           renameNode : function(req, nodeId, name, cb) {
-              //todo check acess rights
-              this._updateNode(nodeId, {
-                    "name": qx.lang.String.trim(name),
-                    "mdate": qx.lang.Date.now()
-                }, cb);
+              var me = this;
+              this.getPageAccessMask(req, nodeId, function(err, mask) {
+                  if (err) {
+                      cb(err);
+                      return;
+                  }
+                  if (mask.indexOf("r") == -1) {
+                      cb(me.tr("Недостаточно прав доступа для изменения имени страницы"));
+                      return;
+                  }
+                  me._updateNode(nodeId, {
+                        "name": qx.lang.String.trim(name),
+                        "mdate": qx.lang.Date.now()
+                    }, cb);
+              });
           },
 
           /**
@@ -159,6 +180,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param node {pagenode} new node specification
            */
           _updateNode : function(nodeId, node, cb) {
+              var me = this;
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
@@ -181,8 +203,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                           return;
                       }
                       if (cand) {
-                          // todo translate
-                          cb("Страница с именем: '" + node.name + "' уже существует", null);
+                          cb(me.tr("Страница с именем: %1 уже существует", node.name));
                           return;
                       }
                       qx.lang.Object.mergeWith(doc, node, true);
@@ -191,7 +212,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                               cb(err);
                               return;
                           }
-                          sm.cms.page.PageMgr.__updateNodeCachedPath(doc, cb);
+                          me.__updateNodeCachedPath(doc, cb);
                       });
                   });
               });
@@ -638,5 +659,9 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   update(node, "");
               }
           }
+      },
+
+      defer : function(statics) {
+          statics.tr = qx.locale.Manager.tr;
       }
   });

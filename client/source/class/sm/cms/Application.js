@@ -260,7 +260,7 @@ qx.Class.define("sm.cms.Application", {
 
               //Разделы сайта
               if (nData.indexOf("pages.") == 0) {
-                  if (node.$$accessMask && node.$$accessMask.indexOf("e") != -1) {
+                  if ((node.$$accessMask && node.$$accessMask.indexOf("e") != -1) || sm.cms.Application.userHasRole("structure.admin")) {
 
                       if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
                           bt = new qx.ui.menu.Button(this.tr("Создать страницу"));
