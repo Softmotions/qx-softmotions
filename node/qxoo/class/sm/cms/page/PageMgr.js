@@ -473,6 +473,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param action {String} Must be either 'edit' or 'news'
            * @param pageId {String} Page ID
            * @param req Request
+           * @param cb {function(err, isAllowed{Boolean})}
            */
           isPageActionAllowed :  function(action, pageId, req, cb) {
               qx.core.Assert.assertInArray(action, ["edit", "news"]);

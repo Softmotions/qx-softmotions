@@ -153,9 +153,11 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
           _loadPageTemplates : function(opts, cb) {
               opts = opts || {};
+
               var tselect = this._grefs["hdr.templates"];
               var tselectItems = tselect._getItems();
               var me = this;
+
               var syncTSelection = function() { //Select appropriate item in templates list
                   var selected = false;
                   for (var i = 0; i < tselectItems.length; ++i) {
@@ -175,34 +177,29 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                       cb();
                   }
               };
-              var refresh = (tselectItems.length == 0); //if true templates list will be reloaded
+
               if (opts["tmplCategory"] != null && opts["tmplCategory"] != this._tmplCategory) {
                   this._tmplCategory = opts["tmplCategory"];
-                  refresh = true;
               } else if (opts["tmplCategory"] == null) { //reset to default
                   this._tmplCategory = this._opts["tmplCategory"];
-                  refresh = true;
               }
-              if (refresh) { //Reload templates
-                  var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
-                  if (this._tmplCategory != null) {
-                      req.setParameter("category", this._tmplCategory, false);
-                  }
-                  req.send(function(resp) {
-                      tselect.removeAll();
-                      tselect.add(new qx.ui.form.ListItem(this.tr("Шаблон не выбран/страница не существует"), null, {}));
-                      var respTemplates = resp.getContent();
-                      if (qx.lang.Type.isArray(respTemplates)) {
-                          for (var i = 0; i < respTemplates.length; ++i) {
-                              tselect.add(new qx.ui.form.ListItem(respTemplates[i]["name"], null, respTemplates[i]));
-                          }
+              var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.templates"), "GET", "application/json");
+              req.setParameter("asm", me._pageInfo["asm"], false);
+              if (this._tmplCategory != null) {
+                  req.setParameter("category", this._tmplCategory, false);
+              }
+              req.send(function(resp) {
+                  tselect.removeAll();
+                  tselect.add(new qx.ui.form.ListItem(this.tr("Шаблон не выбран/страница не существует"), null, {}));
+                  var respTemplates = resp.getContent();
+                  if (qx.lang.Type.isArray(respTemplates)) {
+                      for (var i = 0; i < respTemplates.length; ++i) {
+                          tselect.add(new qx.ui.form.ListItem(respTemplates[i]["name"], null, respTemplates[i]));
                       }
-                      tselectItems = tselect._getItems();
-                      syncTSelection();
-                  }, this);
-              } else {
+                  }
+                  tselectItems = tselect._getItems();
                   syncTSelection();
-              }
+              }, this);
           },
 
 

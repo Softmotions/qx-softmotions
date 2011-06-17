@@ -43,6 +43,22 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               });
           },
 
+
+          /**
+           * Is current user allowed to use assembly with specified id (asmId)
+           *
+           * @param req {Request}
+           * @param asmId {String}
+           * @return true If current user is allowed to use asm with asmId
+           */
+          _isAllowedAsm : function(req, asmId) {
+              if (asmId == "" || asmId == null) {
+                  return req.isUserInRoles(["template:*"]);
+              }
+              return req.isUserInRoles(["template:*", "template:" + asmId]);
+          },
+
+
           /**
            * Response available page templates
            */
@@ -56,7 +72,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               var asms = [];
               for (var an in amap) {
                   var asm = amap[an];
-                  if ((typeof asm["name"]) !== "string" || asm["name"].length == 0) {
+                  if ((typeof asm["name"]) !== "string" || asm["name"].length == 0 ||
+                    !this._isAllowedAsm(req, asm["_name_"])) {
                       continue;
                   }
                   if ((category != null && asm["_category_"] != category) ||
@@ -65,6 +82,26 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   }
                   asms.push(asm);
               }
+
+              var pageAsm = req.params["asm"]; //Add assembly
+              if (pageAsm != null && pageAsm != "") {
+                  var inList = false;
+                  for (var i = 0; i < asms.length; ++i) {
+                      if (asms["_name_"] == pageAsm) {
+                          inList = true;
+                          break;
+                      }
+                  }
+                  if (!inList) {
+                      //Page assembly is not in allowed list, add it manually,
+                      //farther security checks will be during page saving
+                      var asm = amap[pageAsm];
+                      if (asm && typeof asm["name"] === "string" && asm["name"].length > 0) {
+                          asms.push(asm);
+                      }
+                  }
+              }
+
               var c = asms.length;
               if (c == 0) {
                   this.writeJSONObject(res, resp, ctx);
@@ -190,8 +227,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                       if (!res["_editable_"]) { //last chance
                           res["_editable_"] = req.isUserInRoles(["structure.admin"]);
                       }
-                      delete res["access"]; //Always disable access field
-                      delete res["owner"];  //Always disable owner field
+                      delete res["access"]; //Always disable access-map field
 
                       if (doc["asm"] && req.params["_news_"]) { //Want to get news options
                           ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
@@ -290,6 +326,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                       return;
                   }
 
+                  var oldAsm = doc["asm"];
                   doc["published"] = (req.params["published"] == "true");
                   if (qx.lang.Type.isString(req.params["asm"])) {
                       doc["asm"] = req.params["asm"];
@@ -317,6 +354,15 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                 me.tr("У вас недостаточно прав для редактирования страницы"),
                                 false, true);
                               return;
+                          }
+
+                          if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
+                              if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(doc["asm"])) {
+                                  me.handleError(resp, ctx,
+                                    me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
+                                    false, true);
+                                  return;
+                              }
                           }
 
                           me.__setupPageKeywords(doc);
