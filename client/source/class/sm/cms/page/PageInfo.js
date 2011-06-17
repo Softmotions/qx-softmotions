@@ -14,7 +14,13 @@ qx.Class.define("sm.cms.page.PageInfo", {
            * User clicked button to edit page
            * data: [pageId]
            */
-          "editPage" : "qx.event.type.Data"
+          "editPage" : "qx.event.type.Data",
+
+          /**
+           * Loaded page info
+           * data: pageInfo json object
+           */
+          "infoLoaded" : "qx.event.type.Data"
       },
 
       construct : function() {
@@ -96,6 +102,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
                   this._initInfo();
                   this._initPageAccess();
                   this.setEditEnabled(true);
+                  this.fireDataEvent("infoLoaded", this.__pageInfo);
               }, this);
           },
 
@@ -114,7 +121,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
                   status.show();
 
                   grefs["editButton"].setLabel(this.tr("Редактировать"));
-                  if (!pi["_editable_"]) {
+                  if (pi["_amask_"] == null || pi["_amask_"].indexOf("e") == -1) { //Access mask
                       grefs["editButton"].exclude();
                   } else {
                       grefs["editButton"].show();

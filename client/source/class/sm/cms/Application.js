@@ -149,6 +149,16 @@ qx.Class.define("sm.cms.Application", {
               };
 
 
+              var pageInfoHandler = function(ev) {
+                  var pInfo = ev.getData();
+                  if (!pInfo) {
+                      return;
+                  }
+                  //setup editable flag
+                  this.__nav._setSelectedNodesAttrs({"$$accessMask" : pInfo["_amask_"] || ""});
+              };
+
+
               var selectPageHandler = function(ev) {
                   var pid = ev.getData()[0];
                   //Мы на странице.
@@ -206,6 +216,7 @@ qx.Class.define("sm.cms.Application", {
               rStack.registerWidget("pageInfo", function() {
                   var pinfo = new sm.cms.page.PageInfo();
                   pinfo.addListener("editPage", editPageHandler, this);
+                  pinfo.addListener("infoLoaded", pageInfoHandler, this);
                   return pinfo;
               }, null, this);
               rStack.registerWidget("mediaInfo", function() {
@@ -249,7 +260,7 @@ qx.Class.define("sm.cms.Application", {
 
               //Разделы сайта
               if (nData.indexOf("pages.") == 0) {
-                  if (sm.cms.Application.userHasRole("structure.admin")) {
+                  if (node.$$accessMask && node.$$accessMask.indexOf("e") != -1) {
 
                       if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
                           bt = new qx.ui.menu.Button(this.tr("Создать страницу"));

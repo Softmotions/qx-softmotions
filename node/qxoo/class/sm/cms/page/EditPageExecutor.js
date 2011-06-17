@@ -30,9 +30,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               }
 
               var node = sm.cms.page.PageMgr.buildNode(req.params);
-
               var me = this;
-              sm.cms.page.PageMgr.createNodeForParent(parent, node, function(err, doc) {
+              sm.cms.page.PageMgr.createNodeForParent(req.getUserId(), parent, node, function(err, doc) {
                   if (err) {
                       me.handleError(resp, ctx, err);
                       return;
@@ -172,7 +171,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               var pageId = req.params["ref"];
               var me = this;
 
-              var coll = sm.cms.page.PageMgr.getColl();
+              var pmgr = sm.cms.page.PageMgr;
+              var coll = pmgr.getColl();
               var q = {"_id" : coll.toObjectID(pageId)};
               var opts = {};
 
@@ -218,29 +218,27 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   var res = doc ? doc : {};
 
                   var finish = function() {
-                      res["_editable_"] = false;
-                      if (res["owner"] == uid) {
-                          res["_editable_"] = true;
-                      } else if (res["access"] && qx.lang.Type.isArray(res["access"]["edit"])) {
-                          res["_editable_"] = (res["access"]["edit"].indexOf(uid) != -1);
-                      }
-                      if (!res["_editable_"]) { //last chance
-                          res["_editable_"] = req.isUserInRoles(["structure.admin"]);
-                      }
-                      delete res["access"]; //Always disable access-map field
+                      pmgr.getPageAccessMask(req, pageId, function(err, amask) {
+                          if (err) {
+                              me.handleError(resp, ctx, err);
+                              return;
+                          }
+                          res["_amask_"] = amask;
+                          delete res["access"]; //Always disable access-map field
 
-                      if (doc["asm"] && req.params["_news_"]) { //Want to get news options
-                          ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
-                              if (err) {
-                                  me.handleError(resp, ctx, err);
-                                  return;
-                              }
-                              res["_news_"] = asm["_news_"];
+                          if (doc["asm"] && req.params["_news_"]) { //Want to get news options
+                              ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
+                                  if (err) {
+                                      me.handleError(resp, ctx, err);
+                                      return;
+                                  }
+                                  res["_news_"] = asm["_news_"];
+                                  me.writeJSONObject(res, resp, ctx);
+                              });
+                          } else {
                               me.writeJSONObject(res, resp, ctx);
-                          });
-                      } else {
-                          me.writeJSONObject(res, resp, ctx);
-                      }
+                          }
+                      });
                   };
 
                   if (!doc["asm"] || !doc["attrs"]) {
@@ -344,12 +342,12 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
 
                   var errCount = 0;
                   var finish = function() {
-                      pmgr.isPageActionAllowed("edit", doc["_id"], req, function(err, granted) {
+                      pmgr.getPageAccessMask(req, doc["_id"], function(err, mask) {
                           if (err) {
                               me.handleError(resp, ctx, err);
                               return;
                           }
-                          if (!granted) {
+                          if (mask.indexOf("e") == -1) {
                               me.handleError(resp, ctx,
                                 me.tr("У вас недостаточно прав для редактирования страницы"),
                                 false, true);
@@ -357,7 +355,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                           }
 
                           if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
-                              if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(doc["asm"])) {
+                              if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
                                   me.handleError(resp, ctx,
                                     me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
                                     false, true);

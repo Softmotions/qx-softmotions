@@ -20,7 +20,8 @@
  *    media : [fnames],
  *    hierarchy : [nodeIds], // parent nodes ids (with out current node id)
  *    cachedPath : String,
- *    owner : String //Page owner
+ *    creator : String //Page creator user ID
+ *    owner : String //Page owner user ID
  *    category : String //News category, only for news pages
  *    annotation : String //News annotation, only for news pages
  *    access : {     //Access rights
@@ -56,7 +57,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, cb);
           },
 
-          rmNode : function(nodeId, cb) {
+          rmNode : function(req, nodeId, cb) {
+              //todo check access rights
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
@@ -68,7 +70,6 @@ qx.Class.define("sm.cms.page.PageMgr", {
                       cb("Node not found!");
                       return;
                   }
-
                   coll.remove(doc, function(err) {
                       if (err) {
                           cb(err);
@@ -85,10 +86,11 @@ qx.Class.define("sm.cms.page.PageMgr", {
           /**
            * Create new node for specified parent
            *
+           * @param userId {String} userId creates node
            * @param parentId {String} parent node id
-           * @param node {pagenode} node specification
+           * @param node {Map} node specification
            */
-          createNodeForParent : function(parentId, node, cb) {
+          createNodeForParent : function(userId, parentId, node, cb) {
               if (qx.core.Environment.get("app.debug")) {
                   qx.core.Assert.assertString(node.name);
                   qx.core.Assert.assertNumber(node.type);
@@ -112,6 +114,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   var save = function(parent) {
                       doc["cachedPath"] = (parent ? parent["cachedPath"] || "" : "") + "/" + doc["name"];
                       doc["hierarchy"] = parent ? (parent["hierarchy"] ? [].concat(parent["hierarchy"]).concat(parent["_id"]) : [parent["_id"]]) : [];
+                      doc["owner"] = doc["creator"] = userId;
                       coll.save(doc, cb);
                   };
 
@@ -141,13 +144,12 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param nodeId {String} node id
            * @param name {String} new node name
            */
-          renameNode : function(nodeId, name, cb) {
-              sm.cms.page.PageMgr.updateNode(nodeId,
-                {
+          renameNode : function(req, nodeId, name, cb) {
+              //todo check acess rights
+              this._updateNode(nodeId, {
                     "name": qx.lang.String.trim(name),
                     "mdate": qx.lang.Date.now()
-                },
-                cb);
+                }, cb);
           },
 
           /**
@@ -156,7 +158,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param nodeId {String} node id
            * @param node {pagenode} new node specification
            */
-          updateNode : function(nodeId, node, cb) {
+          _updateNode : function(nodeId, node, cb) {
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
@@ -469,64 +471,106 @@ qx.Class.define("sm.cms.page.PageMgr", {
           },
 
           /**
-           * Return true if action is allowed for page document
-           * @param action {String} Must be either 'edit' or 'news'
-           * @param pageId {String} Page ID
-           * @param req Request
-           * @param cb {function(err, isAllowed{Boolean})}
+           * Return page access mask, which is string
+           * every character of it indicates specific access mode.
+           *
+           * Modes:
+           * <ul>
+           *    <li>e - edit page</li>
+           *    <li>n - manage page news</li>
+           *    <li>d - Can drop page</li>
+           *    <li>r - Can rename page</li>
+           * </ul>
+           *
+           *
+           * @param req {Request}
+           * @param pageId {String|ObjectID} Page ID
+           * @param cb {function(err, accessMode)}
            */
-          isPageActionAllowed :  function(action, pageId, req, cb) {
-              qx.core.Assert.assertInArray(action, ["edit", "news"]);
+          getPageAccessMask : function(req, pageId, cb) {
 
+              if (pageId == null) {
+                  cb(null, "");
+                  return;
+              }
+
+              var amodes = [];
               var me = this;
+
+              var pushModes = function() {
+                  for (var i = 0; i < arguments.length; ++i) {
+                      var a = arguments[i];
+                      if (amodes.indexOf(a) == -1) {
+                          amodes.push(a);
+                      }
+                  }
+                  return amodes;
+              };
+
               var checkAccess = function(doc) {
-                  if (req.isUserInRoles(["admin"])) {
-                      cb(null, true);
-                      return;
-                  }
-                  if (action == "edit" && req.isUserInRoles(["structure.admin"])) {
-                      cb(null, true);
-                      return;
-                  }
-                  if (action == "news" && req.isUserInRoles(["news.admin"])) {
-                      cb(null, true);
+                  if (doc == null) {
+                      cb(null, "");
                       return;
                   }
                   var uid = req.getUserId();
+                  if (req.isUserInRoles(["structure.admin"]) || doc["creator"] == uid) {
+                      cb(null, pushModes("e", "n", "d", "r").join(""));
+                      return;
+                  }
+                  if (req.isUserInRoles(["news.admin"])) {
+                      pushModes("n");
+                  }
                   if (doc["owner"] == uid) {
-                      cb(null, true);
-                      return;
+                      pushModes("e", "n");
                   }
+
                   var access = doc["access"] || {};
-                  var alist = access[action] || [];
-                  if (alist.indexOf(uid) != -1) {
-                      cb(null, true);
-                      return;
+                  var alist = access["edit"];
+                  if (alist != null && alist.indexOf(uid) != -1) {
+                      pushModes("e");
+                  }
+                  alist = access["news"];
+                  if (alist != null && alist.indexOf(uid) != -1) {
+                      pushModes("n");
                   }
 
-                  //if we want to edit news page
-                  if (action == "edit" && doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"]) {
+                  //Check news page
+                  if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] &&
+                    (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
+
+                      if (req.isUserInRoles(["news.admin"])) { //if we news admin
+                          cb(null, pushModes("e", "d", "r").join(""));
+                          return;
+                      }
                       var ref = doc["refpage"];
-                      me.isPageActionAllowed("news", ref.oid, req, cb);
-                      return;
-                  }
+                      me.getPageAccessMask(req, ref.oid, function(err, pmodes) {
+                          if (err) {
+                              cb(err, "");
+                          }
+                          if (pmodes.indexOf("n") != -1) {
+                              pushModes("e", "d", "r");
+                          }
+                          cb(null, amodes.join(""));
+                      });
 
-                  cb(null, false);
+                  } else {
+                      cb(null, amodes.join(""));
+                  }
               };
 
 
               var coll = this.getColl();
               coll.findOne({_id : coll.toObjectID(pageId)},
-                {fields : {"owner" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
+                {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
                 function(err, doc) {
                     if (err) {
-                        cb(err, false);
+                        cb(err, "");
                         return;
                     }
                     checkAccess(doc);
                 });
-
           },
+
 
 
           ///////////////////////////////////////////////////////////////////////////
@@ -538,7 +582,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
            *
            * @param node {String} modified node
            */
-          __updateNodeCachedPath: function(node, cb) {
+          __updateNodeCachedPath : function(node, cb) {
               var mongo = this.__getMongo();
               var coll = this.getColl();
 

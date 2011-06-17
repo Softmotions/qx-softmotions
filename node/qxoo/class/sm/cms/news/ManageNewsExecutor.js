@@ -22,12 +22,12 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
               }
               var me = this;
               var nmgr = sm.cms.page.PageMgr;
-              nmgr.isPageActionAllowed("news", req.params["refpage"], req, function(err, granted) {
+              nmgr.getPageAccessMask(req, req.params["refpage"], function(err, mask) {
                   if (err) {
                       me.handleError(resp, ctx, err);
                       return;
                   }
-                  if (!granted) {
+                  if (mask.indexOf("n") == -1) { //Create news
                       me.handleError(resp, ctx,
                         me.tr("У вас недостаточно прав для создания новостей в данном разделе"),
                         false, true);
@@ -153,12 +153,12 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
                       qx.lang.Array.remove(roots, root);
                       finish();
                   } else if (action == "add") {
-                      pmgr.isPageActionAllowed("news", root, req, function(err, granted) {
+                      pmgr.getPageAccessMask(req, root, function(err, mask) {
                           if (err) {
                               me.handleError(resp, ctx, err);
                               return;
                           }
-                          if (!granted) {
+                          if (mask.indexOf("n") == -1) {
                               me.handleError(resp, ctx,
                                 me.tr("У вас недостаточно прав для управления новостями в данном разделе"),
                                 false, true);

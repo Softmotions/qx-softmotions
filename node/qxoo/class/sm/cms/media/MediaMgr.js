@@ -101,7 +101,7 @@ qx.Class.define("sm.cms.media.MediaMgr", {
            * Remove node.
            * Fired event sm.cms.Events#mediaRemoved
            */
-          rmNode : function(nodeId, cb) {
+          rmNode : function(req, nodeId, cb) {
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
@@ -126,10 +126,13 @@ qx.Class.define("sm.cms.media.MediaMgr", {
           },
 
           /**
-           * Create new node.
-           * Fired event sm.cms.Events#mediaAdded
+           * Create new media node for specified parent
+           *
+           * @param userId {String} userId creates node
+           * @param parentId {String} parent node id
+           * @param node {Map} node specification
            */
-          createNodeForParent : function(parentId, node, cb) {
+          createNodeForParent : function(userId, parentId, node, cb) {
               if (qx.core.Environment.get("app.debug")) {
                   qx.core.Assert.assertString(node.name);
                   qx.core.Assert.assertNumber(node.type);
@@ -166,20 +169,18 @@ qx.Class.define("sm.cms.media.MediaMgr", {
           /**
            * Rename node
            */
-          renameNode : function(nodeId, name, cb) {
-              sm.cms.media.MediaMgr.updateNode(nodeId,
-                {
+          renameNode : function(req, nodeId, name, cb) {
+              this._updateNode(nodeId, {
                     "name": qx.lang.String.trim(name),
                     "mdate": qx.lang.Date.now()
-                },
-                cb);
+                }, cb);
           },
 
           /**
            * Update node item.
            * Fired event sm.cms.Events#mediaUpdated
            */
-          updateNode : function(nodeId, node, cb) {
+          _updateNode : function(nodeId, node, cb) {
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {

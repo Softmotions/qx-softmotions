@@ -165,7 +165,7 @@ qx.Class.define("sm.cms.media.EditMediaExecutor", {
                       me.handleError(resp, ctx, err);
                       return;
                   }
-                  sm.cms.media.MediaMgr.rmNode(ref, function(err) {
+                  sm.cms.media.MediaMgr.rmNode(req, ref, function(err) {
                       if (err) {
                           me.handleError(resp, ctx, err);
                           return;

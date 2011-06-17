@@ -260,6 +260,18 @@ qx.Class.define("sm.cms.nav.NavResources", {
               }
           },
 
+          _setSelectedNodesAttrs : function(attrs, overwrite) {
+              if (attrs == null || typeof attrs != "object") {
+                  return null;
+              }
+              var snodes = this.__navTree.getSelectedNodes();
+              for (var i = 0; i < snodes.length; ++i) {
+                  var node = snodes[i];
+                  qx.lang.Object.mergeWith(node, attrs, !!overwrite);
+              }
+              this.__navTree.getDataModel().setData();
+          },
+
           /**
            * Update node state (label and icon)
            * @param nnode Navigation node
@@ -271,8 +283,8 @@ qx.Class.define("sm.cms.nav.NavResources", {
                   var node = resp.getContent();
                   nnode.label = node.label;
                   if (node.cont) {
-                      nnode.icon = node.asm != null ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
-                      nnode.iconSelected = node.asm != null ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
+                      nnode.icon = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
+                      nnode.iconSelected = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
                   }
                   this.__navTree.getDataModel().setData();
               }, this);

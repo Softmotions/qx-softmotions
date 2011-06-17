@@ -142,7 +142,7 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
 
               var node = (category.mgr).buildCategoryNode(req.params);
               var me = this;
-              (category.mgr).createNodeForParent(parent, node, function(err, doc) {
+              (category.mgr).createNodeForParent(req.getUserId(), parent, node, function(err, doc) {
                   if (err) {
                       me.handleError(resp, ctx, err);
                       return;
@@ -172,15 +172,13 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
               }
               ref = ref.substring(category.path.length + 1);//+ dot symbol
 
-              (category.mgr).renameNode(ref,
-                req.params["name"],
-                function(err, status) {
-                    if (err) {
-                        me.handleError(resp, ctx, err);
-                        return;
-                    }
-                    me.writeJSONObject({}, resp, ctx);
-                });
+              (category.mgr).renameNode(req, ref, req.params["name"], function(err, status) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  me.writeJSONObject({}, resp, ctx);
+              });
           },
 
           /**
@@ -197,7 +195,7 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
                   throw new sm.nsrv.Message("Invalid request", true);
               }
               ref = ref.substring(category.path.length + 1);//+ dot symbol
-              (category.mgr).rmNode(ref, function(err) {
+              (category.mgr).rmNode(req, ref, function(err) {
                   if (err) {
                       me.handleError(resp, ctx, err);
                       return;
