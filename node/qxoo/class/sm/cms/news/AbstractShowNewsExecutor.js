@@ -8,6 +8,12 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
       include : [sm.nsrv.MExecutor, qx.locale.MTranslation],
       type : "abstract",
 
+      statics :
+      {
+          ARCH_PAGE_SIZE : 20
+      },
+
+
       members :
       {
 
@@ -95,11 +101,11 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
               }
 
               pageIndex = Math.max(1, pageIndex || 1);
-              pageSize = Math.max(0, pageSize || nsu.NewsExecutor.ARCH_PAGE_SIZE);
+              pageSize = Math.max(0, pageSize || this.self(arguments).ARCH_PAGE_SIZE);
 
               var pages = {
                   pageSize: pageSize,
-                  upageSize: pageSize != nsu.NewsExecutor.ARCH_PAGE_SIZE,
+                  upageSize: pageSize != this.self(arguments).ARCH_PAGE_SIZE,
                   prevPage: pageSize > 0 && pageIndex > 1 ? pageIndex - 1 : null,
                   prevPages: [],
                   pageIndex: pageIndex,
