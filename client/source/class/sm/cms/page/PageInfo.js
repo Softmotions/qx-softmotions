@@ -140,9 +140,10 @@ qx.Class.define("sm.cms.page.PageInfo", {
               var pi = this.__pageInfo;
               var at = this.__accessTable;
               var apps = sm.cms.Application.APP_STATE;
+              var uid = apps.getUserId();
 
               if (pi["asm"] == null ||
-                (apps.getUserId() != pi["owner"] && !apps.userInRoles(["structure.admin", "users.admin"]))) {
+                (uid != pi["owner"] && uid != pi["creator"] && !apps.userInRoles(["structure.admin", "users.admin"]))) {
                   at.hide();
                   return;
               }

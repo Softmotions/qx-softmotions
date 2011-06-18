@@ -64,6 +64,10 @@ qx.Class.define("sm.cms.Application", {
               sm.cms.Application.INSTANCE.__components[name] = component;
           },
 
+          getUserId : function() {
+              return sm.cms.Application.APP_STATE.getUserId();
+          },
+
           userHasRole : function(role) {
               return sm.cms.Application.APP_STATE.userHasRole(role);
           },

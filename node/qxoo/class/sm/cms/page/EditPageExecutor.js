@@ -554,7 +554,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
 
               var coll = sm.cms.page.PageMgr.getColl();
 
-              coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, access : 1}},
+              coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, creator : 1, access : 1}},
                 function(err, doc) {
 
                     if (err) {
@@ -567,9 +567,19 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     }
 
                     var userRefs = {};
-                    if (doc["owner"]) {
+                    if (doc["owner"] != null) {
                         userRefs[doc["owner"]] = ["owner"];
                     }
+
+                    if (doc["creator"] != null) {
+                        var creator = doc["creator"];
+                        if (userRefs[creator]) {
+                            userRefs[creator].push("creator");
+                        } else {
+                            userRefs[creator] = ["creator"];
+                        }
+                    }
+
                     if (doc["access"]) {
                         var access = doc["access"];
                         for (var k in access) {
@@ -626,7 +636,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               var me = this;
               var coll = sm.cms.page.PageMgr.getColl();
 
-              coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, access : 1}},
+              coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, creator : 1, access : 1}},
                 function(err, doc) {
                     if (err) {
                         me.handleError(resp, ctx, err);
@@ -638,9 +648,9 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     }
                     //check access rights
                     var userId = req.getUserId();
-                    if ((doc.owner != userId || role == "owner") && !req.isUserInRoles(["users.admin", "structure.admin"])) {
-                        qx.log.Logger.warn(this, "__page_update_acl()", "User denied", userId);
-                        resp.sendForbidden();
+
+                    if ((doc.creator != userId) && !req.isUserInRoles(["users.admin", "structure.admin"])) {
+                        me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для смены владельца страницы"), false, true);
                         return;
                     }
 

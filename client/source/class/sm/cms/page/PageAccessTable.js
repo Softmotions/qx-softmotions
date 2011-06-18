@@ -39,14 +39,24 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                   this.__aclTable.stopEditing();
               }
 
+              var uid = sm.cms.Application.getUserId();
+              var creator = null;
+
               this.__pageRef = ref;
-              var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.acl", "ref", ref), "GET", "application/json");
+
+              var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.acl", "ref", ref),
+                "GET", "application/json");
 
               req.addListener("finished", function(ev) {
                   var err = ev.getData();
                   if (err) { //If error, cleanup
                       this.__ownerBt.setValue("");
                       this._reload([]);
+                  }
+                  if (uid == creator || sm.cms.Application.userInRoles(["structure.admin"])) {
+                      this.__ownerBt.setEnabled(true);
+                  } else {
+                      this.__ownerBt.setEnabled(false);
                   }
               }, this);
 
@@ -72,9 +82,15 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                       if (roles.indexOf("owner") != -1) {
                           this.__ownerBt.setValue(user["login"] + " | " + user["name"]);
                           this.__ownerBt.setUserData(user);
-                          if (roles.length == 1) { //only owner flag presented, skipping
-                              continue;
-                          }
+                      }
+                      if (roles.indexOf("creator") != -1) {
+                          creator = user["login"];
+                      }
+
+                      //Process edit & news
+                      if (roles.indexOf("edit") == -1 && roles.indexOf("new") == -1) {
+                          //no edit/news flags, skipping
+                          continue;
                       }
                       // todo rolenames hardcoded
                       var rowSpec = [
