@@ -33,6 +33,7 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
                 function(err, user) {
                     if (err || user == null || user["disabled"] == true) {
                         callback(err, null);
+                        return;
                     }
                     me.buildUserData(user, callback);
                 });
