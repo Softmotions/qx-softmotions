@@ -114,7 +114,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                   items : []
               };
 
-              // 3 previos pages
+              // 3 previous pages
               for (var i = Math.max(1, pageIndex - 3); i < pageIndex; ++i) {
                   pages.prevPages.push(i);
               }
