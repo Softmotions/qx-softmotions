@@ -80,7 +80,7 @@ qx.Class.define("sm.nsrv.NKServer", {
           /**
            * Server startup
            */
-          startup : function(port, host) {
+          startup : function(port, host, filters) {
               if (this.__server) {
                   try {
                       this.__server.close();
@@ -112,10 +112,17 @@ qx.Class.define("sm.nsrv.NKServer", {
                   };
               };
               var chandlers = [];
+
+              //Processing custom filters
+              if (filters != null && filters.constructor === Array) {
+                  for (var i = 0; i < filters.length; ++i) {
+                      chandlers.push(filters[i]);
+                  }
+              }
               var vengines = qx.lang.Object.getValues(this.__vengines);
               for (var i = 0; i < vengines.length; ++i) {
                   var ve = vengines[i];
-                  chandlers[i] = vhost(ve.getVHostName(), ve.createConnectServer());
+                  chandlers.push(vhost(ve.getVHostName(), ve.createConnectServer()));
               }
               this.__server = new connect.HTTPServer(chandlers);
               this.__server.listen(port, host);
