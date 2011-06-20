@@ -6,31 +6,26 @@
 qx.Class.define("sm.cms.page.AbstractPagesSearchExecutor", {
       extend  : qx.core.Object,
       include : [sm.nsrv.MExecutor],
-
-      statics :
-      {
-          ARCH_PAGE_SIZE : 10
-      },
+      type : "abstract",
 
       members :
       {
 
-          __page_search : function(req, resp, ctx) {
-
-              qx.log.Logger.info("params=" + qx.util.Json.stringify(req.params));
+          _page_search : function(req, resp, ctx, defaultPageSize) {
 
               var me = this;
               var pmgr = sm.cms.page.PageMgr;
 
               var pageIndex = req.params["pageIndex"];
               var pageSize = req.params["pageSize"];
+              var type = req.params["type"];
 
               pageIndex = Math.max(1, pageIndex || 1);
-              pageSize = Math.max(0, pageSize || this.self(arguments).ARCH_PAGE_SIZE);
+              pageSize = Math.max(0, pageSize || defaultPageSize);
 
               var pages = {
                   pageSize: pageSize,
-                  upageSize: pageSize != this.self(arguments).ARCH_PAGE_SIZE,
+                  upageSize: pageSize != defaultPageSize,
                   prevPage: pageSize > 0 && pageIndex > 1 ? pageIndex - 1 : null,
                   prevPages: [],
                   pageIndex: pageIndex,
@@ -44,13 +39,16 @@ qx.Class.define("sm.cms.page.AbstractPagesSearchExecutor", {
                   pages.prevPages.push(i);
               }
 
-
-              //todo type
-
               var qspec = {
                   published : true,
                   stext : req.params.stext
               };
+              if (type == "pages") {
+                  qspec.type = [pmgr.TYPE_PAGE, pmgr.TYPE_CATEGORY];
+              } else if (type == "news") {
+                  qspec.type = pmgr.TYPE_NEWS_PAGE;
+              }
+
 
               var pageOpts = {};
               if (pageSize != 0) {
@@ -117,14 +115,6 @@ qx.Class.define("sm.cms.page.AbstractPagesSearchExecutor", {
                         finish();
                     });
               });
-          }
-      },
-
-      handlers :
-      {
-          "res/page/pages_search.jz" : {
-              webapp : "exp",
-              handler : "__page_search"
           }
       }
   });

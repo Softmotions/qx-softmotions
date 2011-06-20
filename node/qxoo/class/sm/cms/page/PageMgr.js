@@ -314,7 +314,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
           /**
            * params:
            * <code>
-           *   type :
+           *   type {String|Number|Array}:
            *   refpage :
            *
            *   stext :
@@ -351,9 +351,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
               };
 
               var type = (typeof qspec["type"] === "string") ? parseInt(qspec["type"]) : qspec["type"];
-              if (!isNaN(type)) {
-                  qp["type"] = type;
+              if (type != null) {
+                  if (type.constructor === Array && type.length > 0) {
+                      qp["type"] = {"$in" : type};
+                  } else if (!isNaN(type)) {
+                      qp["type"] = type;
+                  }
               }
+
               if (qspec["refpage"] != null) {
                   qp["refpage"] = coll.toDBRef(qspec["refpage"]);
               }
