@@ -552,6 +552,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   path = '/' + path;
               }
               path = req.info.webapp["docRoot"] + path;
+              this.__mergeTemplate(path, req, res, ctx);
+          },
+
+
+          __mergeTemplate : function(path, req, res, ctx, tmDelegate) {
+
               var ext = this.__path.extname(path);
               if (ext && ext != "") {
                   ext = ext.substring(1);
@@ -599,15 +605,19 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
               }
 
-              var me = this;
-              tengine.createTemplate(path, function(err, template) {
-                  if (err) {
-                      qx.log.Logger.error(me, "Failed template, path: " + path, err);
-                      res.sendError();
-                      return;
-                  }
-                  tengine.mergeTemplate(me, template, req, res, ctx, headers);
-              });
+              if (tmDelegate != null && typeof tmDelegate === "function") {
+                  tmDelegate(tengine, headers);
+              } else {
+                  var me = this;
+                  tengine.createTemplate(path, function(err, template) {
+                      if (err) {
+                          qx.log.Logger.error(me, "Failed template, path: " + path, err);
+                          res.sendError();
+                          return;
+                      }
+                      tengine.mergeTemplate(me, template, req, res, ctx, headers);
+                  });
+              }
           },
 
           /**
@@ -635,8 +645,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   ctx.collectMessageHeaders();
                   me.__renderTemplate(req, res, ctx, forward);
               };
-
               ctx._vhost_engine_ = this;
+              req._ctx_ = ctx;
 
               /**
                * Stores messages into response headers
@@ -783,6 +793,46 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           },
 
           /**
+           * Handle response status code. Write to response data by specified path.
+           */
+          __handleResponseSCode : function(req, res, scode, headers, data) {
+              var me = this;
+              var path;
+              var webapp = req.info.webapp;
+              if (req.internal || data != null || !webapp || !webapp.statusPages || !(path = webapp.statusPages["" + scode])) {
+                  if (headers["Content-Type"] == null) {
+                      headers["Content-Type"] = "text/plain";
+                  }
+                  res.writeHead(scode, headers);
+                  res.end(typeof data === "string" ? data : "");
+                  return;
+              }
+
+              //Response with specified status page
+              if (path.length > 0 && path.charAt(0) != '/') {
+                  path = '/' + path;
+              }
+              path = webapp["docRoot"] + path;
+              var ctx = req._ctx_ || {};
+              this.__mergeTemplate(path, req, res, ctx, function(tengine, mheaders) {
+                  qx.lang.Object.carefullyMergeWith(mheaders, headers);
+                  tengine.createTemplate(path, function(err, template) {
+                      if (err || template["notfound"]) {
+                          qx.log.Logger.error(me, "Failed status code page: " + path, err || "");
+                          if (mheaders["Content-Type"] == null) {
+                              mheaders["Content-Type"] = "text/plain";
+                          }
+                          res.writeHead(scode, mheaders);
+                          res.end("");
+                          return;
+                      }
+                      res.statusCode = scode;
+                      tengine.mergeTemplate(me, template, req, res, ctx, mheaders);
+                  });
+              });
+          },
+
+          /**
            * Initiate request
            */
           __initRequestHandler : function(req, res, next) {
@@ -795,9 +845,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
               res.sendSCode = function(scode, headers, data) {
                   headers = headers || {};
-                  qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": "text/plain" });
-                  res.writeHead(scode, headers);
-                  res.end((typeof(data) === "string") ? data : "");
+                  me.__handleResponseSCode(req, res, scode, headers, data);
               };
               res.sendNotFound = function(headers, data) {
                   res.sendSCode(404, headers, data);
@@ -811,6 +859,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               res.sendOk = function(headers, data) {
                   res.sendSCode(200, headers, data);
               };
+              if (res.outerResponse == null) {
+                  res.outerResponse = function() {
+                      return res;
+                  };
+              }
               res._implicitHeader = function() {// TODO: for session compatibility
               };
 

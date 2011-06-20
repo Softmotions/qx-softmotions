@@ -151,7 +151,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       getUserRoles : req.getUserRoles,
                       isUserHasRoles : req.isUserHasRoles,
                       isUserInRoles : req.isUserInRoles,
-                      allRoles : req.allRoles
+                      allRoles : req.allRoles,
+                      _ctx_ : req._ctx_
                   };
 
                   if (params) {
@@ -179,6 +180,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       __data : [],
 
                       __end : false,
+
+                      outerResponse : res.outerResponse,
 
                       writeContinue : function() {
                           throw new Error("Unsupported opreation: writeContinue()");
