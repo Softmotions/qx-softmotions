@@ -121,14 +121,16 @@ qx.Class.define("sm.cms.media.EditMediaExecutor", {
 
                   var node = sm.cms.media.MediaMgr.buildNode(fmeta);
 
-                  sm.cms.media.MediaMgr.createNodeForParent(parentId == "root" ? undefined : parentId, node, function(err, doc) {
-                      if (err) {
-                          cb(err);
-                          return;
-                      }
-                      fmeta["gfname"] = "media" + doc["_id"];
-                      writeMF(fmeta, cb);
-                  });
+                  sm.cms.media.MediaMgr.createNodeForParent(req.getUserId(),
+                    parentId == "root" ? undefined : parentId,
+                    node, function(err, doc) {
+                        if (err) {
+                            cb(err);
+                            return;
+                        }
+                        fmeta["gfname"] = "media" + doc["_id"];
+                        writeMF(fmeta, cb);
+                    });
               };
 
               //Perform async save for each file
