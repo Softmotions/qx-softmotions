@@ -11,10 +11,10 @@ qx.Class.define("sm.cms.editor.NewsCatsEditor", {
       extend : sm.cms.editor.TagsField,
 
       construct : function(options) {
-          if (!options["maxCount"] === undefined) {
+          if (!options["maxCount"] == null) {
               options["maxCount"] = 20;
           }
-          if (options["maxLength"] === undefined) {
+          if (options["maxLength"] == null) {
               options["maxLength"] = 20;
           }
           this.base(arguments, options);
