@@ -61,11 +61,11 @@ qx.Class.define("sm.cms.editor.TagsField", {
               var me = this;
               return function(value, formItem) {
                   if (value.length > me._maxCount) {
-                      throw new qx.core.ValidationError("Validation Error", me.tr("Первышенно максимальное количество элементов 1%", me._maxCount));
+                      throw new qx.core.ValidationError("Validation Error", me.tr("Первышенно максимальное количество элементов %1", me._maxCount));
                   }
                   for (var i = 0; i < value.length; ++i) {
                       if (value[i].length > me._maxLength) {
-                          throw new qx.core.ValidationError("Validation Error", me.tr("Первышенна максимальная длина элемента 1% ", me._maxLength));
+                          throw new qx.core.ValidationError("Validation Error", me.tr("Первышенна максимальная длина элемента %1 ", me._maxLength));
                       }
                   }
                   return true;
