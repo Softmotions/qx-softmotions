@@ -48,10 +48,10 @@ qx.Class.define("sm.nsrv.HTTPUtils", {
               if (!scode) {
                   scode = 200;
               }
-              if (!resp.headers) {
+              if (resp.headers == null) {
                   resp.headers = {};
               }
-              if (headers) {
+              if (headers != null) {
                   qx.lang.Object.mergeWith(resp.headers, headers);
               }
               resp.writeHead(scode, resp.headers);

@@ -555,6 +555,26 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               this.__mergeTemplate(path, req, res, ctx);
           },
 
+          __applyConfigHeaders : function(req, headers) {
+              if (req.info != null && req.info.webapp != null && req.info.webapp["headers"] != null) {
+                  // /Apply custom headers by pattern matching
+                  var cheaders = req.info.webapp["headers"];
+                  for (var hk in cheaders) {
+                      var hspec = cheaders[hk];
+                      if (hspec.$$re === undefined) {
+                          hspec.$$re = new RegExp(hk);
+                      }
+                      if (hspec.$$re.test(req.info.path)) {
+                          for (var hname in hspec) {
+                              if (hname == "$$re" || headers[hname] != null) {
+                                  continue;
+                              }
+                              headers[hname] = hspec[hname];
+                          }
+                      }
+                  }
+              }
+          },
 
           __mergeTemplate : function(path, req, res, ctx, tmDelegate) {
 
@@ -579,25 +599,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
 
               //template engine headers
-              var headers = qx.lang.Object.clone(res.headers);
-              qx.lang.Object.carefullyMergeWith(headers, { "Content-Type": ctype });
-
-              if (req.info.webapp["headers"] != null) { //Apply custom headers by pattern matching
-                  var cheaders = req.info.webapp["headers"];
-                  for (var hk in cheaders) {
-                      var hspec = cheaders[hk];
-                      if (hspec.$$re === undefined) {
-                          hspec.$$re = new RegExp(hk);
-                      }
-                      if (hspec.$$re.test(req.info.path)) {
-                          for (var hname in hspec) {
-                              if (hname == "$$re" || headers[hname] != null) {
-                                  continue;
-                              }
-                              headers[hname] = hspec[hname];
-                          }
-                      }
-                  }
+              var headers = res.headers || {};
+              if (headers["Content-Type"] == null) {
+                  headers["Content-Type"] = ctype;
               }
 
               //write template
@@ -625,6 +629,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
            */
           __handleReq : function(req, res, next) {
 
+              var me = this;
+
               //trying to find handlers
               var hconf = this.__handlers[req.info.pathname];
               if (!hconf) { //try to find regexp handler
@@ -637,7 +643,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                       }
                   }
               }
-              var me = this;
+
               var ctx = function(forward) {
                   if (forward && forward["terminated"] == true) {
                       return; //response must be managed by executor
@@ -645,6 +651,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   ctx.collectMessageHeaders();
                   me.__renderTemplate(req, res, ctx, forward);
               };
+
               ctx._vhost_engine_ = this;
               req._ctx_ = ctx;
 
@@ -653,7 +660,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                * Return true if found message errors
                */
               ctx.collectMessageHeaders = function(ignoreScode) {
-                  var errC = me.__messageHeaders(res);
+                  var errC = me.__messageHeaders(req, res);
                   if (errC > 0 && !ignoreScode) {
                       //todo review status code
                       res.statusCode = 500;
@@ -662,6 +669,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                       return false;
                   }
               };
+
+
               if (req.$$ctxParams) {
                   for (var k in req.$$ctxParams) {
                       if (ctx[k] === undefined) {
@@ -728,7 +737,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           /**
            * Flush message headers into response
            */
-          __messageHeaders : function(res) {
+          __messageHeaders : function(req, res) {
 
               //skip saving message headers in internal responses
               if (res.internal === true || !qx.lang.Type.isArray(res.messages)) {
@@ -737,6 +746,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               if (!res.headers) {
                   res.headers = {};
               }
+
+              this.__applyConfigHeaders(req, res.headers);
+
               var errC = 0;  //Error messages count
               var nerrC = 0; //Not error messages count
               for (var i = 0; i < res.messages.length; ++i) {
@@ -780,7 +792,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
               var headers = { "Content-Type": "text/plain" };
               if (errOpts["messagesInHeaders"]) {
-                  errC = this.__messageHeaders(res); //Collect message headers
+                  errC = this.__messageHeaders(req, res); //Collect message headers
               }
               if (res.headers) {
                   qx.lang.Object.mergeWith(headers, res.headers);
