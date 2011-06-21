@@ -415,7 +415,7 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
           __insTree : function() {
               var val = [];
               val.push("");
-              val.push("<tree>");
+              val.push("<tree open=\"true\">");
               val.push("- Корень");
               val.push("-- Потомок 1");
               val.push("--- Потомок третьего уровня");
