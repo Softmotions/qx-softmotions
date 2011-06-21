@@ -70,9 +70,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
                       cb(me.tr("Недостаточно прав доступа для удаления страницы"));
                       return;
                   }
-                  var mongo = me.__getMongo();
                   var coll = me.getColl();
-                  coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
+                  coll.findOne({"_id" : coll.toObjectID(nodeId)}, function(err, doc) {
                       if (err) {
                           cb(err);
                           return;
@@ -81,14 +80,24 @@ qx.Class.define("sm.cms.page.PageMgr", {
                           cb("Node not found!");
                           return;
                       }
-                      coll.remove(doc, function(err) {
+                      coll.count({"parent" : coll.toDBRef(nodeId)}, function(err, count) {
                           if (err) {
                               cb(err);
                               return;
                           }
-                          var ee = sm.cms.Events.getInstance();
-                          ee.fireDataEvent("pageRemoved", doc);
-                          cb(null);
+                          if (count > 0) {
+                              cb(me.tr("У данного раздела есть подстраницы, пожалуйста удалите сначала их"));
+                              return;
+                          }
+                          coll.remove({"_id" : coll.toObjectID(nodeId)}, function(err) {
+                              if (err) {
+                                  cb(err);
+                                  return;
+                              }
+                              var ee = sm.cms.Events.getInstance();
+                              ee.fireDataEvent("pageRemoved", doc);
+                              cb(null);
+                          });
                       });
                   });
               });

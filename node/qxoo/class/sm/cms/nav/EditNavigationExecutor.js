@@ -174,7 +174,7 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
 
               (category.mgr).renameNode(req, ref, req.params["name"], function(err, status) {
                   if (err) {
-                      me.handleError(resp, ctx, err);
+                      me.handleError(resp, ctx, err, false, true);
                       return;
                   }
                   me.writeJSONObject({}, resp, ctx);
@@ -197,7 +197,7 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
               ref = ref.substring(category.path.length + 1);//+ dot symbol
               (category.mgr).rmNode(req, ref, function(err) {
                   if (err) {
-                      me.handleError(resp, ctx, err);
+                      me.handleError(resp, ctx, err, false, true);
                       return;
                   }
                   me.writeJSONObject({}, resp, ctx);
