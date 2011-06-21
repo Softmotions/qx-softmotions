@@ -88,7 +88,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                       }
 
                       //Process edit & news
-                      if (roles.indexOf("edit") == -1 && roles.indexOf("new") == -1) {
+                      if (roles.indexOf("edit") == -1 && roles.indexOf("news") == -1) {
                           //no edit/news flags, skipping
                           continue;
                       }
