@@ -78,12 +78,12 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                   }
                   var proto = refspec.substring(0, colInd).toLowerCase();
                   if (["http", "https", "ftp"].indexOf(proto) == -1) {
-                      this.handleError(resp, ctx, "Invalid protocol: " + proto);
+                      this.handleError(resp, ctx, "Invalid protocol: " + proto, false, true);
                       return;
                   }
                   var nlocation = proto + refspec.substring(colInd);
                   //send redirect
-                  this.writeHead(resp, ctx, 301, {"Location" : nlocation});
+                  this.writeHead(resp, ctx, 301, {"Location" : decodeURIComponent(nlocation)});
                   resp.end();
                   ctx({"terminated" : true});
 
