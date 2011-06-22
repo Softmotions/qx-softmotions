@@ -21,31 +21,13 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                   sm.cms.tags.TagsMgr.updateStatistic(doc.attrs.tags["value"], doc.tags);
               }
 
-              //todo !!!!! nsu site specific code !!!!
-
               //If main page saved
               var isMain = (doc.attrs._main_page_ != null) && (doc.attrs._main_page_.value == true);
               if (isMain) {
                   var conf = env.getConfig();
                   conf["main_page"] = doc["_id"].toString();
-                  qx.log.Logger.warn("Setting site main page to: " + conf["main_page"]);
+                  qx.log.Logger.warn(this, "Setting site main page to: " + conf["main_page"]);
                   env.setConfig(conf);
-
-                  // store main page navigation to config as a default navigation data
-                  var nconf = env.getJSONConfig("navigation") || {};
-                  if (doc.attrs.nav_bar != null) {
-                      nconf["nav_bar"] = (doc.attrs.nav_bar.ctx || {}).items || [];
-                      qx.log.Logger.warn("Setting default nav_bar to: " + qx.util.Json.stringify(nconf["nav_bar"]));
-                  }
-                  if (doc.attrs.headlinks != null) {
-                      nconf["headlinks"] = doc.attrs.headlinks.ctx || [];
-                      qx.log.Logger.warn("Setting default headlinks to: " + qx.util.Json.stringify(nconf["headlinks"]));
-                  }
-                  env.setJSONConfig("navigation", nconf);
-
-                  var misc = env.getJSONConfig("misc");
-                  misc.main_style = (doc.attrs.style != null && doc.attrs.style.value != null ? doc.attrs.style.value : null);
-                  env.setJSONConfig("misc", misc);
 
                   // flush _main_page_ flag for all other "main" pages
                   var ncoll = sm.cms.page.PageMgr.getColl();
@@ -53,11 +35,10 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                     {$set : {"attrs._main_page_.value" : false}},
                     function(err, doc) {
                         if (err) {
-                            qx.log.Logger.error("sm.cms.handlers.SavePageHandler", err);
+                            qx.log.Logger.error(this, "sm.cms.handlers.SavePageHandler", err);
                         }
                     });
               }
-
           },
 
           removePage : function(ev) {
@@ -72,7 +53,7 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
 
       defer : function(statics) {
           var ee = sm.cms.Events.getInstance();
-          ee.addListener("pageSaved", statics.savePage);
-          ee.addListener("pageRemoved", statics.removePage);
+          ee.addListener("pageSaved", statics.savePage, sm.cms.handlers.SavePageHandler);
+          ee.addListener("pageRemoved", statics.removePage, sm.cms.handlers.SavePageHandler);
       }
   });

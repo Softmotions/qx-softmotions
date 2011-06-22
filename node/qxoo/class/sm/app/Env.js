@@ -140,7 +140,7 @@ qx.Class.define("sm.app.Env", {
 
 
           /**
-           * Return instnce of JSON config.
+           * Return instance of JSON config.
            * Caller must use {@link #setJSONConfig} to save modifications and
            * notify observers
            * @param name Name of config

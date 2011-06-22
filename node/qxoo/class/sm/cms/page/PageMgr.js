@@ -8,7 +8,8 @@
  * MongoDB model Item
  *
  * navItem : {
- *    parent : dbref
+ *    parent : dbref,
+ *    refpage : dbref, //Referenced page for news pages
  *    name : String,
  *    mdate : Date,
  *    published : Boolean
