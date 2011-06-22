@@ -810,7 +810,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
           __handleResponseSCode : function(req, res, scode, headers, data) {
               var me = this;
               var path;
-              var webapp = req.info.webapp;
+              var webapp = req.info ? req.info.webapp : null;
               if (req.internal || data != null || !webapp || !webapp.statusPages || !(path = webapp.statusPages["" + scode])) {
                   if (headers["Content-Type"] == null) {
                       headers["Content-Type"] = "text/plain";
