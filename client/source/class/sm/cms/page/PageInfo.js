@@ -161,7 +161,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
               if (this.__pageInfo != null) {
                   var pp = sm.cms.Application.ACT.getUrl("page.preview");
                   qx.bom.Window.open(pp + this.__pageInfo["_id"],
-                    this.tr("Предпросмотр").toString() + " " + this.__pageInfo["name"],
+                    "Preview",
                     {}, false, false);
               }
           },

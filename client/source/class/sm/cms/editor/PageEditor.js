@@ -71,11 +71,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
               var data = ev.getData();
               var arr = ev.getTarget();
               if (arr && arr.length > 0 && (data.type == "order")) {
-                  try {
-                      this._showInTemplate(arr.getItem(0));
-                  } catch(e) {
-                      qx.log.Logger.error(this, "Failed to create page editor", e);
-                  }
+                  this._showInTemplate(arr.getItem(0));
               }
           }, this);
           hcont.add(el, {flex : 1});
@@ -349,7 +345,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
               this.__savePage(function() {
                   var pp = sm.cms.Application.ACT.getUrl("page.preview");
                   qx.bom.Window.open(pp + this._pageInfo["_id"],
-                    this.tr("Предпросмотр").toString() + " " + this._pageInfo["name"],
+                    "Preview",
                     {}, false, false);
                   this.fireDataEvent("pageSaved", true); //preview flag
               }, this);

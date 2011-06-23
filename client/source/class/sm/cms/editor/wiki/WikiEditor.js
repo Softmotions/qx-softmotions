@@ -61,10 +61,40 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
           this.base(arguments);
           this._setLayout(new qx.ui.layout.VBox(4));
           var ta = this.__ensureChildren();
+
+          //todo scary textselection hacks
+          if (qx.core.Environment.get("engine.name") == "mshtml") {
+              var getCaret = function(el) {
+                  if (el == null) {
+                      return 0;
+                  }
+                  var start = 0;
+                  var range = el.createTextRange();
+                  var range2 = document.selection.createRange().duplicate();
+                  // get the opaque string
+                  var range2Bookmark = range2.getBookmark();
+                  range.moveToBookmark(range2Bookmark);
+                  while (range.moveStart("character", -1) !== 0) {
+                      start++
+                  }
+                  return start;
+              };
+              var syncSel = function() {
+                  var tael = ta.getContentElement().getDomElement();
+                  this.__lastSStart = this.__lastSEnd = getCaret(tael);
+              };
+              ta.addListener("keyup", syncSel, this);
+              ta.addListener("focus", syncSel, this);
+              ta.addListener("click", syncSel, this);
+          }
       },
 
       members :
       {
+
+          __lastSStart : 0,
+
+          __lastSEnd : 0,
 
 
           __ensureChildren : function() {
@@ -181,13 +211,23 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
               this.__insAdd(val.join("\n"));
           },
 
+          _getSelectionStart : function() {
+              var sStart = this.__getTextArea().getTextSelectionStart();
+              return (sStart == null || sStart == -1 || sStart == 0) ? this.__lastSStart : sStart;
+          },
+
+          _getSelectionEnd : function() {
+              var sEnd = this.__getTextArea().getTextSelectionEnd();
+              return (sEnd == null || sEnd == -1 || sEnd == 0) ? this.__lastSEnd : sEnd;
+          },
+
           __insAdd : function(text) {
               var ta = this.__getTextArea();
               var tel = ta.getContentElement();
               var scrollY = tel.getScrollY();
 
-              var sStart = tel.getTextSelectionStart();
-              var sEnd = tel.getTextSelectionEnd();
+              var sStart = this._getSelectionStart();
+              var sEnd = this._getSelectionEnd();
 
               var nval = [];
               var value = ta.getValue();
@@ -208,11 +248,11 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
               var tel = ta.getContentElement();
               var scrollY = tel.getScrollY();
 
-              var sStart = tel.getTextSelectionStart();
-              var sEnd = tel.getTextSelectionEnd();
-              var sText = tel.getTextSelection();
+              var sStart = this._getSelectionStart();
+              var sEnd = this._getSelectionEnd();
+              var sText = (sStart != sEnd) ? tel.getTextSelection() : null;
 
-              var text = ptVal ? ((sText != null && sText.length > 0) ? sText : prompt(ptVal, sText)) : "";
+              var text = ptVal ? ((sText != null && sText.length > 0) ? sText : prompt(ptVal, "")) : "";
               if (text == null) {
                   return;
               }
@@ -247,8 +287,8 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
           __insPageRef : function() {
               var ta = this.__getTextArea();
               var tel = ta.getContentElement();
-              var sStart = tel.getTextSelectionStart();
-              var sEnd = tel.getTextSelectionEnd();
+              var sStart = this._getSelectionStart();
+              var sEnd = this._getSelectionEnd();
               var value = ta.getValue();
               if (value == null) value = "";
               var scrollY = tel.getScrollY();
@@ -282,8 +322,8 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
           __insTable : function() {
               var ta = this.__getTextArea();
               var tel = ta.getContentElement();
-              var sStart = tel.getTextSelectionStart();
-              var sEnd = tel.getTextSelectionEnd();
+              var sStart = this._getSelectionStart();
+              var sEnd = this._getSelectionEnd();
               var value = ta.getValue();
               if (value == null) value = "";
               var scrollY = tel.getScrollY();
@@ -346,8 +386,8 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
           __insAttachment : function() {
               var ta = this.__getTextArea();
               var tel = ta.getContentElement();
-              var sStart = tel.getTextSelectionStart();
-              var sEnd = tel.getTextSelectionEnd();
+              var sStart = this._getSelectionStart();
+              var sEnd = this._getSelectionEnd();
               var value = ta.getValue();
               if (value == null) value = "";
               var scrollY = tel.getScrollY();

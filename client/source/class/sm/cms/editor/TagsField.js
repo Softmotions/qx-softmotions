@@ -48,7 +48,7 @@ qx.Class.define("sm.cms.editor.TagsField", {
               var result = [];
               var items = value.split(/[,;]/);
               for (var i = 0; i < items.length; ++i) {
-                  var item = items[i].trim();
+                  var item = qx.lang.String.trim(items[i]);
                   if (item != "" && !cache[item]) {
                       result.push(item);
                       cache[item] = true;

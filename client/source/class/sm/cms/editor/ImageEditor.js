@@ -221,7 +221,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                   }
                   if (dim) {
                       var hdim = (dim == "width") ? this.tr("ширина") : this.tr("высота");
-                      var rest = ctr.substring(dim.length).trim();
+                      var rest =  qx.lang.String.trim(ctr.substring(dim.length));
                       var op = rest.charAt(0);
                       var val = parseInt(rest.substring(1));
                       if (isNaN(val)) {

@@ -96,19 +96,21 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
           form.add(ps, this.tr("Корневая страница"));
 
 
+          var cancel = new qx.ui.form.Button("Отменить");
           var ok = new qx.ui.form.Button("Создать");
           ok.addListener("execute", function() {
               if (!form.validate()) {
                   return;
               }
+              ok.setEnabled(false);
+              cancel.setEnabled(false);
               this.fireDataEvent("completed", [title.getValue(), pid])
           }, this);
 
-          var cancel = new qx.ui.form.Button("Отменить");
+
           cancel.addListener("execute", function() {
               this.close();
           }, this);
-
           form.addButton(ok);
           form.addButton(cancel);
 
