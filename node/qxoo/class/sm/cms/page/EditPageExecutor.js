@@ -86,7 +86,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
               if (pageAsm != null && pageAsm != "") {
                   var inList = false;
                   for (var i = 0; i < asms.length; ++i) {
-                      if (asms["_name_"] == pageAsm) {
+                      if (asms[i]["_name_"] == pageAsm) {
                           inList = true;
                           break;
                       }
