@@ -7,7 +7,6 @@ qx.Class.define("sm.cms.editor.TextFieldEditor", {
       extend : qx.ui.form.TextField,
 
       construct : function(options) {
-          qx.log.Logger.info("opts=" + qx.util.Json.stringify(options));
           this.base(arguments);
           if (options["maxLength"] != null) {
               this.setMaxLength(options["maxLength"]);
@@ -18,7 +17,6 @@ qx.Class.define("sm.cms.editor.TextFieldEditor", {
           if (options["minimalLineHeight"] != null) {
               this.setMinimalLineHeight(options["minimalLineHeight"]);
           }
-          qx.log.Logger.info("getML=" + this.getMaxLength());
       },
 
       members :
