@@ -80,6 +80,7 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                   var proto = refspec.substring(0, colInd).toLowerCase();
                   if (["http", "https", "ftp"].indexOf(proto) == -1) {
                       this.handleError(resp, ctx, "Invalid protocol: " + proto, false, true);
+                      qx.log.Logger.warn(this, "Invalid protocol: " + proto);
                       return;
                   }
                   var nlocation = proto + refspec.substring(colInd);
