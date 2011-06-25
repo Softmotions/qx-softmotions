@@ -217,6 +217,10 @@ qx.Class.define("sm.cms.media.MediaMgr", {
               });
           },
 
+          getChildNodesQueryForNav : function(parentId) {
+              return this.getChildNodesQuery(parentId);
+          },
+
           /**
            * Prepare query for fetch child nodes
            */

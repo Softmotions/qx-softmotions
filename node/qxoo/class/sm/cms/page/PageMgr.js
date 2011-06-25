@@ -301,6 +301,13 @@ qx.Class.define("sm.cms.page.PageMgr", {
           ///////////////////////////////////////////////////////////////////////////
 
 
+          getChildNodesQueryForNav : function(parentId) {
+              var q = this.getChildNodesQuery(parentId);
+              q.updateOptions({"fields" : {"name" : 1, "asm" : 1, "parent" : 1, "published" : 1, "type" : 1, "mdate" : 1}});
+              return q;
+          },
+
+
           /**
            * Returns query for fetch child node with specified parent
            *

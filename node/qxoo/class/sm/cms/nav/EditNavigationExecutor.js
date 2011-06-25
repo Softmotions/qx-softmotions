@@ -76,7 +76,6 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
            */
           __node : function(req, resp, ctx) {
               var me = this;
-              var cats = this.self(arguments).CATEGORIES;
               if (!qx.lang.Type.isString(req.params["ref"])) {
                   throw new sm.nsrv.Message("Invalid request", true);
               }
@@ -105,16 +104,17 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
               var res = [];
               var me = this;
 
-              if (category.mgr.getChildNodesQuery) {
-                  var q = category.mgr.getChildNodesQuery(pageId == "root" ? null : pageId);
+              var mgr = category.mgr;
+              if (mgr.getChildNodesQueryForNav) {
+                  var q = mgr.getChildNodesQueryForNav(pageId == "root" ? null : pageId);
                   q.each(
                     function(index, doc) {
-                        res.push(category.mgr.buildNavItem(category.path, doc));
+                        res.push(mgr.buildNavItem(category.path, doc));
                     }).exec(function() {
                         me.writeJSONObject(res, resp, ctx);
                     });
-              } else if (category.mgr.getChildNavItems) {
-                  me.writeJSONObject(category.mgr.getChildNavItems(category.path, pageId), resp, ctx);
+              } else if (mgr.getChildNavItems) {
+                  me.writeJSONObject(mgr.getChildNavItems(category.path, pageId), resp, ctx);
               } else {
                   me.writeJSONObject(res, resp, ctx);
               }
