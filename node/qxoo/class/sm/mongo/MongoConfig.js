@@ -95,7 +95,8 @@ qx.Class.define("sm.mongo.MongoConfig", {
                 mcfg["db_port"],
                 {
                     native_parser : !!mcfg["native_parser"],
-                    poolSize : mcfg["poolSize"]
+                    poolSize : mcfg["poolSize"],
+                    auto_reconnect : !!mcfg["auto_reconnect"]
                 });
               this.__mongo.open(
                 function(err) {
