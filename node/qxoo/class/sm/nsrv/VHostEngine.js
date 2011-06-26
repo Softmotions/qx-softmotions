@@ -878,7 +878,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
               res._implicitHeader = function() {// TODO: for session compatibility
               };
-
               if (qx.core.Environment.get("sm.nsrv.access-control-allow") == true) {
                   var hset = {"Access-Control-Allow-Origin" : "*"};
                   var rh = req.headers["access-control-request-headers"];
@@ -901,6 +900,21 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               var info = req.info = this.__url.parse(req.url);
               if (~info.pathname.indexOf("..")) { //Simple security checking
                   return res.sendForbidden(res);
+              }
+
+              if (!res.internal) { //Cleanup memory
+                  var oldEnd = res.end;
+                  res.end = function(data, enc) {
+                      oldEnd.apply(res, arguments);
+                      if (req._ctx_) {
+                          for (var rk in req._ctx_) {
+                              delete req._ctx_[rk];
+                          }
+                      }
+                      for (var rk in req) {
+                          delete req[rk];
+                      }
+                  };
               }
 
               var wapps = this.__config["webapps"];
