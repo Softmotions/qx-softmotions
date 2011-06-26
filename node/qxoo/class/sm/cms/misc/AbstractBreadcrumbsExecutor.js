@@ -110,7 +110,7 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
                   published : !!news_root,
                   name : page["category"] ? page["category"] : "",
                   link : news_root || "",
-                  date : page["mdate"] ? df.format(new Date(parseInt(page["mdate"]))) : null
+                  date : page["cdate"] ? df.format(new Date(parseInt(page["cdate"]))) : null
               };
 
               if (news_root) {
