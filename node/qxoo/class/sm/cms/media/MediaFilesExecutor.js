@@ -73,6 +73,9 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
 
                   var colInd = refspec.indexOf("://");
                   if (colInd == -1) {
+                      colInd = refspec.indexOf(":/");
+                  }
+                  if (colInd == -1) {
                       this.handleError(resp, ctx, "Invalid request", false, true);
                       qx.log.Logger.warn(this, "Invalid refspec: " + refspec);
                       return;
