@@ -188,18 +188,18 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       },
 
                       writeHead : function(scode, headers) {
-                          ires.statusCode = scode;
+                          this.statusCode = scode;
                           if (headers) {
-                              qx.lang.Object.mergeWith(ires.headers, headers);
+                              qx.lang.Object.mergeWith(this.headers, headers);
                           }
                       },
 
                       setHeader : function(hn, hv) {
-                          ires.headers[hn] = hv;
+                          this.headers[hn] = hv;
                       },
 
                       getHeader : function(hn) {
-                          var ret = ires.headers[hn];
+                          var ret = this.headers[hn];
                           if (ret == null) {
                               ret = res.getHeader(hn);
                           }
@@ -207,8 +207,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       },
 
                       removeHeader : function(hn) {
-                          if (ires.headers[hn] != undefined) {
-                              delete ires.headers[hn];
+                          if (this.headers[hn] != undefined) {
+                              delete this.headers[hn];
                           }
                       },
 
@@ -218,36 +218,49 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                       write : function(chunk, encoding) {
                           //todo encoding ignored, assumed utf8
-                          ires.__data.push(chunk.toString());
+                          this.__data.push(chunk.toString());
                       },
 
                       end : function(chunk, encoding) {
-                          if (ires.__end) { //End already called
+                          if (this.__end) { //End already called
                               qx.log.Logger.warn(me, "resp.end() called twice!");
                               return;
                           }
-                          ires.__end = true;
+                          this.__end = true;
                           if (chunk != null && chunk != undefined) {
-                              ires.write(chunk, encoding);
+                              this.write(chunk, encoding);
                           }
 
-                          for (var i = 0; i < ires.messages.length; ++i) {
-                              var msg = ires.messages[i];
-                              if (ires.statusCode != 500 && msg.isError()) {
-                                  ires.statusCode = 500; //Mark as err
+                          for (var i = 0; i < this.messages.length; ++i) {
+                              var msg = this.messages[i];
+                              if (this.statusCode != 500 && msg.isError()) {
+                                  this.statusCode = 500; //Mark as err
                               }
                               res.messages.push(msg);
                           }
-                          if (ires.statusCode != 200) {
+                          if (this.statusCode != 200) {
                               qx.log.Logger.warn(me, "_irequest_() statusCode is not OK: " + ires.statusCode +
                                 ", path: " + ireq.url);
                           }
 
                           cbc = true;
-                          if (ires.__data.length > 0) {
-                              cb(null, ires.__data.join(""));
-                          } else {
-                              cb(null, "");
+                          try {
+                              if (this.__data.length > 0) {
+                                  cb(null, this.__data.join(""));
+                              } else {
+                                  cb(null, "");
+                              }
+                          } finally {
+                              //cleanup proxy response refs
+                              delete this["__data;"];
+                              delete this["headers"];
+                              delete this["messages"];
+                              delete this["outerResponse"];
+
+                              //cleanup proxy request refs
+                              for (var k in ireq) {
+                                  delete ireq[k];
+                              }
                           }
                       }
                   };
