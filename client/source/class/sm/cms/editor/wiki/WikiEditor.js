@@ -289,12 +289,13 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
               var tel = ta.getContentElement();
               var sStart = this._getSelectionStart();
               var sEnd = this._getSelectionEnd();
+              var sText = (sStart != sEnd) ? tel.getTextSelection() : null;
               var value = ta.getValue();
               if (value == null) value = "";
               var scrollY = tel.getScrollY();
 
 
-              var dlg = new sm.cms.page.PageLinkDlg({allowOuterLinks : true});
+              var dlg = new sm.cms.page.PageLinkDlg({allowOuterLinks : true, linkText : sText});
 
               var pageSelected = function(ev) {
                   var sp = ev.getData();

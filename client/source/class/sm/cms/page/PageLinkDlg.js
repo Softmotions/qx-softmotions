@@ -41,7 +41,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
 
       construct : function(options) {
           this.base(arguments, this.tr("Ссылка на страницу"), null);
-          options = options || {};
+          this.__options = options = options || {};
           this.setLayout(new qx.ui.layout.VBox(5));
           this.set({
                 modal         : true,
@@ -70,6 +70,9 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
 
           if (options["includeLinkName"] == null || options["includeLinkName"] == true) {
               var lname = new qx.ui.form.TextField().set({required : options["requireLinkName"] === undefined ? true : !!options["requireLinkName"]});
+              if (options.linkText != null && options.linkText != "") {
+                  lname.setValue(options.linkText);
+              }
               form.add(lname, this.tr("Текст ссылки"));
           }
 
@@ -116,16 +119,17 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
           this.add(footer);
 
           this.__navCont.addListener("selectPage", function(ev) {
+              var opts = this.__options;
               var data = ev.getData();
               if (!data[2]) { //no asm for page
                   ok.setEnabled(false);
-                  if (lname) {
+                  if (lname && (opts.linkText == null || opts.linkText == "")) {
                       lname.setValue("");
                   }
                   this.__currentPage = null;
                   return;
               }
-              if (lname) {
+              if (lname && (opts.linkText == null || opts.linkText == "")) {
                   var label = data[1].label;
                   lname.setValue(label);
               }
@@ -135,8 +139,9 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
           }, this);
 
           this.__navCont.addListener("selectOther", function(ev) {
+              var opts = this.__options;
               ok.setEnabled(false);
-              if (lname) {
+              if (lname && (opts.linkText == null || opts.linkText == "")) {
                   lname.setValue("");
               }
               this.__currentPage = null;
@@ -156,6 +161,8 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
 
           __closeCmd : null,
 
+          __options : null,
+
           open : function() {
               this.base(arguments);
               this.__navCont.init(this.getEnsureOpened());
@@ -165,7 +172,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
               if (this.__closeCmd) {
                   this.__closeCmd.setEnabled(false);
               }
-              this.__currentPage = this.__currentPageNode = null;
+              this.__currentPage = this.__currentPageNode = this.__options = null;
               this._disposeObjects("__closeCmd", "__navCont");
           },
 
