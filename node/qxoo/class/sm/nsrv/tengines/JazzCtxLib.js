@@ -133,11 +133,14 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                   //Internal request proxy
                   var ireq = {
+
+                      internal : true,
                       url : url,
                       method : "GET",
                       headers : req.headers,
                       httpVersion : "1.0",
                       params : {},
+                      form : req.form,
                       outerParams : req.outerParams,
                       stripParams : req.stripParams,
                       //session & cookies
@@ -171,16 +174,12 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                   //Internal response proxy
                   var ires = {
 
+                      internal : true,
                       statusCode : 200,
-
                       headers : {},
-
                       messages : [],
-
                       __data : [],
-
                       __end : false,
-
                       outerResponse : res.outerResponse,
 
                       writeContinue : function() {

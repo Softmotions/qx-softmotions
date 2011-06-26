@@ -998,7 +998,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   if (qs) {
                       qx.lang.Object.mergeWith(req.params, this.__querystring.parse(qs), false);
                   }
-                  if (isFormRequest) {
+                  if (isFormRequest && !req.internal) { //disable for internal requests
                       var form = req.form = new this.__formidable.IncomingForm();
                       var fopts = this.__config["formdiableOptions"];
                       if (fopts) {

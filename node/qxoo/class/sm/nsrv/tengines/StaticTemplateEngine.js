@@ -67,6 +67,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
                     "Content-Type": template["ctype"]
                 });
               if (template["notfound"]) {
+                  headers["Content-Type"] = "text/plain";
                   res.sendNotFound(headers);
                   return;
               }
@@ -78,7 +79,7 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
               });
               this.__io.responseHTTPump(rs, res, function(err) {
                   if (err) {
-                      qx.log.Logger.error(me, "File pumping error: " + template["path"], err);
+                      qx.log.Logger.warn(me, "File pumping error: " + template["path"], err);
                   }
               });
           }

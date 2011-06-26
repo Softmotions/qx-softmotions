@@ -200,6 +200,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
           mergeTemplate : function(vhe, template, req, res, ctx, headers) {
               this.mergeTemplateInternal(vhe, template, req, res, ctx, headers, function(nf, err, data) {
                   if (nf) { //Notfound
+                      headers["Content-Type"] = "text/plain";
                       res.sendNotFound(headers);
                       return;
                   }
