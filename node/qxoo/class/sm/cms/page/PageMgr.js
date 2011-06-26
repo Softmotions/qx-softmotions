@@ -9,9 +9,10 @@
  *
  * navItem : {
  *    parent : dbref,
- *    refpage : dbref, //Referenced page for news pages
- *    name : String,
- *    mdate : Date,
+ *    refpage : dbref,      //Referenced page for news pages
+ *    name : String,        //Page name
+ *    mdate : Date,         //Page modification time
+ *    cdate : Date,         //Page creation time
  *    published : Boolean
  *    type : int [0 - category, 1 - page, 2 - news page]
  *    asm  : String, name of assembly on which page based
@@ -19,13 +20,13 @@
  *    attrs : {},
  *    extra : {},
  *    media : [fnames],
- *    hierarchy : [nodeIds], // parent nodes ids (with out current node id)
+ *    hierarchy : [nodeIds], //parent nodes ids (with out current node id)
  *    cachedPath : String,
- *    creator : String //Page creator user ID
- *    owner : String //Page owner user ID
- *    category : String //News category, only for news pages
- *    annotation : String //News annotation, only for news pages
- *    access : {     //Access rights
+ *    creator : String       //Page creator user ID
+ *    owner : String         //Page owner user ID
+ *    category : String      //News category, only for news pages
+ *    annotation : String    //News annotation, only for news pages
+ *    access : {             //Access rights
  *       <mode name> : [users]
  *    }
  * }
@@ -136,6 +137,9 @@ qx.Class.define("sm.cms.page.PageMgr", {
                       doc["cachedPath"] = (parent ? parent["cachedPath"] || "" : "") + "/" + doc["name"];
                       doc["hierarchy"] = parent ? (parent["hierarchy"] ? [].concat(parent["hierarchy"]).concat(parent["_id"]) : [parent["_id"]]) : [];
                       doc["owner"] = doc["creator"] = userId;
+                      if (doc["cdate"] == null) {
+                          doc["cdate"] = doc["mdate"];
+                      }
                       coll.save(doc, cb);
                   };
 
@@ -206,7 +210,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   var updateCache = doc["name"] != node["name"];
                   // пытаемся найти в текущем разделе ноду с новым именем. если её нет - сохраняем
                   var q = sm.cms.page.PageMgr.getChildNodesQuery(doc["parent"] ? mongo.toObjectID(doc["parent"]["oid"]) : null);
-                  q.updateQuery({"name": node["name"], "_id": {"$ne": mongo.toObjectID(doc["_id"])}});
+                  q.updateQuery({"name" : node["name"], "_id" : {"$ne": mongo.toObjectID(doc["_id"])}});
                   coll.findOne(q.getQuery(), function(err, cand) {
                       if (err) {
                           cb(err, null);
@@ -217,6 +221,9 @@ qx.Class.define("sm.cms.page.PageMgr", {
                           return;
                       }
                       qx.lang.Object.mergeWith(doc, node, true);
+                      if (doc["cdate"] == null) {
+                          doc["cdate"] = doc["mdate"];
+                      }
                       coll.save(doc, !updateCache ? cb : function(err) {
                           if (err) {
                               cb(err);
@@ -264,10 +271,12 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * Build specification for category node
            */
           buildCategoryNode : function(params) {
+              var now = qx.lang.Date.now();
               return {
                   "name" : qx.lang.String.trim(params["name"]),
                   "type" : this.TYPE_CATEGORY,
-                  "mdate" : qx.lang.Date.now()
+                  "mdate" : now,
+                  "cdate" : now
               };
           },
 
@@ -275,10 +284,12 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * Build specification for page node
            */
           buildNode : function(params) {
+              var now = qx.lang.Date.now();
               return {
                   "name" : qx.lang.String.trim(params["name"]),
                   "type" : this.TYPE_PAGE,
-                  "mdate" : qx.lang.Date.now()
+                  "mdate" : now,
+                  "cdate" : now
               };
           },
 
@@ -287,11 +298,13 @@ qx.Class.define("sm.cms.page.PageMgr", {
            */
           buildNewsNode : function(params) {
               var coll = this.getColl();
+              var now = qx.lang.Date.now();
               return {
                   "name" : qx.lang.String.trim(params["name"]),
                   "refpage" : coll.toDBRef(params["refpage"]),
                   "type" : this.TYPE_NEWS_PAGE,
-                  "mdate" : qx.lang.Date.now()
+                  "mdate" : now,
+                  "cdate" : now
               };
           },
 
@@ -663,8 +676,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
               // search for parent (getting parent cached path)
               if (node["parent"]) {
-                  coll.findOne({"_id": mongo.toObjectID(node["parent"]["oid"])},
-                    {"fields":{"cachedPath": 1}},
+                  coll.findOne({"_id" : mongo.toObjectID(node["parent"]["oid"])},
+                    {"fields" : {"cachedPath": 1}},
                     function(err, parent) {
                         if (err) {
                             cb(err);

@@ -35,6 +35,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                         "category" : 1,
                         "annotation" : 1,
                         "mdate" : 1,
+                        "cdate" : 1,
                         "attrs.image" : 1
                     });
               } catch(err) {
@@ -45,12 +46,18 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
               if (options["queryOpts"]) {
                   q.updateOptions(options["queryOpts"]);
               }
+
               var df = sm.cms.util.DateTimeHelper.DDMMYYYY_FMT;
               var me = this;
               var res = [];
               q.each(
                 function(index, doc) {
-                    doc["mdate"] = df.format(new Date(parseInt(doc["mdate"])));
+                    if (doc["mdate"] != null) {
+                        doc["mdate"] = df.format(new Date(parseInt(doc["mdate"])));
+                    }
+                    if (doc["cdate"] != null) {
+                        doc["cdate"] = df.format(new Date(parseInt(doc["cdate"])));
+                    }
                     res.push(doc);
                 }).exec(function(err) {
                     if (err) {
@@ -76,6 +83,9 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
               this._fetch_news_list(req, resp, ctx,
                 {"refpage" : page["_id"],
                     "queryOpts" : {
+                        "sort" : [
+                            ["cdate" , -1]
+                        ],
                         "limit" : limit != null ? limit : 8
                     }});
           },
@@ -149,6 +159,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                         "category" : 1,
                         "annotation" : 1,
                         "mdate" : 1,
+                        "cdate" : 1,
                         "attrs.image" : 1,
                         "refpage" : 1
                     });
@@ -164,6 +175,13 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                       if (p.mdate != null) {
                           try {
                               p.mdate = df.format(new Date(parseInt(p.mdate)));
+                          } catch(e) {
+                              qx.log.Logger.error(this, e);
+                          }
+                      }
+                      if (p.cdate != null) {
+                          try {
+                              p.cdate = df.format(new Date(parseInt(p.cdate)));
                           } catch(e) {
                               qx.log.Logger.error(this, e);
                           }
