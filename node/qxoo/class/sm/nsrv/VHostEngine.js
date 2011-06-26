@@ -1032,7 +1032,28 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               var conf = this.__config;
 
               var cookieParser = connect.cookieParser();
-              var session = connect.session({secret: (conf["sessionSecret"] || "5bb1097b24bd420a82ef4e916e864a48")});
+
+              //Session staff
+              var sessOpts = {secret: "5bb1097b24bd420a82ef4e916e864a48"};
+              if (conf["session"]) {
+                  qx.lang.Object.mergeWith(sessOpts, conf["session"]);
+              }
+              var ignoreSessFor = qx.lang.Type.isArray(sessOpts["ignore"]) ? sessOpts["ignore"] : [];
+              var connectSession = connect.session(sessOpts);
+              var session = function(req, res, next) {
+                  if (req.internal === true) {
+                      next();
+                      return;
+                  }
+                  for (var i = 0; i < ignoreSessFor.length; ++i) {
+                      if (req.info.pathname.indexOf(ignoreSessFor[i]) == 0) {
+                          next();
+                          return;
+                      }
+                  }
+                  connectSession(req, res, next);
+              };
+              //EOF session staff
 
               this.__server = connect.createServer(
                 function (req, res, next) {
@@ -1043,15 +1064,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 },
                 function (req, res, next) {
-                    if (req.internal === true) {
-                        next()
-                    } else {
-                        session(req, res, next);
-                    }
-                },
-                function (req, res, next) {
                     me.__initRequestHandler(req, res, next);
                 },
+                session
+                ,
                 function (req, res, next) {
                     me.__populateRequestParams(req, res, next);
                 },
