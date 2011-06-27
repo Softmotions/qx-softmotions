@@ -155,8 +155,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       getUserRoles : req.getUserRoles,
                       isUserHasRoles : req.isUserHasRoles,
                       isUserInRoles : req.isUserInRoles,
-                      allRoles : req.allRoles,
-                      _ctx_ : req._ctx_
+                      allRoles : req.allRoles
                   };
 
                   if (params) {
@@ -257,8 +256,12 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               delete this["messages"];
                               delete this["outerResponse"];
 
-                              //cleanup proxy request refs
-                              for (var k in ireq) {
+                              if (ireq._ctx_) { //prune associated context
+                                  for (var rk in ireq._ctx_) {
+                                      delete ireq._ctx_[rk];
+                                  }
+                              }
+                              for (var k in ireq) { //prune proxy request refs
                                   delete ireq[k];
                               }
                               req = null;
