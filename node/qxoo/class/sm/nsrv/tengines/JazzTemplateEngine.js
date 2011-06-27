@@ -208,6 +208,9 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                       res.sendError();
                       return;
                   }
+
+                  //qx.log.Logger.info("typeof data=" + (typeof data) );
+
                   ctx.collectMessageHeaders(true);
                   qx.lang.Object.carefullyMergeWith(res.headers, headers);
                   res.writeHead((res.statusCode || 200), res.headers);

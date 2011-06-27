@@ -139,6 +139,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                       method : "GET",
                       headers : req.headers,
                       httpVersion : "1.0",
+                      info : req.info,
                       params : {},
                       form : req.form,
                       outerParams : req.outerParams,
@@ -217,7 +218,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                       write : function(chunk, encoding) {
                           //todo encoding ignored, assumed utf8
-                          this.__data.push(chunk.toString());
+                          this.__data.push((typeof chunk === "string") ? chunk : chunk.toString());
                       },
 
                       end : function(chunk, encoding) {
@@ -260,6 +261,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               for (var k in ireq) {
                                   delete ireq[k];
                               }
+                              req = null;
+                              res = null;
+                              ctx = null;
                           }
                       }
                   };
@@ -326,9 +330,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                   //Save assembly instance
                   aiStack.push(asm);
-                  me.irequestExt(vhe, te, ctx, core, params, ctxParams, function(err, data) {
-                      cb(err, data);
-                  });
+                  me.irequestExt(vhe, te, ctx, core, params, ctxParams, cb);
               });
           },
 

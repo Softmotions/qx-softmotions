@@ -557,7 +557,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
           __applyConfigHeaders : function(req, headers) {
               if (req.info != null && req.info.webapp != null && req.info.webapp["headers"] != null) {
-                  // /Apply custom headers by pattern matching
+                  // Apply custom headers by pattern matching
                   var cheaders = req.info.webapp["headers"];
                   for (var hk in cheaders) {
                       var hspec = cheaders[hk];
@@ -645,16 +645,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
 
               var ctx = function(forward) {
-                  if (forward && forward["terminated"] == true) {
-                      return; //response must be managed by executor
+                  if (!forward || forward["terminated"] != true) {
+                      ctx.collectMessageHeaders();
+                      me.__renderTemplate(req, res, ctx, forward);
                   }
-                  ctx.collectMessageHeaders();
-                  me.__renderTemplate(req, res, ctx, forward);
+                  ctx = null;
               };
-
-              ctx._vhost_engine_ = this;
-              req._ctx_ = ctx;
-
               /**
                * Stores messages into response headers
                * Return true if found message errors
@@ -670,7 +666,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   }
               };
 
-
+              ctx._vhost_engine_ = this;
+              req._ctx_ = ctx;
               if (req.$$ctxParams) {
                   for (var k in req.$$ctxParams) {
                       if (ctx[k] === undefined) {
@@ -848,7 +845,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
            * Initiate request
            */
           __initRequestHandler : function(req, res, next) {
+
               var me = this;
+
               //Response messages
               res.messages = res.messages || [];
 
@@ -878,6 +877,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
               res._implicitHeader = function() {// TODO: for session compatibility
               };
+
               if (qx.core.Environment.get("sm.nsrv.access-control-allow") == true) {
                   var hset = {"Access-Control-Allow-Origin" : "*"};
                   var rh = req.headers["access-control-request-headers"];
@@ -906,7 +906,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   var oldEnd = res.end;
                   res.end = function(data, enc) {
                       oldEnd.apply(res, arguments);
-                      if (req._ctx_) {
+                      if (req._ctx_) { //prune associated context
                           for (var rk in req._ctx_) {
                               delete req._ctx_[rk];
                           }
@@ -914,6 +914,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                       for (var rk in req) {
                           delete req[rk];
                       }
+                      /*for (var rk in res) {
+                       delete res[rk];
+                       }
+                       var gc = $$node.require("gc/gc");
+                       var util = $$node.require("util");
+                       var GC = new gc.GC();
+                       GC.collect();
+                       */
                   };
               }
 
@@ -1016,7 +1024,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   //todo other requests forbidden?
                   res.sendForbidden();
               }
-              if (!req.outerParams) {
+              if (req.outerParams == null) {
                   req.outerParams = req.params;
               }
               req.stripParams = function(prefix) {
