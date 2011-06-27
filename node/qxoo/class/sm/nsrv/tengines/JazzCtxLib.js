@@ -251,7 +251,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               }
                           } finally {
                               //cleanup proxy response refs
-                              delete this["__data;"];
+                              delete this["__data"];
                               delete this["headers"];
                               delete this["messages"];
                               delete this["outerResponse"];
