@@ -226,8 +226,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               return;
                           }
                           this.__end = true;
-                          if (chunk != null && chunk != undefined) {
+                          if (chunk != null) {
                               this.write(chunk, encoding);
+                              chunk = null;
                           }
 
                           for (var i = 0; i < this.messages.length; ++i) {
@@ -268,7 +269,6 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               ireq = null;
                               req = null;
                               res = null;
-                              ctx = null;
                           }
                       }
                   };
