@@ -264,6 +264,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                               for (var k in ireq) { //prune proxy request refs
                                   delete ireq[k];
                               }
+                              ires = null;
+                              ireq = null;
                               req = null;
                               res = null;
                               ctx = null;
