@@ -916,6 +916,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                           for (var rk in req) {
                               delete req[rk];
                           }
+                          oldEnd = null;
                       }
                       /*for (var rk in res) {
                        delete res[rk];
