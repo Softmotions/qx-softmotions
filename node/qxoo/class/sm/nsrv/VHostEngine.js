@@ -905,14 +905,17 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               if (!res.internal) { //Cleanup memory
                   var oldEnd = res.end;
                   res.end = function(data, enc) {
-                      oldEnd.apply(res, arguments);
-                      if (req._ctx_) { //prune associated context
-                          for (var rk in req._ctx_) {
-                              delete req._ctx_[rk];
+                      try {
+                          oldEnd.apply(res, arguments);
+                      } finally {
+                          if (req._ctx_) { //prune associated context
+                              for (var rk in req._ctx_) {
+                                  delete req._ctx_[rk];
+                              }
                           }
-                      }
-                      for (var rk in req) {
-                          delete req[rk];
+                          for (var rk in req) {
+                              delete req[rk];
+                          }
                       }
                       /*for (var rk in res) {
                        delete res[rk];
