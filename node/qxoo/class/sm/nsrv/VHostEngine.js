@@ -470,11 +470,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
            */
           __cleanupHandlers : function() {
               var me = this;
+              var now = new Date().getTime();
+              if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 5)) { //todo 5 min time hardcoded
+                  return;
+              }
               $$node.process.nextTick(function() {
-                  var now = new Date().getTime();
-                  if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 5)) { //todo 5 min time hardcoded
-                      return;
-                  }
                   me.__cleanupHandlersLastTime = now;
                   for (var hk in me.__handlers) {
                       var hconf = me.__handlers[hk];
