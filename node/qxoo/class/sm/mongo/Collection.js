@@ -234,6 +234,6 @@ qx.Class.define("sm.mongo.Collection", {
       },
 
       destruct : function() {
-          this.__name = this.__nativeCollection = this.__mongo = null;
+          this.__name = this.__nativeCollection = this.__mongo = this.__callQueue = null;
       }
   });

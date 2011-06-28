@@ -173,7 +173,7 @@ qx.Class.define("sm.mongo.Query", {
               var count = 0;
               var lastDoc = null;
               var error = null;
-              var items = this.__callbacks["all"] ? [] : null;
+              var items = me.__callbacks["all"] ? [] : null;
 
               stream.addListener("end", function() {
                   try {
@@ -185,10 +185,17 @@ qx.Class.define("sm.mongo.Query", {
                               me.__callRecordCallbacks("last", count, lastDoc);
                           }
                       }
-                  } finally {
+                  } finally {  //cleanup
+                      stream.removeAllListeners();
+                      delete me.__callbacks["first"];
+                      delete me.__callbacks["last"];
+                      delete me.__callbacks["each"];
+                      delete me.__callbacks["all"];
+                      me.__callbacks = {};
                       if (callback) {
                           callback(error);
                       }
+                      items = lastDoc = error = null;
                   }
               });
 

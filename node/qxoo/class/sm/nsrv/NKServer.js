@@ -93,24 +93,6 @@ qx.Class.define("sm.nsrv.NKServer", {
               qx.log.Logger.info("Starting 'sm.nsrv.NKServer' server at port: " + port + " on address: " + host);
 
               var connect = $$node.require("connect");
-
-              var vhost = function(hostname, server) {
-                  if (!hostname) throw new Error('vhost hostname required');
-                  if (!server) throw new Error('vhost server required');
-                  var regexp = new RegExp('^' + hostname.replace(/[*]/g, '(.*?)') + '$');
-                  return function(req, res, next) {
-                      var host = (req.headers.host && hostname != "__default__") ? req.headers.host.split(':')[0] : null;
-                      if (host && (req.subdomains = regexp.exec(host))) {
-                          req.subdomains = req.subdomains.slice(1);
-                          server.emit("request", req, res, next);
-                      } else if (hostname == "__default__") {
-                          //default vhost recieves all requests
-                          server.emit("request", req, res, next);
-                      } else {
-                          next();
-                      }
-                  };
-              };
               var chandlers = [];
 
               //Processing custom filters
@@ -122,10 +104,28 @@ qx.Class.define("sm.nsrv.NKServer", {
               var vengines = qx.lang.Object.getValues(this.__vengines);
               for (var i = 0; i < vengines.length; ++i) {
                   var ve = vengines[i];
-                  chandlers.push(vhost(ve.getVHostName(), ve.createConnectServer()));
+                  chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
               }
               this.__server = new connect.HTTPServer(chandlers);
               this.__server.listen(port, host);
+          },
+
+          __vhost : function(hostname, server) {
+              if (!hostname) throw new Error('vhost hostname required');
+              if (!server) throw new Error('vhost server required');
+              var regexp = new RegExp('^' + hostname.replace(/[*]/g, '(.*?)') + '$');
+              return function(req, res, next) {
+                  var host = (req.headers.host && hostname != "__default__") ? req.headers.host.split(':')[0] : null;
+                  if (host && (req.subdomains = regexp.exec(host))) {
+                      req.subdomains = req.subdomains.slice(1);
+                      server.emit("request", req, res, next);
+                  } else if (hostname == "__default__") {
+                      //default vhost recieves all requests
+                      server.emit("request", req, res, next);
+                  } else {
+                      next();
+                  }
+              };
           },
 
           /**

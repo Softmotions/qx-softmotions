@@ -29,14 +29,20 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               $$node.process.nextTick(function() {
                   if (req._ctx_) { //agressive prune associated context
                       for (var rk in req._ctx_) {
-                          delete req._ctx_[rk];
+                          if (req._ctx_.hasOwnProperty(rk)) {
+                              delete req._ctx_[rk];
+                          }
                       }
                   }
                   for (var rk in req) {
-                      delete req[rk];
+                      if (req.hasOwnProperty(rk)) {
+                          delete req[rk];
+                      }
                   }
                   for (var rk in res) {
-                      delete res[rk];
+                      if (res.hasOwnProperty(rk)) {
+                          delete res[rk];
+                      }
                   }
               });
           }
@@ -966,7 +972,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                        var util = $$node.require("util");
                        var GC = new gc.GC();
                        GC.collect();*/
-
                   };
               }
 
