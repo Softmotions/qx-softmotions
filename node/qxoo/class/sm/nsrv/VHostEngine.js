@@ -466,7 +466,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
           /**
            * Periodically recreate duty handlers
-           * to prune possible cyclic object refs with closures
+           * to avoid possible cyclic refs with constant executors and closures
            */
           __cleanupHandlers : function() {
               var me = this;
