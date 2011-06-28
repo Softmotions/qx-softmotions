@@ -407,6 +407,29 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                    */
                   escapeUrl : function(data, cb) {
                       cb(data != null ? encodeURIComponent(data) : "");
+                  },
+
+                  /**
+                   * Format date
+                   * @param date{Date|null} Date to format, if null current date will be used
+                   * @param format{String|null} Date format if null default date represendations will be used
+                   * @see qx.util.format.DateFormat
+                   */
+                  date : function(date, format, cb) {
+                      if (date == null) {
+                          date = new Date();
+                      }
+                      if (format == null) {
+                          cb(date.toString());
+                          return;
+                      }
+                      if (format == "rfc822") {
+                          cb(sm.cms.util.DateTimeHelper.formatRFC822(date));
+                          return;
+                      } else {
+                          var df = new qx.util.format.DateFormat(format);
+                          cb(df.format(date));
+                      }
                   }
               };
           },

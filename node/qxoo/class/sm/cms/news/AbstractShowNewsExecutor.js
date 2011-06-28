@@ -53,10 +53,12 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
               q.each(
                 function(index, doc) {
                     if (doc["mdate"] != null) {
-                        doc["mdate"] = df.format(new Date(parseInt(doc["mdate"])));
+                        doc["mdateDate"] = new Date(parseInt(doc["mdate"]));
+                        doc["mdate"] = df.format(doc["mdateDate"]);
                     }
                     if (doc["cdate"] != null) {
-                        doc["cdate"] = df.format(new Date(parseInt(doc["cdate"])));
+                        doc["cdateDate"] = new Date(parseInt(doc["cdate"]));
+                        doc["cdate"] = df.format(doc["cdateDate"]);
                     }
                     res.push(doc);
                 }).exec(function(err) {
@@ -74,14 +76,18 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
            */
           _in_page_news : function(req, resp, ctx, limit) {
 
-              var page = ctx["_page_"];
-              if (!page) {
-                  qx.log.Logger.warn(this, "No page in context");
-                  ctx();
-                  return;
+              var pageId = ctx["_page_"] ? ctx["_page_"]._id : null;
+              if (pageId == null) { //try to get main
+                  var cfg = this.getDefaultEnv().getConfig();
+                  pageId = cfg.main_page;
+                  if (pageId == null) {
+                      qx.log.Logger.warn(this, "Cannot find page to fetch news");
+                      ctx();
+                      return;
+                  }
               }
               this._fetch_news_list(req, resp, ctx,
-                {"refpage" : page["_id"],
+                {"refpage" : pageId,
                     "queryOpts" : {
                         "sort" : [
                             ["cdate" , -1]

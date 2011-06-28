@@ -469,26 +469,26 @@ qx.Class.define("sm.nsrv.VHostEngine", {
            * to avoid possible cyclic refs with constant executors and closures
            */
           __cleanupHandlers : function() {
-              var me = this;
-              var now = new Date().getTime();
-              if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 5)) { //todo 5 min time hardcoded
-                  return;
-              }
-              $$node.process.nextTick(function() {
-                  me.__cleanupHandlersLastTime = now;
-                  for (var hk in me.__handlers) {
-                      var hconf = me.__handlers[hk];
-                      var hinst = hconf["$$instance"];
-                      if (hinst == null || hinst.$$duty === false || hinst.$$notrecreate === true) {
-                          continue;
-                      }
-                      var ninst = new hinst.constructor();
-                      ninst.$$duty = false;
-                      delete hconf["$$instance"];
-                      hconf["$$instance"] = ninst;
-                      hinst.dispose();
-                  }
-              });
+              /*var me = this;
+               var now = new Date().getTime();
+               if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 10)) { //todo 10min time hardcoded
+               return;
+               }
+               $$node.process.nextTick(function() {
+               me.__cleanupHandlersLastTime = now;
+               for (var hk in me.__handlers) {
+               var hconf = me.__handlers[hk];
+               var hinst = hconf["$$instance"];
+               if (hinst == null || hinst.$$duty === false || hinst.$$notrecreate === true) {
+               continue;
+               }
+               var ninst = new hinst.constructor();
+               ninst.$$duty = false;
+               delete hconf["$$instance"];
+               hconf["$$instance"] = ninst;
+               hinst.dispose();
+               }
+               });*/
           },
 
           /**
