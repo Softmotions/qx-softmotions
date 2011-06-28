@@ -5,6 +5,7 @@
 
 qx.Class.define("sm.cms.youtube.AbstractYouTubeExecutor", {
       extend  : qx.core.Object,
+      include : [sm.nsrv.MExecutor],
       type : "abstract",
 
       construct : function() {
@@ -14,6 +15,8 @@ qx.Class.define("sm.cms.youtube.AbstractYouTubeExecutor", {
           setInterval(sm.cms.youtube.AbstractYouTubeExecutor.updateYouTubeCache,
             cfg["updateTimeout"] || 86400000); // default timeout - 1 day
           sm.cms.youtube.AbstractYouTubeExecutor.updateYouTubeCache();
+          //mark as fully persistent executor
+          this._doNotRecreateMe(true);
       },
 
       statics :

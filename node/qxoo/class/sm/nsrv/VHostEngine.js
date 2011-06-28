@@ -22,6 +22,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   return;
               }
               this.__asmProvider = provider;
+          },
+
+
+          cleanupRequest : function(req, res) {
+              $$node.process.nextTick(function() {
+                  if (req._ctx_) { //agressive prune associated context
+                      for (var rk in req._ctx_) {
+                          delete req._ctx_[rk];
+                      }
+                  }
+                  for (var rk in req) {
+                      delete req[rk];
+                  }
+                  for (var rk in res) {
+                      delete res[rk];
+                  }
+              });
           }
       },
 
@@ -87,6 +104,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
            * Security (by webapps)
            */
           __security : null,
+
+
+          __cleanupHandlersLastTime : 0,
 
           /**
            * Returns virtual host name
@@ -445,6 +465,33 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
 
           /**
+           * Periodically recreate duty handlers
+           * to prune possible cyclic object refs with closures
+           */
+          __cleanupHandlers : function() {
+              var me = this;
+              $$node.process.nextTick(function() {
+                  var now = new Date().getTime();
+                  if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 5)) { //todo 5 min time hardcoded
+                      return;
+                  }
+                  me.__cleanupHandlersLastTime = now;
+                  for (var hk in me.__handlers) {
+                      var hconf = me.__handlers[hk];
+                      var hinst = hconf["$$instance"];
+                      if (hinst == null || hinst.$$duty === false || hinst.$$notrecreate === true) {
+                          continue;
+                      }
+                      var ninst = new hinst.constructor();
+                      ninst.$$duty = false;
+                      delete hconf["$$instance"];
+                      hconf["$$instance"] = ninst;
+                      hinst.dispose();
+                  }
+              });
+          },
+
+          /**
            * Load request handlers index
            */
           __loadHandlers : function() {
@@ -470,6 +517,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   }
 
                   var hinstance = new clazz();
+                  hinstance.$$duty = false;
                   for (var lList in handlers) {
 
                       var hconf = handlers[lList];
@@ -689,6 +737,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                   var callback = function() {
                       try {
+                          hinst.$$duty = true;
                           exec.call(hinst, req, res, ctx);
                       } catch(e) {
                           var report = true;
@@ -859,16 +908,16 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                   me.__handleResponseSCode(req, res, scode, headers, data);
               };
               res.sendNotFound = function(headers, data) {
-                  res.sendSCode(404, headers, data);
+                  this.sendSCode(404, headers, data);
               };
               res.sendForbidden = function(headers, data) {
-                  res.sendSCode(403, headers, data);
+                  this.sendSCode(403, headers, data);
               };
               res.sendError = function(headers, data) {
-                  res.sendSCode(500, headers, data);
+                  this.sendSCode(500, headers, data);
               };
               res.sendOk = function(headers, data) {
-                  res.sendSCode(200, headers, data);
+                  this.sendSCode(200, headers, data);
               };
               if (res.outerResponse == null) {
                   res.outerResponse = function() {
@@ -903,29 +952,21 @@ qx.Class.define("sm.nsrv.VHostEngine", {
               }
 
               if (!res.internal) { //Cleanup memory
-                  var oldEnd = res.end;
+                  var origEnd = res.end;
                   res.end = function(data, enc) {
                       try {
-                          oldEnd.apply(res, arguments);
+                          origEnd.apply(res, arguments);
                       } finally {
-                          if (req._ctx_) { //prune associated context
-                              for (var rk in req._ctx_) {
-                                  delete req._ctx_[rk];
-                              }
-                          }
-                          for (var rk in req) {
-                              delete req[rk];
-                          }
-                          oldEnd = null;
+                          sm.nsrv.VHostEngine.cleanupRequest(req, res);
+                          me.__cleanupHandlers();
+                          origEnd = null;
                       }
-                      /*for (var rk in res) {
-                       delete res[rk];
-                       }
-                       var gc = $$node.require("gc/gc");
+
+                      /*var gc = $$node.require("gc/gc");
                        var util = $$node.require("util");
                        var GC = new gc.GC();
-                       GC.collect();
-                       */
+                       GC.collect();*/
+
                   };
               }
 

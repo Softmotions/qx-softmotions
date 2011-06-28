@@ -251,20 +251,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                                   cb(null, "");
                               }
                           } finally {
-                              //cleanup proxy response refs
-                              delete this["__data"];
-                              delete this["headers"];
-                              delete this["messages"];
-                              delete this["outerResponse"];
-
-                              if (ireq._ctx_) { //prune associated context
-                                  for (var rk in ireq._ctx_) {
-                                      delete ireq._ctx_[rk];
-                                  }
-                              }
-                              for (var k in ireq) { //prune proxy request refs
-                                  delete ireq[k];
-                              }
+                              sm.nsrv.VHostEngine.cleanupRequest(ireq, ires);
                               ires = null;
                               ireq = null;
                               req = null;

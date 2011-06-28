@@ -79,6 +79,10 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
            */
           getDefaultEnv : function() {
               return sm.app.Env.getDefault();
+          },
+
+          _doNotRecreateMe : function(val) {
+              this.$$notrecreate = !!val;
           }
       }
   });
