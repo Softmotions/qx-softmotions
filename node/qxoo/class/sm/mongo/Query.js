@@ -195,7 +195,7 @@ qx.Class.define("sm.mongo.Query", {
                       if (callback) {
                           callback(error);
                       }
-                      items = lastDoc = error = null;
+                      me  = items = lastDoc = error = null;
                   }
               });
 
