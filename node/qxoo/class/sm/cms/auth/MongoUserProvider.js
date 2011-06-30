@@ -78,7 +78,7 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
                   if (err) {
                       callback(err, null);
                   } else {
-                      result.roles = me.resoleUserRoles(allRoles, user.roles);
+                      result.roles = me.resolveUserRoles(allRoles, user.roles);
                       callback(null, result);
                   }
               });

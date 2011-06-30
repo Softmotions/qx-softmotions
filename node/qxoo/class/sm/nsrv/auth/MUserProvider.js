@@ -15,7 +15,7 @@ qx.Mixin.define("sm.nsrv.auth.MUserProvider", {
            *
            * @throws Error if invalid argument was passed
            */
-          resoleUserRoles: function(allRoles, userRoles) {
+          resolveUserRoles: function(allRoles, userRoles) {
               if (allRoles == null || allRoles.constructor !== Array ||
                 userRoles == null || userRoles.constructor !== Array) {
                   throw new Error("Invalid argruments");

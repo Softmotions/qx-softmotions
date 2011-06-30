@@ -268,7 +268,7 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
                       }
                       var res = [];
                       var implicitRoles = (user.roles != null && user.roles.constructor === Array) ? user.roles : [];
-                      var userRoles = me.resoleUserRoles(allRoles, implicitRoles);
+                      var userRoles = me.resolveUserRoles(allRoles, implicitRoles);
                       for (var i = 0; i < allRoles.length; ++i) {
                           var rnode = allRoles[i];
                           res.push([rnode["id"],
