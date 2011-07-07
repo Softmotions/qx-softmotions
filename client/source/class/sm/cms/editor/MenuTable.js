@@ -50,15 +50,14 @@ qx.Class.define("sm.cms.editor.MenuTable", {
       construct : function(options) {
 
           this.__options = options || {};
-          this.__active_on_item = [];
+          this.__toolbar_items = [];
 
           this.base(arguments);
 
           this.set({allowGrowX : true, allowGrowY : false, height : 170});
 
-          for (var i = 0; i < this.__active_on_item.length; ++i) {
-              var item = this.__active_on_item[i];
-              item.setEnabled(false);
+          for (var i = 0; i < this.__toolbar_items.length; ++i) {
+              this.__doItemEnabled(this.__toolbar_items[i], false);
           }
 
           this._reload([]);
@@ -70,9 +69,12 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           __options : null,
 
           /**
-           * List of widgets active on selected element
+           * List of widgets and its enabled rules
            */
-          __active_on_item : null,
+          __tollbar_items : null,
+
+          __synchronize: null,
+          __synchronizePath: null,
 
 
           ///////////////////////////////////////////////////////////////////////////
@@ -87,13 +89,25 @@ qx.Class.define("sm.cms.editor.MenuTable", {
               mb.addListener("execute", function(e) {
                   this.__manageLink();
               }, this);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: false,
+                    inactiveOnSync: true
+                });
+
               mainPart.add(mb);
+
+              mainPart.addSeparator();
 
               mb = new qx.ui.toolbar.Button(this.tr("Удалить"), "icon/16/actions/list-remove.png");
               mb.addListener("execute", function(e) {
                   this.removeRowByIndex(this.getSelectedRowIndex());
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
 
               mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-up.png");
@@ -101,7 +115,11 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                   var ind = this.getSelectedRowIndex();
                   this.moveRowByIndex(ind, -1, true);
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
 
               mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-down.png");
@@ -109,8 +127,48 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                   var ind = this.getSelectedRowIndex();
                   this.moveRowByIndex(ind, 1, true);
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
+
+              if (this.__options["synchronizable"]) {
+                  mb = new qx.ui.toolbar.Separator().set({width: 25});
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.basic.Label("Синхронизация: ").set({alignY: "middle", marginRight: 5});
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
+                  mb.addListener("execute", function(ev) {
+                      this.__manageSync();
+                  }, this);
+                  this.__toolbar_items.push({
+                        item: mb,
+                        activeOnItem: false,
+                        inactiveOnSync: true
+                    });
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
+                  mb.addListener("execute", function(ev) {
+                      sm.cms.Application.confirm(this.tr("Вы действительно хотите отключить синхронизацию?"), function(res){
+                          if(res) {
+                              this.__synchronize = null;
+                              this.__synchronizePath = "";
+                              this.__applyEditorEnabled();
+                          }
+                      }, this);
+                  }, this);
+                  this.__toolbar_items.push({
+                        item: mb,
+                        activeOnItem: false,
+                        activeOnSync: true
+                    });
+                  mainPart.add(mb);
+              }
 
               return toolbar;
           },
@@ -119,15 +177,14 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           _createTable : function(tm) {
               var table = new sm.table.Table(tm, tm.getCustom());
               table.set({showCellFocusIndicator : false,
-                    statusBarVisible : false,
+                    statusBarVisible : !!this.__options["synchronizable"],
                     focusCellOnMouseMove : false});
 
               var smodel = table.getSelectionModel();
               smodel.addListener("changeSelection", function(ev) {
                   var scount = smodel.getSelectedCount();
-                  for (var i = 0; i < this.__active_on_item.length; ++i) {
-                      var item = this.__active_on_item[i];
-                      item.setEnabled(scount > 0);
+                  for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                      this.__doItemEnabled(this.__toolbar_items[i], scount > 0);
                   }
               }, this);
 
@@ -160,6 +217,31 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           ///////////////////////////////////////////////////////////////////////////
           //                               Impl                                    //
           ///////////////////////////////////////////////////////////////////////////
+
+          // apply enabled rule for item
+          __doItemEnabled: function(item, onItem) {
+              item.item.setEnabled(
+                (!item.activeOnItem || onItem) &&
+                  (!item.inactiveOnSync || !this.__synchronize) &&
+                  (!item.activeOnSync || !!this.__synchronize)
+              );
+          },
+
+          __applyEditorEnabled: function() {
+              var table = this.getTable();
+
+              if (this.__options["synchronizable"] && this.__synchronize) {
+                  table.setEnabled(false);
+                  table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с ").toString() + (this.__synchronizePath || ""));
+              } else {
+                  table.setEnabled(true);
+                  table.setAdditionalStatusBarText("");
+              }
+
+              for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                  this.__doItemEnabled(this.__toolbar_items[i], false);
+              }
+          },
 
           // add new menu link
           __manageLink : function() {
@@ -194,6 +276,30 @@ qx.Class.define("sm.cms.editor.MenuTable", {
               dlg.open();
           },
 
+          // enable menu synchronization
+          __manageSync : function() {
+              var dlg = new sm.cms.page.PageLinkDlg({
+                    "oklabel": this.tr("Выбрать"),
+                    "requireLinkName": false,
+                    "allowOuterLinks" : false
+                });
+              dlg.addListener("pageSelected", function(ev) {
+                  var data = ev.getData();
+                  if (this.__options.pageInfo && this.__options.pageInfo["_id"] == data[0]) {
+                      sm.cms.Application.alert(this.tr("Нельзя синхронизовывать с тойже страницей!"));
+                      return;
+                  }
+
+                  this.__synchronize = data[0];
+                  this.__synchronizePath = data[2].join("/");
+
+                  dlg.close();
+
+                  this.__applyEditorEnabled();
+              }, this);
+              dlg.open();
+          },
+
           ///////////////////////////////////////////////////////////////////////////
           //                            StringForm stuff                           //
           ///////////////////////////////////////////////////////////////////////////
@@ -201,47 +307,72 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           // overridden
           setValue : function(value) {
-              if (value == null) {
-                  value = [];
+              value = value || {};
+              if (!qx.lang.Type.isObject(value)) {
+                  qx.log.Logger.error(this, "Value is not object", value);
+                  value = {};
               }
-              if (!qx.lang.Type.isArray(value)) {
-                  qx.log.Logger.error(this, "Value is not array ", value);
-                  value = [];
+
+              value.items = value.items || [];
+              if (!qx.lang.Type.isArray(value.items)) {
+                  qx.log.Logger.error(this, "Value items is not array", value.items);
+                  value.items = [];
               }
+              this.__synchronize = value.synchronize = this.__options["synchronizable"] ? value.synchronize : null;
+              this.__synchronizePath = value.synchronizePath = this.__options["synchronizable"] ? value.synchronizePath : null;
+
               var tdata = [];
-              for (var i = 0; i < value.length; ++i) {
-                  var name = value[i]["name"];
-                  var link = value[i]["link"];
+              for (var i = 0; i < value.items.length; ++i) {
+                  var name = value.items[i]["name"];
+                  var link = value.items[i]["link"];
                   if (name == null || link == null) {
                       continue;
                   }
                   var rdata = [name, link];
-                  rdata.rowData = value[i];
+                  rdata.rowData = value.items[i];
                   tdata.push(rdata);
               }
+
+              var table = this.getTable();
               var tm = this.getTableModel();
               tm.setData(tdata);
+
+              this.__applyEditorEnabled();
+
               this.fireDataEvent("changeValue", value);
           },
 
           // overridden
           resetValue : function() {
-              this.setValue([]);
+              this.setValue({});
           },
 
           // overridden
           getValue : function() {
-              var obj = [];
-              var tdata = this.getTableModel().getData();
-              for (var i = 0; i < tdata.length; ++i) {
-                  obj.push(tdata[i].rowData);
-              }
-              return obj;
-          }
-      },
+              if (this.__options["synchronizable"] && this.__synchronize) {
+                  return {
+                      synchronize: this.__synchronize,
+                      synchronizePath: this.__synchronizePath || "",
+                      items: []
+                  };
+              } else {
+                  var obj = [];
+                  var tdata = this.getTableModel().getData();
+                  for (var i = 0; i < tdata.length; ++i) {
+                      obj.push(tdata[i].rowData);
+                  }
 
-      destruct : function() {
-          this.__active_on_item = this.__options = null;
+                  return {
+                      synchronize: null,
+                      synchronizePath: "",
+                      items: obj
+                  };
+              }
+          },
+
+          destruct : function() {
+              this.__toolbar_items = this.__options = this.__synchronize = null;
+          }
       }
   });
 

@@ -48,10 +48,13 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
           this._setLayout(new qx.ui.layout.VBox());
 
           this.__options = options = options || {};
+          options["synchronizable"] = !!options["synchronizable"] && !options["main"];
 
           var view = this.__form = this.__mtable =
             new sm.cms.editor.MenuTable({
-                  "allowOuterLinks" : !!options["allowOuterLinks"]
+                  "allowOuterLinks" : !!options["allowOuterLinks"],
+                  "synchronizable" : !!options["synchronizable"],
+                  "pageInfo" : options["pageInfo"]
               });
 
           this.__allowOuterLinks = !!options["allowOuterLinks"];
@@ -94,7 +97,6 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
           __options: null,
           __active : null,
           __mtable  : null,
-
           ///////////////////////////////////////////////////////////////////////////
           //                            StringForm stuff                           //
           ///////////////////////////////////////////////////////////////////////////
@@ -108,17 +110,24 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                   value = {};
               }
 
+              value.active = value.active || !!this.__options["main"];
+              if (this.__active) {
+                  this.__active.setValue(value.active);
+              }
+
+              value.synchronize = this.__options["synchronizable"] ? value.synchronize : null;
               value.items = value.items || [];
               if (!qx.lang.Type.isArray(value.items)) {
                   qx.log.Logger.error(this, "Value items is not array", value.items);
                   value.items = [];
               }
-              this.__mtable.setValue(value.items);
 
-              value.active = value.active || !!this.__options["main"];
-              if (this.__active) {
-                  this.__active.setValue(value.active);
-              }
+
+              this.__mtable.setValue({
+                    items: value.items,
+                    synchronize: value.synchronize,
+                    synchronizePath: value.synchronizePath
+                });
 
               this.fireDataEvent("changeValue", value);
           },
@@ -130,10 +139,22 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
 
           // overridden
           getValue : function() {
-              return {
-                  active: !!this.__options["main"] || this.__active && this.__active.getValue(),
-                  items: this.__mtable.getValue()
-              };
+              if (!!this.__options["main"] || this.__active && this.__active.getValue()) {
+                  var subvalue = this.__mtable.getValue();
+                  return {
+                      active: true,
+                      synchronize: this.__options["synchronizable"] ? subvalue.synchronize : null,
+                      synchronizePath: this.__options["synchronizable"] ? subvalue.synchronizePath || "" : "",
+                      items: subvalue
+                  };
+              } else {
+                  return {
+                      active: false,
+                      synchronize: null,
+                      synchronizePath: "",
+                      items: []
+                  };
+              }
           }
       },
 
