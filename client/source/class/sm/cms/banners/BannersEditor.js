@@ -15,101 +15,97 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
 
       construct : function() {
           this.base(arguments);
-          var layout = new qx.ui.layout.Grid();
-          layout.setSpacing(6);
-          layout.setColumnFlex(0, 0);
-          layout.setColumnFlex(1, 1);
-          layout.setColumnAlign(0, "right", "top");
+
+          var layout = new qx.ui.layout.VBox(5);
           this._setLayout(layout);
           this.set({padding : 10});
 
           this.__grefs = [];
           this.__banners = {};
+          this.__viewOptions = {};
 
           var i = -1;
 
           this.__grefs["name"] = new qx.ui.basic.Label("");
 
+          // кнопка сохранить
+          var save = new qx.ui.form.Button(this.tr("Сохранить"));
+          save.addListener("execute", this.__saveBanner, this);
+          this.__grefs["save"] = save;
+
+          var hcont = new qx.ui.container.Composite(new qx.ui.layout.HBox(5));
+
+          hcont.add(this.__grefs["name"], {flex : 0});
+          hcont.add(new qx.ui.core.Spacer(), {flex : 1});
+          hcont.add(this.__grefs["save"], {flex : 0});
+
           // поле выбора категории медиа раздела
           var category = new sm.ui.form.ButtonField(null, "sm/cms/icon/16/wiki/link_add.png");
           category.setReadOnly(true);
           category.setEnabled(false);
-          category.addListener("execute", function(ev) {
-              var dlg = new sm.cms.media.MediaLibLinkDlg({fileSelectable: false});
-              var categorySelected = function(ev) {
-                  var sp = ev.getData();
-                  var cname = "";
-                  var hr = sp[1];
-                  for (var i = 0; i < hr.length; ++i) {
-                      cname += "/" + hr[i];
-                  }
-                  category.setValue(cname);
-
-                  this.__bannerCategory = sp[0];
-                  this.__loadMediaList();
-                  dlg.close();
-              };
-              dlg.addListener("branchSelected", categorySelected, this);
-              dlg.open();
-          }, this);
+          category.addListener("execute", this.__categoryDlgOpen, this);
 
           this.__grefs["category"] = category;
 
-          // инициализируем таблицу с банерами
-          var tm = new sm.model.JsonTableModel();
-          var tce = new sm.model.TextFieldCellEditor();
-          tce.getValidationFunction = function() {
-              return function(value, oldValue) {
-                  return value < 0 ? oldValue : value;
-              }
-          };
-          this.__setJsonTableData(tm, []);
-          var banners = new sm.table.Table(tm, tm.getCustom()).set({
-                "statusBarVisible" : false,
-                "showCellFocusIndicator" : false});
-          banners.getTableColumnModel().setCellEditorFactory(1, tce);
-          banners.addListener("dataEdited", this.__dataEdited, this);
-          banners.setContextMenuHandler(0, this.__bannersCtxMenuHandler, this);
-          banners.setContextMenuHandler(1, this.__bannersCtxMenuHandler, this);
-          banners.setContextMenuHandler(2, this.__bannersCtxMenuHandler, this);
+          this.__grefs["banners"] = this.__banners = new sm.cms.banners.BannersTable();
 
-          this.__grefs["banners"] = banners;
+          this.__banners.getSelectionModel().addListener("changeSelection", this.__rowSelected, this);
+
+          this.__infoSide = new qx.ui.container.Composite();
+
+          var iLayout = new qx.ui.layout.Grid();
+          iLayout.setSpacing(6);
+          iLayout.setColumnFlex(0, 0);
+          iLayout.setColumnFlex(1, 1);
+          iLayout.setColumnAlign(0, "right", "top");
+          this.__infoSide.setLayout(iLayout);
+
+          this.__iPreviewBox = new qx.ui.groupbox.GroupBox(this.tr("Изображение"));
+          var pLayout = new qx.ui.layout.HBox(5, "center");
+          this.__iPreviewBox.setLayout(pLayout);
+
+          this.__iPreview = new qx.ui.basic.Image();
+          var hbox = new qx.ui.container.Composite(new qx.ui.layout.HBox(0).set({alignY : "middle", alignX: "center"}));
+          hbox.add(this.__iPreview);
+          var scroll = new qx.ui.container.Scroll();
+          scroll.add(hbox);
+          this.__iPreviewBox.add(scroll, {flex: 1});
 
 
-          // кнопка сохранить
-          var hcont = new qx.ui.container.Composite(new qx.ui.layout.HBox(5));
+          this.add(this.__infoSide);
+          this.add(this.__iPreviewBox, {flex: 1});
 
-          var save = new qx.ui.form.Button(this.tr("Сохранить"));
-          save.addListener("execute", this.__saveBanner, this);
-          hcont.add(new qx.ui.core.Spacer(), {flex : 1});
-          hcont.add(save, {flex : 0});
-
-          this.__grefs["save"] = save;
-
+          this.__iPreviewBox.hide();
 
           // помещаем полученные элементы  на экран
           ++i;
-          this.add(new qx.ui.basic.Label(this.tr("Расположение:")), {row : i, column : 0});
-          this.add(this.__grefs["name"], {row : i, column : 1});
+          this.__infoSide.add(new qx.ui.basic.Label(this.tr("Расположение:")), {row : i, column : 0});
+          this.__infoSide.add(hcont, {row : i, column : 1});
 
           ++i;
-          this.add(new qx.ui.basic.Label(this.tr("Медиа категория:")), {row : i, column : 0});
-          this.add(this.__grefs["category"], {row : i, column : 1});
+          this.__infoSide.add(new qx.ui.basic.Label(this.tr("Медиа категория:")), {row : i, column : 0});
+          this.__infoSide.add(this.__grefs["category"], {row : i, column : 1});
 
           ++i;
-          this.add(new qx.ui.basic.Label(this.tr("Банеры:")), {row : i, column : 0});
-          this.add(this.__grefs["banners"], {row : i, column : 1});
-
-          ++i;
-          this.add(hcont, {row : i, column : 1});
+          this.__infoSide.add(new qx.ui.basic.Label(this.tr("Банеры:")), {row : i, column : 0});
+          this.__infoSide.add(this.__grefs["banners"], {row : i, column : 1});
       },
 
       members :
       {
+          __viewOptions : null,
+
+          __infoSide : null,
+
+          __iPreview : null,
+
+          __iPreviewBox : null,
 
           __grefs : null,
 
-          __banners : null,
+          __bannerType : null,
+
+          __bannerCategory : null,
 
           /**
            * Вызывается при открытии кона редактирования
@@ -124,44 +120,10 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
           },
 
           /**
-           * Context menu
-           */
-          __bannersCtxMenuHandler : function(col, row, table, dataModel, contextMenu) {
-              var bid = dataModel.getRowAssociatedData(row);
-              if (!bid) {
-                  return false;
-              }
-              var bt;
-              var me = this;
-
-              bt = new qx.ui.menu.Button(this.tr("Ссылка"));
-              bt.addListener("execute", function(ev) {
-                  var dlg = new sm.cms.page.PageLinkDlg({allowOuterLinks : true, includeLinkName : false});
-                  var pageSelected = function(ev) {
-                      var sp = ev.getData();
-                      var pspec = sp[0].indexOf("://") != -1 ? sp[0] : ("/exp/p" + sp[0]);
-                      var rows = dataModel.getData();
-                      rows[row][2] = pspec;
-                      dataModel.setData(rows);
-
-                      me.__banners[bid].link = pspec;
-
-                      dlg.close();
-                  };
-                  dlg.addListener("pageSelected", pageSelected, this);
-                  dlg.addListener("linkSelected", pageSelected, this);
-                  dlg.open();
-              }, this);
-              contextMenu.add(bt);
-
-              return true;
-          },
-
-          /**
            * Обрабатываем ответ сервера с настройками банера
            */
           __loadBannerData : function(resp) {
-              var bi = this.__bannerInfo = resp.getContent();
+              var bi = resp.getContent();
 
               var bname = this.__grefs["name"];
               bname.setValue(bi["name"] || "");
@@ -172,65 +134,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
               bcategory.setEnabled(true);
               this.__bannerCategory = bi["category"] || "";
 
-              this.__applyBanners(bi["banners"] || []);
-          },
-
-          /**
-           * Генерируем строки данных для таблицы, на основе мета-данных банера
-           */
-          __applyBanners : function(banners) {
-              var btable = this.__grefs["banners"];
-              var tm = btable.getTableModel();
-              if (btable.isEditing()) {
-                  btable.stopEditing();
-              }
-              btable.getSelectionModel().resetSelection();
-
-              var items = [];
-              this.__banners = {};
-              for (var i = 0; i < banners.length; ++i) {
-                  var banner = banners[i];
-                  this.__banners[banner.id] = banner;
-                  items.push([
-                      [banner.name, banner.weight, banner.link],
-                      banner.id
-                  ]);
-              }
-
-              this.__setJsonTableData(tm, items);
-          },
-
-          /**
-           * Генерация данных таблицы, на основе переданных элементов
-           */
-          __setJsonTableData : function(tm, banners) {
-              var data = {
-                  "title" : "",
-                  "columns" : [
-                      {
-                          "title" : this.tr("Название").toString(),
-                          "id" : "name",
-                          "sortable" : true,
-                          "width" : "1*"
-                      },
-                      {
-                          "title" : this.tr("Вес").toString(),
-                          "id" : "weight",
-                          "sortable" : true,
-                          "width" : "1*",
-                          "type" : "number",
-                          "editable" : true
-                      },
-                      {
-                          "title" : this.tr("Ссылка").toString(),
-                          "id" : "link",
-                          "sortable" : true,
-                          "width" : "1*"
-                      }
-                  ],
-                  "items" : banners
-              };
-              tm.setJsonData(data);
+              this.__banners.setBanners(bi["banners"] || []);
           },
 
           /**
@@ -247,6 +151,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
               req.setParameter("type", 1, false);
               req.send(function(resp) {
                   var files = resp.getContent();
+                  var obanners = this.__banners.getBannersMap();
                   var banners = [];
                   // для каждого файла строим мета-данные банера
                   for (var i = 0; i < files.length; ++ i) {
@@ -255,26 +160,67 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
                             id: file["_id"],
                             name: file["name"],
                             // пытаемся смерджить с уже существующими данными
-                            weight: this.__banners[file["_id"]] ? this.__banners[file["_id"]].weight : 1,
-                            link: this.__banners[file["_id"]] ? this.__banners[file["_id"]].link || "" : ""
+                            description: obanners[file["_id"]] ? obanners[file["_id"]].description || "" : "",
+                            weight: obanners[file["_id"]] ? obanners[file["_id"]].weight : 1,
+                            link: obanners[file["_id"]] ? obanners[file["_id"]].link || "" : ""
                         });
                   }
-                  // обновляем таблицу с банерами
-                  this.__applyBanners(banners)
+//                  обновляем таблицу с банерами
+                  this.__banners.setBanners(banners);
               }, this);
           },
 
           /**
-           * Обработчик события об изменении данных в таблице
+           * Category selector dialog
            */
-          __dataEdited : function(ev) {
-              var edata = ev.getData();
-              if (edata.col != 1) {
-                  return;
-              }
+          __categoryDlgOpen: function(ev) {
+              var dlg = new sm.cms.media.MediaLibLinkDlg({fileSelectable: false});
+              dlg.addListener("branchSelected", function(ev) {
+                  var sp = ev.getData();
+                  var cname = "";
+                  var hr = sp[1];
+                  for (var i = 0; i < hr.length; ++i) {
+                      cname += "/" + hr[i];
+                  }
+                  this.__grefs["category"].setValue(cname);
 
-              var bid = this.__grefs["banners"].getTableModel().getRowAssociatedData(edata.row);
-              this.__banners[bid].weight = +edata.value;
+                  this.__bannerCategory = sp[0];
+                  this.__loadMediaList();
+                  dlg.close();
+              }, this);
+              dlg.open();
+          },
+
+          /**
+           * Fired when new banner row selected
+           */
+          __rowSelected : function(ev) {
+              this.__iPreview.setSource(null);
+
+              var sind = this.__banners.getSelectedRowIndex()
+              if (sind >= 0) {
+                  var mediaRef = this.__banners.getSelectedRowData();
+                  if (!mediaRef) {
+                      return;
+                  }
+
+                  var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("medialib.info"), "GET", "application/json");
+                  req.setParameter("ref", mediaRef, false);
+                  req.send(function(resp) {
+                      var i = -1;
+                      var pi = resp.getContent();
+                      var msource = sm.cms.Application.ACT.getUrl("media.get", "ref", "media" + mediaRef);
+                      if (pi["contentType"] && pi["contentType"].indexOf("image/") == 0) {
+                          this.__iPreview.setSource(msource);
+                          this.__iPreviewBox.show();
+                      } else {
+                          this.__iPreview.setSource(null);
+                          this.__iPreviewBox.hide();
+                      }
+                  }, this);
+              } else {
+                  this.__iPreviewBox.hide();
+              }
           },
 
           /**
@@ -284,7 +230,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
               var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("banner.save"), "POST", "application/json");
               req.setParameter("type", this.__bannerType, true);
               req.setParameter("category", this.__bannerCategory, true);
-              req.setParameter("banners", qx.util.Json.stringify(qx.lang.Object.getValues(this.__banners)), true);
+              req.setParameter("banners", qx.util.Json.stringify(this.__banners.getBanners()), true);
 
               this.__grefs["save"].setEnabled(false);
 
@@ -301,7 +247,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
       },
 
       destruct : function() {
-          this.__banners = null;
-          this._disposeMap("__grefs");
+          this.__bannerType = this.__bannerCategory = null;
+          this._disposeObjects();
       }
   });

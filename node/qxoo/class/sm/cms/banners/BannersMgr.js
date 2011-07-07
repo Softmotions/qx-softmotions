@@ -120,6 +120,7 @@ qx.Class.define("sm.cms.banners.BannersMgr", {
                       var bitem = {
                           id: mediaItem["_id"],
                           name: mediaItem["name"],
+                          description: "",
                           weight: 1,
                           link: ""
                       };
