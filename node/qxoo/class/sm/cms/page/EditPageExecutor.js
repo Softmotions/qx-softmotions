@@ -250,51 +250,62 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   me.__asmMeta(doc["asm"], ctx, function(err, meta) {
                       if (err || !meta) {
                           finish();
+                          return;
                       }
-                      //Process page attributes
-                      var attrs = doc["attrs"];
-                      var loadTasks = [];
 
-                      for (var an in attrs) {
-                          var av = attrs[an];
-                          var attrMeta = meta[an];
-                          if (!attrMeta) {
-                              delete attrs[an];
-                              continue;
+                      sm.cms.page.AttrSubscriptionMgr.getAllSubscriptions(doc["_id"], function(err, subscriptions) {
+                          if (err) {
+                              finish();
+                              return;
                           }
 
-                          var loadAs = attrMeta["loadAs"];
-                          if (av != null && av["value"] != null && (loadAs == null || loadAs === "value")) { //already have value
-                              continue;
+                          doc["_subscriptions"] = subscriptions;
+
+                          //Process page attributes
+                          var attrs = doc["attrs"];
+                          var loadTasks = [];
+
+                          for (var an in attrs) {
+                              var av = attrs[an];
+                              var attrMeta = meta[an];
+                              if (!attrMeta) {
+                                  delete attrs[an];
+                                  continue;
+                              }
+
+                              var loadAs = attrMeta["loadAs"];
+                              if (av != null && av["value"] != null && (loadAs == null || loadAs === "value")) { //already have value
+                                  continue;
+                              }
+                              if ((typeof attrMeta["loadAs"]) === "function") {
+                                  loadAs = attrMeta["loadAs"];
+                              } else {
+                                  loadAs = sm.cms.asm.AttrConverter.loadCtxVal; //assume ctx val todo?
+                              }
+                              loadTasks.push([an, loadAs]);
                           }
-                          if ((typeof attrMeta["loadAs"]) === "function") {
-                              loadAs = attrMeta["loadAs"];
+
+                          //Use custom loaders to get attr value
+                          if (loadTasks.length == 0) {
+                              finish();
                           } else {
-                              loadAs = sm.cms.asm.AttrConverter.loadCtxVal; //assume ctx val todo?
+                              var tc = loadTasks.length;
+                              for (var i = 0; i < loadTasks.length; ++i) {
+                                  var an = loadTasks[i][0];
+                                  var loadFunc = loadTasks[i][1];
+                                  loadFunc(an, attrs[an], doc, function(err, val) {
+                                      if (err) {
+                                          delete attrs[an];
+                                      } else {
+                                          attrs[an] = {"value" : val};
+                                      }
+                                      if (--tc == 0) {
+                                          finish();
+                                      }
+                                  });
+                              }
                           }
-                          loadTasks.push([an, loadAs]);
-                      }
-
-                      //Use custom loaders to get attr value
-                      if (loadTasks.length == 0) {
-                          finish();
-                      } else {
-                          var tc = loadTasks.length;
-                          for (var i = 0; i < loadTasks.length; ++i) {
-                              var an = loadTasks[i][0];
-                              var loadFunc = loadTasks[i][1];
-                              loadFunc(an, attrs[an], doc, function(err, val) {
-                                  if (err) {
-                                      delete attrs[an];
-                                  } else {
-                                      attrs[an] = {"value" : val};
-                                  }
-                                  if (--tc == 0) {
-                                      finish();
-                                  }
-                              });
-                          }
-                      }
+                      });
                   });
               });
           },
@@ -687,6 +698,50 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     });
                 }
               );
+          },
+
+          /**
+           * Update (enable/disable) attribute synchronization
+           */
+          __page_update_sync : function(req, resp, ctx) {
+              var me = this;
+
+              var ref = req.params["ref"];
+              var attribute = req.params["attribute"];
+              if (!qx.lang.Type.isString(ref) || !qx.lang.Type.isString(attribute) || ref == "" || attribute == "") {
+                  throw new sm.nsrv.Message("Invalid request", true);
+              }
+
+              var enable = req.params["enable"];
+
+              if (enable == "true") {
+                  var parent = req.params["parent"];
+                  if (!qx.lang.Type.isString(parent) || parent == "") {
+                      throw new sm.nsrv.Message("Invalid request", true);
+                  }
+
+                  sm.cms.page.AttrSubscriptionMgr.addSubscription(parent, ref, attribute, function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
+                      sm.cms.page.AttrSubscriptionMgr.synchronizeSubscriber(ref, attribute, function(err){
+                          if (err) {
+                              me.handleError(resp, ctx, err);
+                              return;
+                          }
+                          me.writeJSONObject({}, resp, ctx);
+                      });
+                  });
+              } else {
+                  sm.cms.page.AttrSubscriptionMgr.removeSubscription(ref, attribute, function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
+                      me.writeJSONObject({}, resp, ctx);
+                  });
+              }
           }
       },
 
@@ -726,6 +781,11 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
           "/page/update/acl" : {
               webapp : "adm",
               handler :"__page_update_acl"
+          },
+
+          "/page/update/attrsync" : {
+              webapp : "adm",
+              handler : "__page_update_sync"
           }
       }
   });

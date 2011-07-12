@@ -68,14 +68,13 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           __options : null,
 
+          __synchronize : null,
+          __synchronizeInfo : null,
+
           /**
            * List of widgets and its enabled rules
            */
-          __tollbar_items : null,
-
-          __synchronize: null,
-          __synchronizePath: null,
-
+          __toolbar_items : null,
 
           ///////////////////////////////////////////////////////////////////////////
           //                         sm.table.ToolbarTable                         //
@@ -143,7 +142,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
                   mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
                   mb.addListener("execute", function(ev) {
-                      this.__manageSync();
+                      this.__manageSync(true);
                   }, this);
                   this.__toolbar_items.push({
                         item: mb,
@@ -154,13 +153,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
                   mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
                   mb.addListener("execute", function(ev) {
-                      sm.cms.Application.confirm(this.tr("Вы действительно хотите отключить синхронизацию?"), function(res){
-                          if(res) {
-                              this.__synchronize = null;
-                              this.__synchronizePath = "";
-                              this.__applyEditorEnabled();
-                          }
-                      }, this);
+                      this.__manageSync(false);
                   }, this);
                   this.__toolbar_items.push({
                         item: mb,
@@ -232,7 +225,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
               if (this.__options["synchronizable"] && this.__synchronize) {
                   table.setEnabled(false);
-                  table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с ").toString() + (this.__synchronizePath || ""));
+                  table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с %1", this.__synchronizeInfo["cachedPath"] || "").toString());
               } else {
                   table.setEnabled(true);
                   table.setAdditionalStatusBarText("");
@@ -277,27 +270,17 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           },
 
           // enable menu synchronization
-          __manageSync : function() {
-              var dlg = new sm.cms.page.PageLinkDlg({
-                    "oklabel": this.tr("Выбрать"),
-                    "requireLinkName": false,
-                    "allowOuterLinks" : false
-                });
-              dlg.addListener("pageSelected", function(ev) {
-                  var data = ev.getData();
-                  if (this.__options.pageInfo && this.__options.pageInfo["_id"] == data[0]) {
-                      sm.cms.Application.alert(this.tr("Нельзя синхронизовывать с тойже страницей!"));
-                      return;
-                  }
+          __manageSync : function(enable) {
+              if (this.__options["synchronizeCallback"]) {
+                this.__options["synchronizeCallback"](enable);
+              }
+          },
 
-                  this.__synchronize = data[0];
-                  this.__synchronizePath = data[2].join("/");
+          setSynchronize: function(isSynch, syncInfo) {
+              this.__synchronize = !!isSynch;
+              this.__synchronizeInfo = isSynch ? syncInfo || {} : {};
 
-                  dlg.close();
-
-                  this.__applyEditorEnabled();
-              }, this);
-              dlg.open();
+              this.__applyEditorEnabled();
           },
 
           ///////////////////////////////////////////////////////////////////////////
@@ -307,33 +290,25 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           // overridden
           setValue : function(value) {
-              value = value || {};
-              if (!qx.lang.Type.isObject(value)) {
-                  qx.log.Logger.error(this, "Value is not object", value);
-                  value = {};
+              if (value == null) {
+                  value = [];
               }
-
-              value.items = value.items || [];
-              if (!qx.lang.Type.isArray(value.items)) {
-                  qx.log.Logger.error(this, "Value items is not array", value.items);
-                  value.items = [];
+              if (!qx.lang.Type.isArray(value)) {
+                  qx.log.Logger.error(this, "Value is not array ", value);
+                  value = [];
               }
-              this.__synchronize = value.synchronize = this.__options["synchronizable"] ? value.synchronize : null;
-              this.__synchronizePath = value.synchronizePath = this.__options["synchronizable"] ? value.synchronizePath : null;
-
               var tdata = [];
-              for (var i = 0; i < value.items.length; ++i) {
-                  var name = value.items[i]["name"];
-                  var link = value.items[i]["link"];
+              for (var i = 0; i < value.length; ++i) {
+                  var name = value[i]["name"];
+                  var link = value[i]["link"];
                   if (name == null || link == null) {
                       continue;
                   }
                   var rdata = [name, link];
-                  rdata.rowData = value.items[i];
+                  rdata.rowData = value[i];
                   tdata.push(rdata);
               }
 
-              var table = this.getTable();
               var tm = this.getTableModel();
               tm.setData(tdata);
 
@@ -344,35 +319,23 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           // overridden
           resetValue : function() {
-              this.setValue({});
+              this.setValue([]);
           },
 
           // overridden
           getValue : function() {
-              if (this.__options["synchronizable"] && this.__synchronize) {
-                  return {
-                      synchronize: this.__synchronize,
-                      synchronizePath: this.__synchronizePath || "",
-                      items: []
-                  };
-              } else {
-                  var obj = [];
-                  var tdata = this.getTableModel().getData();
-                  for (var i = 0; i < tdata.length; ++i) {
-                      obj.push(tdata[i].rowData);
-                  }
-
-                  return {
-                      synchronize: null,
-                      synchronizePath: "",
-                      items: obj
-                  };
+              var obj = [];
+              var tdata = this.getTableModel().getData();
+              for (var i = 0; i < tdata.length; ++i) {
+                  obj.push(tdata[i].rowData);
               }
-          },
-
-          destruct : function() {
-              this.__toolbar_items = this.__options = this.__synchronize = null;
+              return obj;
           }
+      },
+
+      destruct : function() {
+          this.__toolbar_items = this.__options = null;
+          this.__synchronize = this.__synchronizeInfo = null;
       }
   });
 
