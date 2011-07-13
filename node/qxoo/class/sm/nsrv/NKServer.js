@@ -99,8 +99,16 @@ qx.Class.define("sm.nsrv.NKServer", {
            * Server startup
            */
           startup : function(port, host, filters) {
+
+              var me = this;
+
               if (this.__server) {
-                  this.shutdown();
+                  this.shutdown(function() {
+                    if (me.__server == null) {
+                        me.startup(port, host, filters);
+                    }
+                  });
+                  return;
               }
 
               port = port || 3000;
@@ -116,21 +124,20 @@ qx.Class.define("sm.nsrv.NKServer", {
                       chandlers.push(filters[i]);
                   }
               }
+
               var vengines = qx.lang.Object.getValues(this.__vengines);
               for (var i = 0; i < vengines.length; ++i) {
                   var ve = vengines[i];
                   var srv = ve.createConnectServer();
 
-                  //Preconfigure server by custom config interceptors
+                  //Postconfigure connect HTTP server by custom config interceptors
                   var ciInst = null;
                   var ci = this.self(arguments).__CS_INTERCEPTORS;
                   while (ci.length > 0 && (ciInst = ci.shift()) != null) {
-                      if (typeof ciInst == "function") {
-                          try {
-                              ciInst.call(ciInst, srv);
-                          } catch(e) {
-                              qx.log.Logger.error(this, e);
-                          }
+                      try {
+                          ciInst.call(ciInst, srv, this);
+                      } catch(e) {
+                          qx.log.Logger.error(this, e);
                       }
                   }
 
@@ -162,22 +169,31 @@ qx.Class.define("sm.nsrv.NKServer", {
           /**
            * Server shutdown
            */
-          shutdown : function() {
+          shutdown : function(cb) {
               if (this.__server) {
-                  qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
-                  try {
-                      this.fireDataEvent("shutdown", this);
-                      this.__server.close();
-                  } finally {
-                      this.__server = null;
-                  }
+                  var me = this;
+                  this.fireDataEvent("shutdown", this);
+                  $$node.process.nextTick(function() {
+                      qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
+                      try {
+                          me.__server.close();
+                      } finally {
+                          me.__server = null;
+                          if (cb) {
+                              cb();
+                          }
+                      }
+                  });
+              } else if (cb) {
+                  cb();
               }
           }
       },
 
       destruct : function() {
-          this.shutdown();
-          this.__server = null;
-          this._disposeMap("__vengines");
+          var me = this;
+          this.shutdown(function() {
+              me._disposeMap("__vengines");
+          });
       }
-  });
+});
