@@ -720,28 +720,94 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                       throw new sm.nsrv.Message("Invalid request", true);
                   }
 
-                  sm.cms.page.AttrSubscriptionMgr.addSubscription(parent, ref, attribute, function(err) {
-                      if (err) {
-                          me.handleError(resp, ctx, err);
-                          return;
-                      }
-                      sm.cms.page.AttrSubscriptionMgr.synchronizeSubscriber(ref, attribute, function(err){
-                          if (err) {
-                              me.handleError(resp, ctx, err);
-                              return;
-                          }
-                          me.writeJSONObject({}, resp, ctx);
-                      });
-                  });
+                  // load page asm names
+                  var asms = {};
+                  var pcoll = sm.cms.page.PageMgr.getColl();
+                  pcoll.createQuery({_id: {$in: [pcoll.toObjectID(ref), pcoll.toObjectID(parent)]}}, {fields: {_id: 1, asm: 1}})
+                  .each(function(index, item){
+                        asms[item["_id"]] = item["asm"];
+                    })
+                  .exec(function(err){
+                        if (err) {
+                            me.handleError(resp, ctx, err);
+                            return;
+                        }
+
+                        if (!asms[ref] || !asms[parent]) {
+                            me.writeJSONObject({state: false}, resp, ctx);
+                            return;
+                        }
+
+                        // check subscription allow
+                        me.__check_subscription_allow(asms[ref], asms[parent], attribute, ctx, function(state) {
+                            if (!state) {
+                                me.writeJSONObject({state: false}, resp, ctx);
+                                return;
+                            }
+
+                            // add subscription
+                            sm.cms.page.AttrSubscriptionMgr.addSubscription(parent, ref, attribute, function(err) {
+                                if (err) {
+                                    me.handleError(resp, ctx, err);
+                                    return;
+                                }
+                                // one time synchronization
+                                sm.cms.page.AttrSubscriptionMgr.synchronizeSubscriber(ref, attribute, function(err){
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
+                                    me.writeJSONObject({state: true}, resp, ctx);
+                                });
+                            });
+                        });
+                    });
               } else {
                   sm.cms.page.AttrSubscriptionMgr.removeSubscription(ref, attribute, function(err) {
                       if (err) {
                           me.handleError(resp, ctx, err);
                           return;
                       }
-                      me.writeJSONObject({}, resp, ctx);
+                      me.writeJSONObject({state: true}, resp, ctx);
                   });
               }
+          },
+
+          /**
+           * Check allow subscription: check equals for attribute editors in asm meta definition
+           */
+          __check_subscription_allow: function(lasm, sasm, attrName, ctx, cb) {
+              var me = this;
+
+              if (lasm == sasm) {
+                  cb(true);
+                  return;
+              }
+
+              // load first asm
+              me.__asmMeta(lasm, ctx, function(err, lasmMeta) {
+                  if (err || !lasmMeta || !lasmMeta[attrName]) {
+                      cb(false);
+                      return;
+                  }
+                  var lattrMeta = lasmMeta[attrName] || {};
+                  var leditor = lattrMeta["editor"];
+                  var ledName = qx.lang.Type.isString(leditor) ? leditor : (leditor ? leditor["name"] : null);
+
+                  // load second asm
+                  me.__asmMeta(sasm, ctx, function(err, sasmMeta){
+                      if (err || !sasmMeta || !sasmMeta[attrName]) {
+                          cb(false);
+                          return;
+                      }
+
+                      var sattrMeta = sasmMeta[attrName] || {};
+                      var seditor = sattrMeta["editor"];
+                      var sedName = qx.lang.Type.isString(seditor) ? seditor : (seditor ? seditor["name"] : null);
+
+                      cb(ledName === sedName);
+                  });
+              });
           }
       },
 

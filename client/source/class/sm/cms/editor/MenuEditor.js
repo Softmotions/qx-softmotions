@@ -131,6 +131,12 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                       req.setParameter("attribute", this.__options["attrName"]);
                       req.setParameter("parent", data[0]);
                       req.send(function(resp) {
+                          var state = resp.getContent();
+                          if (!state || !state.state) {
+                              sm.cms.Application.alert(this.tr("Невозможно синхронизоваться с выбранной страницей!"));
+                              return;
+                          }
+
                           this.__mtable.setEnabled(true);
 
                           var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.info"), "POST", "application/json");
