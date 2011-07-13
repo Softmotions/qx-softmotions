@@ -12,10 +12,28 @@ qx.Class.define("sm.nsrv.NKServer", {
 
       statics :
       {
+         __CS_INTERCEPTORS : [],
+
+         registerConnectServerConfigInterceptor : function(ic) {
+             if (typeof ic == "function") {
+                 this.__CS_INTERCEPTORS.push(ic);
+             }
+         }
       },
 
       events :
       {
+          /**
+           * Fired if NKServer started listening
+           * data: NKServer instance
+           */
+         "startup" : "qx.event.type.Data",
+
+          /**
+           * Fired if NKServer going to shutdown
+           * data: NKServer instance
+           */
+         "shutdown" : "qx.event.type.Data"
       },
 
       properties :
@@ -82,10 +100,7 @@ qx.Class.define("sm.nsrv.NKServer", {
            */
           startup : function(port, host, filters) {
               if (this.__server) {
-                  try {
-                      this.__server.close();
-                  } catch(e) {
-                  }
+                  this.shutdown();
               }
 
               port = port || 3000;
@@ -104,10 +119,26 @@ qx.Class.define("sm.nsrv.NKServer", {
               var vengines = qx.lang.Object.getValues(this.__vengines);
               for (var i = 0; i < vengines.length; ++i) {
                   var ve = vengines[i];
-                  chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
+                  var srv = ve.createConnectServer();
+
+                  //Preconfigure server by custom config interceptors
+                  var ciInst = null;
+                  var ci = this.self(arguments).__CS_INTERCEPTORS;
+                  while (ci.length > 0 && (ciInst = ci.shift()) != null) {
+                      if (typeof ciInst == "function") {
+                          try {
+                              ciInst.call(ciInst, srv);
+                          } catch(e) {
+                              qx.log.Logger.error(this, e);
+                          }
+                      }
+                  }
+
+                  chandlers.push(this.__vhost(ve.getVHostName(), srv));
               }
               this.__server = new connect.HTTPServer(chandlers);
               this.__server.listen(port, host);
+              this.fireDataEvent("startup", this);
           },
 
           __vhost : function(hostname, server) {
@@ -135,6 +166,7 @@ qx.Class.define("sm.nsrv.NKServer", {
               if (this.__server) {
                   qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
                   try {
+                      this.fireDataEvent("shutdown", this);
                       this.__server.close();
                   } finally {
                       this.__server = null;
