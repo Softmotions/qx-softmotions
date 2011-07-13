@@ -27,13 +27,13 @@ qx.Class.define("sm.nsrv.NKServer", {
            * Fired if NKServer started listening
            * data: NKServer instance
            */
-         "startup" : "qx.event.type.Data",
+         "started" : "qx.event.type.Data",
 
           /**
            * Fired if NKServer going to shutdown
            * data: NKServer instance
            */
-         "shutdown" : "qx.event.type.Data"
+         "goingshutdown" : "qx.event.type.Data"
       },
 
       properties :
@@ -143,9 +143,12 @@ qx.Class.define("sm.nsrv.NKServer", {
 
                   chandlers.push(this.__vhost(ve.getVHostName(), srv));
               }
-              this.__server = new connect.HTTPServer(chandlers);
-              this.__server.listen(port, host);
-              this.fireDataEvent("startup", this);
+
+              $$node.process.nextTick(function() {
+                  me.__server = new connect.HTTPServer(chandlers);
+                  me.__server.listen(port, host);
+                  me.fireDataEvent("started", this);
+              });
           },
 
           __vhost : function(hostname, server) {
@@ -172,7 +175,7 @@ qx.Class.define("sm.nsrv.NKServer", {
           shutdown : function(cb) {
               if (this.__server) {
                   var me = this;
-                  this.fireDataEvent("shutdown", this);
+                  this.fireDataEvent("goingshutdown", this);
                   $$node.process.nextTick(function() {
                       qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
                       try {
