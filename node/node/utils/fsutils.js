@@ -6,48 +6,214 @@
 // Various filesystem utils
 
 
-var l_fs = require("fs");
+var l_fs = require("fs-ext");
 var l_path = require("path");
 var l_regexp = require("utils/regexp");
 
+const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
+module.exports.FileSeparator = FileSeparator;
 
-//todo perform locking, need c++ addon
-var fLock = false;
+
+///////////////////////////////////////////////////////////////////////////
+//                    Read/Write files with lock options                 //
+///////////////////////////////////////////////////////////////////////////
+
+
 var writeFileLock = module.exports.writeFileLock = function(path, data, enc, cb) {
-    if (fLock) {
-        process.nextTick(function() {
-            writeFileLock(path, data, enc, cb);
+    l_fs.open(path, "w", null, function(err, fd) {
+        if (err) {
+            if (cb) {
+                cb(err);
+            }
+            return;
+        }
+        l_fs.flock(fd, "ex", function(err) {
+            if (err) {
+                l_fs.close(fd, function() {
+                    if (cb) {
+                        cb(err);
+                    }
+                });
+                return;
+            }
+            //fd, data, position, encoding, callback
+            l_fs.write(fd, data, 0, enc, function(err) {
+                l_fs.flock(fd, "un", function() {
+                    l_fs.close(fd, function() {
+                        if (cb) {
+                            cb(err);
+                        }
+                    });
+                });
+            });
         });
-        return;
-    }
-    l_fs.writeFile(path, data, enc, function(err) {
-        fLock = false;
-        if (cb) cb(err);
     });
 };
 
 var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
-    if (fLock) {
-        process.nextTick(function() {
-            readFileLock(path, cb);
+    l_fs.open(path, "r", null, function(err, fd) {
+        if (err) {
+            if (cb) {
+                cb(err);
+            }
+            return;
+        }
+        l_fs.flock(fd, "sh", function(err) {
+            if (err) {
+                l_fs.close(fd, function() {
+                    if (cb) {
+                        cb(err);
+                    }
+                });
+                return;
+            }
+            readFileFd(fd, enc, function(err, data) {
+                l_fs.flock(fd, "un", function() {
+                    l_fs.close(fd, function() {
+                        if (cb) {
+                            cb(err, data);
+                        }
+                    });
+                });
+            });
         });
-        return;
-    }
-    l_fs.readFile(path, enc, function(err, data) {
-        fLock = false;
-        if (cb) cb(err, data);
     });
 };
 
 var readFileLockSync = module.exports.readFileLockSync = function(path, enc) {
-    //todo perform locking, need c++ addon
-    return l_fs.readFileSync(path, enc);
+    var data = null;
+    var fd = l_fs.openSync(path, "r");
+    try {
+        l_fs.flockSync(fd, "sh");
+        try {
+            data = readFileFdSync(fd, enc);
+        } finally {
+            l_fs.flockSync(fd, "un");
+        }
+    } finally {
+        l_fs.closeSync(fd);
+    }
+    return data;
 };
 
-var writeFileLockSync = module.exports.writeFileLockSync = function(path, data, enc) {
-    //todo perform locking, need c++ addon
-    return l_fs.writeFileSync(path, data, enc);
+
+///////////////////////////////////////////////////////////////////////////
+//                       Read/Write files by FD                          //
+///////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Read entire file reffered by file descriptor (fd)
+ * @param fd {Integer} File descriptor
+ * @param enc {String?null} Optional encoding
+ * @param callback {function(err, data)?null} Optional callback
+ */
+var readFileFd = module.exports.readFileFd = function(fd, enc, callback) {
+
+    var encoding = typeof(enc) === 'string' ? enc : null;
+    var callback = arguments[arguments.length - 1];
+    if (typeof(callback) !== 'function') {
+        callback = function() {
+        };
+    }
+    var readStream = fs.createReadStream(null, {"fd" : fd});
+    readStream.emit('open', fd);
+    readStream.resume();
+
+    var buffers = [];
+    var nread = 0;
+
+    readStream.on('data', function(chunk) {
+        buffers.push(chunk);
+        nread += chunk.length;
+    });
+
+    readStream.on('error', function(er) {
+        callback(er);
+        readStream.destroy();
+    });
+
+    readStream.on('end', function() {
+        // copy all the buffers into one
+        var buffer;
+        switch (buffers.length) {
+            case 0:
+                buffer = new Buffer(0);
+                break;
+            case 1:
+                buffer = buffers[0];
+                break;
+            default: // concat together
+                buffer = new Buffer(nread);
+                var n = 0;
+                buffers.forEach(function(b) {
+                    var l = b.length;
+                    b.copy(buffer, n, 0, l);
+                    n += l;
+                });
+                break;
+        }
+        if (encoding) {
+            try {
+                buffer = buffer.toString(encoding);
+            } catch (er) {
+                return callback(er);
+            }
+        }
+        callback(null, buffer);
+    });
 };
+
+
+/**
+ * Read entire file reffered by file descriptor (fd)
+ * File descriptor will not be closed upon completion.
+ *
+ * @param fd {Integer} File descriptor
+ * @param enc {String?null} Optional encoding
+ */
+var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
+
+    var buffer = new Buffer(4048);
+    var buffers = [];
+    var nread = 0;
+    var lastRead = 0;
+
+    do {
+        if (lastRead) {
+            buffer._bytesRead = lastRead;
+            nread += lastRead;
+            buffers.push(buffer);
+        }
+        var buffer = new Buffer(4048);
+        lastRead = l_fs.readSync(fd, buffer, 0, buffer.length, null);
+    } while (lastRead > 0);
+
+    if (buffers.length > 1) {
+        var offset = 0;
+        var i;
+        buffer = new Buffer(nread);
+        buffers.forEach(function(i) {
+            if (!i._bytesRead) return;
+            i.copy(buffer, offset, 0, i._bytesRead);
+            offset += i._bytesRead;
+        });
+    } else if (buffers.length) {
+        // buffers has exactly 1 (possibly zero length) buffer, so this should
+        // be a shortcut
+        buffer = buffers[0].slice(0, buffers[0]._bytesRead);
+    } else {
+        buffer = new Buffer(0);
+    }
+
+    if (encoding) buffer = buffer.toString(encoding);
+    return buffer;
+};
+
+
+///////////////////////////////////////////////////////////////////////////
+//                         Directory & path staff                        //
+///////////////////////////////////////////////////////////////////////////
 
 
 /**
@@ -88,13 +254,6 @@ module.exports.mkdirsSync = function (dirname, mode) {
 
 
 /**
- * Current file separator
- */
-  const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
-module.exports.FileSeparator = FileSeparator;
-
-
-/**
  * Returns true of path is absolute
  * @param path {String}
  * @param os {String? undefined} OS id
@@ -113,6 +272,10 @@ module.exports.isAbsolutePath = function(path) {
         return ((c >= 'a' && c <= 'z') && colon == 1 && path.length > 2 && path.charAt(2) == FileSeparator);
     }
 };
+
+///////////////////////////////////////////////////////////////////////////
+//                            Directory scanner                          //
+///////////////////////////////////////////////////////////////////////////
 
 const DirectoryScanner = function(rootDir, scanSpec) {
 

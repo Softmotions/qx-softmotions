@@ -143,54 +143,78 @@ qx.Class.define("sm.app.Env", {
            * Return instance of JSON config.
            * Caller must use {@link #setJSONConfig} to save modifications and
            * notify observers
-           * @param name Name of config
+           * @param name{String} Name of config
+           * @param notCheckTemplate{Boolean?false} If true do not try to load template file
            * @return {Object} Json config
            */
-          getJSONConfig : function(name) {
+          getJSONConfig : function(name, notCheckTemplate) {
               var c = this.__jsonConfigCache[name];
               if (c) {
                   return c;
+              }
+              if (notCheckTemplate) {
+                 return null;
               }
               var fname = name + ".json";
               var cpath = this.__envBase + fname;
               if (!this.__lpath.existsSync(cpath)) {
                   var tpath = this.getTmplDir() + fname;
                   if (this.__lpath.existsSync(tpath)) {
-                      this.setJSONConfig(name, this.__readFileJSONTemplate(tpath));
+                      this.setJSONConfig(name, this._readFileJSONTemplate(tpath));
                       return this.__jsonConfigCache[name];
                   } else {
                       throw new Error("Unable to load config, no template: " + tpath);
                   }
               } else {
-                  c = this.__jsonConfigCache[name] = this.__readFileJSON(cpath);
+                  c = this.__jsonConfigCache[name] = this._readFileJSON(cpath);
               }
               return c;
           },
 
           /**
-           * Update named JSON configuration and store it in file
+           * Save named JSON configuration and store it in file
            *
            * @param name Name of config
            * @param object Javascript to be stored in file as Json
+           * @param cb {function?null} Optional callback
            */
-          setJSONConfig : function(name, object) {
+          setJSONConfig : function(name, object, cb) {
               var me = this;
               var fname = name + ".json";
               var cpath = this.__envBase + fname;
               this.__jsonConfigCache[name] = object;
-              this.__lfsutils.writeFileLock(cpath, qx.util.Json.stringify(object, true), "utf8", function() {
+              this.__lfsutils.writeFileLock(cpath, qx.util.Json.stringify(object, true), "utf8", function(err) {
                   me.fireDataEvent("configChanged", name);
+                  if (err) {
+                      qx.log.Logger.error(me, "setJSONConfig", err);
+                  }
+                  if (cb != null) {
+                      cb(err);
+                  }
               });
           },
 
-          __readFileJSONTemplate : function(path) {
+          /**
+           * Update(merge) named JSON configuration
+           *
+           * @param name
+           * @param object
+           * @param cb
+           */
+          updateJSONConfig : function(name, object, cb) {
+              var cfg = this.getJSONConfig(name);
+              qx.lang.Object.mergeWith(cfg, object, true);
+              this.setJSONConfig(name, cfg, cb);
+          },
+
+          _readFileJSONTemplate : function(path) {
               var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
               //todo use template engine!!!
               var data = fdata.replace(/\$\{install_path\}/g, $$node.process.cwd());
               return qx.util.Json.parse(data);
           },
 
-          __readFileJSON : function(path) {
+          _readFileJSON : function(path) {
               var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
               return qx.util.Json.parse(fdata);
           },
