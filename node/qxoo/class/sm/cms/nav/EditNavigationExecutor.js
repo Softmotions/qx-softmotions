@@ -172,7 +172,7 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
               }
               ref = ref.substring(category.path.length + 1);//+ dot symbol
 
-              (category.mgr).renameNode(req, ref, req.params["name"], function(err, status) {
+              (category.mgr).renameNode(req, ref, req.params["name"], null, function(err, status) {
                   if (err) {
                       me.handleError(resp, ctx, err, false, true);
                       return;

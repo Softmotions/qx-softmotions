@@ -169,7 +169,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
            * @param nodeId {String} node id
            * @param name {String} new node name
            */
-          renameNode : function(req, nodeId, name, cb) {
+          renameNode : function(req, nodeId, name, options, cb) {
               var me = this;
               this.getPageAccessMask(req, nodeId, function(err, mask) {
                   if (err) {
@@ -183,7 +183,9 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   me._updateNode(nodeId, {
                         "name": qx.lang.String.trim(name),
                         "mdate": qx.lang.Date.now()
-                    }, cb);
+                    },
+                    options,
+                    cb);
               });
           },
 
@@ -192,8 +194,10 @@ qx.Class.define("sm.cms.page.PageMgr", {
            *
            * @param nodeId {String} node id
            * @param node {pagenode} new node specification
+           * @param options options for update
+           *                  nameNonUnique - if true don't check node name unique
            */
-          _updateNode : function(nodeId, node, cb) {
+          _updateNode : function(nodeId, node, options, cb) {
               var me = this;
               var mongo = this.__getMongo();
               var coll = this.getColl();
@@ -211,15 +215,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
                   // пытаемся найти в текущем разделе ноду с новым именем. если её нет - сохраняем
                   var q = sm.cms.page.PageMgr.getChildNodesQuery(doc["parent"] ? mongo.toObjectID(doc["parent"]["oid"]) : null);
                   q.updateQuery({"name" : node["name"], "_id" : {"$ne": mongo.toObjectID(doc["_id"])}});
-                  coll.findOne(q.getQuery(), function(err, cand) {
-                      if (err) {
-                          cb(err, null);
-                          return;
-                      }
-                      if (cand) {
-                          cb(me.tr("Страница с именем: %1 уже существует", node.name));
-                          return;
-                      }
+
+                  var doUpdate = function() {
                       qx.lang.Object.mergeWith(doc, node, true);
                       if (doc["cdate"] == null) {
                           doc["cdate"] = doc["mdate"];
@@ -231,7 +228,27 @@ qx.Class.define("sm.cms.page.PageMgr", {
                           }
                           me.__updateNodeCachedPath(doc, cb);
                       });
-                  });
+                  };
+
+                  // check name unique if:
+                  //    page is not news
+                  //    options not specified
+                  //    "nameNonUnique" option is not "true"
+                  if (doc["type"] != me.TYPE_NEWS_PAGE && (!options || !options["nameNonUnique"])) {
+                      coll.findOne(q.getQuery(), function(err, cand) {
+                          if (err) {
+                              cb(err, null);
+                              return;
+                          }
+                          if (cand) {
+                              cb(me.tr("Страница с именем: %1 уже существует", node.name));
+                              return;
+                          }
+                          doUpdate();
+                      });
+                  } else {
+                      doUpdate();
+                  }
               });
           },
 

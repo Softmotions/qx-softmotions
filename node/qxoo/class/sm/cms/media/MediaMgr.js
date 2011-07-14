@@ -145,23 +145,33 @@ qx.Class.define("sm.cms.media.MediaMgr", {
                       cb(err, null);
                       return;
                   }
-                  if (doc) {
+
+                  // check unique media node only for categories
+                  if (doc && doc["type"] == 0) {
                       cb("Элемент с именем: '" + node.name + "' уже существует", null);
                       return;
                   }
 
-                  doc = node;
-                  if (parentId) {
-                      doc["parent"] = coll.toDBRef(parentId);
+                  var isAdd = !doc;
+
+                  // merge node
+                  if (!isAdd) {
+                      delete node["cdate"];
+                      doc = qx.lang.Object.mergeWith(doc, node, true);
                   } else {
-                      delete doc["parent"];
-                  }
-                  doc["mdate"] = node["mdate"];
-                  coll.save(doc, function(err, doc) {
-                      if (!err) {
-                          sm.cms.Events.getInstance().fireDataEvent("mediaAdded", [parentId, doc]);
+                      doc = node;
+                      if (parentId) {
+                          doc["parent"] = coll.toDBRef(parentId);
+                      } else {
+                          delete doc["parent"];
                       }
-                      cb(err, doc);
+                  }
+
+                  coll.save(doc, function(err, sdoc) {
+                      if (!err) {
+                          sm.cms.Events.getInstance().fireDataEvent(isAdd ? "mediaAdded" : "mediaUpdated", [parentId, isAdd ? sdoc : doc]);
+                      }
+                      cb(err, isAdd ? sdoc : doc);
                   });
               });
           },
@@ -169,18 +179,20 @@ qx.Class.define("sm.cms.media.MediaMgr", {
           /**
            * Rename node
            */
-          renameNode : function(req, nodeId, name, cb) {
+          renameNode : function(req, nodeId, name, options, cb) {
               this._updateNode(nodeId, {
                     "name": qx.lang.String.trim(name),
                     "mdate": qx.lang.Date.now()
-                }, cb);
+                },
+                options,
+                cb);
           },
 
           /**
            * Update node item.
            * Fired event sm.cms.Events#mediaUpdated
            */
-          _updateNode : function(nodeId, node, cb) {
+          _updateNode : function(nodeId, node, options, cb) {
               var mongo = this.__getMongo();
               var coll = this.getColl();
               coll.findOne({"_id" : mongo.toObjectID(nodeId)}, function(err, doc) {
