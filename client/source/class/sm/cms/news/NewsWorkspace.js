@@ -167,6 +167,20 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
               if (page == null || page["id"] == null) {
                   return false;
               }
+
+              var renBt = new qx.ui.menu.Button(this.tr("Переименовать"));
+              renBt.addListener("execute", function(ev) {
+                  var d = new sm.cms.nav.RenameNavDlg({$$data: "pages." + page["id"], label: page["name"]});
+                  d.setPosition("bottom-right");
+                  d.addListener("completed", function(ev) {
+                      d.hide();
+                      this.__reloadNews();
+                  }, this);
+                  d.placeToWidget(ev.getTarget(), false);
+                  d.show();
+              }, this);
+              contextMenu.add(renBt);
+
               var edBt = new qx.ui.menu.Button(this.tr("Редактировать"));
               edBt.addListener("execute", function() {
                   this.fireDataEvent("editNews", page["id"]);
