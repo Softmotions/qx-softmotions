@@ -181,11 +181,11 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 me._updateNode(nodeId, {
-                            "name": qx.lang.String.trim(name),
-                            "mdate": qx.lang.Date.now()
-                        },
-                        options,
-                        cb);
+                      "name": qx.lang.String.trim(name),
+                      "mdate": qx.lang.Date.now()
+                  },
+                  options,
+                  cb);
             });
         },
 
@@ -212,9 +212,6 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 }
 
                 var updateCache = doc["name"] != node["name"];
-                // пытаемся найти в текущем разделе ноду с новым именем. если её нет - сохраняем
-                var q = sm.cms.page.PageMgr.getChildNodesQuery(doc["parent"] ? mongo.toObjectID(doc["parent"]["oid"]) : null);
-                q.updateQuery({"name" : node["name"], "_id" : {"$ne": mongo.toObjectID(doc["_id"])}});
 
                 var doUpdate = function() {
                     qx.lang.Object.mergeWith(doc, node, true);
@@ -235,6 +232,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 //    options not specified
                 //    "nameNonUnique" option is not "true"
                 if (doc["type"] != me.TYPE_NEWS_PAGE && (!options || !options["nameNonUnique"])) {
+                    var q = sm.cms.page.PageMgr.getChildNodesQuery(doc["parent"] ? mongo.toObjectID(doc["parent"]["oid"]) : null);
+                    q.updateQuery({"name" : node["name"], "_id" : {"$ne": mongo.toObjectID(doc["_id"])}});
                     coll.findOne(q.getQuery(), function(err, cand) {
                         if (err) {
                             cb(err, null);
@@ -609,7 +608,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
                 //Check news page
                 if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] &&
-                        (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
+                  (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
 
                     if (req.isUserInRoles(["news.admin"])) { //if we news admin
                         cb(null, pushModes("e", "d", "r").join(""));
@@ -634,14 +633,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
             var coll = this.getColl();
             coll.findOne({_id : coll.toObjectID(pageId)},
-                    {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
-                    function(err, doc) {
-                        if (err) {
-                            cb(err, "");
-                            return;
-                        }
-                        checkAccess(doc);
-                    });
+              {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
+              function(err, doc) {
+                  if (err) {
+                      cb(err, "");
+                      return;
+                  }
+                  checkAccess(doc);
+              });
         },
 
 
@@ -682,30 +681,30 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     }
 
                     coll.createQuery({"parent" : coll.toDBRef(cnodeId)}, {"fields" : {"_id" : 1, "name" : 1}})
-                            .each(function(index, unode) {
-                                update(unode, path);
-                            })
-                            .exec(function(err) {
-                                gcb(err);
-                            });
+                      .each(function(index, unode) {
+                          update(unode, path);
+                      })
+                      .exec(function(err) {
+                          gcb(err);
+                      });
                 });
             };
 
             // search for parent (getting parent cached path)
             if (node["parent"]) {
                 coll.findOne({"_id" : mongo.toObjectID(node["parent"]["oid"])},
-                        {"fields" : {"cachedPath": 1}},
-                        function(err, parent) {
-                            if (err) {
-                                cb(err);
-                                return;
-                            }
-                            if (!parent) {
-                                cb("Parent not found");
-                                return;
-                            }
-                            update(node, parent["cachedPath"]);
-                        });
+                  {"fields" : {"cachedPath": 1}},
+                  function(err, parent) {
+                      if (err) {
+                          cb(err);
+                          return;
+                      }
+                      if (!parent) {
+                          cb("Parent not found");
+                          return;
+                      }
+                      update(node, parent["cachedPath"]);
+                  });
 
             } else {
                 update(node, "");
