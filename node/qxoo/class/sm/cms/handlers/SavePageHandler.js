@@ -39,10 +39,26 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                         }
                     });
               }
+
+              sm.cms.page.AttrSubscriptionMgr.synchronizeSubscriptions(doc["_id"]);
           },
 
           removePage : function(ev) {
               var doc = ev.getData();
+
+              //remove all subscriptions with this page
+              sm.cms.page.AttrSubscriptionMgr.removeAllSubscriptions(doc["_id"], function(err) {
+                  if (err) {
+                      qx.log.Logger.error("sm.cms.handlers.SavePageHandler#removeAllSubscriptions", err);
+                  }
+              });
+              sm.cms.page.AttrSubscriptionMgr.removeAllSubscribers(doc["_id"], function(err) {
+                  if (err) {
+                      qx.log.Logger.error("sm.cms.handlers.SavePageHandler#removeSubscribers", err);
+                  }
+              });
+
+
               if (doc.asm == null || doc.tags == null) {
                   return;
               }

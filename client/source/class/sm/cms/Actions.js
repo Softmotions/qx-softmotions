@@ -228,6 +228,13 @@ qx.Class.define("sm.cms.Actions", {
               this._addAction("page.update.acl", um.toUri("/adm/page/update/acl"));
           }
 
+          //Page attribute synchronization update
+          if (qx.core.Environment.get("sm.cms.test.urls")) {
+              this._addAction("page.update.attrsync", um.toUri("http://127.0.0.1:3001/adm/page/update/attrsync"));
+          } else {
+              this._addAction("page.update.attrsync", um.toUri("/adm/page/update/attrsync"));
+          }
+
 
           //Page preview
           if (qx.core.Environment.get("sm.cms.test.urls")) {

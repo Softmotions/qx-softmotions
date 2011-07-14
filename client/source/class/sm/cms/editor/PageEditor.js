@@ -257,6 +257,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
               var editor = mItem["editor"];
               var edName = qx.lang.Type.isString(editor) ? editor : (editor ? editor["name"] : null);
               var edOptions = (edName == editor || editor == null ? {} : editor);
+              edOptions["attrName"] = attrName;
               edOptions["pageInfo"] = pageInfo;
 
               switch (edName) {

@@ -250,51 +250,62 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   me.__asmMeta(doc["asm"], ctx, function(err, meta) {
                       if (err || !meta) {
                           finish();
+                          return;
                       }
-                      //Process page attributes
-                      var attrs = doc["attrs"];
-                      var loadTasks = [];
-
-                      for (var an in attrs) {
-                          var av = attrs[an];
-                          var attrMeta = meta[an];
-                          if (!attrMeta) {
-                              delete attrs[an];
-                              continue;
+                      sm.cms.page.AttrSubscriptionMgr.getAllSubscriptions(doc["_id"], function(err, subscriptions) {
+                          if (err) {
+                              qx.log.Logger.error(me, err);
+                              finish();
+                              return;
                           }
 
-                          var loadAs = attrMeta["loadAs"];
-                          if (av != null && av["value"] != null && (loadAs == null || loadAs === "value")) { //already have value
-                              continue;
+                          doc["_subscriptions"] = subscriptions;
+
+                          //Process page attributes
+                          var attrs = doc["attrs"];
+                          var loadTasks = [];
+
+                          for (var an in attrs) {
+                              var av = attrs[an];
+                              var attrMeta = meta[an];
+                              if (!attrMeta) {
+                                  delete attrs[an];
+                                  continue;
+                              }
+
+                              var loadAs = attrMeta["loadAs"];
+                              if (av != null && av["value"] != null && (loadAs == null || loadAs === "value")) { //already have value
+                                  continue;
+                              }
+                              if ((typeof attrMeta["loadAs"]) === "function") {
+                                  loadAs = attrMeta["loadAs"];
+                              } else {
+                                  loadAs = sm.cms.asm.AttrConverter.loadCtxVal; //assume ctx val todo?
+                              }
+                              loadTasks.push([an, loadAs]);
                           }
-                          if ((typeof attrMeta["loadAs"]) === "function") {
-                              loadAs = attrMeta["loadAs"];
+
+                          //Use custom loaders to get attr value
+                          if (loadTasks.length == 0) {
+                              finish();
                           } else {
-                              loadAs = sm.cms.asm.AttrConverter.loadCtxVal; //assume ctx val todo?
+                              var tc = loadTasks.length;
+                              for (var i = 0; i < loadTasks.length; ++i) {
+                                  var an = loadTasks[i][0];
+                                  var loadFunc = loadTasks[i][1];
+                                  loadFunc(an, attrs[an], doc, function(err, val) {
+                                      if (err) {
+                                          delete attrs[an];
+                                      } else {
+                                          attrs[an] = {"value" : val};
+                                      }
+                                      if (--tc == 0) {
+                                          finish();
+                                      }
+                                  });
+                              }
                           }
-                          loadTasks.push([an, loadAs]);
-                      }
-
-                      //Use custom loaders to get attr value
-                      if (loadTasks.length == 0) {
-                          finish();
-                      } else {
-                          var tc = loadTasks.length;
-                          for (var i = 0; i < loadTasks.length; ++i) {
-                              var an = loadTasks[i][0];
-                              var loadFunc = loadTasks[i][1];
-                              loadFunc(an, attrs[an], doc, function(err, val) {
-                                  if (err) {
-                                      delete attrs[an];
-                                  } else {
-                                      attrs[an] = {"value" : val};
-                                  }
-                                  if (--tc == 0) {
-                                      finish();
-                                  }
-                              });
-                          }
-                      }
+                      });
                   });
               });
           },
@@ -354,6 +365,28 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                               return;
                           }
 
+                          var doSave = function() {
+                              me.__setupPageKeywords(doc);
+
+                              //perform update
+                              coll.update({_id : ref}, doc, function(err, ret) {
+                                  if (err) {
+                                      me.handleError(resp, ctx, err);
+                                      return;
+                                  }
+                                  if (errCount > 0) {
+                                      me.handleError(resp, ctx, me.tr("При сохранении страницы произошли ошибки"));
+                                      return;
+                                  }
+                                  try {
+                                      me.writeJSONObject({}, resp, ctx);
+                                  } finally {
+                                      var ee = sm.cms.Events.getInstance();
+                                      ee.fireDataEvent("pageSaved", doc);
+                                  }
+                              });
+                          };
+
                           if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
                               if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
                                   me.handleError(resp, ctx,
@@ -361,27 +394,20 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                     false, true);
                                   return;
                               }
+
+                              // check all subscriptions
+                              me.__check_subscriptions(doc["_id"], oldAsm, doc["asm"], ctx, function(err) {
+                                  if (err) {
+                                      me.handleError(resp, ctx, err);
+                                      return;
+                                  }
+
+                                  doSave();
+                              });
+                          } else {
+                              doSave();
                           }
 
-                          me.__setupPageKeywords(doc);
-
-                          //perform update
-                          coll.update({_id : ref}, doc, function(err, ret) {
-                              if (err) {
-                                  me.handleError(resp, ctx, err);
-                                  return;
-                              }
-                              if (errCount > 0) {
-                                  me.handleError(resp, ctx, me.tr("При сохранении страницы произошли ошибки"));
-                                  return;
-                              }
-                              try {
-                                  me.writeJSONObject({}, resp, ctx);
-                              } finally {
-                                  var ee = sm.cms.Events.getInstance();
-                                  ee.fireDataEvent("pageSaved", doc);
-                              }
-                          });
                       });
                   };
                   if (doc["asm"] == null) { //Removed assembly ref
@@ -687,6 +713,263 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     });
                 }
               );
+          },
+
+          /**
+           * Update (enable/disable) attribute synchronization
+           */
+          __page_update_sync : function(req, resp, ctx) {
+              var me = this;
+              var smgr = sm.cms.page.AttrSubscriptionMgr;
+              var ref = req.params["ref"];
+              var attribute = req.params["attribute"];
+              if (!qx.lang.Type.isString(ref) || !qx.lang.Type.isString(attribute) || ref == "" || attribute == "") {
+                  throw new sm.nsrv.Message("Invalid request", true);
+              }
+
+              var enable = req.params["enable"];
+
+              if (enable == "true") {
+                  var parent = req.params["parent"];
+                  if (!qx.lang.Type.isString(parent) || parent == "") {
+                      throw new sm.nsrv.Message("Invalid request", true);
+                  }
+
+                  // load page asm names
+                  var asms = {};
+                  var pcoll = sm.cms.page.PageMgr.getColl();
+                  pcoll.createQuery({_id: {$in: [pcoll.toObjectID(ref), pcoll.toObjectID(parent)]}}, {fields: {_id: 1, asm: 1}})
+                    .each(function(index, item) {
+                        asms[item["_id"]] = item["asm"];
+                    })
+                    .exec(function(err) {
+                        if (err) {
+                            me.handleError(resp, ctx, err);
+                            return;
+                        }
+
+                        if (!asms[ref] || !asms[parent]) {
+                            me.writeJSONObject({state: false}, resp, ctx);
+                            return;
+                        }
+
+                        // check subscription allow
+                        me.__check_subscription_allow(asms[ref], asms[parent], attribute, ctx, function(state) {
+                            if (!state) {
+                                me.writeJSONObject({state: false}, resp, ctx);
+                                return;
+                            }
+
+                            // add subscription
+                            smgr.addSubscription(parent, ref, attribute, function(err) {
+                                if (err) {
+                                    me.handleError(resp, ctx, err);
+                                    return;
+                                }
+                                // one time synchronization
+                                smgr.synchronizeSubscriber(ref, attribute, function(err) {
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
+                                    me.writeJSONObject({state: true}, resp, ctx);
+                                });
+                            });
+                        });
+                    });
+              } else {
+                  smgr.removeSubscription(ref, attribute, function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
+                      me.writeJSONObject({state: true}, resp, ctx);
+                  });
+              }
+          },
+
+          /**
+           * Check allow subscription: check equals for attribute editors in asm meta definition
+           */
+          __check_subscription_allow: function(lasm, sasm, attrName, ctx, cb) {
+              var me = this;
+
+              if (lasm == null || sasm == null) {
+                  cb(false);
+                  return;
+              }
+
+              if (lasm == sasm) {
+                  cb(true);
+                  return;
+              }
+
+              // load first asm
+              me.__asmMeta(lasm, ctx, function(err, lasmMeta) {
+                  if (err || !lasmMeta || !lasmMeta[attrName]) {
+                      cb(false);
+                      return;
+                  }
+                  var lattrMeta = lasmMeta[attrName] || {};
+                  var leditor = lattrMeta["editor"];
+                  var ledName = qx.lang.Type.isString(leditor) ? leditor : (leditor ? leditor["name"] : null);
+
+                  // load second asm
+                  me.__asmMeta(sasm, ctx, function(err, sasmMeta) {
+                      if (err || !sasmMeta || !sasmMeta[attrName]) {
+                          cb(false);
+                          return;
+                      }
+
+                      var sattrMeta = sasmMeta[attrName] || {};
+                      var seditor = sattrMeta["editor"];
+                      var sedName = qx.lang.Type.isString(seditor) ? seditor : (seditor ? seditor["name"] : null);
+
+                      cb(ledName === sedName);
+                  });
+              });
+          },
+
+          /**
+           * check page subscriptions
+           */
+          __check_subscriptions: function(ref, oasm, nasm, ctx, cb) {
+              var me = this;
+              var smgr = sm.cms.page.AttrSubscriptionMgr;
+
+              if (oasm == nasm) {
+                  cb();
+                  return;
+              }
+
+              var oeNames = {};
+              var neNames = {};
+
+              var doCheck = function() {
+                  // load all subscriptions for page
+                  smgr.getAllSubscriptions(ref, function(err, subscriptions) {
+                      if (err) {
+                          cb(err);
+                          return;
+                      }
+
+                      // load all subscribers for page
+                      smgr.getSubscribers(ref, function(err, subsribers) {
+                          if (err) {
+                              cb(err);
+                              return;
+                          }
+
+                          var attributeNames;
+                          var index;
+
+                          // unsubscribe pages for all attributes, which editors (old & new) not equal
+                          var unsubscribe1 = function(err) {
+                              if (err) {
+                                  cb(err);
+                                  return;
+                              }
+
+                              if (++index >= attributeNames.length) {
+                                  cb();
+                                  return;
+                              }
+
+                              // check editors equal
+                              var attributeName = attributeNames[index];
+                              if (!oeNames[attributeName] || !neNames[attributeName] || oeNames[attributeName] !== neNames[attributeName]) {
+                                  qx.log.Logger.debug("Remove subscribers, page: " + ref + ", attribute: " + attributeName);
+                                  smgr.removeSubscribers(ref, attributeName, unsubscribe1);
+                              } else {
+                                  unsubscribe1();
+                              }
+                          };
+
+
+                          // remove subscriptions for all attributes, which editors (old & new) not equal
+                          var unsubscribe2 = function(err) {
+                              if (err) {
+                                  cb(err);
+                                  return;
+                              }
+
+                              if (++index >= attributeNames.length) {
+                                  attributeNames = qx.lang.Object.getKeys(subsribers);
+                                  index = -1;
+                                  unsubscribe1();
+                                  return;
+                              }
+
+                              // check editors equal
+                              var attributeName = attributeNames[index];
+                              if (!oeNames[attributeName] || !neNames[attributeName] || oeNames[attributeName] !== neNames[attributeName]) {
+                                  qx.log.Logger.debug("Remove subscription, page: " + ref + ", attribute: " + attributeName);
+                                  smgr.removeSubscription(ref, attributeName, unsubscribe2);
+                              } else {
+                                  unsubscribe2();
+                              }
+                          };
+
+                          attributeNames = qx.lang.Object.getKeys(subscriptions);
+                          index = -1;
+                          unsubscribe2();
+                      });
+                  });
+              };
+
+              if (oasm != null && oasm != "") {
+                  // load old asm
+                  me.__asmMeta(oasm, ctx, function(err, oasmMeta) {
+                      if (err) {
+                          cb(err);
+                          return;
+                      }
+
+                      if (!oasmMeta) {
+                          doCheck();
+                          return;
+                      }
+
+                      // build editor names cache
+                      var oamNames = qx.lang.Object.getKeys(oasmMeta);
+                      for (var i = 0; i < oamNames.length; ++i) {
+                          var oaName = oamNames[i];
+                          var oaMeta = oasmMeta[oaName] || {};
+                          var oeditor = oaMeta["editor"];
+                          oeNames[oaName] = qx.lang.Type.isString(oeditor) ? oeditor : (oeditor ? oeditor["name"] : null);
+                      }
+
+                      if (nasm != null && nasm != "") {
+                          // load new asm
+                          me.__asmMeta(nasm, ctx, function(err, nasmMeta) {
+                              if (err) {
+                                  cb(err);
+                                  return;
+                              }
+
+                              if (!nasmMeta) {
+                                  doCheck();
+                                  return;
+                              }
+
+                              // build editor names cache
+                              var namNames = qx.lang.Object.getKeys(nasmMeta);
+                              for (var i = 0; i < namNames.length; ++i) {
+                                  var naName = namNames[i];
+                                  var naMeta = nasmMeta[naName] || {};
+                                  var neditor = naMeta["editor"];
+                                  neNames[naName] = qx.lang.Type.isString(neditor) ? neditor : (neditor ? neditor["name"] : null);
+                              }
+
+                              doCheck();
+                          });
+                      } else {
+                          doCheck();
+                      }
+                  });
+              } else {
+                  doCheck();
+              }
           }
       },
 
@@ -726,6 +1009,11 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
           "/page/update/acl" : {
               webapp : "adm",
               handler :"__page_update_acl"
+          },
+
+          "/page/update/attrsync" : {
+              webapp : "adm",
+              handler : "__page_update_sync"
           }
       }
   });

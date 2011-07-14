@@ -50,15 +50,14 @@ qx.Class.define("sm.cms.editor.MenuTable", {
       construct : function(options) {
 
           this.__options = options || {};
-          this.__active_on_item = [];
+          this.__toolbar_items = [];
 
           this.base(arguments);
 
           this.set({allowGrowX : true, allowGrowY : false, height : 170});
 
-          for (var i = 0; i < this.__active_on_item.length; ++i) {
-              var item = this.__active_on_item[i];
-              item.setEnabled(false);
+          for (var i = 0; i < this.__toolbar_items.length; ++i) {
+              this.__doItemEnabled(this.__toolbar_items[i], false);
           }
 
           this._reload([]);
@@ -69,11 +68,13 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
           __options : null,
 
-          /**
-           * List of widgets active on selected element
-           */
-          __active_on_item : null,
+          __synchronize : null,
+          __synchronizeInfo : null,
 
+          /**
+           * List of widgets and its enabled rules
+           */
+          __toolbar_items : null,
 
           ///////////////////////////////////////////////////////////////////////////
           //                         sm.table.ToolbarTable                         //
@@ -87,13 +88,25 @@ qx.Class.define("sm.cms.editor.MenuTable", {
               mb.addListener("execute", function(e) {
                   this.__manageLink();
               }, this);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: false,
+                    inactiveOnSync: true
+                });
+
               mainPart.add(mb);
+
+              mainPart.addSeparator();
 
               mb = new qx.ui.toolbar.Button(this.tr("Удалить"), "icon/16/actions/list-remove.png");
               mb.addListener("execute", function(e) {
                   this.removeRowByIndex(this.getSelectedRowIndex());
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
 
               mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-up.png");
@@ -101,7 +114,11 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                   var ind = this.getSelectedRowIndex();
                   this.moveRowByIndex(ind, -1, true);
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
 
               mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-down.png");
@@ -109,8 +126,42 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                   var ind = this.getSelectedRowIndex();
                   this.moveRowByIndex(ind, 1, true);
               }, this);
-              this.__active_on_item.push(mb);
+              this.__toolbar_items.push({
+                    item: mb,
+                    activeOnItem: true,
+                    inactiveOnSync: true
+                });
               mainPart.add(mb);
+
+              if (this.__options["synchronizable"]) {
+                  mb = new qx.ui.toolbar.Separator().set({width: 25});
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.basic.Label("Синхронизация: ").set({alignY: "middle", marginRight: 5});
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
+                  mb.addListener("execute", function(ev) {
+                      this.__manageSync(true);
+                  }, this);
+                  this.__toolbar_items.push({
+                        item: mb,
+                        activeOnItem: false,
+                        inactiveOnSync: true
+                    });
+                  mainPart.add(mb);
+
+                  mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
+                  mb.addListener("execute", function(ev) {
+                      this.__manageSync(false);
+                  }, this);
+                  this.__toolbar_items.push({
+                        item: mb,
+                        activeOnItem: false,
+                        activeOnSync: true
+                    });
+                  mainPart.add(mb);
+              }
 
               return toolbar;
           },
@@ -119,15 +170,14 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           _createTable : function(tm) {
               var table = new sm.table.Table(tm, tm.getCustom());
               table.set({showCellFocusIndicator : false,
-                    statusBarVisible : false,
+                    statusBarVisible : !!this.__options["synchronizable"],
                     focusCellOnMouseMove : false});
 
               var smodel = table.getSelectionModel();
               smodel.addListener("changeSelection", function(ev) {
                   var scount = smodel.getSelectedCount();
-                  for (var i = 0; i < this.__active_on_item.length; ++i) {
-                      var item = this.__active_on_item[i];
-                      item.setEnabled(scount > 0);
+                  for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                      this.__doItemEnabled(this.__toolbar_items[i], scount > 0);
                   }
               }, this);
 
@@ -160,6 +210,31 @@ qx.Class.define("sm.cms.editor.MenuTable", {
           ///////////////////////////////////////////////////////////////////////////
           //                               Impl                                    //
           ///////////////////////////////////////////////////////////////////////////
+
+          // apply enabled rule for item
+          __doItemEnabled: function(item, onItem) {
+              item.item.setEnabled(
+                (!item.activeOnItem || onItem) &&
+                  (!item.inactiveOnSync || !this.__synchronize) &&
+                  (!item.activeOnSync || !!this.__synchronize)
+              );
+          },
+
+          __applyEditorEnabled: function() {
+              var table = this.getTable();
+
+              if (this.__options["synchronizable"] && this.__synchronize) {
+                  table.setEnabled(false);
+                  table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с %1", this.__synchronizeInfo["cachedPath"] || "").toString());
+              } else {
+                  table.setEnabled(true);
+                  table.setAdditionalStatusBarText("");
+              }
+
+              for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                  this.__doItemEnabled(this.__toolbar_items[i], false);
+              }
+          },
 
           // add new menu link
           __manageLink : function() {
@@ -194,6 +269,20 @@ qx.Class.define("sm.cms.editor.MenuTable", {
               dlg.open();
           },
 
+          // enable menu synchronization
+          __manageSync : function(enable) {
+              if (this.__options["synchronizeCallback"]) {
+                this.__options["synchronizeCallback"](enable);
+              }
+          },
+
+          setSynchronize: function(isSynch, syncInfo) {
+              this.__synchronize = !!isSynch;
+              this.__synchronizeInfo = isSynch ? syncInfo || {} : {};
+
+              this.__applyEditorEnabled();
+          },
+
           ///////////////////////////////////////////////////////////////////////////
           //                            StringForm stuff                           //
           ///////////////////////////////////////////////////////////////////////////
@@ -219,8 +308,12 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                   rdata.rowData = value[i];
                   tdata.push(rdata);
               }
+
               var tm = this.getTableModel();
               tm.setData(tdata);
+
+              this.__applyEditorEnabled();
+
               this.fireDataEvent("changeValue", value);
           },
 
@@ -241,7 +334,8 @@ qx.Class.define("sm.cms.editor.MenuTable", {
       },
 
       destruct : function() {
-          this.__active_on_item = this.__options = null;
+          this.__toolbar_items = this.__options = null;
+          this.__synchronize = this.__synchronizeInfo = null;
       }
   });
 

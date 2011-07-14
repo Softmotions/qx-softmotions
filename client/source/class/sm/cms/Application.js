@@ -20,6 +20,7 @@ qx.Class.define("sm.cms.Application", {
           ///////////////////////////////////////////////////////////
           //                         Alerts
           ///////////////////////////////////////////////////////////
+
           confirm : function(message, callback, context) {
               if (this.__CONFIRM == null) {
                   var root = qx.core.Init.getApplication().getRoot();
