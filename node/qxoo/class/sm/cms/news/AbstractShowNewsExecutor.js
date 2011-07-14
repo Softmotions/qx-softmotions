@@ -51,24 +51,24 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
             var me = this;
             var res = [];
             q.each(
-                    function(index, doc) {
-                        if (doc["mdate"] != null) {
-                            doc["mdateDate"] = new Date(parseInt(doc["mdate"]));
-                            doc["mdate"] = df.format(doc["mdateDate"]);
-                        }
-                        if (doc["cdate"] != null) {
-                            doc["cdateDate"] = new Date(parseInt(doc["cdate"]));
-                            doc["cdate"] = df.format(doc["cdateDate"]);
-                        }
-                        res.push(doc);
-                    }).exec(function(err) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        ctx["news"] = res;
-                        ctx();
-                    });
+              function(index, doc) {
+                  if (doc["mdate"] != null) {
+                      doc["mdateDate"] = new Date(parseInt(doc["mdate"]));
+                      doc["mdate"] = df.format(doc["mdateDate"]);
+                  }
+                  if (doc["cdate"] != null) {
+                      doc["cdateDate"] = new Date(parseInt(doc["cdate"]));
+                      doc["cdate"] = df.format(doc["cdateDate"]);
+                  }
+                  res.push(doc);
+              }).exec(function(err) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  ctx["news"] = res;
+                  ctx();
+              });
         },
 
         /**
@@ -87,13 +87,13 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                 }
             }
             this._fetch_news_list(req, resp, ctx,
-                    {"refpage" : pageId,
-                        "queryOpts" : {
-                            "sort" : [
-                                ["cdate" , -1]
-                            ],
-                            "limit" : limit != null ? limit : 8
-                        }});
+              {"refpage" : pageId,
+                  "queryOpts" : {
+                      "sort" : [
+                          ["cdate" , -1]
+                      ],
+                      "limit" : limit != null ? limit : 8
+                  }});
         },
 
         /**
@@ -109,11 +109,11 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
 
             //checked categories
             var cats = req.params["cats"];
-            if (sm.lang.String.isEmpty(cats)) {
-                cats = [];
-            }
             if (typeof cats === "string" && cats != "") {
                 cats = [cats];
+            }
+            if (cats == null || cats.constructor !== Array) {
+                cats = [];
             }
 
             pageIndex = Math.max(1, pageIndex || 1);
@@ -228,15 +228,15 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                     }
 
                     bq.updateOptions(pageOpts).each(
-                            function(index, doc) {
-                                pages.items.push(doc);
-                            }).exec(function(err) {
-                                if (err) {
-                                    me.handleError(resp, ctx, err);
-                                    return;
-                                }
-                                finish();
-                            });
+                      function(index, doc) {
+                          pages.items.push(doc);
+                      }).exec(function(err) {
+                          if (err) {
+                              me.handleError(resp, ctx, err);
+                              return;
+                          }
+                          finish();
+                      });
                 });
             });
         },
@@ -249,14 +249,14 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
             var pmgr = sm.cms.page.PageMgr;
             var coll = pmgr.getColl();
             coll.distinct("category",
-                    refpage ? {type : pmgr.TYPE_NEWS_PAGE, refpage : coll.toDBRef(refpage)} : {type : pmgr.TYPE_NEWS_PAGE},
-                    function(err, vals) {
-                        if (err) {
-                            cb(err, null);
-                            return;
-                        }
-                        cb(null, vals.sort());
-                    });
+              refpage ? {type : pmgr.TYPE_NEWS_PAGE, refpage : coll.toDBRef(refpage)} : {type : pmgr.TYPE_NEWS_PAGE},
+              function(err, vals) {
+                  if (err) {
+                      cb(err, null);
+                      return;
+                  }
+                  cb(null, vals.sort());
+              });
         },
 
 
