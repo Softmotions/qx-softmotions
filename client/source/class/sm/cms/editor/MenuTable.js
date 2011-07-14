@@ -14,328 +14,328 @@
  * Menu editor table
  */
 qx.Class.define("sm.cms.editor.MenuTable", {
-      extend : sm.table.ToolbarLocalTable,
-      implement : [
-          qx.ui.form.IStringForm,
-          qx.ui.form.IForm
-      ],
-      include : [
-          qx.ui.form.MForm,
-          qx.ui.core.MChildrenHandling,
-          sm.table.MTableMutator
-      ],
+    extend : sm.table.ToolbarLocalTable,
+    implement : [
+        qx.ui.form.IStringForm,
+        qx.ui.form.IForm
+    ],
+    include : [
+        qx.ui.form.MForm,
+        qx.ui.core.MChildrenHandling,
+        sm.table.MTableMutator
+    ],
 
-      events :
-      {
-          /** Fired when the value was modified */
-          "changeValue" : "qx.event.type.Data",
+    events :
+    {
+        /** Fired when the value was modified */
+        "changeValue" : "qx.event.type.Data",
 
-          /** Fired when the enabled state was modified */
-          "changeEnabled" : "qx.event.type.Data",
+        /** Fired when the enabled state was modified */
+        "changeEnabled" : "qx.event.type.Data",
 
-          /** Fired when the valid state was modified */
-          "changeValid" : "qx.event.type.Data",
+        /** Fired when the valid state was modified */
+        "changeValid" : "qx.event.type.Data",
 
-          /** Fired when the invalidMessage was modified */
-          "changeInvalidMessage" : "qx.event.type.Data",
+        /** Fired when the invalidMessage was modified */
+        "changeInvalidMessage" : "qx.event.type.Data",
 
-          /** Fired when the required was modified */
-          "changeRequired" : "qx.event.type.Data"
-      },
+        /** Fired when the required was modified */
+        "changeRequired" : "qx.event.type.Data"
+    },
 
-      properties :
-      {
-      },
+    properties :
+    {
+    },
 
-      construct : function(options) {
+    construct : function(options) {
 
-          this.__options = options || {};
-          this.__toolbar_items = [];
+        this.__options = options || {};
+        this.__toolbar_items = [];
 
-          this.base(arguments);
+        this.base(arguments);
 
-          this.set({allowGrowX : true, allowGrowY : false, height : 170});
+        this.set({allowGrowX : true, allowGrowY : false, height : 170});
 
-          for (var i = 0; i < this.__toolbar_items.length; ++i) {
-              this.__doItemEnabled(this.__toolbar_items[i], false);
-          }
+        for (var i = 0; i < this.__toolbar_items.length; ++i) {
+            this.__doItemEnabled(this.__toolbar_items[i], false);
+        }
 
-          this._reload([]);
-      },
+        this._reload([]);
+    },
 
-      members :
-      {
+    members :
+    {
 
-          __options : null,
+        __options : null,
 
-          __synchronize : null,
-          __synchronizeInfo : null,
+        __synchronize : null,
+        __synchronizeInfo : null,
 
-          /**
-           * List of widgets and its enabled rules
-           */
-          __toolbar_items : null,
+        /**
+         * List of widgets and its enabled rules
+         */
+        __toolbar_items : null,
 
-          ///////////////////////////////////////////////////////////////////////////
-          //                         sm.table.ToolbarTable                         //
-          ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
+        //                         sm.table.ToolbarTable                         //
+        ///////////////////////////////////////////////////////////////////////////
 
-          _createToolbarItems : function(toolbar) {
-              var mainPart = new qx.ui.toolbar.Part();
-              toolbar.add(mainPart);
+        _createToolbarItems : function(toolbar) {
+            var mainPart = new qx.ui.toolbar.Part();
+            toolbar.add(mainPart);
 
-              var mb = new qx.ui.toolbar.Button(this.tr("Новая ссылка"), "icon/16/actions/list-add.png");
-              mb.addListener("execute", function(e) {
-                  this.__manageLink();
-              }, this);
-              this.__toolbar_items.push({
+            var mb = new qx.ui.toolbar.Button(this.tr("Новая ссылка"), "icon/16/actions/list-add.png");
+            mb.addListener("execute", function(e) {
+                this.__manageLink();
+            }, this);
+            this.__toolbar_items.push({
+                item: mb,
+                activeOnItem: false,
+                inactiveOnSync: true
+            });
+
+            mainPart.add(mb);
+
+            mainPart.addSeparator();
+
+            mb = new qx.ui.toolbar.Button(this.tr("Удалить"), "icon/16/actions/list-remove.png");
+            mb.addListener("execute", function(e) {
+                this.removeRowByIndex(this.getSelectedRowIndex());
+            }, this);
+            this.__toolbar_items.push({
+                item: mb,
+                activeOnItem: true,
+                inactiveOnSync: true
+            });
+            mainPart.add(mb);
+
+            mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-up.png");
+            mb.addListener("execute", function(ev) {
+                var ind = this.getSelectedRowIndex();
+                this.moveRowByIndex(ind, -1, true);
+            }, this);
+            this.__toolbar_items.push({
+                item: mb,
+                activeOnItem: true,
+                inactiveOnSync: true
+            });
+            mainPart.add(mb);
+
+            mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-down.png");
+            mb.addListener("execute", function(ev) {
+                var ind = this.getSelectedRowIndex();
+                this.moveRowByIndex(ind, 1, true);
+            }, this);
+            this.__toolbar_items.push({
+                item: mb,
+                activeOnItem: true,
+                inactiveOnSync: true
+            });
+            mainPart.add(mb);
+
+            if (this.__options["synchronizable"]) {
+                mb = new qx.ui.toolbar.Separator().set({width: 25});
+                mainPart.add(mb);
+
+                mb = new qx.ui.basic.Label("Синхронизация: ").set({alignY: "middle", marginRight: 5});
+                mainPart.add(mb);
+
+                mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
+                mb.addListener("execute", function(ev) {
+                    this.__manageSync(true);
+                }, this);
+                this.__toolbar_items.push({
                     item: mb,
                     activeOnItem: false,
                     inactiveOnSync: true
                 });
+                mainPart.add(mb);
 
-              mainPart.add(mb);
-
-              mainPart.addSeparator();
-
-              mb = new qx.ui.toolbar.Button(this.tr("Удалить"), "icon/16/actions/list-remove.png");
-              mb.addListener("execute", function(e) {
-                  this.removeRowByIndex(this.getSelectedRowIndex());
-              }, this);
-              this.__toolbar_items.push({
+                mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
+                mb.addListener("execute", function(ev) {
+                    this.__manageSync(false);
+                }, this);
+                this.__toolbar_items.push({
                     item: mb,
-                    activeOnItem: true,
-                    inactiveOnSync: true
+                    activeOnItem: false,
+                    activeOnSync: true
                 });
-              mainPart.add(mb);
+                mainPart.add(mb);
+            }
 
-              mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-up.png");
-              mb.addListener("execute", function(ev) {
-                  var ind = this.getSelectedRowIndex();
-                  this.moveRowByIndex(ind, -1, true);
-              }, this);
-              this.__toolbar_items.push({
-                    item: mb,
-                    activeOnItem: true,
-                    inactiveOnSync: true
-                });
-              mainPart.add(mb);
+            return toolbar;
+        },
 
-              mb = new qx.ui.toolbar.Button(null, "icon/16/actions/go-down.png");
-              mb.addListener("execute", function(ev) {
-                  var ind = this.getSelectedRowIndex();
-                  this.moveRowByIndex(ind, 1, true);
-              }, this);
-              this.__toolbar_items.push({
-                    item: mb,
-                    activeOnItem: true,
-                    inactiveOnSync: true
-                });
-              mainPart.add(mb);
+        //overriden
+        _createTable : function(tm) {
+            var table = new sm.table.Table(tm, tm.getCustom());
+            table.set({showCellFocusIndicator : false,
+                statusBarVisible : !!this.__options["synchronizable"],
+                focusCellOnMouseMove : false});
 
-              if (this.__options["synchronizable"]) {
-                  mb = new qx.ui.toolbar.Separator().set({width: 25});
-                  mainPart.add(mb);
+            var smodel = table.getSelectionModel();
+            smodel.addListener("changeSelection", function(ev) {
+                var scount = smodel.getSelectedCount();
+                for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                    this.__doItemEnabled(this.__toolbar_items[i], scount > 0);
+                }
+            }, this);
 
-                  mb = new qx.ui.basic.Label("Синхронизация: ").set({alignY: "middle", marginRight: 5});
-                  mainPart.add(mb);
+            return table;
+        },
 
-                  mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
-                  mb.addListener("execute", function(ev) {
-                      this.__manageSync(true);
-                  }, this);
-                  this.__toolbar_items.push({
-                        item: mb,
-                        activeOnItem: false,
-                        inactiveOnSync: true
-                    });
-                  mainPart.add(mb);
+        //overriden
+        _setJsonTableData : function(tm, items) {
+            var data = {
+                "title" : "",
+                "columns" : [
+                    {
+                        "title" : this.tr("Название").toString(),
+                        "id" : "name",
+                        "sortable" : false,
+                        "width" : "1*"
+                    },
+                    {
+                        "title" : this.tr("Ссылка").toString(),
+                        "id" : "link",
+                        "sortable" : false,
+                        "width" : "1*"
+                    }
+                ],
+                "items" : items
+            };
+            tm.setJsonData(data);
+        },
 
-                  mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
-                  mb.addListener("execute", function(ev) {
-                      this.__manageSync(false);
-                  }, this);
-                  this.__toolbar_items.push({
-                        item: mb,
-                        activeOnItem: false,
-                        activeOnSync: true
-                    });
-                  mainPart.add(mb);
-              }
+        ///////////////////////////////////////////////////////////////////////////
+        //                               Impl                                    //
+        ///////////////////////////////////////////////////////////////////////////
 
-              return toolbar;
-          },
+        // apply enabled rule for item
+        __doItemEnabled: function(item, onItem) {
+            item.item.setEnabled(
+                    (!item.activeOnItem || onItem) &&
+                            (!item.inactiveOnSync || !this.__synchronize) &&
+                            (!item.activeOnSync || !!this.__synchronize)
+            );
+        },
 
-          //overriden
-          _createTable : function(tm) {
-              var table = new sm.table.Table(tm, tm.getCustom());
-              table.set({showCellFocusIndicator : false,
-                    statusBarVisible : !!this.__options["synchronizable"],
-                    focusCellOnMouseMove : false});
+        __applyEditorEnabled: function() {
+            var table = this.getTable();
 
-              var smodel = table.getSelectionModel();
-              smodel.addListener("changeSelection", function(ev) {
-                  var scount = smodel.getSelectedCount();
-                  for (var i = 0; i < this.__toolbar_items.length; ++i) {
-                      this.__doItemEnabled(this.__toolbar_items[i], scount > 0);
-                  }
-              }, this);
+            if (this.__options["synchronizable"] && this.__synchronize) {
+                table.setEnabled(false);
+                table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с %1", this.__synchronizeInfo["cachedPath"] || "").toString());
+            } else {
+                table.setEnabled(true);
+                table.setAdditionalStatusBarText("");
+            }
 
-              return table;
-          },
+            for (var i = 0; i < this.__toolbar_items.length; ++i) {
+                this.__doItemEnabled(this.__toolbar_items[i], false);
+            }
+        },
 
-          //overriden
-          _setJsonTableData : function(tm, items) {
-              var data = {
-                  "title" : "",
-                  "columns" : [
-                      {
-                          "title" : this.tr("Название").toString(),
-                          "id" : "name",
-                          "sortable" : false,
-                          "width" : "1*"
-                      },
-                      {
-                          "title" : this.tr("Ссылка").toString(),
-                          "id" : "link",
-                          "sortable" : false,
-                          "width" : "1*"
-                      }
-                  ],
-                  "items" : items
-              };
-              tm.setJsonData(data);
-          },
+        // add new menu link
+        __manageLink : function() {
+            var dlg = new sm.cms.page.PageLinkDlg({
+                "requireLinkName": true,
+                "allowOuterLinks" : this.__options["allowOuterLinks"]
+            });
+            dlg.addListener("pageSelected", function(ev) {
+                var data = ev.getData();
+                var ldata = {
+                    "name" : data[1],
+                    "link" : "/exp/p" + data[0]
+                };
+                this.addRow(function(odata) {
+                    return (odata["name"] == ldata["name"])
+                }, [ldata["name"], ldata["link"]], ldata);
 
-          ///////////////////////////////////////////////////////////////////////////
-          //                               Impl                                    //
-          ///////////////////////////////////////////////////////////////////////////
+                dlg.close();
+            }, this);
+            dlg.addListener("linkSelected", function(ev) {
+                var data = ev.getData();
+                var ldata = {
+                    "name" : data[1],
+                    "link" : data[0]
+                };
+                this.addRow(function(odata) {
+                    return (odata["name"] == ldata["name"])
+                }, [ldata["name"], ldata["link"]], ldata);
 
-          // apply enabled rule for item
-          __doItemEnabled: function(item, onItem) {
-              item.item.setEnabled(
-                (!item.activeOnItem || onItem) &&
-                  (!item.inactiveOnSync || !this.__synchronize) &&
-                  (!item.activeOnSync || !!this.__synchronize)
-              );
-          },
+                dlg.close();
+            }, this);
+            dlg.open();
+        },
 
-          __applyEditorEnabled: function() {
-              var table = this.getTable();
-
-              if (this.__options["synchronizable"] && this.__synchronize) {
-                  table.setEnabled(false);
-                  table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с %1", this.__synchronizeInfo["cachedPath"] || "").toString());
-              } else {
-                  table.setEnabled(true);
-                  table.setAdditionalStatusBarText("");
-              }
-
-              for (var i = 0; i < this.__toolbar_items.length; ++i) {
-                  this.__doItemEnabled(this.__toolbar_items[i], false);
-              }
-          },
-
-          // add new menu link
-          __manageLink : function() {
-              var dlg = new sm.cms.page.PageLinkDlg({
-                    "requireLinkName": true,
-                    "allowOuterLinks" : this.__options["allowOuterLinks"]
-                });
-              dlg.addListener("pageSelected", function(ev) {
-                  var data = ev.getData();
-                  var ldata = {
-                      "name" : data[1],
-                      "link" : "/exp/p" + data[0]
-                  };
-                  this.addRow(function(odata) {
-                      return (odata["name"] == ldata["name"])
-                  }, [ldata["name"], ldata["link"]], ldata);
-
-                  dlg.close();
-              }, this);
-              dlg.addListener("linkSelected", function(ev) {
-                  var data = ev.getData();
-                  var ldata = {
-                      "name" : data[1],
-                      "link" : data[0]
-                  };
-                  this.addRow(function(odata) {
-                      return (odata["name"] == ldata["name"])
-                  }, [ldata["name"], ldata["link"]], ldata);
-
-                  dlg.close();
-              }, this);
-              dlg.open();
-          },
-
-          // enable menu synchronization
-          __manageSync : function(enable) {
-              if (this.__options["synchronizeCallback"]) {
+        // enable menu synchronization
+        __manageSync : function(enable) {
+            if (this.__options["synchronizeCallback"]) {
                 this.__options["synchronizeCallback"](enable);
-              }
-          },
+            }
+        },
 
-          setSynchronize: function(isSynch, syncInfo) {
-              this.__synchronize = !!isSynch;
-              this.__synchronizeInfo = isSynch ? syncInfo || {} : {};
+        setSynchronize: function(isSynch, syncInfo) {
+            this.__synchronize = !!isSynch;
+            this.__synchronizeInfo = isSynch ? syncInfo || {} : {};
 
-              this.__applyEditorEnabled();
-          },
+            this.__applyEditorEnabled();
+        },
 
-          ///////////////////////////////////////////////////////////////////////////
-          //                            StringForm stuff                           //
-          ///////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////
+        //                            StringForm stuff                           //
+        ///////////////////////////////////////////////////////////////////////////
 
 
-          // overridden
-          setValue : function(value) {
-              if (value == null) {
-                  value = [];
-              }
-              if (!qx.lang.Type.isArray(value)) {
-                  qx.log.Logger.error(this, "Value is not array ", value);
-                  value = [];
-              }
-              var tdata = [];
-              for (var i = 0; i < value.length; ++i) {
-                  var name = value[i]["name"];
-                  var link = value[i]["link"];
-                  if (name == null || link == null) {
-                      continue;
-                  }
-                  var rdata = [name, link];
-                  rdata.rowData = value[i];
-                  tdata.push(rdata);
-              }
+        // overridden
+        setValue : function(value) {
+            if (value == null) {
+                value = [];
+            }
+            if (!qx.lang.Type.isArray(value)) {
+                qx.log.Logger.error(this, "Value is not array ", value);
+                value = [];
+            }
+            var tdata = [];
+            for (var i = 0; i < value.length; ++i) {
+                var name = value[i]["name"];
+                var link = value[i]["link"];
+                if (name == null || link == null) {
+                    continue;
+                }
+                var rdata = [name, link];
+                rdata.rowData = value[i];
+                tdata.push(rdata);
+            }
 
-              var tm = this.getTableModel();
-              tm.setData(tdata);
+            var tm = this.getTableModel();
+            tm.setData(tdata);
 
-              this.__applyEditorEnabled();
+            this.__applyEditorEnabled();
 
-              this.fireDataEvent("changeValue", value);
-          },
+            this.fireDataEvent("changeValue", value);
+        },
 
-          // overridden
-          resetValue : function() {
-              this.setValue([]);
-          },
+        // overridden
+        resetValue : function() {
+            this.setValue([]);
+        },
 
-          // overridden
-          getValue : function() {
-              var obj = [];
-              var tdata = this.getTableModel().getData();
-              for (var i = 0; i < tdata.length; ++i) {
-                  obj.push(tdata[i].rowData);
-              }
-              return obj;
-          }
-      },
+        // overridden
+        getValue : function() {
+            var obj = [];
+            var tdata = this.getTableModel().getData();
+            for (var i = 0; i < tdata.length; ++i) {
+                obj.push(tdata[i].rowData);
+            }
+            return obj;
+        }
+    },
 
-      destruct : function() {
-          this.__toolbar_items = this.__options = null;
-          this.__synchronize = this.__synchronizeInfo = null;
-      }
-  });
+    destruct : function() {
+        this.__toolbar_items = this.__options = null;
+        this.__synchronize = this.__synchronizeInfo = null;
+    }
+});
 

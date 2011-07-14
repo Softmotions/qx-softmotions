@@ -4,12 +4,12 @@
  */
 
 qx.Theme.define("sm.cms.theme.Theme", {
-      meta :
-      {
-          color : sm.cms.theme.Color,
-          decoration : sm.cms.theme.Decoration,
-          font : sm.cms.theme.Font,
-          icon : qx.theme.icon.Tango,
-          appearance : sm.cms.theme.Appearance
-      }
-  });
+    meta :
+    {
+        color : sm.cms.theme.Color,
+        decoration : sm.cms.theme.Decoration,
+        font : sm.cms.theme.Font,
+        icon : qx.theme.icon.Tango,
+        appearance : sm.cms.theme.Appearance
+    }
+});

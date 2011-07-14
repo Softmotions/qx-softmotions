@@ -4,25 +4,25 @@
  */
 
 qx.Class.define("sm.cms.util.FlexFormRenderer", {
-      extend  : qx.ui.form.renderer.Single,
+    extend  : qx.ui.form.renderer.Single,
 
 
-      construct : function(form) {
-          this.base(arguments, form);
-          var layout = this._getLayout();
-          layout.setColumnFlex(0, 0);
-          layout.setColumnFlex(1, 1);
-          layout.setColumnAlign(0, "right", "top");
-          layout.setColumnAlign(1, "left", "top");
-          //this._setLayout(layout);
-      },
+    construct : function(form) {
+        this.base(arguments, form);
+        var layout = this._getLayout();
+        layout.setColumnFlex(0, 0);
+        layout.setColumnFlex(1, 1);
+        layout.setColumnAlign(0, "right", "top");
+        layout.setColumnAlign(1, "left", "top");
+        //this._setLayout(layout);
+    },
 
-      members :
-      {
+    members :
+    {
 
-      },
+    },
 
-      destruct : function() {
-          //this._disposeObjects("__field_name");
-      }
-  });
+    destruct : function() {
+        //this._disposeObjects("__field_name");
+    }
+});

@@ -46,97 +46,97 @@
 //}
 
 qx.Class.define("sm.mongo.MongoConfig", {
-      extend  : qx.core.Object,
+    extend  : qx.core.Object,
 
-      properties :
-      {
-          config : {
-              check : "Object",
-              nullable : true,
-              apply : "__applyConfig"
-          }
-      },
+    properties :
+    {
+        config : {
+            check : "Object",
+            nullable : true,
+            apply : "__applyConfig"
+        }
+    },
 
-      construct : function(cfg) {
-          this.base(arguments);
-          this.setConfig(cfg);
-      },
+    construct : function(cfg) {
+        this.base(arguments);
+        this.setConfig(cfg);
+    },
 
-      members :
-      {
-          /**
-           * sm.mongo.Mongo
-           */
-          __mongo : null,
+    members :
+    {
+        /**
+         * sm.mongo.Mongo
+         */
+        __mongo : null,
 
-          getMongo : function() {
-              return this.__mongo;
-          },
+        getMongo : function() {
+            return this.__mongo;
+        },
 
-          __applyConfig : function(mcfg) {
+        __applyConfig : function(mcfg) {
 
-              qx.core.Assert.assertObject(mcfg);
+            qx.core.Assert.assertObject(mcfg);
 
-              var async = $$node.require("async");
-              var me = this;
+            var async = $$node.require("async");
+            var me = this;
 
-              if (this.__mongo) {
-                  /*var cinfo = this.__mongo.getConnectInfo();
-                   needInit = (cinfo["dbname"] != mcfg["db_name"] ||
-                   cinfo["host"] != mcfg["db_host"] ||
-                   cinfo["port"] != mcfg["db_port"]);*/
-                  this.__mongo.close();
-                  this.__mongo = null;
-              }
+            if (this.__mongo) {
+                /*var cinfo = this.__mongo.getConnectInfo();
+                 needInit = (cinfo["dbname"] != mcfg["db_name"] ||
+                 cinfo["host"] != mcfg["db_host"] ||
+                 cinfo["port"] != mcfg["db_port"]);*/
+                this.__mongo.close();
+                this.__mongo = null;
+            }
 
-              qx.log.Logger.info(this, "Init mongodb connection: " + qx.util.Json.stringify(mcfg));
-              this.__mongo = new sm.mongo.Mongo(mcfg["db_name"],
-                mcfg["db_host"],
-                mcfg["db_port"],
-                {
-                    native_parser : !!mcfg["native_parser"],
-                    poolSize : mcfg["poolSize"],
-                    auto_reconnect : !!mcfg["auto_reconnect"]
-                });
-              this.__mongo.open(
-                function(err) {
-                    if (err) {
-                        return;
-                    }
-                    var ilist = mcfg["indexes"];
-                    if (qx.lang.Type.isArray(ilist)) {
-                        async.forEach(ilist, qx.lang.Function.bind(me.__ensureIndex, me),
-                          function(err) {
-                              if (err) {
-                                  qx.log.Logger.error(me, "Ensure index failed: " + err);
-                              }
-                          });
-                    }
-                });
-          },
+            qx.log.Logger.info(this, "Init mongodb connection: " + qx.util.Json.stringify(mcfg));
+            this.__mongo = new sm.mongo.Mongo(mcfg["db_name"],
+                    mcfg["db_host"],
+                    mcfg["db_port"],
+                    {
+                        native_parser : !!mcfg["native_parser"],
+                        poolSize : mcfg["poolSize"],
+                        auto_reconnect : !!mcfg["auto_reconnect"]
+                    });
+            this.__mongo.open(
+                    function(err) {
+                        if (err) {
+                            return;
+                        }
+                        var ilist = mcfg["indexes"];
+                        if (qx.lang.Type.isArray(ilist)) {
+                            async.forEach(ilist, qx.lang.Function.bind(me.__ensureIndex, me),
+                                    function(err) {
+                                        if (err) {
+                                            qx.log.Logger.error(me, "Ensure index failed: " + err);
+                                        }
+                                    });
+                        }
+                    });
+        },
 
-          /**
-           * Ensure index for config
-           */
-          __ensureIndex : function(cfg, cb) {
-              var cname = cfg["collection"];
-              var spec = cfg["spec"];
-              if (!cname || !spec) {
-                  if (cb) {
-                      cb();
-                  }
-                  return;
-              }
-              var coll = this.__mongo.collection(cname);
-              coll.ensureIndex(spec, {"unique" : !!cfg["unique"], "sparse" : !!cfg["sparse"]}, cb);
-          }
-      },
+        /**
+         * Ensure index for config
+         */
+        __ensureIndex : function(cfg, cb) {
+            var cname = cfg["collection"];
+            var spec = cfg["spec"];
+            if (!cname || !spec) {
+                if (cb) {
+                    cb();
+                }
+                return;
+            }
+            var coll = this.__mongo.collection(cname);
+            coll.ensureIndex(spec, {"unique" : !!cfg["unique"], "sparse" : !!cfg["sparse"]}, cb);
+        }
+    },
 
-      destruct : function() {
-          if (this.__mongo) {
-              this.__mongo.close();
-              this.__mongo = null;
-          }
-          //this._disposeObjects("__field_name");
-      }
-  });
+    destruct : function() {
+        if (this.__mongo) {
+            this.__mongo.close();
+            this.__mongo = null;
+        }
+        //this._disposeObjects("__field_name");
+    }
+});

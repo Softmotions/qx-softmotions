@@ -4,8 +4,8 @@
  */
 
 qx.Theme.define("sm.cms.theme.Color", {
-      extend : qx.theme.simple.Color,
-      colors :
-      {
-      }
-  });
+    extend : qx.theme.simple.Color,
+    colors :
+    {
+    }
+});

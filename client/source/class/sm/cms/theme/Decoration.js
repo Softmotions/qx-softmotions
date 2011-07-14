@@ -4,16 +4,16 @@
  */
 
 qx.Theme.define("sm.cms.theme.Decoration", {
-      extend : qx.theme.simple.Decoration,
-      decorations :
-      {
-          "shadow-popup" : {
-              decorator: qx.ui.decoration.Uniform,
-              style :
-              {
-                  width : 0,
-                  color : "button-border"
-              }
-          }
-      }
-  });
+    extend : qx.theme.simple.Decoration,
+    decorations :
+    {
+        "shadow-popup" : {
+            decorator: qx.ui.decoration.Uniform,
+            style :
+            {
+                width : 0,
+                color : "button-border"
+            }
+        }
+    }
+});

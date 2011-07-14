@@ -4,27 +4,27 @@
  */
 
 qx.Class.define("sm.cms.editor.TextFieldEditor", {
-      extend : qx.ui.form.TextField,
+    extend : qx.ui.form.TextField,
 
-      construct : function(options) {
-          this.base(arguments);
-          if (options["maxLength"] != null) {
-              this.setMaxLength(options["maxLength"]);
-          }
-          if (options["placeholder"] != null) {
-              this.setPlaceholder(options["placeholder"]);
-          }
-          if (options["minimalLineHeight"] != null) {
-              this.setMinimalLineHeight(options["minimalLineHeight"]);
-          }
-      },
+    construct : function(options) {
+        this.base(arguments);
+        if (options["maxLength"] != null) {
+            this.setMaxLength(options["maxLength"]);
+        }
+        if (options["placeholder"] != null) {
+            this.setPlaceholder(options["placeholder"]);
+        }
+        if (options["minimalLineHeight"] != null) {
+            this.setMinimalLineHeight(options["minimalLineHeight"]);
+        }
+    },
 
-      members :
-      {
+    members :
+    {
 
-      },
+    },
 
-      destruct : function() {
-          //this._disposeObjects("__field_name");
-      }
-  });
+    destruct : function() {
+        //this._disposeObjects("__field_name");
+    }
+});

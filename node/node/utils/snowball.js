@@ -115,7 +115,7 @@ function Snowball(lng) {
                     return false;
                 for (var i = 0; i < s_size; i++)
                     if (current.charCodeAt(this.c - s_size + i) != s
-                      .charCodeAt(i))
+                            .charCodeAt(i))
                         return false;
                 this.c -= s_size;
                 return true;
@@ -124,8 +124,8 @@ function Snowball(lng) {
                 var i = 0, j = v_size, c = this.c, l = this.l, common_i = 0, common_j = 0, first_key_inspected = false;
                 while (true) {
                     var k = i + ((j - i) >> 1), diff = 0, common = common_i < common_j
-                      ? common_i
-                      : common_j, w = v[k];
+                            ? common_i
+                            : common_j, w = v[k];
                     for (var i2 = common; i2 < w.s_size; i2++) {
                         if (c + common == l) {
                             diff = -1;
@@ -169,8 +169,8 @@ function Snowball(lng) {
                 var i = 0, j = v_size, c = this.c, lb = this.lb, common_i = 0, common_j = 0, first_key_inspected = false;
                 while (true) {
                     var k = i + ((j - i) >> 1), diff = 0, common = common_i < common_j
-                      ? common_i
-                      : common_j, w = v[k];
+                            ? common_i
+                            : common_j, w = v[k];
                     for (var i2 = w.s_size - 1 - common; i2 >= 0; i2--) {
                         if (c - common == lb) {
                             diff = -1;
@@ -212,7 +212,7 @@ function Snowball(lng) {
             },
             r_s : function(c_bra, c_ket, s) {
                 var adjustment = s.length - (c_ket - c_bra), left = current
-                  .substring(0, c_bra), right = current.substring(c_ket);
+                        .substring(0, c_bra), right = current.substring(c_ket);
                 current = left + s + right;
                 this.l += adjustment;
                 if (this.c >= c_ket)
@@ -223,7 +223,7 @@ function Snowball(lng) {
             },
             s_ch : function() {
                 if (this.b < 0 || this.b > this.k || this.k > this.l
-                  || this.l > current.length)
+                        || this.l > current.length)
                     throw ("faulty slice operation");
             },
             s_f : function(s) {
@@ -253,8 +253,8 @@ function Snowball(lng) {
     var stemFactory = {
         EnglishStemmer : function() {
             var a_0 = [new Among("arsen", -1, -1), new Among("commun", -1, -1),
-                new Among("gener", -1, -1)], a_1 = [new Among("'", -1, 1),
-                new Among("'s'", 0, 1), new Among("'s", -1, 1)], a_2 = [
+                       new Among("gener", -1, -1)], a_1 = [new Among("'", -1, 1),
+                                                           new Among("'s'", 0, 1), new Among("'s", -1, 1)], a_2 = [
                 new Among("ied", -1, 2), new Among("s", -1, 3),
                 new Among("ies", 1, 2), new Among("sses", 1, 1),
                 new Among("ss", 1, -1), new Among("us", 1, -1)], a_3 = [
@@ -265,9 +265,9 @@ function Snowball(lng) {
                 new Among("pp", 0, 2), new Among("rr", 0, 2),
                 new Among("at", 0, 1), new Among("tt", 0, 2),
                 new Among("iz", 0, 1)], a_4 = [new Among("ed", -1, 2),
-                new Among("eed", 0, 1), new Among("ing", -1, 2),
-                new Among("edly", -1, 2), new Among("eedly", 3, 1),
-                new Among("ingly", -1, 2)], a_5 = [
+                                               new Among("eed", 0, 1), new Among("ing", -1, 2),
+                                               new Among("edly", -1, 2), new Among("eedly", 3, 1),
+                                               new Among("ingly", -1, 2)], a_5 = [
                 new Among("anci", -1, 3), new Among("enci", -1, 2),
                 new Among("ogi", -1, 13), new Among("li", -1, 16),
                 new Among("bli", 3, 12), new Among("abli", 4, 4),
@@ -285,16 +285,16 @@ function Snowball(lng) {
                 new Among("ical", -1, 4), new Among("tional", -1, 1),
                 new Among("ational", 5, 2), new Among("ful", -1, 5),
                 new Among("ness", -1, 5)], a_7 = [new Among("ic", -1, 1),
-                new Among("ance", -1, 1), new Among("ence", -1, 1),
-                new Among("able", -1, 1), new Among("ible", -1, 1),
-                new Among("ate", -1, 1), new Among("ive", -1, 1),
-                new Among("ize", -1, 1), new Among("iti", -1, 1),
-                new Among("al", -1, 1), new Among("ism", -1, 1),
-                new Among("ion", -1, 2), new Among("er", -1, 1),
-                new Among("ous", -1, 1), new Among("ant", -1, 1),
-                new Among("ent", -1, 1), new Among("ment", 15, 1),
-                new Among("ement", 16, 1)], a_8 = [new Among("e", -1, 1),
-                new Among("l", -1, 2)], a_9 = [
+                                                  new Among("ance", -1, 1), new Among("ence", -1, 1),
+                                                  new Among("able", -1, 1), new Among("ible", -1, 1),
+                                                  new Among("ate", -1, 1), new Among("ive", -1, 1),
+                                                  new Among("ize", -1, 1), new Among("iti", -1, 1),
+                                                  new Among("al", -1, 1), new Among("ism", -1, 1),
+                                                  new Among("ion", -1, 2), new Among("er", -1, 1),
+                                                  new Among("ous", -1, 1), new Among("ant", -1, 1),
+                                                  new Among("ent", -1, 1), new Among("ment", 15, 1),
+                                                  new Among("ement", 16, 1)], a_8 = [new Among("e", -1, 1),
+                                                                                     new Among("l", -1, 2)], a_9 = [
                 new Among("succeed", -1, -1), new Among("proceed", -1, -1),
                 new Among("exceed", -1, -1), new Among("canning", -1, -1),
                 new Among("inning", -1, -1), new Among("earring", -1, -1),
@@ -310,7 +310,7 @@ function Snowball(lng) {
                 new Among("tying", -1, 5), new Among("ugly", -1, 8)], g_v = [
                 17, 65, 16, 1], g_v_WXY = [1, 17, 65, 208, 1], g_valid_LI = [
                 55, 141, 2], B_Y_found, I_p2, I_p1, habr = [r_Step_1b,
-                r_Step_1c, r_Step_2, r_Step_3, r_Step_4, r_Step_5], sbp = new SnowballProgram();
+                                                            r_Step_1c, r_Step_2, r_Step_3, r_Step_4, r_Step_5], sbp = new SnowballProgram();
             this.setCurrent = function(word) {
                 sbp.s_c(word);
             };
@@ -386,11 +386,11 @@ function Snowball(lng) {
             function r_shortv() {
                 var v_1 = sbp.l - sbp.c;
                 if (!(sbp.o_g_b(g_v_WXY, 89, 121)
-                  && sbp.i_g_b(g_v, 97, 121) && sbp.o_g_b(g_v, 97, 121))) {
+                        && sbp.i_g_b(g_v, 97, 121) && sbp.o_g_b(g_v, 97, 121))) {
                     sbp.c = sbp.l - v_1;
                     if (!sbp.o_g_b(g_v, 97, 121)
-                      || !sbp.i_g_b(g_v, 97, 121)
-                      || sbp.c > sbp.lb)
+                            || !sbp.i_g_b(g_v, 97, 121)
+                            || sbp.c > sbp.lb)
                         return false;
                 }
                 return true;
@@ -763,14 +763,14 @@ function Snowball(lng) {
         },
         RussianStemmer : function() {
             var a_0 = [new Among("\u0432", -1, 1),
-                new Among("\u0438\u0432", 0, 2),
-                new Among("\u044B\u0432", 0, 2),
-                new Among("\u0432\u0448\u0438", -1, 1),
-                new Among("\u0438\u0432\u0448\u0438", 3, 2),
-                new Among("\u044B\u0432\u0448\u0438", 3, 2),
-                new Among("\u0432\u0448\u0438\u0441\u044C", -1, 1),
-                new Among("\u0438\u0432\u0448\u0438\u0441\u044C", 6, 2),
-                new Among("\u044B\u0432\u0448\u0438\u0441\u044C", 6, 2)], a_1 = [
+                       new Among("\u0438\u0432", 0, 2),
+                       new Among("\u044B\u0432", 0, 2),
+                       new Among("\u0432\u0448\u0438", -1, 1),
+                       new Among("\u0438\u0432\u0448\u0438", 3, 2),
+                       new Among("\u044B\u0432\u0448\u0438", 3, 2),
+                       new Among("\u0432\u0448\u0438\u0441\u044C", -1, 1),
+                       new Among("\u0438\u0432\u0448\u0438\u0441\u044C", 6, 2),
+                       new Among("\u044B\u0432\u0448\u0438\u0441\u044C", 6, 2)], a_1 = [
                 new Among("\u0435\u0435", -1, 1),
                 new Among("\u0438\u0435", -1, 1),
                 new Among("\u043E\u0435", -1, 1),
@@ -1065,7 +1065,7 @@ function Snowball(lng) {
         }
     };
     var stemName = lng.substring(0, 1).toUpperCase()
-      + lng.substring(1).toLowerCase() + "Stemmer";
+            + lng.substring(1).toLowerCase() + "Stemmer";
     return new stemFactory[stemName]();
 }
 

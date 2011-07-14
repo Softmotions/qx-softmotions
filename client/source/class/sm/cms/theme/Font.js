@@ -4,8 +4,8 @@
  */
 
 qx.Theme.define("sm.cms.theme.Font", {
-      extend : qx.theme.simple.Font,
-      fonts :
-      {
-      }
-  });
+    extend : qx.theme.simple.Font,
+    fonts :
+    {
+    }
+});

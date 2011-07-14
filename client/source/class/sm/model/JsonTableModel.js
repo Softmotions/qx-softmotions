@@ -23,81 +23,81 @@
  */
 
 qx.Class.define("sm.model.JsonTableModel", {
-      extend  : qx.ui.table.model.Simple,
+    extend  : qx.ui.table.model.Simple,
 
-      construct : function() {
-          this.base(arguments);
-          this._columnsInitiated = false;
-      },
+    construct : function() {
+        this.base(arguments);
+        this._columnsInitiated = false;
+    },
 
-      members :
-      {
-          _columnsInitiated : false,
+    members :
+    {
+        _columnsInitiated : false,
 
-          __custom : null,
+        __custom : null,
 
-          setJsonData : function(data) {
-              this._applyJsonData(data);
-          },
+        setJsonData : function(data) {
+            this._applyJsonData(data);
+        },
 
 
-          _applyJsonData : function(data) {
-              if (data == null) {
-                  qx.log.Logger.warn(this, "No data found in json model");
-                  return;
-              }
-              var colsSpec = null;
-              if (this._columnsInitiated == false) {
-                  colsSpec = data["columns"];
-                  if (!colsSpec || !(colsSpec instanceof Array)) {
-                      qx.log.Logger.warn(this, "No columns found or invalid columns type in json data");
-                      return;
-                  }
-                  var columns = [];
-                  var columnsData = [];
-                  for (var i = 0; i < colsSpec.length; ++i) {
-                      var cs = colsSpec[i];
-                      columns[i] = cs["title"];
-                      columnsData[i] = cs["id"] ? cs["id"] : new String(i);
-                  }
-                  this.setColumns(columns, columnsData);
+        _applyJsonData : function(data) {
+            if (data == null) {
+                qx.log.Logger.warn(this, "No data found in json model");
+                return;
+            }
+            var colsSpec = null;
+            if (this._columnsInitiated == false) {
+                colsSpec = data["columns"];
+                if (!colsSpec || !(colsSpec instanceof Array)) {
+                    qx.log.Logger.warn(this, "No columns found or invalid columns type in json data");
+                    return;
+                }
+                var columns = [];
+                var columnsData = [];
+                for (var i = 0; i < colsSpec.length; ++i) {
+                    var cs = colsSpec[i];
+                    columns[i] = cs["title"];
+                    columnsData[i] = cs["id"] ? cs["id"] : new String(i);
+                }
+                this.setColumns(columns, columnsData);
 
-                  var tcm = new sm.model.JsonTableColumnModel(colsSpec);
-                  this.__custom = {
-                      tableColumnModel : function(obj) {
-                          return tcm;
-                      }
-                  };
-                  this._columnsInitiated = true;
-              }
+                var tcm = new sm.model.JsonTableColumnModel(colsSpec);
+                this.__custom = {
+                    tableColumnModel : function(obj) {
+                        return tcm;
+                    }
+                };
+                this._columnsInitiated = true;
+            }
 
-              var items = data["items"];
-              if (!items || !(items instanceof Array)) {
-                  qx.log.Logger.warn(this, "No data found or invalid columns type in json data");
-                  return;
-              }
-              var ditems = new Array(items.length);
-              for (var i = 0; i < items.length; ++i) {
-                  var rData = null;
-                  var rArr = items[i];
-                  if (rArr.length == 2 && (rArr[0] instanceof Array)) {
-                      rData = rArr[1];
-                      rArr = rArr[0];
-                  }
-                  ditems[i] = rArr;
-                  ditems[i].rowData = rData;
-              }
-              this.setData(ditems);
-          },
+            var items = data["items"];
+            if (!items || !(items instanceof Array)) {
+                qx.log.Logger.warn(this, "No data found or invalid columns type in json data");
+                return;
+            }
+            var ditems = new Array(items.length);
+            for (var i = 0; i < items.length; ++i) {
+                var rData = null;
+                var rArr = items[i];
+                if (rArr.length == 2 && (rArr[0] instanceof Array)) {
+                    rData = rArr[1];
+                    rArr = rArr[0];
+                }
+                ditems[i] = rArr;
+                ditems[i].rowData = rData;
+            }
+            this.setData(ditems);
+        },
 
-          getRowAssociatedData : function(rowIndex) {
-              var data = this.getData();
-              var row = data[rowIndex];
-              return (row != null && row.rowData != undefined) ? row.rowData : null;
-          },
+        getRowAssociatedData : function(rowIndex) {
+            var data = this.getData();
+            var row = data[rowIndex];
+            return (row != null && row.rowData != undefined) ? row.rowData : null;
+        },
 
-          getCustom : function() {
-              return this.__custom;
-          }
-      }
-  });
+        getCustom : function() {
+            return this.__custom;
+        }
+    }
+});

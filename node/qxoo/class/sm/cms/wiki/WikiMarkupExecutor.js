@@ -4,24 +4,24 @@
  */
 
 qx.Class.define("sm.cms.wiki.WikiMarkupExecutor", {
-      extend  : qx.core.Object,
+    extend  : qx.core.Object,
 
-      members :
-      {
-          /**
-           * Generate html code based on markup
-           */
-          __wiki : function(req, resp, ctx) {
-              resp.end(ctx["html"] ? ctx["html"] : "");
-              ctx({"terminated" : true});
-          }
-      },
+    members :
+    {
+        /**
+         * Generate html code based on markup
+         */
+        __wiki : function(req, resp, ctx) {
+            resp.end(ctx["html"] ? ctx["html"] : "");
+            ctx({"terminated" : true});
+        }
+    },
 
-      handlers :
-      {
-          "/wiki" : {
-              webapp : "exp",
-              handler : "__wiki"
-          }
-      }
-  });
+    handlers :
+    {
+        "/wiki" : {
+            webapp : "exp",
+            handler : "__wiki"
+        }
+    }
+});

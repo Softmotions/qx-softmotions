@@ -17,35 +17,35 @@
  *</code>
  */
 qx.Class.define("sm.cms.auth.HybridUserProvider", {
-      extend  : sm.cms.auth.MongoUserProvider,
+    extend  : sm.cms.auth.MongoUserProvider,
 
-      construct : function(options) {
-          this.base(arguments, options);
-      },
+    construct : function(options) {
+        this.base(arguments, options);
+    },
 
-      members :
-      {
-          //overriden
-          getRolesList: function(callback) {
-              var env = sm.app.Env.getDefault();
-              var sconf = env.getJSONConfig("security");
-              var roles = [];
-              if (sconf["roles"]) {
-                  var qxtype = qx.lang.Type;
-                  var sroles = sconf["roles"];
-                  for (var i = 0; i < sroles.length; ++i) {
-                      var r = sroles[i];
-                      if (qxtype.isArray(r) && qxtype.isString(r[0])) {
-                          roles.push({id : r[0], parent : qxtype.isArray(r[2]) ? r[2] : null, desc : r[1]});
-                      }
-                  }
-              }
-              callback(null, roles);
-          }
-      },
+    members :
+    {
+        //overriden
+        getRolesList: function(callback) {
+            var env = sm.app.Env.getDefault();
+            var sconf = env.getJSONConfig("security");
+            var roles = [];
+            if (sconf["roles"]) {
+                var qxtype = qx.lang.Type;
+                var sroles = sconf["roles"];
+                for (var i = 0; i < sroles.length; ++i) {
+                    var r = sroles[i];
+                    if (qxtype.isArray(r) && qxtype.isString(r[0])) {
+                        roles.push({id : r[0], parent : qxtype.isArray(r[2]) ? r[2] : null, desc : r[1]});
+                    }
+                }
+            }
+            callback(null, roles);
+        }
+    },
 
-      destruct : function() {
-          //this._disposeObjects("__field_name");                                
-      }
-  });
+    destruct : function() {
+        //this._disposeObjects("__field_name");
+    }
+});
 

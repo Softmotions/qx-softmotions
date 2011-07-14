@@ -8,171 +8,171 @@
  */
 
 qx.Class.define("sm.ui.form.ButtonField", {
-      extend : qx.ui.core.Widget,
-      implement : [
-          qx.ui.form.IStringForm,
-          qx.ui.form.IForm
-      ],
-      include : [
-          qx.ui.form.MForm,
-          qx.ui.core.MChildrenHandling
-      ],
+    extend : qx.ui.core.Widget,
+    implement : [
+        qx.ui.form.IStringForm,
+        qx.ui.form.IForm
+    ],
+    include : [
+        qx.ui.form.MForm,
+        qx.ui.core.MChildrenHandling
+    ],
 
-      events :
-      {
-          /** Fired when the value was modified */
-          "changeValue" : "qx.event.type.Data",
+    events :
+    {
+        /** Fired when the value was modified */
+        "changeValue" : "qx.event.type.Data",
 
-          /**
-           * Fired when user data changed
-           */
-          "changeUserData" : "qx.event.type.Data",
+        /**
+         * Fired when user data changed
+         */
+        "changeUserData" : "qx.event.type.Data",
 
-          /** Fired when the enabled state was modified */
-          "changeEnabled" : "qx.event.type.Data",
+        /** Fired when the enabled state was modified */
+        "changeEnabled" : "qx.event.type.Data",
 
-          /** Fired when the valid state was modified */
-          "changeValid" : "qx.event.type.Data",
+        /** Fired when the valid state was modified */
+        "changeValid" : "qx.event.type.Data",
 
-          /** Fired when the invalidMessage was modified */
-          "changeInvalidMessage" : "qx.event.type.Data",
+        /** Fired when the invalidMessage was modified */
+        "changeInvalidMessage" : "qx.event.type.Data",
 
-          /** Fired when the required was modified */
-          "changeRequired" : "qx.event.type.Data",
+        /** Fired when the required was modified */
+        "changeRequired" : "qx.event.type.Data",
 
-          /** Execute search, press ENTER ot button pressed */
-          "execute" : "qx.event.type.Event"
-      },
+        /** Execute search, press ENTER ot button pressed */
+        "execute" : "qx.event.type.Event"
+    },
 
-      properties :
-      {
-          appearance : {
-              init : "sm-bt-field",
-              refine : true
-          },
+    properties :
+    {
+        appearance : {
+            init : "sm-bt-field",
+            refine : true
+        },
 
-          focusable : {
-              refine : true,
-              init : true
-          },
+        focusable : {
+            refine : true,
+            init : true
+        },
 
-          /**
-           * Custom user data
-           */
-          userData : {
-              nullable : true,
-              event : "changeUserData"
-          }
-      },
-
-
-      construct : function(label, icon) {
-          this.base(arguments);
-          this._setLayout(new qx.ui.layout.HBox(2).set({alignY : "middle"}));
-          this.__label = label;
-          this.__icon = icon;
-          this.getChildControl("text");
-          this.getChildControl("button");
-      },
-
-      members :
-      {
-          __label : null,
-
-          __icon : null,
-
-          __button : null,
+        /**
+         * Custom user data
+         */
+        userData : {
+            nullable : true,
+            event : "changeUserData"
+        }
+    },
 
 
-          _forwardStates : {
-              invalid : true
-          },
+    construct : function(label, icon) {
+        this.base(arguments);
+        this._setLayout(new qx.ui.layout.HBox(2).set({alignY : "middle"}));
+        this.__label = label;
+        this.__icon = icon;
+        this.getChildControl("text");
+        this.getChildControl("button");
+    },
 
-          // overridden
-          addListener : function(type, listener, self, capture) {
-              switch (type) {
-                  case "execute":
-                      this.base(arguments, type, listener, self, capture);
-                      break;
-                  default:
-                      this.getChildControl("text").addListener(type, listener, self, capture);
-                      this.getChildControl("button");
-                      break;
-              }
-          },
+    members :
+    {
+        __label : null,
 
-          getTextField : function() {
-              return this.getChildControl("text");
-          },
+        __icon : null,
 
-          setReadOnly : function(val) {
-              return this.getChildControl("text").setReadOnly(val);
-          },
+        __button : null,
 
-          getReadOnly : function() {
-              return this.getChildControl("text").getReadOnly();
-          },
 
-          // overridden
-          setValue : function(value) {
-              this.getChildControl("text").setValue(value);
-          },
+        _forwardStates : {
+            invalid : true
+        },
 
-          // overridden
-          resetValue : function() {
-              this.getChildControl("text").resetValue();
-          },
+        // overridden
+        addListener : function(type, listener, self, capture) {
+            switch (type) {
+                case "execute":
+                    this.base(arguments, type, listener, self, capture);
+                    break;
+                default:
+                    this.getChildControl("text").addListener(type, listener, self, capture);
+                    this.getChildControl("button");
+                    break;
+            }
+        },
 
-          // overridden
-          getValue : function() {
-              return this.getChildControl("text").getValue();
-          },
+        getTextField : function() {
+            return this.getChildControl("text");
+        },
 
-          setPlaceholder : function(text) {
-              this.getChildControl("text").setPlaceholder(text);
-          },
+        setReadOnly : function(val) {
+            return this.getChildControl("text").setReadOnly(val);
+        },
 
-          //overriden
-          _applyEnabled : function(value, old) {
-              this.base(arguments, value, old);
-              this.getChildControl("text").setEnabled(value);
-              this.getChildControl("button").setEnabled(value);
-          },
+        getReadOnly : function() {
+            return this.getChildControl("text").getReadOnly();
+        },
 
-          _createChildControlImpl : function(id, hash) {
-              var control;
-              switch (id) {
-                  case "button" :
-                      control = new qx.ui.form.Button(this.__label, this.__icon);
-                      control.addListener("execute", function(ev) {
-                          this.fireEvent("execute");
-                      }, this);
-                      this._add(control);
-                      break;
-                  case "text" : //text field
-                      control = new qx.ui.form.TextField();
-                      control.addListener("focusin", function(ev) {
-                          this.addState("focused");
-                      }, this);
-                      control.addListener("focusout", function(ev) {
-                          this.removeState("focused");
-                      }, this);
-                      control.addListener("keydown", function(ev) {
-                          if (ev.getKeyCode() == 13) {
-                              ev.stop();
-                              this.fireEvent("execute");
-                          }
-                      }, this);
-                      this._add(control, {flex : 1});
-                      break;
-              }
-              return control || this.base(arguments, id);
-          }
-      },
+        // overridden
+        setValue : function(value) {
+            this.getChildControl("text").setValue(value);
+        },
 
-      destruct : function() {
-          //this._disposeObjects("__field_name");
-          this.__label = this.__icon = null;
-      }
-  });
+        // overridden
+        resetValue : function() {
+            this.getChildControl("text").resetValue();
+        },
+
+        // overridden
+        getValue : function() {
+            return this.getChildControl("text").getValue();
+        },
+
+        setPlaceholder : function(text) {
+            this.getChildControl("text").setPlaceholder(text);
+        },
+
+        //overriden
+        _applyEnabled : function(value, old) {
+            this.base(arguments, value, old);
+            this.getChildControl("text").setEnabled(value);
+            this.getChildControl("button").setEnabled(value);
+        },
+
+        _createChildControlImpl : function(id, hash) {
+            var control;
+            switch (id) {
+                case "button" :
+                    control = new qx.ui.form.Button(this.__label, this.__icon);
+                    control.addListener("execute", function(ev) {
+                        this.fireEvent("execute");
+                    }, this);
+                    this._add(control);
+                    break;
+                case "text" : //text field
+                    control = new qx.ui.form.TextField();
+                    control.addListener("focusin", function(ev) {
+                        this.addState("focused");
+                    }, this);
+                    control.addListener("focusout", function(ev) {
+                        this.removeState("focused");
+                    }, this);
+                    control.addListener("keydown", function(ev) {
+                        if (ev.getKeyCode() == 13) {
+                            ev.stop();
+                            this.fireEvent("execute");
+                        }
+                    }, this);
+                    this._add(control, {flex : 1});
+                    break;
+            }
+            return control || this.base(arguments, id);
+        }
+    },
+
+    destruct : function() {
+        //this._disposeObjects("__field_name");
+        this.__label = this.__icon = null;
+    }
+});
 

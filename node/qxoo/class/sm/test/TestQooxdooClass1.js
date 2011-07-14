@@ -4,46 +4,46 @@
  */
 
 qx.Class.define("sm.test.TestQooxdooClass1", {
-      extend  : qx.core.Object,
+    extend  : qx.core.Object,
 
-      statics :
-      {
-      },
+    statics :
+    {
+    },
 
-      events :
-      {
-          "changeTest" : "qx.event.type.Data",
-          "changeTest2" : "qx.event.type.Data"
-      },
+    events :
+    {
+        "changeTest" : "qx.event.type.Data",
+        "changeTest2" : "qx.event.type.Data"
+    },
 
-      properties :
-      {
+    properties :
+    {
 
-          test : {
-              check : "Integer",
-              init : 0,
-              apply : "__applyTest",
-              event : "changeTest"
-          },
+        test : {
+            check : "Integer",
+            init : 0,
+            apply : "__applyTest",
+            event : "changeTest"
+        },
 
-          boundedTest : {
-              check : "Integer"
-          }
-      },
+        boundedTest : {
+            check : "Integer"
+        }
+    },
 
-      construct : function() {
-          this.base(arguments);
-      },
+    construct : function() {
+        this.base(arguments);
+    },
 
-      members :
-      {
-          __applyTest : function(val) {
-              this.fireDataEvent("changeTest2", val + 1);
-          }
+    members :
+    {
+        __applyTest : function(val) {
+            this.fireDataEvent("changeTest2", val + 1);
+        }
 
-      },
+    },
 
-      destruct : function() {
-          //this._disposeObjects("__field_name");
-      }
-  });
+    destruct : function() {
+        //this._disposeObjects("__field_name");
+    }
+});
