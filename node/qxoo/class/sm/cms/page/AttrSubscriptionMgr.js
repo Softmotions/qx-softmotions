@@ -61,9 +61,19 @@ qx.Class.define("sm.cms.page.AttrSubscriptionMgr", {
           },
 
           /**
+           * Remove subscribers for specified node and attribute
+           */
+          removeSubscribers: function(nodeId, attribute, cb) {
+              var coll = this.getColl();
+              var pcoll = this.getPageColl();
+
+              coll.remove({"parent": pcoll.toObjectID(nodeId), "attribute": attribute}, cb);
+          },
+
+          /**
            * Remove all subscribers for specified node
            */
-          removeSubscribers: function(nodeId, cb) {
+          removeAllSubscribers: function(nodeId, cb) {
               var coll = this.getColl();
               var pcoll = this.getPageColl();
 

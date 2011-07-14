@@ -52,7 +52,7 @@ qx.Class.define("sm.cms.handlers.SavePageHandler", {
                       qx.log.Logger.error("sm.cms.handlers.SavePageHandler#removeAllSubscriptions", err);
                   }
               });
-              sm.cms.page.AttrSubscriptionMgr.removeSubscribers(doc["_id"], function(err) {
+              sm.cms.page.AttrSubscriptionMgr.removeAllSubscribers(doc["_id"], function(err) {
                   if (err) {
                       qx.log.Logger.error("sm.cms.handlers.SavePageHandler#removeSubscribers", err);
                   }

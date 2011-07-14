@@ -124,7 +124,6 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                           return;
                       }
 
-                      this.__mtable.setEnabled(false);
                       var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.update.attrsync"), "POST", "application/json");
                       req.setParameter("ref", this.__options["pageInfo"]["_id"]);
                       req.setParameter("enable", true);
@@ -136,8 +135,6 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                               sm.cms.Application.alert(this.tr("Невозможно синхронизоваться с выбранной страницей!"));
                               return;
                           }
-
-                          this.__mtable.setEnabled(true);
 
                           var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.info"), "POST", "application/json");
                           req.setParameter("ref", this.__options["pageInfo"]["_id"]);
@@ -160,13 +157,11 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                   sm.cms.Application.confirm(this.tr("Вы действительно хотите отключить синхронизацию?"),
                     qx.lang.Function.bind(function(res) {
                         if (res) {
-                            this.__mtable.setEnabled(false);
                             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.update.attrsync"), "POST", "application/json");
                             req.setParameter("ref", this.__options["pageInfo"]["_id"]);
                             req.setParameter("enable", false);
                             req.setParameter("attribute", this.__options["attrName"]);
                             req.send(function(resp) {
-                                this.__mtable.setEnabled(true);
                                 this.__mtable.setSynchronize(false);
                             }, this);
                         }
