@@ -152,9 +152,6 @@ qx.Class.define("sm.app.Env", {
             if (c) {
                 return c;
             }
-            if (notCheckTemplate) {
-                return null;
-            }
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
             if (!this.__lpath.existsSync(cpath)) {
@@ -162,8 +159,10 @@ qx.Class.define("sm.app.Env", {
                 if (this.__lpath.existsSync(tpath)) {
                     this.setJSONConfig(name, this._readFileJSONTemplate(tpath));
                     return this.__jsonConfigCache[name];
-                } else {
+                } else if (!notCheckTemplate) {
                     throw new Error("Unable to load config, no template: " + tpath);
+                } else {
+                    return null;
                 }
             } else {
                 c = this.__jsonConfigCache[name] = this._readFileJSON(cpath);
