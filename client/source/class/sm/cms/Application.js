@@ -129,7 +129,7 @@ qx.Class.define("sm.cms.Application", {
             nav.setContextMenuHandler(this.__navTreeCtxMenuHandler, this);
 
             //Init nav panel after starting
-            sm.cms.Application.INSTANCE.addListenerOnce("guiInitialized", function(ev) {
+            sm.cms.Application.INSTANCE.addListenerOnce("guiStateInitialized", function(ev) {
                 nav.init();
             }, this);
 
