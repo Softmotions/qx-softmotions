@@ -48,6 +48,10 @@ qx.Class.define("sm.app.AppState", {
         __json : null,
         __stateObject : null,
 
+        reload : function() {
+            this.__json.reload();
+        },
+
         /**
          * Устанавливает значение property объекта состояния текущего приложения
          * @param props {Object}
