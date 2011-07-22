@@ -40,6 +40,16 @@ qx.Class.define("sm.table.Table", {
 
         getSelectedRowData : function() {
             return this.getRowData(this.getSelectionModel().getAnchorSelectionIndex());
+        },
+
+        updateRowStyles : function(onlyRow) {
+            var scrollerArr = this._getPaneScrollerArr();
+            for (var i = 0; i < scrollerArr.length; i++) {
+                scrollerArr[i].getTablePane()._updateRowStyles(onlyRow);
+            }
         }
+
+        //paneUpdated
+
     }
 });
