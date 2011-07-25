@@ -129,7 +129,7 @@ qx.Class.define("sm.cms.Application", {
             nav.setContextMenuHandler(this.__navTreeCtxMenuHandler, this);
 
             //Init nav panel after starting
-            sm.cms.Application.INSTANCE.addListenerOnce("guiStateInitialized", function(ev) {
+            sm.cms.Application.INSTANCE.addListenerOnce("guiInitialized", function(ev) {
                 nav.init();
             }, this);
 
@@ -288,6 +288,15 @@ qx.Class.define("sm.cms.Application", {
                                 if (removed) {
                                     me.__rightSideStack.showWidget("root");
                                 }
+                            });
+
+                        }, this);
+                        contextMenu.add(bt);
+
+                        bt = new qx.ui.menu.Button(this.tr("Переместить"));
+                        bt.addListener("execute", function(ev) {
+                            this.__nav._moveNavItem(ev, node, function() {
+                                me.__rightSideStack.showWidget("root");
                             });
 
                         }, this);

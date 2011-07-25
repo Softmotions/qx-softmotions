@@ -61,7 +61,8 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
             this.center();
         }, this);
 
-        this.__navCont = new sm.cms.nav.NavResources(this.tr("Выберите страницу или раздел"), "pages");
+        this.__navCont = new sm.cms.nav.NavResources(this.tr("Выберите страницу или раздел"),
+          "pages", options["qMods"]);
         this.add(this.__navCont, {flex : 1});
 
 
@@ -121,7 +122,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
         this.__navCont.addListener("selectPage", function(ev) {
             var opts = this.__options;
             var data = ev.getData();
-            if (!data[2]) { //no asm for page
+            if (!data[2] && !options["withNoAsm"]) { //no asm for page
                 ok.setEnabled(false);
                 if (lname && (opts.linkText == null || opts.linkText == "")) {
                     lname.setValue("");

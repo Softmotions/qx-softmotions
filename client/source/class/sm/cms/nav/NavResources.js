@@ -62,9 +62,13 @@ qx.Class.define("sm.cms.nav.NavResources", {
         }
     },
 
-    construct : function(treeCaption, navMode) {
+    construct : function(treeCaption, navMode, qMods) {
         this.base(arguments);
         this.setLayout(new qx.ui.layout.VBox());
+
+        if (qMods != null) {
+            this.__qMods = qx.util.Json.stringify(qMods);
+        }
 
         if (navMode != null) {
             this.setNavMode(navMode);
@@ -126,6 +130,8 @@ qx.Class.define("sm.cms.nav.NavResources", {
 
     members :
     {
+        __qMods : null,
+
         __navTree : null,
 
         getHierarchy : function(node) {
@@ -151,6 +157,10 @@ qx.Class.define("sm.cms.nav.NavResources", {
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("nav.resources"), "GET", "application/json");
             if (this.getNavMode() != null) {
                 req.setParameter("navMode", this.getNavMode());
+            }
+            //query mods
+            if (this.__qMods != null) {
+                req.setParameter("qMods", this.__qMods);
             }
             if (node != null) {
                 nodeId = node.nodeId;
@@ -336,6 +346,38 @@ qx.Class.define("sm.cms.nav.NavResources", {
                     }
                 });
             }, this);
+        },
+
+
+        _moveNavItem : function(ev, node, cb) {
+            var me = this;
+            if (!node || node.$$data == null) {
+                cb(null);
+                return;
+            }
+            var ldlg = new sm.cms.page.PageLinkDlg({
+                oklabel : this.tr("Переместить сюда"),
+                allowOuterLinks : false,
+                includeLinkName : false,
+                withNoAsm : true,
+                qMods : {type : 0}
+            });
+            ldlg.addListener("pageSelected", function(ev) {
+                var intoPid = ev.getData()[0];
+                var subjPid = node.$$data.substring("pages.".length);
+                var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.move"), "GET", "application/json");
+                req.setParameter("into", intoPid, false);
+                req.setParameter("subj", subjPid, false);
+                req.send(function(resp) {
+                    me.__navTree.getDataModel().clearData();
+                    me.__loadLevel();
+                    ldlg.close();
+                    if (cb) {
+                        cb();
+                    }
+                });
+            }, this);
+            ldlg.open();
         },
 
         /**

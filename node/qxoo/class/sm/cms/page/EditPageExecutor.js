@@ -72,11 +72,11 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             for (var an in amap) {
                 var asm = amap[an];
                 if ((typeof asm["name"]) !== "string" || asm["name"].length == 0 ||
-                        !this._isAllowedAsm(req, asm["_name_"])) {
+                  !this._isAllowedAsm(req, asm["_name_"])) {
                     continue;
                 }
                 if ((category != null && asm["_category_"] != category) ||
-                        (category == null && asm["_category_"] != null)) {
+                  (category == null && asm["_category_"] != null)) {
                     continue;
                 }
                 asms.push(asm);
@@ -360,8 +360,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         }
                         if (mask.indexOf("e") == -1) {
                             me.handleError(resp, ctx,
-                                    me.tr("У вас недостаточно прав для редактирования страницы"),
-                                    false, true);
+                              me.tr("У вас недостаточно прав для редактирования страницы"),
+                              false, true);
                             return;
                         }
 
@@ -390,8 +390,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
                             if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
                                 me.handleError(resp, ctx,
-                                        me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
-                                        false, true);
+                                  me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
+                                  false, true);
                                 return;
                             }
 
@@ -515,9 +515,9 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 var saveAs = attrMeta["saveAs"];
                 if (!saveAs) {
                     saveAs = (asm[attrName] == null ||
-                            atype === "string" ||
-                            atype === "boolean" ||
-                            atype === "number") ? "value" : "ctx";
+                      atype === "string" ||
+                      atype === "boolean" ||
+                      atype === "number") ? "value" : "ctx";
                 }
                 if ((typeof saveAs) === "function") {
                     try {
@@ -529,7 +529,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         });
                     } catch(e) {
                         qx.log.Logger.error(this, "Error to call attribute converter, asm: " + asm["_name_"] +
-                                ", attr: " + attrName, e);
+                          ", attr: " + attrName, e);
                     }
                 } else if ("value" == saveAs || "json" == saveAs) {
                     if ((typeof rawValue) === "string" && "json" == saveAs) {
@@ -537,7 +537,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                             rawValue = JSON.parse(rawValue);
                         } catch(e) {
                             qx.log.Logger.error(this, "Failed to parse as json object. asm: " + asm["_name_"] +
-                                    ", attr: " + attrName + ", attrValue: " + rawValue, e);
+                              ", attr: " + attrName + ", attrValue: " + rawValue, e);
                         }
                     }
                     attrs[attrName] = {"value" : rawValue};
@@ -548,7 +548,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                             attrs[attrName] = {"ctx" : JSON.parse(rawValue)};
                         } catch(e) {
                             qx.log.Logger.error(this, "Failed to parse as json object. asm: " + asm["_name_"] +
-                                    ", attr: " + attrName + ", attrValue: " + rawValue, e);
+                              ", attr: " + attrName + ", attrValue: " + rawValue, e);
                         }
                     } else {
                         attrs[attrName] = {"ctx" : rawValue};
@@ -581,66 +581,66 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             var coll = sm.cms.page.PageMgr.getColl();
 
             coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, creator : 1, access : 1}},
-                    function(err, doc) {
+              function(err, doc) {
 
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  if (doc == null) {
+                      me.writeMessage(resp, ctx, "Invalid request", true);
+                      return;
+                  }
+
+                  var userRefs = {};
+                  if (doc["owner"] != null) {
+                      userRefs[doc["owner"]] = ["owner"];
+                  }
+
+                  if (doc["creator"] != null) {
+                      var creator = doc["creator"];
+                      if (userRefs[creator]) {
+                          userRefs[creator].push("creator");
+                      } else {
+                          userRefs[creator] = ["creator"];
+                      }
+                  }
+
+                  if (doc["access"]) {
+                      var access = doc["access"];
+                      for (var k in access) {
+                          var alist = access[k];
+                          for (var i = 0; i < alist.length; ++i) {
+                              var login = alist[i];
+                              if (!userRefs[login]) {
+                                  userRefs[login] = [k];
+                              } else {
+                                  userRefs[login].push(k);
+                              }
+                          }
+                      }
+                  }
+                  var userRefsArr = [];
+                  for (var k in userRefs) {
+                      userRefsArr.push(k);
+                  }
+
+                  var ucoll = sm.cms.user.UsersMgr.getColl();
+                  var uq = ucoll.createQuery({login : {$in : userRefsArr}}, {fields : {login : 1, name : 1, email : 1}});
+                  uq.each(
+                    function(index, user) {
+                        var uref = userRefs[user.login];
+                        if (uref) {
+                            res.push([user.login, user.name, user.email, uref]);
+                        }
+                    }).exec(function(err) {
                         if (err) {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        if (doc == null) {
-                            me.writeMessage(resp, ctx, "Invalid request", true);
-                            return;
-                        }
-
-                        var userRefs = {};
-                        if (doc["owner"] != null) {
-                            userRefs[doc["owner"]] = ["owner"];
-                        }
-
-                        if (doc["creator"] != null) {
-                            var creator = doc["creator"];
-                            if (userRefs[creator]) {
-                                userRefs[creator].push("creator");
-                            } else {
-                                userRefs[creator] = ["creator"];
-                            }
-                        }
-
-                        if (doc["access"]) {
-                            var access = doc["access"];
-                            for (var k in access) {
-                                var alist = access[k];
-                                for (var i = 0; i < alist.length; ++i) {
-                                    var login = alist[i];
-                                    if (!userRefs[login]) {
-                                        userRefs[login] = [k];
-                                    } else {
-                                        userRefs[login].push(k);
-                                    }
-                                }
-                            }
-                        }
-                        var userRefsArr = [];
-                        for (var k in userRefs) {
-                            userRefsArr.push(k);
-                        }
-
-                        var ucoll = sm.cms.user.UsersMgr.getColl();
-                        var uq = ucoll.createQuery({login : {$in : userRefsArr}}, {fields : {login : 1, name : 1, email : 1}});
-                        uq.each(
-                                function(index, user) {
-                                    var uref = userRefs[user.login];
-                                    if (uref) {
-                                        res.push([user.login, user.name, user.email, uref]);
-                                    }
-                                }).exec(function(err) {
-                                    if (err) {
-                                        me.handleError(resp, ctx, err);
-                                        return;
-                                    }
-                                    me.writeJSONObject(res, resp, ctx);
-                                });
+                        me.writeJSONObject(res, resp, ctx);
                     });
+              });
         },
 
         /**
@@ -663,55 +663,55 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             var coll = sm.cms.page.PageMgr.getColl();
 
             coll.findOne({_id : coll.toObjectID(ref)}, {fields : {owner : 1, creator : 1, access : 1}},
-                    function(err, doc) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        if (doc == null) {
-                            me.writeMessage(resp, ctx, "Invalid request", true);
-                            return;
-                        }
-                        //check access rights
-                        var userId = req.getUserId();
+              function(err, doc) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  if (doc == null) {
+                      me.writeMessage(resp, ctx, "Invalid request", true);
+                      return;
+                  }
+                  //check access rights
+                  var userId = req.getUserId();
 
-                        if ((doc.creator != userId) && !req.isUserInRoles(["users.admin", "structure.admin"])) {
-                            me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для смены владельца страницы"), false, true);
-                            return;
-                        }
+                  if ((doc.creator != userId) && !req.isUserInRoles(["users.admin", "structure.admin"])) {
+                      me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для смены владельца страницы"), false, true);
+                      return;
+                  }
 
-                        var updateSpec = {$set : {}};
-                        if (role == "owner") {
-                            updateSpec["$set"]["owner"] = uid;
-                        } else {
-                            var access = doc["access"] || {};
-                            if (role == "*" && sign == "-") { //remove all access roles from user
-                                for (var k in access) {
-                                    if (qx.lang.Type.isArray(access[k])) {
-                                        qx.lang.Array.remove(access[k], uid);
-                                    }
-                                }
-                            } else { //modify specific access
-                                var ulist = access[role];
-                                if (!qx.lang.Type.isArray(ulist)) {
-                                    access[role] = [];
-                                }
-                                if (sign == "+" && access[role].indexOf(uid) == -1) {
-                                    access[role].push(uid);
-                                } else if (sign == "-") {
-                                    qx.lang.Array.remove(access[role], uid);
-                                }
-                            }
-                            updateSpec["$set"]["access"] = access;
-                        }
-                        coll.update({_id : coll.toObjectID(ref)}, updateSpec, {safe : true}, function(err) {
-                            if (err) {
-                                me.handleError(resp, ctx, err);
-                                return;
-                            }
-                            me.writeJSONObject({}, resp, ctx);
-                        });
-                    }
+                  var updateSpec = {$set : {}};
+                  if (role == "owner") {
+                      updateSpec["$set"]["owner"] = uid;
+                  } else {
+                      var access = doc["access"] || {};
+                      if (role == "*" && sign == "-") { //remove all access roles from user
+                          for (var k in access) {
+                              if (qx.lang.Type.isArray(access[k])) {
+                                  qx.lang.Array.remove(access[k], uid);
+                              }
+                          }
+                      } else { //modify specific access
+                          var ulist = access[role];
+                          if (!qx.lang.Type.isArray(ulist)) {
+                              access[role] = [];
+                          }
+                          if (sign == "+" && access[role].indexOf(uid) == -1) {
+                              access[role].push(uid);
+                          } else if (sign == "-") {
+                              qx.lang.Array.remove(access[role], uid);
+                          }
+                      }
+                      updateSpec["$set"]["access"] = access;
+                  }
+                  coll.update({_id : coll.toObjectID(ref)}, updateSpec, {safe : true}, function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
+                      me.writeJSONObject({}, resp, ctx);
+                  });
+              }
             );
         },
 
@@ -739,44 +739,44 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 var asms = {};
                 var pcoll = sm.cms.page.PageMgr.getColl();
                 pcoll.createQuery({_id: {$in: [pcoll.toObjectID(ref), pcoll.toObjectID(parent)]}}, {fields: {_id: 1, asm: 1}})
-                        .each(function(index, item) {
-                            asms[item["_id"]] = item["asm"];
-                        })
-                        .exec(function(err) {
-                            if (err) {
-                                me.handleError(resp, ctx, err);
-                                return;
-                            }
+                  .each(function(index, item) {
+                      asms[item["_id"]] = item["asm"];
+                  })
+                  .exec(function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
 
-                            if (!asms[ref] || !asms[parent]) {
-                                me.writeJSONObject({state: false}, resp, ctx);
-                                return;
-                            }
+                      if (!asms[ref] || !asms[parent]) {
+                          me.writeJSONObject({state: false}, resp, ctx);
+                          return;
+                      }
 
-                            // check subscription allow
-                            me.__check_subscription_allow(asms[ref], asms[parent], attribute, ctx, function(state) {
-                                if (!state) {
-                                    me.writeJSONObject({state: false}, resp, ctx);
-                                    return;
-                                }
+                      // check subscription allow
+                      me.__check_subscription_allow(asms[ref], asms[parent], attribute, ctx, function(state) {
+                          if (!state) {
+                              me.writeJSONObject({state: false}, resp, ctx);
+                              return;
+                          }
 
-                                // add subscription
-                                smgr.addSubscription(parent, ref, attribute, function(err) {
-                                    if (err) {
-                                        me.handleError(resp, ctx, err);
-                                        return;
-                                    }
-                                    // one time synchronization
-                                    smgr.synchronizeSubscriber(ref, attribute, function(err) {
-                                        if (err) {
-                                            me.handleError(resp, ctx, err);
-                                            return;
-                                        }
-                                        me.writeJSONObject({state: true}, resp, ctx);
-                                    });
-                                });
-                            });
-                        });
+                          // add subscription
+                          smgr.addSubscription(parent, ref, attribute, function(err) {
+                              if (err) {
+                                  me.handleError(resp, ctx, err);
+                                  return;
+                              }
+                              // one time synchronization
+                              smgr.synchronizeSubscriber(ref, attribute, function(err) {
+                                  if (err) {
+                                      me.handleError(resp, ctx, err);
+                                      return;
+                                  }
+                                  me.writeJSONObject({state: true}, resp, ctx);
+                              });
+                          });
+                      });
+                  });
             } else {
                 smgr.removeSubscription(ref, attribute, function(err) {
                     if (err) {
@@ -970,6 +970,84 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             } else {
                 doCheck();
             }
+        },
+
+
+        //Move page into another parent
+        __page_move : function(req, resp, ctx) {
+            var me = this;
+            qx.log.Logger.info("Page move params=" + JSON.stringify(req.params));
+            var into = req.params["into"];
+            var subj = req.params["subj"];
+            if (into == null || subj == null) {
+                me.handleError(resp, ctx, "Invalid request");
+                return;
+            }
+            if (into == subj) {
+                me.handleError(resp, ctx, this.tr("Нельзя перенести категорию саму в себя"), false, true);
+                return;
+            }
+
+            var pmgr = sm.cms.page.PageMgr;
+            var coll = sm.cms.page.PageMgr.getColl();
+            coll.findOne({_id : coll.toObjectID(subj)},
+              function(err, subjDoc) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  if (subjDoc == null) {
+                      me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", subj));
+                      return;
+                  }
+                  coll.findOne({_id : coll.toObjectID(into)},
+                    function(err, intoDoc) {
+                        if (err) {
+                            me.handleError(resp, ctx, err);
+                            return;
+                        }
+                        if (intoDoc == null) {
+                            me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", into));
+                            return;
+                        }
+                        if (intoDoc["type"] != 0) {
+                            me.handleError(resp, ctx, me.tr("Ветка в которую перемещается страница должна быть каталогом"));
+                            return;
+                        }
+                        checkAccess(subjDoc, intoDoc);
+                    });
+              });
+
+            var checkAccess = function(subjDoc, intoDoc) {
+                pmgr.getPageAccessMask(req, subjDoc["_id"], function(err, amask) {
+                    if (err) {
+                        me.handleError(resp, ctx, err);
+                        return;
+                    }
+                    if (amask == null || amask.indexOf("e") == -1) {
+                        me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения: %1", subjDoc["name"]));
+                        return;
+                    }
+                    pmgr.getPageAccessMask(req, intoDoc["_id"], function(err, amask) {
+                        if (err) {
+                            me.handleError(resp, ctx, err);
+                            return;
+                        }
+                        if (amask == null || amask.indexOf("e") == -1) {
+                            me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения в: %1", subjDoc["name"]));
+                            return;
+                        }
+                        applyMove(subjDoc, intoDoc);
+                    });
+                });
+            };
+
+            var applyMove = function(subjDoc, intoDoc) {
+                qx.log.Logger.info("Apply move!!!!!");
+                me.writeJSONObject({}, resp, ctx);
+            };
+
+
         }
     },
 
@@ -1011,9 +1089,16 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             handler :"__page_update_acl"
         },
 
+        //Update (enable/disable) attribute synchronization
         "/page/update/attrsync" : {
             webapp : "adm",
             handler : "__page_update_sync"
+        },
+
+        //Move page into another parent
+        "/page/move" : {
+            webapp : "adm",
+            handler : "__page_move"
         }
     }
 });

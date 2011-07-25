@@ -63,7 +63,8 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
                 //Выбрали что-то вложенное
                 var category = this.__getCategoryForNode(parent);
                 if (category != null) {
-                    this.__loadLevel(category, parent.substring((category.path + ".").length), resp, ctx);
+                    var qMods = req.params["qMods"] != null ? JSON.parse(req.params["qMods"]) : null;
+                    this.__loadLevel(category, parent.substring((category.path + ".").length), resp, ctx, qMods);
                 } else {
                     this.writeJSONObject([], resp, ctx);
                 }
@@ -100,19 +101,22 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
         /**
          * Загрузка уровня в иерархии
          */
-        __loadLevel : function(category, pageId, resp, ctx) {
+        __loadLevel : function(category, pageId, resp, ctx, qMods) {
             var res = [];
             var me = this;
 
             var mgr = category.mgr;
             if (mgr.getChildNodesQueryForNav) {
                 var q = mgr.getChildNodesQueryForNav(pageId == "root" ? null : pageId);
+                if (qMods != null) {
+                    q.updateQuery(qMods);
+                }
                 q.each(
-                        function(index, doc) {
-                            res.push(mgr.buildNavItem(category.path, doc));
-                        }).exec(function() {
-                            me.writeJSONObject(res, resp, ctx);
-                        });
+                  function(index, doc) {
+                      res.push(mgr.buildNavItem(category.path, doc));
+                  }).exec(function() {
+                      me.writeJSONObject(res, resp, ctx);
+                  });
             } else if (mgr.getChildNavItems) {
                 me.writeJSONObject(mgr.getChildNavItems(category.path, pageId), resp, ctx);
             } else {
