@@ -1068,7 +1068,9 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         me.handleError(resp, ctx, err);
                         return;
                     }
-                    me.writeJSONObject({}, resp, ctx);
+                    pmgr.updateNodeCachedPath(subjDoc, function() {
+                        me.writeJSONObject({}, resp, ctx);
+                    });
                 });
             };
         }

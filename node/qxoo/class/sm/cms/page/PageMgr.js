@@ -223,7 +223,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                             cb(err);
                             return;
                         }
-                        me.__updateNodeCachedPath(doc, cb);
+                        me.updateNodeCachedPath(doc, cb);
                     });
                 };
 
@@ -654,7 +654,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
          *
          * @param node {String} modified node
          */
-        __updateNodeCachedPath : function(node, cb) {
+        updateNodeCachedPath : function(node, cb) {
             var mongo = this.__getMongo();
             var coll = this.getColl();
 
