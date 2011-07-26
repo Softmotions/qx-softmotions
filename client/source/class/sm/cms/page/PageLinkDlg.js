@@ -22,6 +22,12 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
 
 
         /**
+         * data: [otherNodeId]
+         */
+        otherSelected : "qx.event.type.Data",
+
+
+        /**
          * Fired when dialog closed
          */
         close : "qx.event.type.Event"
@@ -40,8 +46,8 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
     },
 
     construct : function(options) {
-        this.base(arguments, this.tr("Ссылка на страницу"), null);
         this.__options = options = options || {};
+        this.base(arguments, options["caption"] || this.tr("Ссылка на страницу"), null);
         this.setLayout(new qx.ui.layout.VBox(5));
         this.set({
             modal         : true,
@@ -107,6 +113,8 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
                     hr.shift();
                 }
                 this.fireDataEvent("pageSelected", [this.__currentPage, lname ? lname.getValue() : this.__currentPageNode.label, hr]); //Inner page selected
+            } else if (options["allowOther"] && this.__otherId != null) {
+                this.fireDataEvent("otherSelected", [this.__otherId]);
             }
         }, this);
         var cancel = new qx.ui.form.Button(this.tr("Отменить"));
@@ -137,21 +145,30 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
             ok.setEnabled(true);
             this.__currentPage = data[0];
             this.__currentPageNode = data[1];
+            this.__otherId = null;
         }, this);
 
         this.__navCont.addListener("selectOther", function(ev) {
+            var data = ev.getData();
             var opts = this.__options;
-            ok.setEnabled(false);
+            if (!opts["allowOther"]) {
+                ok.setEnabled(false);
+            } else {
+                ok.setEnabled(true);
+            }
             if (lname && (opts.linkText == null || opts.linkText == "")) {
                 lname.setValue("");
             }
             this.__currentPage = null;
             this.__currentPageNode = null;
+            this.__otherId = data[0];
         }, this);
     },
 
     members :
     {
+
+        __otherId : null,
 
         __currentPage : null,
 

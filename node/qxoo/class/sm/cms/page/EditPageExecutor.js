@@ -976,7 +976,6 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
         //Move page into another parent
         __page_move : function(req, resp, ctx) {
             var me = this;
-            qx.log.Logger.info("Page move params=" + JSON.stringify(req.params));
             var into = req.params["into"];
             var subj = req.params["subj"];
             if (into == null || subj == null) {
@@ -1000,22 +999,26 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                       me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", subj));
                       return;
                   }
-                  coll.findOne({_id : coll.toObjectID(into)},
-                    function(err, intoDoc) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        if (intoDoc == null) {
-                            me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", into));
-                            return;
-                        }
-                        if (intoDoc["type"] != 0) {
-                            me.handleError(resp, ctx, me.tr("Ветка в которую перемещается страница должна быть каталогом"));
-                            return;
-                        }
-                        checkAccess(subjDoc, intoDoc);
-                    });
+                  if (into == "pages.root") {
+                      checkAccess(subjDoc, null);
+                  } else {
+                      coll.findOne({_id : coll.toObjectID(into)},
+                        function(err, intoDoc) {
+                            if (err) {
+                                me.handleError(resp, ctx, err);
+                                return;
+                            }
+                            if (intoDoc == null) {
+                                me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", into));
+                                return;
+                            }
+                            if (intoDoc["type"] != 0) {
+                                me.handleError(resp, ctx, me.tr("Ветка в которую перемещается страница должна быть каталогом"));
+                                return;
+                            }
+                            checkAccess(subjDoc, intoDoc);
+                        });
+                  }
               });
 
             var checkAccess = function(subjDoc, intoDoc) {
@@ -1028,26 +1031,46 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения: %1", subjDoc["name"]));
                         return;
                     }
-                    pmgr.getPageAccessMask(req, intoDoc["_id"], function(err, amask) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
+                    if (intoDoc != null) {
+                        pmgr.getPageAccessMask(req, intoDoc["_id"], function(err, amask) {
+                            if (err) {
+                                me.handleError(resp, ctx, err);
+                                return;
+                            }
+                            if (amask == null || amask.indexOf("e") == -1) {
+                                me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения в: %1", subjDoc["name"]));
+                                return;
+                            }
+                            applyMove(subjDoc, intoDoc);
+                        });
+                    } else {
+                        if (!req.isUserInRoles(["structure.admin"])) {
+                            me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения страницы в корень"));
                             return;
                         }
-                        if (amask == null || amask.indexOf("e") == -1) {
-                            me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения в: %1", subjDoc["name"]));
-                            return;
-                        }
-                        applyMove(subjDoc, intoDoc);
-                    });
+                        applyMove(subjDoc, null);
+                    }
                 });
             };
 
             var applyMove = function(subjDoc, intoDoc) {
-                qx.log.Logger.info("Apply move!!!!!");
-                me.writeJSONObject({}, resp, ctx);
+                if (intoDoc != null) {
+                    subjDoc["parent"] = coll.toDBRef(intoDoc["_id"]);
+                    subjDoc["cachedPath"] = intoDoc["cachedPath"] + "/" + subjDoc["name"];
+                    subjDoc["hierarchy"] = [].concat(intoDoc["hierarchy"]).concat(intoDoc["_id"]);
+                } else {
+                    delete subjDoc["parent"];
+                    subjDoc["cachedPath"] = "/" + subjDoc["name"];
+                    subjDoc["hierarchy"] = [];
+                }
+                coll.save(subjDoc, function(err) {
+                    if (err) {
+                        me.handleError(resp, ctx, err);
+                        return;
+                    }
+                    me.writeJSONObject({}, resp, ctx);
+                });
             };
-
-
         }
     },
 

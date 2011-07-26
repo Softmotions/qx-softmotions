@@ -356,13 +356,16 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 return;
             }
             var ldlg = new sm.cms.page.PageLinkDlg({
+                caption : this.tr("Перемещение страницы"),
                 oklabel : this.tr("Переместить сюда"),
                 allowOuterLinks : false,
                 includeLinkName : false,
                 withNoAsm : true,
+                allowOther : true,
                 qMods : {type : 0}
             });
-            ldlg.addListener("pageSelected", function(ev) {
+
+            var handleEv = function(ev) {
                 var intoPid = ev.getData()[0];
                 var subjPid = node.$$data.substring("pages.".length);
                 var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.move"), "GET", "application/json");
@@ -376,7 +379,9 @@ qx.Class.define("sm.cms.nav.NavResources", {
                         cb();
                     }
                 });
-            }, this);
+            };
+            ldlg.addListener("otherSelected", handleEv);
+            ldlg.addListener("pageSelected", handleEv);
             ldlg.open();
         },
 
