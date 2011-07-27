@@ -49,7 +49,10 @@ qx.Class.define("sm.app.AppState", {
         __stateObject : null,
 
         reload : function() {
-            this.__json.reload();
+            var req = new sm.io.Request(
+                    this.__url, "GET", "application/json");
+            req.setAsynchronous(false);
+            this.__json.setRequest(req);
         },
 
         /**

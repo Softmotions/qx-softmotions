@@ -69,7 +69,8 @@ qx.Class.define("sm.store.Json", {
         url : {
             check: "String",
             apply: "_applyUrl",
-            event: "changeUrl"
+            event: "changeUrl",
+            nullable : true
         },
 
         /**
@@ -78,7 +79,8 @@ qx.Class.define("sm.store.Json", {
         request : {
             check : "sm.io.Request",
             apply : "_applyRequest",
-            event : "changeRequest"
+            event : "changeRequest",
+            nullable : true
         }
     },
 
