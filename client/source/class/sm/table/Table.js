@@ -15,6 +15,7 @@ qx.Class.define("sm.table.Table", {
     },
 
     members : {
+
         __preventEditNextLine : null,
 
         setPreventEditNextLine : function(val) {
@@ -31,15 +32,31 @@ qx.Class.define("sm.table.Table", {
             this.base(arguments, evt);
         },
 
+        /**
+         * Associated rowData via JsonTableModel
+         * @param ind
+         */
         getRowData : function(ind) {
-            if (ind < 0) {
-                return null;
-            }
-            return this.getTableModel().getRowAssociatedData(ind);
+            return ind < 0 ? null : this.getTableModel().getRowAssociatedData(ind);
         },
 
         getSelectedRowData : function() {
             return this.getRowData(this.getSelectionModel().getAnchorSelectionIndex());
+        },
+
+
+        /**
+         * Row data as getTableModel().getRowData(ind);
+         */
+        getRowData2 : function(ind) {
+            return ind < 0 ? null : this.getTableModel().getRowData(ind);
+        },
+
+        /**
+         * Fist selected row data as getTableModel().getRowData(ind) at first anchor selection index
+         */
+        getSelectedRowData2 : function() {
+            return this.getRowData2(this.getSelectionModel().getAnchorSelectionIndex());
         },
 
         updateRowStyles : function(onlyRow) {
