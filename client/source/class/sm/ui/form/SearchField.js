@@ -40,6 +40,9 @@ qx.Class.define("sm.ui.form.SearchField", {
         /** Execute search, press ENTER key */
         "execute" : "qx.event.type.Event",
 
+        /** Fired if options changed */
+        "changeOptions" :  "qx.event.type.Event",
+
         /** Clears search box */
         "clear" : "qx.event.type.Event"
     },
@@ -72,6 +75,9 @@ qx.Class.define("sm.ui.form.SearchField", {
             }
             this.__menu.add(rb);
         }
+        sgroup.addListener("changeSelection", function() {
+            this.fireEvent("changeOptions");
+        }, this);
 
         this.base(arguments);
         this._setLayout(new qx.ui.layout.HBox().set({alignY : "middle"}));
@@ -90,6 +96,7 @@ qx.Class.define("sm.ui.form.SearchField", {
             switch (type) {
                 case "execute":
                 case "clear":
+                case "changeOptions":
                     this.base(arguments, type, listener, self, capture);
                     break;
                 default:
