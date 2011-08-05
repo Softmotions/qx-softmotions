@@ -44,7 +44,7 @@ qx.Class.define("sm.app.Env", {
         /**
          * Fired if some json configuration changed
          * <code>
-         * ev.getData(): {String} name of configuration file
+         * ev.getData(): [{String} name of config, {Object} newConfig, {Object} oldConfig]
          * </code>
          */
         "configChanged" : "qx.event.type.Data"
@@ -181,9 +181,10 @@ qx.Class.define("sm.app.Env", {
             var me = this;
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
+            var oldConfig = this.__jsonConfigCache[name];
             this.__jsonConfigCache[name] = object;
             this.__lfsutils.writeFileLock(cpath, qx.util.Json.stringify(object, true), "utf8", function(err) {
-                me.fireDataEvent("configChanged", name);
+                me.fireDataEvent("configChanged", [name, object, oldConfig]);
                 if (err) {
                     qx.log.Logger.error(me, "setJSONConfig", err);
                 }
