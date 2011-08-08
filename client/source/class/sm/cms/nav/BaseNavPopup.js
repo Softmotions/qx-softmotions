@@ -18,8 +18,6 @@ qx.Class.define("sm.cms.nav.BaseNavPopup", {
 
     construct : function() {
         this.base(arguments);
-
-        this.base(arguments);
         this._setLayout(new qx.ui.layout.VBox());
         this.set({
             width: 250,
