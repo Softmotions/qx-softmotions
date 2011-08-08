@@ -39,7 +39,7 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
             ctx["last_breadcrumb"] = {
                 name : page["name"],
                 published : !!page["published"],
-                link : page["_id"]
+                link : ("p" + page["_id"])
             };
 
             if (page["hierarchy"] == null) {
