@@ -33,6 +33,9 @@ qx.Class.define("sm.ui.list.RadioList", {
         this.getSelection().addListener("change", function(ev) {
             this.__setValue(this.getSelection().getLength() != 0)
         }, this);
+        this.addListener("changeModel", function() {
+            this.setValue(this.__selected);
+        }, this);
     },
 
     members :
@@ -53,8 +56,23 @@ qx.Class.define("sm.ui.list.RadioList", {
         setValue : function(value) {
             if (!value) {
                 this.getSelection().removeAll();
+                this.__setValue(false);
+            } else {
+                this._ensureSelected();
             }
-            this.__setValue(value);
+        },
+
+        _ensureSelected : function() {
+            if (this.getSelection().getLength() == 0 && this.getModel().getLength() > 0) {
+                this.getSelection().push(this.getModel().getItem(0));
+                return this.getSelection().getItem(0);
+            }
+            this.__setValue(true);
+            return this.getSelection().getItem(0);
+        },
+
+        getSelected : function() {
+            return this.getSelection().getItem(0) || null;
         },
 
         getValue : function() {
