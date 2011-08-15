@@ -213,7 +213,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             var pageInfo = this._pageInfo;
             pageInfo["asm"] = templateItem["asm"];
 
-            //qx.log.Logger.info("pageinfo=" + qx.util.Json.stringify(pageInfo));
+            //qx.log.Logger.info("pageinfo=" + qx.lang.Json.stringify(pageInfo));
 
             //             {"asm":"exp.base_content",
             //             "name":"Обычная страница",
@@ -374,7 +374,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                             if (qx.lang.Type.isString(val)) {
                                 req.setParameter(name, val, true);
                             } else {
-                                req.setParameter(name, qx.util.Json.stringify(val), true);
+                                req.setParameter(name, qx.lang.Json.stringify(val), true);
                             }
                         }
                     }

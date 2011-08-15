@@ -653,7 +653,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             var role = req.params["role"];
 
             if (ref == null || uid == null || role == null || (role.charAt(0) != '+' && role.charAt(0) != '-')) {
-                qx.log.Logger.warn(this, "__page_update_acl()", "Invalid params", qx.util.Json.stringify(req.params));
+                qx.log.Logger.warn(this, "__page_update_acl()", "Invalid params", qx.lang.Json.stringify(req.params));
                 throw new sm.nsrv.Message("Invalid request", true);
             }
             var sign = role.charAt(0);

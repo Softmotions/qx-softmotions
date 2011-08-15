@@ -176,10 +176,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if (!this.__vhostName) {
-                throw new Error("Invalid vhost config: " + qx.util.Json.stringify(this.__config));
+                throw new Error("Invalid vhost config: " + qx.lang.Json.stringify(this.__config));
             }
             if (!qx.lang.Type.isArray(this.__config["webapps"])) {
-                throw new Error("Invalid vhost config, webapps section must be array: " + qx.util.Json.stringify(this.__config));
+                throw new Error("Invalid vhost config, webapps section must be array: " + qx.lang.Json.stringify(this.__config));
             }
             var wapps = this.__config["webapps"];
 
@@ -192,13 +192,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 var wa = wapps[i];
                 if (!qx.lang.Type.isString(wa["id"])) {
-                    throw new Error("Missing webapp 'id' in config: " + qx.util.Json.stringify(this.__config));
+                    throw new Error("Missing webapp 'id' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 if (!qx.lang.Type.isString(wa["docRoot"])) {
-                    throw new Error("Missing webapp 'docRoot' in config: " + qx.util.Json.stringify(this.__config));
+                    throw new Error("Missing webapp 'docRoot' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 if (wappsIds[wa["id"]]) {
-                    throw new Error("Duplicated webapp 'id' in config: " + qx.util.Json.stringify(this.__config));
+                    throw new Error("Duplicated webapp 'id' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 wappsIds[wa["id"]] = true;
 
@@ -211,7 +211,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     waCtx = wa["context"] = waCtx.substring(0, waCtx.length - 1);
                 }
                 if (wappsCtx[waCtx]) {
-                    throw new Error("Duplicated webapp 'context' in config: " + qx.util.Json.stringify(this.__config));
+                    throw new Error("Duplicated webapp 'context' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 wappsCtx[waCtx] = true;
                 wa["contextPath"] = (waCtx == "/") ? "" : waCtx;
@@ -229,7 +229,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
 
                     if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
-                        throw new Error("Missing user provider type in config: " + qx.util.Json.stringify(this.__config));
+                        throw new Error("Missing user provider type in config: " + qx.lang.Json.stringify(this.__config));
                     }
 
                     var uconf = sconf["userProvider"];
@@ -241,13 +241,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         upClass = upName;
                     }
                     if (!upClass || !qx.lang.Type.isFunction(upClass)) {
-                        throw new Error("Invalid user provider type in config: " + qx.util.Json.stringify(this.__config));
+                        throw new Error("Invalid user provider type in config: " + qx.lang.Json.stringify(this.__config));
                     }
 
                     var userProvider = security._userProvider = new upClass(uconf["options"]);
 
                     if (!sconf["auth"] || !sconf["auth"]["type"]) {
-                        throw new Error("Missing auth filter type in config: " + qx.util.Json.stringify(this.__config));
+                        throw new Error("Missing auth filter type in config: " + qx.lang.Json.stringify(this.__config));
                     }
 
                     var aconf = sconf["auth"];
@@ -259,7 +259,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         aClass = aName;
                     }
                     if (!aClass || !qx.lang.Type.isFunction(aClass)) {
-                        throw new Error("Invalid auth filter type in config: " + qx.util.Json.stringify(this.__config));
+                        throw new Error("Invalid auth filter type in config: " + qx.lang.Json.stringify(this.__config));
                     }
                     security.__filter = new aClass(aconf["options"], userProvider, securityStore);
                 }
@@ -272,7 +272,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             });
 
             if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.util.Json.stringify(this.__config));
+                qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.lang.Json.stringify(this.__config));
             }
 
             this.__loadHandlers();
@@ -594,7 +594,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                qx.log.Logger.debug("Forward: " + qx.util.Json.stringify(forward));
+                qx.log.Logger.debug("Forward: " + qx.lang.Json.stringify(forward));
             }
 
             if (forward && forward["terminated"] == true) { //executor takes control of the request

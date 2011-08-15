@@ -143,7 +143,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                 var resp = null;
                 var errors = [];
                 try {
-                    resp = qx.util.Json.parse(data);
+                    resp = qx.lang.Json.parse(data);
                     if (qx.lang.Type.isArray(resp.errors)) {
                         errors = resp.errors;
                     }
@@ -182,7 +182,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
         __checkImageConstrains : function(files) {
             var errors = [];
             if (!qx.lang.Type.isArray(files) || files.length != 1) {
-                qx.log.Logger.warn(this, "Got invalid file meta response: " + qx.util.Json.stringify(files));
+                qx.log.Logger.warn(this, "Got invalid file meta response: " + qx.lang.Json.stringify(files));
                 errors.push(this.tr("Изображение не было загружено"));
                 return errors;
             }
@@ -206,7 +206,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
             for (var i = 0; i < ctrArr.length; ++i) {
                 var ctr = ctrArr[i];
                 if (!qx.lang.Type.isString(ctr)) {
-                    qx.log.Logger.warn(this, "Invalid constraint: " + qx.util.Json.stringify(ctr));
+                    qx.log.Logger.warn(this, "Invalid constraint: " + qx.lang.Json.stringify(ctr));
                     continue;
                 }
                 if (ctr.indexOf("square") == 0 && (width != height)) {
@@ -225,7 +225,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                     var op = rest.charAt(0);
                     var val = parseInt(rest.substring(1));
                     if (isNaN(val)) {
-                        qx.log.Logger.warn(this, "Invalid constraint: " + qx.util.Json.stringify(ctr));
+                        qx.log.Logger.warn(this, "Invalid constraint: " + qx.lang.Json.stringify(ctr));
                         continue;
                     }
                     if (op == "=") {
@@ -241,7 +241,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                             errors.push(hdim + " " + this.tr("изображения больше чем") + " " + (val - 1));
                         }
                     } else {
-                        qx.log.Logger.warn(this, "Invalid constraint: " + qx.util.Json.stringify(ctr));
+                        qx.log.Logger.warn(this, "Invalid constraint: " + qx.lang.Json.stringify(ctr));
                         continue;
                     }
                 }

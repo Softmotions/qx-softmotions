@@ -78,7 +78,7 @@ qx.Class.define("sm.cms.youtube.AbstractYouTubeExecutor", {
                     });
                     res.on("end", function() {
                         // parse response to JSON
-                        var ytdata = qx.util.Json.parse(data);
+                        var ytdata = qx.lang.Json.parse(data);
                         if (!ytdata) {
                             qx.log.Logger.error(me, "Invalid response data");
                             return;

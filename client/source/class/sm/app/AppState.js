@@ -72,7 +72,7 @@ qx.Class.define("sm.app.AppState", {
             for (var pname in props) {
                 sprops[pname] = props[pname];
             }
-            var state = qx.util.Json.stringify(this.__stateObject);
+            var state = qx.lang.Json.stringify(this.__stateObject);
             var req = new sm.io.Request(this.__url, "POST", "application/json");
             req.setParameter("_NSTATE", state);
             this.__json.setRequest(req);
@@ -93,7 +93,7 @@ qx.Class.define("sm.app.AppState", {
             }
             var req = new sm.io.Request(this.__url, "POST", "application/json");
             req.setParameter("_NSTATE_PROPERTY", pname);
-            req.setParameter("_NSTATE_PROPERTY_VAL", qx.util.Json.stringify(pval));
+            req.setParameter("_NSTATE_PROPERTY_VAL", qx.lang.Json.stringify(pval));
             req.send(function() {
                 sprops[pname] = pval;
                 this.fireDataEvent("stateChanged", this.__stateObject);

@@ -481,7 +481,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 var frow = (typeof qspec["firstRow"] === "string") ? parseInt(qspec["firstRow"]) : qspec["firstRow"];
                 var lrow = (typeof qspec["lastRow"] === "string") ? parseInt(qspec["lastRow"]) : qspec["lastRow"];
                 if (isNaN(frow) || isNaN(lrow)) {
-                    throw new Error("Invalid 'firstRow' or 'lastRow' in qspec: " + qx.util.Json.stringify(qspec));
+                    throw new Error("Invalid 'firstRow' or 'lastRow' in qspec: " + qx.lang.Json.stringify(qspec));
                 }
                 opts["skip"] = frow;
                 opts["limit"] = Math.abs(lrow - frow) + 1;
@@ -489,14 +489,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 if (qspec["limit"] != null) {
                     var limit = (typeof qspec["limit"] === "string") ? parseInt(qspec["limit"]) : qspec["limit"];
                     if (isNaN(limit)) {
-                        throw new Error("Invalid 'limit' in qspec: " + qx.util.Json.stringify(qspec));
+                        throw new Error("Invalid 'limit' in qspec: " + qx.lang.Json.stringify(qspec));
                     }
                     opts["limit"] = limit;
                 }
                 if (qspec["skip"] != null) {
                     var skip = (typeof qspec["skip"] === "string") ? parseInt(qspec["skip"]) : qspec["skip"];
                     if (isNaN(skip)) {
-                        throw new Error("Invalid 'skip' in qspec: " + qx.util.Json.stringify(qspec));
+                        throw new Error("Invalid 'skip' in qspec: " + qx.lang.Json.stringify(qspec));
                     }
                     opts["skip"] = skip;
                 }

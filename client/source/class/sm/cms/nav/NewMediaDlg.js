@@ -74,7 +74,7 @@ qx.Class.define("sm.cms.nav.NewMediaDlg", {
                 var resp = null;
                 var errors = [];
                 try {
-                    resp = qx.util.Json.parse(ev.getData());
+                    resp = qx.lang.Json.parse(ev.getData());
                     if (qx.lang.Type.isArray(resp.errors)) {
                         errors = resp.errors;
                     }

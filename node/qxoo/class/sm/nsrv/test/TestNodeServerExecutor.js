@@ -80,7 +80,7 @@ qx.Class.define("sm.nsrv.test.TestNodeServerExecutor", {
          * Test GET request params
          */
         __requestParams : function(req, resp, ctx) {
-            //qx.log.Logger.info("fields=" + qx.util.Json.stringify(req.params));
+            //qx.log.Logger.info("fields=" + qx.lang.Json.stringify(req.params));
             var params = [];
             for (var k in req.params) {
                 params.push({

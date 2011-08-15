@@ -1,6 +1,6 @@
 Index: qooxdoo/framework/source/class/qx/Class.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/Class.js	(revision 27350)
+--- qooxdoo/framework/source/class/qx/Class.js	(revision 28157)
 +++ qooxdoo/framework/source/class/qx/Class.js	(working copy)
 @@ -210,6 +210,18 @@
              this.__addMixin(clazz, config.include[i], false);
@@ -74,9 +74,9 @@ Index: qooxdoo/framework/source/class/qx/Class.js
       *
 Index: qooxdoo/framework/source/class/qx/core/Environment.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 27350)
+--- qooxdoo/framework/source/class/qx/core/Environment.js	(revision 28157)
 +++ qooxdoo/framework/source/class/qx/core/Environment.js	(working copy)
-@@ -805,48 +805,48 @@
+@@ -861,48 +861,48 @@
        // plugin
        // /////////////////////////////////////////
        if (this.useCheck("plugin.gears")) {
@@ -138,7 +138,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        if (this.useCheck("plugin.pdf")) {
-@@ -860,24 +860,24 @@
+@@ -916,24 +916,24 @@
        // IO
        // /////////////////////////////////////////
        if (this.useCheck("io.maxrequests")) {
@@ -168,7 +168,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        // /////////////////////////////////////////
-@@ -898,10 +898,10 @@
+@@ -954,10 +954,10 @@
          this._checks["html.filereader"] = qx.bom.client.Html.getFileReader;
        }
        if (this.useCheck("html.geolocation")) {
@@ -181,7 +181,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
        if (this.useCheck("html.audio.ogg")) {
          this._checks["html.audio.ogg"] = qx.bom.client.Html.getAudioOgg;
-@@ -919,76 +919,76 @@
+@@ -975,45 +975,45 @@
          this._checks["html.audio.aif"] = qx.bom.client.Html.getAudioAif;
        }
        if (this.useCheck("html.video")) {
@@ -238,8 +238,9 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
 -        this._asyncChecks["html.dataurl"] = qx.bom.client.Html.getDataUrl;
 +        this._asyncChecks["html.dataurl"] = false;//qx.bom.client.Html.getDataUrl;
        }
- 
-       // /////////////////////////////////////////
+       if (this.useCheck("html.dataset")) {
+         this._checks["html.dataset"] = qx.bom.client.Html.getDataset;
+@@ -1023,31 +1023,31 @@
        // CSS
        // /////////////////////////////////////////
        if (this.useCheck("css.textoverflow")) {
@@ -278,7 +279,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
        }
  
        if (this.useCheck("css.rgba")) {
-@@ -999,11 +999,11 @@
+@@ -1058,11 +1058,11 @@
        // PHONEGAP
        // /////////////////////////////////////////
        if (this.useCheck("phonegap")) {
@@ -294,7 +295,7 @@ Index: qooxdoo/framework/source/class/qx/core/Environment.js
    },
 Index: qooxdoo/framework/source/class/qx/core/Assert.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 27350)
+--- qooxdoo/framework/source/class/qx/core/Assert.js	(revision 28157)
 +++ qooxdoo/framework/source/class/qx/core/Assert.js	(working copy)
 @@ -79,7 +79,7 @@
        {
@@ -307,7 +308,7 @@ Index: qooxdoo/framework/source/class/qx/core/Assert.js
        } else {
 Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
 ===================================================================
---- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 27350)
+--- qooxdoo/framework/source/class/qx/dev/StackTrace.js	(revision 28157)
 +++ qooxdoo/framework/source/class/qx/dev/StackTrace.js	(working copy)
 @@ -92,12 +92,12 @@
          }
@@ -370,7 +371,7 @@ Index: qooxdoo/framework/source/class/qx/dev/StackTrace.js
            return [this.__fileNameToClassName(error.sourceURL) + ":" + error.line];
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 27350)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 28157)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
 @@ -153,7 +153,8 @@
          temp = os.fdopen(fileDescriptor, "w")
@@ -384,38 +385,58 @@ Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
          if rc != 0:
 Index: qooxdoo/tool/pylib/generator/code/CodeGenerator.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/CodeGenerator.py	(revision 27350)
+--- qooxdoo/tool/pylib/generator/code/CodeGenerator.py	(revision 28157)
 +++ qooxdoo/tool/pylib/generator/code/CodeGenerator.py	(working copy)
-@@ -394,8 +394,17 @@
+@@ -572,21 +572,26 @@
  
          def compileClasses(classList, compConf, log_progress=lambda:None):
-             result = []
+             num_proc = self._job.get('run-time/num-processes', 0)
+-            if num_proc == 0:
+-                result = []
+-                for clazz in classList:
+-                    if clazz.id == "qx.core.Environment" and "variants" in compConf.optimize:
+-                        code = optimizeEnvironmentClass(clazz, compConf)
+-                    else:
+-                        code = clazz.getCode(compConf)
+-                    result.append(code)
+-                    log_progress()
+-                return u''.join(result)
+-            else:
+-                # multi-core version
+-                return _compileClassesMP(classList, compConf, log_progress, num_proc)
++            result = []
 +            nodeInc = self._job.get("compile-options/code/node_includes", False)
-             for clazz in classList:
--                result.append(clazz.getCode(compConf))
++            for clazz in classList:
 +                fpath = clazz.path
 +                result.append("\n//%s\n" % (clazz.id))
-+                if nodeInc:
-+                    if clazz.id.startswith("qx."):
-+                        result.append(clazz.getCode(compConf))
-+                    else:
-+                        result.append("$$node.script.runInThisContext($$node.fs.readFileSync('%s'), '%s');" % (fpath, fpath))
-+                else:
-+                    result.append(clazz.getCode(compConf))
-                 log_progress()
-             return u''.join(result)
  
++                if clazz.id == "qx.core.Environment" and "variants" in compConf.optimize:
++                    code = optimizeEnvironmentClass(clazz, compConf)
++                elif clazz.id.startswith("qx."):
++                    code = clazz.getCode(compConf)
++                elif nodeInc:
++                    code = "$$node.script.runInThisContext($$node.fs.readFileSync('%s'), '%s');" % (fpath, fpath)
++                else:
++                    code = clazz.getCode(compConf)
+ 
++                result.append(code)
++                log_progress()
++            return u''.join(result)
++
++
+         ##
+         # optimize qx.core.Environment.useCheck()
+         #
 Index: qooxdoo/tool/pylib/generator/code/DependencyLoader.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 27350)
+--- qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(revision 28157)
 +++ qooxdoo/tool/pylib/generator/code/DependencyLoader.py	(working copy)
-@@ -195,6 +195,9 @@
-         warn_deps = []
-         logInfos = self._console.getLevel() == "info"
-         ignored_names = set()
-+        ignored_names.add("$$node")
-+        ignored_names.add("$$node.process")
-+        ignored_names.add("$$node.fs")
+@@ -344,7 +344,7 @@
+             classnamespace = classid[:nsindex]
+             ignored_names.add(classnamespace)
+         for dep in warn_deps:
+-            if dep.name not in ignored_names:
++            if ((not dep.name.startswith("$$node")) and (dep.name not in ignored_names)):
+                 self._console.warn("Hint: Unknown global symbol referenced: %s (%s:%s)" % (dep.name, dep.requestor, dep.line))
  
-         # No dependency calculation
-         if len(includeWithDeps) == 0:
+ 

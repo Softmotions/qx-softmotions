@@ -158,7 +158,7 @@ qx.Class.define("sm.mongo.Query", {
         },
 
         dumpQuery : function() {
-            return qx.util.Json.stringify({
+            return qx.lang.Json.stringify({
                 query : this.__query,
                 options : this.__options
             });

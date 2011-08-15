@@ -89,7 +89,7 @@ qx.Class.define("sm.mongo.MongoConfig", {
                 this.__mongo = null;
             }
 
-            qx.log.Logger.info(this, "Init mongodb connection: " + qx.util.Json.stringify(mcfg));
+            qx.log.Logger.info(this, "Init mongodb connection: " + qx.lang.Json.stringify(mcfg));
             this.__mongo = new sm.mongo.Mongo(mcfg["db_name"],
                     mcfg["db_host"],
                     mcfg["db_port"],

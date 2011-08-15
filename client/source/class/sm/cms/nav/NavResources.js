@@ -67,7 +67,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
         this.setLayout(new qx.ui.layout.VBox());
 
         if (qMods != null) {
-            this.__qMods = qx.util.Json.stringify(qMods);
+            this.__qMods = qx.lang.Json.stringify(qMods);
         }
 
         if (navMode != null) {

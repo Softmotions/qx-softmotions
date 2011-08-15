@@ -230,7 +230,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("banner.save"), "POST", "application/json");
             req.setParameter("type", this.__bannerType, true);
             req.setParameter("category", this.__bannerCategory, true);
-            req.setParameter("banners", qx.util.Json.stringify(this.__banners.getBanners()), true);
+            req.setParameter("banners", qx.lang.Json.stringify(this.__banners.getBanners()), true);
 
             this.__grefs["save"].setEnabled(false);
 

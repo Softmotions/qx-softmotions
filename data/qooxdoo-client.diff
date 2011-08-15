@@ -1,6 +1,6 @@
 Index: qooxdoo/tool/pylib/generator/resource/ImageClipping.py
 ===================================================================
---- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 26020)
+--- qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(revision 28157)
 +++ qooxdoo/tool/pylib/generator/resource/ImageClipping.py	(working copy)
 @@ -153,7 +153,8 @@
          temp = os.fdopen(fileDescriptor, "w")

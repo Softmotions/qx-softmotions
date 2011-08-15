@@ -279,7 +279,7 @@ module.exports.testExceptionMsg = function(test) {
         resp.setEncoding("utf8");
         test.equal(resp.statusCode, 200);
         test.equal(resp.headers["content-type"], "text/plain");
-        //qx.log.Logger.warn("headers=" + qx.util.Json.stringify(resp.headers));
+        //qx.log.Logger.warn("headers=" + qx.lang.Json.stringify(resp.headers));
         test.equal(resp.headers["softmotions-msg-reg0"], "3a8e5bbf192d4411b3c565950a801827");
         resp.on("data", function (body) {
         });

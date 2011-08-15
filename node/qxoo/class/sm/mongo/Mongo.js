@@ -167,7 +167,7 @@ qx.Class.define("sm.mongo.Mongo", {
             this.__db.open(function(err) {
                 if (err) {
                     me._onError(err, "Error opening mongodb connection, connect spec: " +
-                            qx.util.Json.stringify(me.__cinfo));
+                            qx.lang.Json.stringify(me.__cinfo));
                 } else {
                     me.fireEvent("opened");
                 }
