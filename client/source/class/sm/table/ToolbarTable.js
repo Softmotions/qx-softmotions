@@ -93,7 +93,7 @@ qx.Class.define("sm.table.ToolbarTable", {
         /**
          * Создаем запрос для загрузки таблица
          */
-        _createRequest : function() {
+        _createRequest : function(data) {
             return null;
         },
 
@@ -109,8 +109,8 @@ qx.Class.define("sm.table.ToolbarTable", {
         /**
          * Перезагружаем содержимое таблицы
          */
-        _reload : function() {
-            var req = this._createRequest();
+        _reload : function(data) {
+            var req = this._createRequest(data);
             if (this._table == null) {
                 var tm = this._createTableModel();
                 if (req) {

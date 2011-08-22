@@ -30,6 +30,20 @@ qx.Class.define("sm.model.JsonTableModel", {
         this._columnsInitiated = false;
     },
 
+
+    properties :
+    {
+        /**
+         * Whether to clear sorting on reload
+         */
+        clearSortingOnReload :
+        {
+            check : "Boolean",
+            init : true
+        }
+    },
+
+
     members :
     {
         _columnsInitiated : false,
@@ -87,7 +101,7 @@ qx.Class.define("sm.model.JsonTableModel", {
                 ditems[i] = rArr;
                 ditems[i].rowData = rData;
             }
-            this.setData(ditems);
+            this.setData(ditems, this.getClearSortingOnReload());
         },
 
         getRowAssociatedData : function(rowIndex) {
