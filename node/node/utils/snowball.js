@@ -1072,3 +1072,22 @@ function Snowball(lng) {
 module.exports.Snowball = Snowball;
 module.exports.russianStemmer = new Snowball("russian");
 module.exports.englishStemmer = new Snowball("english");
+
+
+module.exports.autoSelectStemmer = function(sample) {
+    return module.exports.englishStemmer;
+    /*var res = lngDetector.detect(sample, 1);
+     qx.log.Logger.info("res=" + JSON.stringify(res));
+     var lang = (res && res.length > 0 && res[0].length > 0) ? res[0][0] : "english";
+     switch (lang) {
+     case "english" :
+     return module.exports.englishStemmer;
+     case "russian" :
+     return module.exports.russianStemmer;
+     default :
+     return module.exports.englishStemmer;
+
+     }*/
+};
+
+

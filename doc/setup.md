@@ -21,5 +21,8 @@ Node module
 
     npm install nodeunit
 
+**Snowball**
+    npm install languagedetect
+
 
 
