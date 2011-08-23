@@ -12,6 +12,11 @@ qx.Class.define("sm.table.ToolbarTable", {
 
     events :
     {
+
+        /**
+         * Fired when inner table instance initialized
+         */
+        "tableInitialized" : "qx.event.type.Event"
     },
 
     properties :
@@ -117,6 +122,7 @@ qx.Class.define("sm.table.ToolbarTable", {
                     tm.setRequest(req);
                 }
                 this._table = this._createTable(tm);
+                this.fireEvent("tableInitialized");
                 this.add(this._table, {flex : 1})
             } else {
                 if (this._table.isEditing()) {
