@@ -64,7 +64,36 @@ qx.Class.define("sm.table.Table", {
             for (var i = 0; i < scrollerArr.length; i++) {
                 scrollerArr[i].getTablePane()._updateRowStyles(onlyRow);
             }
+        },
+
+
+        /**
+         * Get selection ranges
+         */
+        getSelectionRanges : function() {
+            var sranges = [];
+            var lastInd = -1;
+            var sr = null;
+            this.getSelectionModel().iterateSelection(function(ind) {
+                if (lastInd + 1 != ind && sr) {
+                    sranges.push(sr);
+                    sr = null;
+                }
+                if (!sr) {
+                    sr = [];
+                    sr[0] = ind;
+                }
+                sr[1] = ind;
+                lastInd = ind;
+            }, this);
+
+            if (sr) {
+                sranges.push(sr);
+            }
+
+            return sranges;
         }
+
 
         //paneUpdated
 

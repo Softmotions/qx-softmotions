@@ -96,6 +96,13 @@ qx.Class.define("sm.table.ToolbarTable", {
         },
 
         /**
+         * Get selection ranges
+         */
+        getSelectionRanges : function() {
+            return this.getTable().getSelectionRanges();
+        },
+
+        /**
          * Создаем запрос для загрузки таблица
          */
         _createRequest : function(data) {
