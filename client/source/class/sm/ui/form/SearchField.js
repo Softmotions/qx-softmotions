@@ -181,7 +181,6 @@ qx.Class.define("sm.ui.form.SearchField", {
                     control.hide();
                     control.addListener("click", function(ev) {
                         this.setValue("");
-                        this.fireEvent("clear");
                     }, this);
                     break;
             }
