@@ -5,6 +5,7 @@
 
 // Various filesystem utils
 
+require("fibers");
 
 var l_fs = require("fs-ext");
 var l_path = require("path");
@@ -467,6 +468,20 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
         }
     }, fcallback, null);
 };
+
+
+DirectoryScanner.prototype.scanIterator = function() {
+    var me = this;
+    var fiber = Fiber(function() {
+        me.scan(function(err, file, fstat) {
+            yield([err, file, fstat]);
+        }, function() {
+            yield(false);
+        });
+    });
+    return fiber.run.bind(fiber);
+};
+
 
 DirectoryScanner.prototype.voteAll = function(farr, onlyPrefix) {
 
