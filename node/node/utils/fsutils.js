@@ -333,9 +333,14 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     if (!inodes) {
         inodes = [];
     }
+
     if (this.__abort === true) {
         if (inodes.length == 0 && fcallback) {
-            process.nextTick(fcallback);
+            process.nextTick(function() {
+                if (inodes.length == 0 && fcallback) {
+                    fcallback();
+                }
+            });
         }
         return;
     }
@@ -345,14 +350,22 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
         } catch(e) {
             callback(e, startDir, null);
             if (inodes.length == 0 && fcallback) {
-                process.nextTick(fcallback);
+                process.nextTick(function() {
+                    if (inodes.length == 0 && fcallback) {
+                        fcallback();
+                    }
+                });
             }
             return;
         }
     }
     if (!fstat.isDirectory()) {
         if (inodes.length == 0 && fcallback) {
-            process.nextTick(fcallback);
+            process.nextTick(function() {
+                if (inodes.length == 0 && fcallback) {
+                    fcallback();
+                }
+            });
         }
         return;
     }
