@@ -330,21 +330,30 @@ DirectoryScanner.prototype.resume = function() {
  */
 //todo symlink loops check !!!
 DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, fcallback, inodes) {
-    if (this.__abort === true) {
-        return;
-    }
     if (!inodes) {
         inodes = [];
+    }
+    if (this.__abort === true) {
+        if (inodes.length == 0 && fcallback) {
+            process.nextTick(fcallback);
+        }
+        return;
     }
     if (!fstat) {
         try {
             fstat = l_fs.lstatSync(startDir);
         } catch(e) {
             callback(e, startDir, null);
+            if (inodes.length == 0 && fcallback) {
+                process.nextTick(fcallback);
+            }
             return;
         }
     }
     if (!fstat.isDirectory()) {
+        if (inodes.length == 0 && fcallback) {
+            process.nextTick(fcallback);
+        }
         return;
     }
     /*if (inodes.indexOf(fstat.ino) != -1) {
