@@ -67,13 +67,14 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             }
             if (this.__active) {
                 if (slot.cached == this.__active.cached) { //this widget active already
-                    return;
+                    return slot.cached;
                 }
                 this.__active.cached.hide();
             }
             this.getWidget(id, true);
             this.__active = slot;
             slot.cached.show();
+            return slot.cached;
         },
 
 

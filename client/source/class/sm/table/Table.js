@@ -12,6 +12,10 @@ qx.Class.define("sm.table.Table", {
 
     construct : function(tableModel, custom) {
         this.base(arguments, tableModel, custom);
+        if (qx.bom.client.Engine.getName() == "webkit") {//fix weird chromium behaviour on ctrl+a
+            this.removeListener("keypress", this._onKeyPress);
+            this.addListener("keydown", this._onKeyPress);
+        }
     },
 
     members : {
