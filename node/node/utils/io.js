@@ -59,12 +59,26 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
     });
 
     readStream.addListener('error', function(err) {
-        writeStream.end();
-        call(err);
+        try {
+            readStream.destroy();
+        } finally {
+            try {
+                writeStream.end();
+            } finally {
+                call(err);
+            }
+        }
     });
 
     writeStream.addListener('error', function(err) {
-        readStream.destroy();
-        call(err);
+        try {
+            writeStream.destroy();
+        } finally {
+            try {
+                readStream.destroy();
+            } finally {
+                call(err);
+            }
+        }
     });
 };
