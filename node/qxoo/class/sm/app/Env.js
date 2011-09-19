@@ -269,7 +269,7 @@ qx.Class.define("sm.app.Env", {
     destruct : function() {
         //this._disposeObjects("__field_name");
         this.close();
-        this.__envBase = null;
+        this.__envBase = this.__appBase = null;
         this.__lpath = this.__lfsutils = null;
     }
 });
