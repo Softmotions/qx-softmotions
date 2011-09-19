@@ -82,14 +82,21 @@ qx.Class.define("sm.app.Env", {
         qx.core.Assert.assertString(envBase);
         qx.core.Assert.assertString(appBase);
 
+
         this.__lpath = $$node.require("path");
         this.__lfsutils = $$node.require("utils/fsutils");
 
         this.__jsonConfigCache = {};
 
         var fs = this.__lfsutils.FileSeparator;
-        this.__envBase = envBase + fs;
-        this.setTmplDir(appBase + fs + this.getTmplDir() + fs);
+
+        appBase = appBase.trim();
+        envBase = envBase.trim();
+
+        this.__envBase = (!qx.lang.String.endsWith(envBase, fs)) ? envBase + fs : envBase;
+        this.__appBase = (!qx.lang.String.endsWith(appBase, fs)) ? appBase + fs : appBase;
+
+        this.setTmplDir(this.__appBase + this.getTmplDir() + fs);
 
         this._options = options || {};
         this._openEnv(!!this._options["create"]);
@@ -111,6 +118,8 @@ qx.Class.define("sm.app.Env", {
 
         __envBase : null,
 
+        __appBase : null,
+
 
         //lib refs
         __lpath : null,
@@ -118,6 +127,9 @@ qx.Class.define("sm.app.Env", {
         __lfsutils : null,
         //eof lib refs
 
+        getAppBase : function() {
+            return this.__appBase;
+        },
 
         getEnvBase : function() {
             return this.__envBase;
@@ -210,7 +222,10 @@ qx.Class.define("sm.app.Env", {
         _readFileJSONTemplate : function(path) {
             var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
             //todo use template engine!!!
-            var data = fdata.replace(/\$\{install_path\}/g, $$node.process.cwd());
+            var appBase = this.getAppBase();
+            //remove trailing slash
+            var installPath = appBase.substring(0, appBase.length - 1);
+            var data = fdata.replace(/\$\{install_path\}/g, installPath);
             return qx.lang.Json.parse(data);
         },
 
