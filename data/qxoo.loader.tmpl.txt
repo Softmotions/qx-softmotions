@@ -37,15 +37,17 @@ window.document = {
 window.location = window.document.location;
 //todo window.Worker
 
-if (!window.$$node) window.$$node = {};
-$$node.script = process.binding('evals').Script;
-$$node.fs = require('fs');
-
 //Publish global nodejs objects
+if (!window.$$node) window.$$node = {};
+$$node.global = global;
 $$node.require = require;
 $$node.process = process;
 $$node.console = console;
 $$node.Buffer = Buffer;
+$$node.dirname = __dirname;
+$$node.filename = __filename;
+$$node.script = process.binding('evals').Script;
+$$node.fs = require('fs');
 
 window.execScript = function(data) {
     return $$node.script.runInThisContext(data, "eval");

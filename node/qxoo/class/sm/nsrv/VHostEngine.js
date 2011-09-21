@@ -59,6 +59,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
     construct : function(config) {
         //required libs
         this.__path = $$node.require("path");
+        this.__fsutils = $$node.require("utils/fsutils");
         this.__url = $$node.require("url");
         this.__formidable = $$node.require("formidable");
         this.__querystring = $$node.require("querystring");
@@ -111,6 +112,15 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __security : null,
 
+        /**
+         * require('path');
+         */
+        __path : null,
+
+        /**
+         * require('utils/fsutils');
+         */
+        __fsutils : null,
 
         __cleanupHandlersLastTime : 0,
 
@@ -140,7 +150,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < teArr.length; ++i) { //Process custom template engines
 
                 qx.core.Assert.assertInterface(teArr[i], sm.nsrv.ITemplateEngine,
-                  "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
+                        "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
 
                 if (config["templateOptions"] != null) {
                     var topts = config["templateOptions"];
@@ -216,10 +226,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 wappsCtx[waCtx] = true;
                 wa["contextPath"] = (waCtx == "/") ? "" : waCtx;
 
+                if (!this.__fsutils.isAbsolutePath(wa["docRoot"])) {
+                    wa["docRoot"] = this.__path.join($$node.dirname, wa["docRoot"]);
+                }
+
                 //check document root
                 var dr = wa["docRoot"];
                 if (!this.__path.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
-                    throw new Error("The 'docRoot': " + wa["docRoot"] + " is not directory");
+                    throw new Error("The 'docRoot': " + dr + " is not directory");
                 }
 
                 // configure security
@@ -421,7 +435,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                      " [" + this.__vhostName + "]:[" + wappId + "]");
+                            " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -449,7 +463,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                      JSON.stringify(asm, true));
+                            JSON.stringify(asm, true));
                 }
             }
 
@@ -551,7 +565,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                              "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                                    "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -560,7 +574,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + hlSlot["$$class"] + "#" + (hlSlot["handler"]) +
-                                  "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
+                                        "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -807,7 +821,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var m = res.messages[i];
                 var isErr = m.isError();
                 res.headers[(isErr ? ("Softmotions-Msg-Err" + errC) : ("Softmotions-Msg-Reg" + nerrC))]
-                  = encodeURIComponent(m.getMessage());
+                        = encodeURIComponent(m.getMessage());
                 if (isErr) {
                     ++errC;
                 } else {
@@ -1132,27 +1146,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //EOF session staff
 
             this.__server = connect.createServer(
-              function (req, res, next) {
-                  if (req.internal === true) {
-                      next()
-                  } else {
-                      cookieParser(req, res, next);
-                  }
-              },
-              function (req, res, next) {
-                  me.__initRequestHandler(req, res, next);
-              },
-              session
-              ,
-              function (req, res, next) {
-                  me.__populateRequestParams(req, res, next);
-              },
-              function (req, res, next) {
-                  me.__handleReq(req, res, next);
-              },
-              function (err, req, res, next) {
-                  me.__handleError(err, req, res, next);
-              });
+                    function (req, res, next) {
+                        if (req.internal === true) {
+                            next()
+                        } else {
+                            cookieParser(req, res, next);
+                        }
+                    },
+                    function (req, res, next) {
+                        me.__initRequestHandler(req, res, next);
+                    },
+                    session
+                    ,
+                    function (req, res, next) {
+                        me.__populateRequestParams(req, res, next);
+                    },
+                    function (req, res, next) {
+                        me.__handleReq(req, res, next);
+                    },
+                    function (err, req, res, next) {
+                        me.__handleError(err, req, res, next);
+                    });
 
             return this.__server;
         },
@@ -1176,7 +1190,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
     destruct : function() {
         this.__config = this.__handlers = this.__regexpHandlers = this.__vhostName = null;
-        this.__path = this.__url = this.__formidable = this.__querystring = null;
+        this.__path = this.__fsutils = this.__url = this.__formidable = this.__querystring = null;
         this.__server = null;
         //this._disposeObjects("__field_name");
     },
