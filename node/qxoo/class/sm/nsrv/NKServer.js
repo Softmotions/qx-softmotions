@@ -176,17 +176,17 @@ qx.Class.define("sm.nsrv.NKServer", {
             if (this.__server) {
                 var me = this;
                 this.fireDataEvent("goingshutdown", this);
-                $$node.process.nextTick(function() {
-                    qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
-                    try {
-                        me.__server.close();
-                    } finally {
-                        me.__server = null;
-                        if (cb) {
-                            cb();
-                        }
+                //$$node.process.nextTick(function() {
+                qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
+                try {
+                    me.__server.close();
+                } finally {
+                    me.__server = null;
+                    if (cb) {
+                        cb();
                     }
-                });
+                }
+                //});
             } else if (cb) {
                 cb();
             }
