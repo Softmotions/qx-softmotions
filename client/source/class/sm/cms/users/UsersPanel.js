@@ -86,7 +86,7 @@ qx.Class.define("sm.cms.users.UsersPanel", {
 
         __editUser : function(user, ind) {
             var dlg = new sm.cms.users.EditUserDlg(user);
-            dlg.addListener("completed", function(ev) {
+            dlg.addListenerOnce("completed", function(ev) {
                 var doc = ev.getData();
                 dlg.close();
                 if (user == null || ind == null) {

@@ -200,7 +200,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
         _newCatDlg : function(ev, pnode) {
             var d = new sm.cms.nav.NewCategoryDlg(pnode);
             d.setPosition("bottom-right");
-            d.addListener("completed", function(ev) {
+            d.addListenerOnce("completed", function(ev) {
                 d.hide();
                 this.__newNavItemCompleted(pnode);
             }, this);
@@ -215,7 +215,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
         _newPageDld : function(ev, pnode) {
             var d = new sm.cms.nav.NewPageDlg(pnode);
             d.setPosition("bottom-right");
-            d.addListener("completed", function(ev) {
+            d.addListenerOnce("completed", function(ev) {
                 d.hide();
                 this.__newNavItemCompleted(pnode);
             }, this);
@@ -229,7 +229,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
          */
         _newMediaDld : function(ev, pnode) {
             var d = new sm.cms.nav.NewMediaDlg(pnode);
-            d.addListener("completed", function(ev) {
+            d.addListenerOnce("completed", function(ev) {
                 d.hide();
                 this.__newNavItemCompleted(pnode);
             }, this);
@@ -243,7 +243,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
         _renameNodeDld : function(ev, pnode) {
             var d = new sm.cms.nav.RenameNavDlg(pnode);
             d.setPosition("bottom-right");
-            d.addListener("completed", function(ev) {
+            d.addListenerOnce("completed", function(ev) {
                 d.hide();
                 // после удачного переименования ноды необходимо получить с сервера текущее её состояние
                 // и обновить в дереве (не трогая всё остальное дерево)

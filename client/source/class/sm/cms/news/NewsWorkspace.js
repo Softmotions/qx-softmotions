@@ -65,7 +65,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
                 }
             }
             var d = new sm.cms.news.NewNewsDlg(options);
-            d.addListener("completed", function(ev) {
+            d.addListenerOnce("completed", function(ev) {
                 var data = ev.getData();
                 this.fireDataEvent("newNews", [data[0], data[1]]); //name, refpage
                 d.close();
@@ -172,7 +172,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             renBt.addListener("execute", function(ev) {
                 var d = new sm.cms.nav.RenameNavDlg({$$data: "pages." + page["id"], label: page["name"]});
                 d.setPosition("bottom-right");
-                d.addListener("completed", function(ev) {
+                d.addListenerOnce("completed", function(ev) {
                     d.hide();
                     this.__reloadNews();
                 }, this);

@@ -169,7 +169,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             ownerBt.setReadOnly(true);
             ownerBt.addListener("execute", function() {
                 var dlg = new sm.cms.users.UsersSelectorDlg();
-                dlg.addListener("completed", function(ev) {
+                dlg.addListenerOnce("completed", function(ev) {
                     var user = ev.getData();
                     dlg.close();
                     this.__updateAccess(user["login"], "+owner", function(err) {
@@ -205,7 +205,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             var addBt = new qx.ui.toolbar.Button(this.tr("Добавить пользователя"), "sm/cms/icon/16/actions/user_add.png");
             addBt.addListener("execute", function(ev) {
                 var dlg = new sm.cms.users.UsersSelectorDlg();
-                dlg.addListener("completed", function(ev) {
+                dlg.addListenerOnce("completed", function(ev) {
                     var user = ev.getData();
                     this.addRow(user["login"], [user["login"], user["name"], false, false]);
                     dlg.close();
