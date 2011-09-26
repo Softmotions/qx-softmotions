@@ -93,7 +93,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
             });
         }
 
-        var fr = new sm.ui.form.OneColumnFormRender(form);
+        var fr = new sm.ui.form.OneColumnFormRenderer(form);
         this.add(fr);
 
         var footer = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"}));

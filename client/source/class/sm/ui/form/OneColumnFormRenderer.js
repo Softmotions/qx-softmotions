@@ -6,7 +6,7 @@
 /**
  * Renders form where labels and fields placed in single c
  */
-qx.Class.define("sm.ui.form.OneColumnFormRender", {
+qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
     extend : qx.ui.form.renderer.AbstractRenderer,
 
 
@@ -79,8 +79,7 @@ qx.Class.define("sm.ui.form.OneColumnFormRender", {
                 required = " <span style='color:red'>*</span> ";
             }
             // Create the label. Append a colon only if there's text to display.
-            var colon = name.length > 0 || item.getRequired() ? " :" : "";
-            return name + required + colon;
+            return name + required;
         },
 
         _createHeader : function(title) {

@@ -92,7 +92,7 @@ qx.Class.define("sm.cms.users.EditUserDlg", {
         cancel.addListener("execute", this.close, this);
         form.addButton(cancel);
 
-        var fr = new sm.ui.form.OneColumnFormRender(form);
+        var fr = new sm.ui.form.OneColumnFormRenderer(form);
         this.add(fr);
 
         this.__closeCmd = new qx.ui.core.Command("Esc");
