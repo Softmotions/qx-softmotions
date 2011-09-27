@@ -90,7 +90,7 @@ qx.Class.define("sm.io.Request", {
                     this.__onsuccess.call(this.__self, e);
                 }
             } finally {
-                this.fireDataEvent("finished", err == false ? null : err);
+                this.fireDataEvent("finished", err == false ? null : e);
             }
             this.base(arguments, e);
         },
