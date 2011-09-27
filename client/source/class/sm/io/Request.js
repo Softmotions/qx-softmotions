@@ -24,12 +24,7 @@ qx.Class.define("sm.io.Request", {
          *
          * data: error or null
          */
-        "finished" : "qx.event.type.Data",
-
-        /**
-         * Fired if request failed
-         */
-        "failed" : "qx.event.type.Event"
+        "finished" : "qx.event.type.Data"
     },
 
     properties :
@@ -71,13 +66,11 @@ qx.Class.define("sm.io.Request", {
 
 
         _onaborted : function(e) {
-            this.fireEvent("failed");
             this.fireDataEvent("finished", e);
             this.base(arguments, e);
         },
 
         _onfailed : function(e) {
-            this.fireEvent("failed");
             this.fireDataEvent("finished", e);
             if (this.isShowMessages() == true) {
                 var got = this.__checkMessages(e);
