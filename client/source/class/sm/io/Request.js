@@ -70,6 +70,11 @@ qx.Class.define("sm.io.Request", {
             this.base(arguments, e);
         },
 
+        _ontimeout : function(e) {
+            this.fireDataEvent("finished", e);
+            this.base(arguments, e);
+        },
+
         _onfailed : function(e) {
             this.fireDataEvent("finished", e);
             if (this.isShowMessages() == true) {
