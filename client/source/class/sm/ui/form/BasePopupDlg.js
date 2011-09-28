@@ -25,6 +25,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
             var root = qx.core.Init.getApplication().getRoot();
             var val = ev.getData();
             if (val == "visible") {
+                qx.ui.core.FocusHandler.getInstance().addRoot(this);
                 if (this.getModal() == true) {
                     root.blockContent(this.getZIndex() - 1);
                 }
