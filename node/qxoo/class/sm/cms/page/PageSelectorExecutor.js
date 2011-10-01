@@ -19,25 +19,28 @@ qx.Class.define("sm.cms.page.PageSelectorExecutor", {
             var q = this.__build_basic_pages_query(req.params);
             var rarr = [];
             q.each(
-                    function(index, doc) {
-                        var asm = amap[doc["asm"]];
-                        var item = {
-                            "name" : doc["name"],
-                            "mdate" : doc["mdate"] ? doc["mdate"] : null,
-                            "published" :  doc["published"],
-                            "template" : asm ? asm["name"] : null,
-                            "refpage" : doc["refpage"] ? doc["refpage"]["oid"] : null,
-                            "type" : doc["type"],
-                            "id" : doc["_id"]
-                        };
-                        rarr.push(item);
-                    }).exec(function(err) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        me.writeJSONObject(rarr, resp, ctx);
-                    });
+              function(index, doc) {
+                  var asm = amap[doc["asm"]];
+                  if (doc["mdate"] != null && (typeof doc["mdate"]) !== "number") {
+                      doc["mdate"] = parseInt(doc["mdate"]);
+                  }
+                  var item = {
+                      "name" : doc["name"],
+                      "mdate" : doc["mdate"],
+                      "published" :  doc["published"],
+                      "template" : asm ? asm["name"] : null,
+                      "refpage" : doc["refpage"] ? doc["refpage"]["oid"] : null,
+                      "type" : doc["type"],
+                      "id" : doc["_id"]
+                  };
+                  rarr.push(item);
+              }).exec(function(err) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  me.writeJSONObject(rarr, resp, ctx);
+              });
         },
 
         __select_pages_count : function(req, resp, ctx) {
