@@ -23,7 +23,7 @@ qx.Class.define("sm.cms.page.PageSelectorExecutor", {
                         var asm = amap[doc["asm"]];
                         var item = {
                             "name" : doc["name"],
-                            "mdate" : doc["mdate"] ? doc["mdate"].toNumber() : null,
+                            "mdate" : doc["mdate"] ? doc["mdate"] : null,
                             "published" :  doc["published"],
                             "template" : asm ? asm["name"] : null,
                             "refpage" : doc["refpage"] ? doc["refpage"]["oid"] : null,
