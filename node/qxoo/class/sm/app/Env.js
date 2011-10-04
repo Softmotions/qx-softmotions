@@ -186,7 +186,8 @@ qx.Class.define("sm.app.Env", {
          * Save named JSON configuration and store it in file
          *
          * @param name Name of config
-         * @param object Javascript to be stored in file as Json
+         * @param object {Object?} Javascript to be stored in file as Json.
+         *                         If object is null, current config state will be saved
          * @param cb {function?null} Optional callback
          */
         setJSONConfig : function(name, object, cb) {
@@ -194,7 +195,7 @@ qx.Class.define("sm.app.Env", {
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
             var oldConfig = this.__jsonConfigCache[name];
-            this.__jsonConfigCache[name] = object;
+            this.__jsonConfigCache[name] = (object != null) ? object : this.__jsonConfigCache[name];
             this.__lfsutils.writeFileLock(cpath, qx.lang.Json.stringify(object, true), "utf8", function(err) {
                 me.fireDataEvent("configChanged", [name, object, oldConfig]);
                 if (err) {
