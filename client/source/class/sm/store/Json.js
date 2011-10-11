@@ -109,7 +109,11 @@ qx.Class.define("sm.store.Json", {
             this.setRequest(req);
         },
 
-        _applyRequest: function(req) {
+        _applyRequest: function(req, old) {
+            if (old != null) {
+                old.removeListener("completed", this.__requestCompleteHandler, this);
+                old.removeListener("changeState", this.__requestChangeStateHandler, this);
+            }
             req.removeListener("completed", this.__requestCompleteHandler, this);
             req.removeListener("changeState", this.__requestChangeStateHandler, this);
             req.addListener("completed", this.__requestCompleteHandler, this);
