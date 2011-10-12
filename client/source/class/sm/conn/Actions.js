@@ -27,15 +27,20 @@ qx.Class.define("sm.conn.Actions", {
                 throw new Error("Action group: '" + name + "' not found");
             }
             if (varagrs) {
-                var sb = new qx.util.StringBuilder();
-                sb.add(act.url);
-                for (var i = 1; i < arguments.length; i += 2) {
-                    sb.add(i > 1 ? "&" : "?");
-                    sb.add(encodeURIComponent(arguments[i]));
-                    sb.add("=");
-                    sb.add(encodeURIComponent(arguments[i + 1]));
+                if (arguments.length === 3) {
+                    return act.url + "?" +
+                            encodeURIComponent(arguments[1]) + "=" + encodeURIComponent(arguments[2]);
+                } else {
+                    var sb = new qx.util.StringBuilder();
+                    sb.add(act.url);
+                    for (var i = 1; i < arguments.length; i += 2) {
+                        sb.add(i > 1 ? "&" : "?");
+                        sb.add(encodeURIComponent(arguments[i]));
+                        sb.add("=");
+                        sb.add(encodeURIComponent(arguments[i + 1]));
+                    }
+                    return sb.join("");
                 }
-                return sb.join("");
             } else {
                 return act.url;
             }

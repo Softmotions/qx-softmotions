@@ -138,8 +138,10 @@ qx.Class.define("sm.store.Json", {
             } else {
                 this.setModel(data);
             }
-            // fire complete event
-            this.fireDataEvent("loaded", this.getModel());
+            if (this.hasListener("loaded")) {
+                // fire complete event
+                this.fireDataEvent("loaded", this.getModel());
+            }
         },
 
         __requestChangeStateHandler : function(ev) {
@@ -164,3 +166,4 @@ qx.Class.define("sm.store.Json", {
     }
 
 });
+
