@@ -47,7 +47,24 @@ qx.Class.define("sm.app.Env", {
          * ev.getData(): [{String} name of config, {Object} newConfig, {Object} oldConfig]
          * </code>
          */
-        "configChanged" : "qx.event.type.Data"
+        "configChanged" : "qx.event.type.Data",
+
+
+        /**
+         * Fired if environment is going to be
+         * <code>
+         * ev.getData(): this
+         * </code>
+         */
+        "closing" : "qx.event.type.Data",
+
+        /**
+         * Fired if environment is closed
+         * <code>
+         * ev.getData(): this
+         * </code>
+         */
+        "closed" : "qx.event.type.Data"
     },
 
     properties :
@@ -264,6 +281,7 @@ qx.Class.define("sm.app.Env", {
 
         close : function() {
             this.__jsonConfigCache = {};
+            this.fireDataEvent("closed", this);
         }
     },
 

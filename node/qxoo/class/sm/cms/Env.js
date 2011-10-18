@@ -36,6 +36,7 @@ qx.Class.define("sm.cms.Env", {
 
         //override
         close : function() {
+            this.fireDataEvent("closing", this);
             if (this.__mongoCfg) {
                 this.__mongoCfg.dispose();
                 this.__mongoCfg = null;
