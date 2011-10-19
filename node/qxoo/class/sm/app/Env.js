@@ -213,7 +213,7 @@ qx.Class.define("sm.app.Env", {
             var cpath = this.__envBase + fname;
             var oldConfig = this.__jsonConfigCache[name];
             this.__jsonConfigCache[name] = (object != null) ? object : this.__jsonConfigCache[name];
-            this.__lfsutils.writeFileLock(cpath, qx.lang.Json.stringify(object, true), "utf8", function(err) {
+            this.__lfsutils.writeFileLock(cpath, JSON.stringify(object), "utf8", function(err) {
                 me.fireDataEvent("configChanged", [name, object, oldConfig]);
                 if (err) {
                     qx.log.Logger.error(me, "setJSONConfig", err);
@@ -244,12 +244,12 @@ qx.Class.define("sm.app.Env", {
             //remove trailing slash
             var installPath = appBase.substring(0, appBase.length - 1);
             var data = fdata.replace(/\$\{install_path\}/g, installPath);
-            return qx.lang.Json.parse(data);
+            return JSON.parse(data);
         },
 
         _readFileJSON : function(path) {
             var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
-            return qx.lang.Json.parse(fdata);
+            return JSON.parse(fdata);
         },
 
         /**
