@@ -116,6 +116,12 @@ qx.Class.define("sm.app.Env", {
         this.setTmplDir(this.__appBase + this.getTmplDir() + fs);
 
         this._options = options || {};
+
+        if (this._options["default"]) { //Register as default env
+            qx.log.Logger.info(this, "Registered: '" + this.classname + "' as default app environment");
+            sm.app.Env.registerDefault(this);
+        }
+
         this._openEnv(!!this._options["create"]);
     },
 
