@@ -28,47 +28,50 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
             var me = this;
             var env = sm.app.Env.getDefault();
             env.getMongo()
-                    .collection(this.__usersColl)
-                    .findOne({"login": login, "password": me.buildHash(password)},
-                    function(err, user) {
-                        if (err || user == null || user["disabled"] == true) {
-                            callback(err, null);
-                            return;
-                        }
-                        me.buildUserData(user, callback);
-                    });
+              .collection(this.__usersColl)
+              .findOne({"login": login, "password": me.buildHash(password)},
+              function(err, user) {
+                  if (err || user == null || user["disabled"] == true) {
+                      callback(err, null);
+                      return;
+                  }
+                  if (!user.roles) {
+                      user.roles = [];
+                  }
+                  me.buildUserData(user, callback);
+              });
         },
 
         getAuthInfo: function(login, callback) {
             var me = this;
             var env = sm.app.Env.getDefault();
             env.getMongo()
-                    .collection(this.__usersColl)
-                    .findOne({"login": login},
-                    function(err, user) {
-                        err || !user ? callback(err, null) : me.buildUserAuth(user, callback);
-                    });
+              .collection(this.__usersColl)
+              .findOne({"login": login},
+              function(err, user) {
+                  err || !user ? callback(err, null) : me.buildUserAuth(user, callback);
+              });
         },
 
         getRolesList : function(callback) {
             var env = sm.app.Env.getDefault();
             var roles = [];
             env.getMongo()
-                    .collection(this.__rolesColl)
-                    .createQuery()
-                    .each(function(index, role) {
-                        roles.push(role);
-                    })
-                    .exec(function(err) {
-                        callback(err, roles)
-                    });
+              .collection(this.__rolesColl)
+              .createQuery()
+              .each(function(index, role) {
+                  roles.push(role);
+              })
+              .exec(function(err) {
+                  callback(err, roles)
+              });
         },
 
         buildHash: function(data) {
             return this.__crypto
-                    .createHash('MD5')
-                    .update(data)
-                    .digest('hex');
+              .createHash('MD5')
+              .update(data)
+              .digest('hex');
         },
 
         buildUserData: function(user, callback) {
