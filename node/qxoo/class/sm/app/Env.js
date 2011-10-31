@@ -192,7 +192,7 @@ qx.Class.define("sm.app.Env", {
             if (!this.__lpath.existsSync(cpath)) {
                 var tpath = this.getTmplDir() + fname;
                 if (this.__lpath.existsSync(tpath)) {
-                    this.setJSONConfig(name, this._readFileJSONTemplate(tpath));
+                    this.setJSONConfig(name, this._readFileJSONTemplate(tpath), null, true);
                     return this.__jsonConfigCache[name];
                 } else if (!notCheckTemplate) {
                     throw new Error("Unable to load config, no template: " + tpath);
@@ -213,14 +213,16 @@ qx.Class.define("sm.app.Env", {
          *                         If object is null, current config state will be saved
          * @param cb {function?null} Optional callback
          */
-        setJSONConfig : function(name, object, cb) {
+        setJSONConfig : function(name, object, cb, nofire) {
             var me = this;
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
             var oldConfig = this.__jsonConfigCache[name];
             this.__jsonConfigCache[name] = (object != null) ? object : this.__jsonConfigCache[name];
             this.__lfsutils.writeFileLock(cpath, JSON.stringify(object), "utf8", function(err) {
-                me.fireDataEvent("configChanged", [name, object, oldConfig]);
+                if (!nofire) {
+                    me.fireDataEvent("configChanged", [name, object, oldConfig]);
+                }
                 if (err) {
                     qx.log.Logger.error(me, "setJSONConfig", err);
                 }
