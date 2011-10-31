@@ -24,6 +24,12 @@ qx.Class.define("sm.cms.Events", {
          */
         "pageRemoved" : "qx.event.type.Data",
 
+        /**
+         * Fired when page is about to be shown
+         * Data: [JSON page document (Mongodb 'navtree' collection), ctx]
+         */
+        "pageShowing" : "qx.event.type.Data",
+
         // media events
         /**
          * Fired when new media item saved.
