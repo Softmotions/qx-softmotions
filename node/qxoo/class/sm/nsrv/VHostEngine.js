@@ -1124,7 +1124,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var cookieParser = connect.cookieParser();
 
             //Session staff
-            var sessOpts = {secret: "5bb1097b24bd420a82ef4e916e864a48"};
+            var sessOpts = {
+                secret: "5bb1097b24bd420a82ef4e916e864a48",
+                store: new sm.mongo.SessionStore({
+                    mongo: sm.app.Env.getDefault().getMongo(),
+                    collection: "sessions"
+                })
+            };
             if (conf["session"]) {
                 qx.lang.Object.mergeWith(sessOpts, conf["session"]);
             }
