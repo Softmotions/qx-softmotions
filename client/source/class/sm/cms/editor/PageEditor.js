@@ -243,7 +243,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                     this.__setupPageAttr(form, p, mItem, pageInfo, index++);
                 }
             }
-            var fr = new sm.cms.util.FlexFormRenderer(form);
+            var fr = new sm.ui.form.FlexFormRenderer(form);
             ws.add(fr);
 
             //Enable save button

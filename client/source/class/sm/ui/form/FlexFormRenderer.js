@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-qx.Class.define("sm.cms.util.FlexFormRenderer", {
+qx.Class.define("sm.ui.form.FlexFormRenderer", {
     extend  : qx.ui.form.renderer.Single,
 
 

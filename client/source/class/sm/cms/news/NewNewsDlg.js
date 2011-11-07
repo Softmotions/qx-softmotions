@@ -114,7 +114,7 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
         form.addButton(ok);
         form.addButton(cancel);
 
-        var fr = new sm.cms.util.FlexFormRenderer(form);
+        var fr = new sm.ui.form.FlexFormRenderer(form);
         this.add(fr);
     },
 

@@ -96,7 +96,7 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
 
             form.add(this.__mtable, this.tr("настройки"), null, "_menu_");
 
-            view = new sm.cms.util.FlexFormRenderer(form);
+            view = new sm.ui.form.FlexFormRenderer(form);
 
             activeCb();
         }
