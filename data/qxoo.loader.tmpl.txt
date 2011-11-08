@@ -46,7 +46,7 @@ $$node.console = console;
 $$node.Buffer = Buffer;
 $$node.dirname = __dirname;
 $$node.filename = __filename;
-$$node.script = process.binding('evals').Script;
+$$node.script = (process.version.indexOf("v0.4") === 0) ? process.binding('evals').Script : require("vm");
 $$node.fs = require('fs');
 
 window.execScript = function(data) {

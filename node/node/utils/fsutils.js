@@ -236,7 +236,7 @@ module.exports.mkdirsSync = function (dirname, mode) {
             }
             throw new Error("Unable to create directory: " + fn);
         } catch (e) {
-            if (e.errno == 2) { //ENOENT todo crossplatform
+            if (e.errno == ((process.version.indexOf("v0.4") === 0) ? 2 : 33)) { //ENOENT todo crossplatform
                 pathsFound.push(fn);
                 fn = l_path.dirname(fn);
             } else {
