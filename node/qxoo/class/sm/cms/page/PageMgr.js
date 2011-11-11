@@ -320,7 +320,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 "refpage" : coll.toDBRef(params["refpage"]),
                 "type" : this.TYPE_NEWS_PAGE,
                 "mdate" : now,
-                "cdate" : now
+                "cdate" : now,
+                "sortOrder" : now
             };
         },
 
