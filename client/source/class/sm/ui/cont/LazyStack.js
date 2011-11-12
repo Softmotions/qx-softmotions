@@ -57,6 +57,13 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         },
 
         /**
+         * Return array of widget ids
+         */
+        getWidgetIds : function() {
+            return Object.keys(this.__slots);
+        },
+
+        /**
          * Show widget with given id on top of the stack
          * @param id {String} widget id
          */
