@@ -17,6 +17,19 @@ qx.Class.define("sm.util.Validate", {
             if (ipRe.test(value) === false && hnRe.test(value) === false && ipv6Re.test(value) === false) {
                 throw new qx.core.ValidationError("Validation Error", errorMessage);
             }
+        },
+
+
+        /**
+         * Checks if value can be a number
+         */
+        checkCanBeNumber : function(value, formItem, errorMessage) {
+            if (typeof value === "number") {
+                return;
+            }
+            if (isNaN(parseInt(value))) {
+                throw new qx.core.ValidationError("Validation Error", qx.locale.Manager.tr("%1 is not a number.", value));
+            }
         }
     }
 });
