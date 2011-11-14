@@ -64,7 +64,13 @@ qx.Class.define("sm.app.Env", {
          * ev.getData(): this
          * </code>
          */
-        "closed" : "qx.event.type.Data"
+        "closed" : "qx.event.type.Data",
+
+
+        /**
+         * Env is opened
+         */
+        "opened" : "qx.event.type.Data"
     },
 
     properties :
@@ -125,8 +131,8 @@ qx.Class.define("sm.app.Env", {
 
         this._openEnv(!!this._options["create"]);
 
-        //Initables
-        this.__initInitables();
+        //Init initables after env opened
+        this.addListenerOnce("opened", this.__initInitables, this);
     },
 
     members :
