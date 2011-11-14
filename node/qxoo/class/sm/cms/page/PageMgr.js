@@ -13,7 +13,7 @@
  *    name : String,        //Page name
  *    mdate : Date,         //Page modification time
  *    cdate : Date,         //Page creation time
- *    sortOrder : Date      //Sort order date for news pages
+ *    popupdate : Date      //Popup date for news pages
  *    published : Boolean
  *    type : int [0 - category, 1 - page, 2 - news page]
  *    asm  : String, name of assembly on which page based
@@ -27,6 +27,7 @@
  *    owner : String         //Page owner user ID
  *    category : String      //News category, only for news pages
  *    annotation : String    //News annotation, only for news pages
+ *    visit_count : Integer  //News visit count
  *    access : {             //Access rights
  *       <mode name> : [users]
  *    }
@@ -324,7 +325,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 "type" : this.TYPE_NEWS_PAGE,
                 "mdate" : now,
                 "cdate" : now,
-                "sortOrder" : now
+                "popupdate" : now
             };
         },
 

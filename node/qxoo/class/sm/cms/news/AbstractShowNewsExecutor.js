@@ -90,7 +90,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                     {"refpage" : pageId,
                         "queryOpts" : {
                             "sort" : [
-                                ["sortOrder" , -1]
+                                ["popupdate" , -1]
                             ],
                             "limit" : (limit != null) ? limit : 8
                         }});

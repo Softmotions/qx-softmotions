@@ -18,9 +18,9 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         /**
          * Update sort order if user wants it to be on top again
          */
-        saveBringToTopSortOrder : function(attrVal, attrName, attrMeta, asm, page, cb) {
-            if (attrVal || page["sortOrder"] == null) {
-                page["sortOrder"] = +new Date();
+        popupNewsOnTop : function(attrVal, attrName, attrMeta, asm, page, cb) {
+            if (attrVal || page["popupdate"] == null) {
+                page["popupdate"] = +new Date();
             }
             cb(null);
         },
@@ -54,7 +54,7 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
                 page["tags"] = JSON.parse(attrVal) || [];
             } catch(e) {
                 qx.log.Logger.error(this, "Failed to parse as json object. asm: " + asm["_name_"] +
-                        ", attr: " + attrName + ", attrValue: " + attrVal, e);
+                  ", attr: " + attrName + ", attrValue: " + attrVal, e);
             }
             cb(null, value);
         },
