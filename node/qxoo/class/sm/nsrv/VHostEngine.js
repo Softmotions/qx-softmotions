@@ -8,6 +8,7 @@
  */
 qx.Class.define("sm.nsrv.VHostEngine", {
     extend  : qx.core.Object,
+    include : [qx.locale.MTranslation],
 
     statics :
     {
@@ -844,6 +845,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 errOpts = {};
             }
             var errC = 0; //errors count
+            if (err instanceof qx.core.ValidationError) {
+                err = new sm.nsrv.Message(this.tr("Validation error: %1", err.message.toString()), true);
+            }
             var message = (err instanceof sm.nsrv.Message);
             var report = true;
             if (message) {
@@ -854,7 +858,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
             }
             if (report && !message) {
-                qx.log.Logger.error(this, err.stack);
+                qx.log.Logger.error(this, err);
             }
             var headers = { "Content-Type": "text/plain" };
             if (errOpts["messagesInHeaders"]) {
