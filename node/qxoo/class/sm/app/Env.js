@@ -99,6 +99,7 @@ qx.Class.define("sm.app.Env", {
         qx.core.Assert.assertString(envBase);
         qx.core.Assert.assertString(appBase);
 
+        this.__initables = [];
 
         this.__lpath = $$node.require("path");
         this.__lfsutils = $$node.require("utils/fsutils");
@@ -123,6 +124,9 @@ qx.Class.define("sm.app.Env", {
         }
 
         this._openEnv(!!this._options["create"]);
+
+        //Initables
+        this.__initInitables();
     },
 
     members :
@@ -149,6 +153,13 @@ qx.Class.define("sm.app.Env", {
 
         __lfsutils : null,
         //eof lib refs
+
+        /**
+         * List of initables
+         * @see sm.app.IInitable
+         */
+        __initables : null,
+
 
         getAppBase : function() {
             return this.__appBase;
@@ -287,8 +298,38 @@ qx.Class.define("sm.app.Env", {
             }
         },
 
+
+        __initInitables : function() {
+            if (this._options["initables"] === false) { //Initables not enabled
+                return;
+            }
+            this._disposeArray("__initables");
+            this.__initables = [];
+            var c = 0;
+            for (var k in qx.Bootstrap.$$registry) {
+                var clazz = qx.Bootstrap.$$registry[k];
+                if (!clazz || !clazz.prototype) {
+                    continue;
+                }
+                if (qx.Bootstrap.hasInterface(clazz, sm.app.IInitable)) {
+                    if (c++ === 0) {
+                        qx.log.Logger.info("Initables:");
+                    }
+                    try {
+                        var initable = new clazz();
+                        qx.log.Logger.info("\t" + clazz.classname + "[" + initable.$$hash + "]");
+                        this.__initables.push(initable);
+                        initable.init(this);
+                    } catch(e) {
+                        qx.log.Logger.error(this, e);
+                    }
+                }
+            }
+        },
+
         close : function() {
             this.__jsonConfigCache = {};
+            this._disposeArray("__initables");
             this.fireDataEvent("closed", this);
         }
     },
@@ -298,5 +339,6 @@ qx.Class.define("sm.app.Env", {
         this.close();
         this.__envBase = this.__appBase = null;
         this.__lpath = this.__lfsutils = null;
+        this.__initables = null;
     }
 });
