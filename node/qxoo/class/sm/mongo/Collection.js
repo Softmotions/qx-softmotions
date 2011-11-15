@@ -9,14 +9,6 @@
 qx.Class.define("sm.mongo.Collection", {
     extend  : qx.core.Object,
 
-    events :
-    {
-    },
-
-    properties :
-    {
-    },
-
     construct : function(mongo, name) {
         this.base(arguments);
         this.__name = name;

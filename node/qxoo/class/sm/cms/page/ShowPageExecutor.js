@@ -97,6 +97,8 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                         ctx["_req_"] = req;
                         ctx["_res_"] = resp;
 
+                        sm.cms.Events.getInstance().fireDataEvent("pageShowing", [doc, ctx]);
+
                         var ctxParams = {};
                         var asmName = "p" + pid;
                         var vhe = ctx._vhost_engine_;

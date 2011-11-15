@@ -13,6 +13,7 @@
  *    name : String,        //Page name
  *    mdate : Date,         //Page modification time
  *    cdate : Date,         //Page creation time
+ *    popupdate : Date      //Popup date for news pages
  *    published : Boolean
  *    type : int [0 - category, 1 - page, 2 - news page]
  *    asm  : String, name of assembly on which page based
@@ -26,6 +27,7 @@
  *    owner : String         //Page owner user ID
  *    category : String      //News category, only for news pages
  *    annotation : String    //News annotation, only for news pages
+ *    visit_count : Integer  //News visit count
  *    access : {             //Access rights
  *       <mode name> : [users]
  *    }
@@ -183,11 +185,11 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 me._updateNode(nodeId, {
-                      "name": qx.lang.String.trim(name),
-                      "mdate": qx.lang.Date.now()
-                  },
-                  options,
-                  cb);
+                            "name": qx.lang.String.trim(name),
+                            "mdate": qx.lang.Date.now()
+                        },
+                        options,
+                        cb);
             });
         },
 
@@ -322,7 +324,8 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 "refpage" : coll.toDBRef(params["refpage"]),
                 "type" : this.TYPE_NEWS_PAGE,
                 "mdate" : now,
-                "cdate" : now
+                "cdate" : now,
+                "popupdate" : now
             };
         },
 
@@ -610,7 +613,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
                 //Check news page
                 if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] &&
-                  (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
+                        (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
 
                     if (req.isUserInRoles(["news.admin"])) { //if we news admin
                         cb(null, pushModes("e", "d", "r").join(""));
@@ -635,14 +638,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
             var coll = this.getColl();
             coll.findOne({_id : coll.toObjectID(pageId)},
-              {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
-              function(err, doc) {
-                  if (err) {
-                      cb(err, "");
-                      return;
-                  }
-                  checkAccess(doc);
-              });
+                    {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
+                    function(err, doc) {
+                        if (err) {
+                            cb(err, "");
+                            return;
+                        }
+                        checkAccess(doc);
+                    });
         },
 
 
@@ -683,30 +686,30 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     }
 
                     coll.createQuery({"parent" : coll.toDBRef(cnodeId)}, {"fields" : {"_id" : 1, "name" : 1}})
-                      .each(function(index, unode) {
-                          update(unode, path);
-                      })
-                      .exec(function(err) {
-                          gcb(err);
-                      });
+                            .each(function(index, unode) {
+                                update(unode, path);
+                            })
+                            .exec(function(err) {
+                                gcb(err);
+                            });
                 });
             };
 
             // search for parent (getting parent cached path)
             if (node["parent"]) {
                 coll.findOne({"_id" : mongo.toObjectID(node["parent"]["oid"])},
-                  {"fields" : {"cachedPath": 1}},
-                  function(err, parent) {
-                      if (err) {
-                          cb(err);
-                          return;
-                      }
-                      if (!parent) {
-                          cb("Parent not found");
-                          return;
-                      }
-                      update(node, parent["cachedPath"]);
-                  });
+                        {"fields" : {"cachedPath": 1}},
+                        function(err, parent) {
+                            if (err) {
+                                cb(err);
+                                return;
+                            }
+                            if (!parent) {
+                                cb("Parent not found");
+                                return;
+                            }
+                            update(node, parent["cachedPath"]);
+                        });
 
             } else {
                 update(node, "");
