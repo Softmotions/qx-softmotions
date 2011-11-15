@@ -49,7 +49,8 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
 
             // hierarchy cache (items)
             var hcache = {};
-            coll.createQuery({"_id" : {"$in" : page["hierarchy"]}}, {fields : {"_id" : 1, "name" : 1, "published" : 1, "attrs" : 1}})
+            var subsites = sm.app.Env.getDefault().getConfig().subsites || {};
+            coll.createQuery({"_id" : {"$in" : page["hierarchy"]}}, {fields : {"_id" : 1, "name" : 1, "published" : 1, "cachedPath" : 1}})
               .each(function(index, hdoc) {
                   hcache[hdoc["_id"]] = hdoc;
               })
@@ -62,13 +63,13 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
                   var hierarchy = page["hierarchy"];
                   for (var i = 0; i < hierarchy.length; ++ i) {
                       var bcitem = hcache[hierarchy[i]] || {};
+                      var subsite = subsites[bcitem.cachedPath || ''];
                       var breadcrumb = {
-                          name : (bcitem.attrs.breadcrumb_name && bcitem.attrs.breadcrumb_name.value ?
-                            bcitem.attrs.breadcrumb_name.value : bcitem["name"]) || "",
+                          name : subsite ? subsite.name : bcitem["name"] || "",
                           link : "/exp/p" + bcitem["_id"],
                           published : !!bcitem["published"]
                       };
-                      if (bcitem.attrs.main_page_in_subsite && bcitem.attrs.main_page_in_subsite.value) {
+                      if (subsite) {
                           breadcrumbs.length = 0; // clear all previous
                           ctx["first_breadcrumb"] = breadcrumb;
                       } else {
