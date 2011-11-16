@@ -71,7 +71,8 @@ qx.Class.define("sm.cms.news.NewsEditor", {
                     if (res && res["attrs"] && res["attrs"]["newscats"]) {
                         var ncats = res["attrs"]["newscats"];
                         if (qx.lang.Type.isArray(ncats.value)) {
-                            me.__newsCats = ncats.value;
+                            me.__newsCats = [].concat(ncats.value);
+                            me.__newsCats.sort();
                         }
                     }
                     me.setPageInfo(pageInfo, opts, cb, true);
@@ -89,6 +90,7 @@ qx.Class.define("sm.cms.news.NewsEditor", {
                  {"name" : this.tr("Категория не выбрана").toString(), "value" : ""}
                  ].concat(this.__newsCats);*/
                 copts["items"] = this.__newsCats;
+
                 return new sm.cms.editor.SelectBoxEditor(copts);
             }
             return this.base(arguments, edName, options);
@@ -117,9 +119,9 @@ qx.Class.define("sm.cms.news.NewsEditor", {
             qx.core.Assert.assertString(refpage);
 
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("news.new",
-                    "name", name,
-                    "refpage", refpage),
-                    "GET", "application/json");
+              "name", name,
+              "refpage", refpage),
+              "GET", "application/json");
             req.send(function(resp) {
                 var doc = resp.getContent();
                 this.setPage(doc["_id"], {}, function() {
