@@ -14,10 +14,11 @@ qx.Class.define("sm.cms.page.PageTable", {
             "published" : this.tr("Опубликована"),
             "template" : this.tr("Шаблон"),
             "refpage" : this.tr("Связана с"),
-            "type" : this.tr("Тип")
+            "type" : this.tr("Тип"),
+            "visit_count" : this.tr("Количество посещений")
         })
                 .set({
-            "useColumns" : ["name", "mdate", "template"],
+            "useColumns" : ["name", "mdate", "template", "visit_count"],
             "rowdataUrl" : sm.cms.Application.ACT.getUrl("select.pages"),
             "rowcountUrl" : sm.cms.Application.ACT.getUrl("select.pages.count")
         });
