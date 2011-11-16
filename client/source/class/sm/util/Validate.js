@@ -19,6 +19,12 @@ qx.Class.define("sm.util.Validate", {
             }
         },
 
+        IPv4_IPv6_Hostname : function(errorMessage) {
+            return function(value) {
+                return sm.util.Validate.check_IPv4_IPv6_Hostname(value, null, errorMessage);
+            }
+        },
+
 
         /**
          * Checks if value can be a number
@@ -30,6 +36,43 @@ qx.Class.define("sm.util.Validate", {
             }
             if (isNaN(parseInt(value))) {
                 throw new qx.core.ValidationError("Validation Error", errorMessage);
+            }
+        },
+
+        canBeNumber : function(errorMessage) {
+            return function(value) {
+                return sm.util.Validate.checkCanBeNumber(value, null, errorMessage);
+            }
+        },
+
+
+        /**
+         * Check if value is not empty
+         * @param value
+         * @param formItem
+         * @param errorMessage
+         */
+        checkNotEmpty : function(value, formItem, errorMessage) {
+            errorMessage = errorMessage || qx.locale.Manager.tr("Field cannot be empty.");
+            if (sm.lang.String.isEmpty(value)) {
+                throw new qx.core.ValidationError("Validation Error", errorMessage);
+            }
+        },
+
+        notEmpty : function(errorMessage) {
+            return function(value) {
+                return sm.util.Validate.checkNotEmpty(value, null, errorMessage);
+            }
+        },
+
+
+        /**
+         * Invalidate item
+         * @param errorMessage
+         */
+        setInvalid : function(errorMessage) {
+            return function(value) {
+                throw new qx.core.ValidationError("Validation Error", errorMessage || this.tr("Invalid"));
             }
         }
     }
