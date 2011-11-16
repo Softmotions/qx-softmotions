@@ -166,16 +166,18 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                 });
             }
             var config = sm.app.Env.getDefault().getConfig();
-            langs.push(config.defaultLanguage);
+            var subsites = config.subsites || {};
+            var defLang = config.defaultLanguage || "en";
+            langs.push(defLang);
             // todo handle languages like "en-gb" and "ru-ru"?
             for (var i = 0, l = langs.length; i < l; ++i) {
                 var language = langs[i];
-                if (language == config.defaultLanguage) {
-                    session.language = config.defaultLanguage;
+                if (language == defLang) {
+                    session.language = language;
                     ctx();
                     return;
                 }
-                var subsite = config.subsites["/" + language];
+                var subsite = subsites["/" + language];
                 if (subsite) {
                     session.language = language;
                     this.__pageInternal(req, resp, ctx, subsite.id);
