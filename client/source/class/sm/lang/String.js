@@ -48,7 +48,7 @@ qx.Class.define("sm.lang.String", {
 
 
         isEmpty : function(str) {
-            return (str == null || str == "" || !str.match(/\S/));
+            return (str == null || str == "" || (typeof str === "string" && !str.match(/\S/)) || false);
         },
 
 
