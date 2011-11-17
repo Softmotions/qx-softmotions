@@ -162,7 +162,8 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
                         // пытаемся смерджить с уже существующими данными
                         description: obanners[file["_id"]] ? obanners[file["_id"]].description || "" : "",
                         weight: obanners[file["_id"]] ? obanners[file["_id"]].weight : 1,
-                        link: obanners[file["_id"]] ? obanners[file["_id"]].link || "" : ""
+                        link: obanners[file["_id"]] ? obanners[file["_id"]].link || "" : "",
+                        enddate: obanners[file["_id"]] ? new Date(obanners[file["_id"]].enddate) || "" : ""
                     });
                 }
 //                  обновляем таблицу с банерами
