@@ -6,7 +6,7 @@
 qx.Class.define("sm.cms.page.PageTable", {
     extend  : qx.ui.table.Table,
 
-    construct : function() {
+    construct : function(useColumns) {
 
         var tm = new sm.model.RemoteVirtualTableModel({
             "name" : this.tr("Название"),
@@ -14,10 +14,11 @@ qx.Class.define("sm.cms.page.PageTable", {
             "published" : this.tr("Опубликована"),
             "template" : this.tr("Шаблон"),
             "refpage" : this.tr("Связана с"),
-            "type" : this.tr("Тип")
+            "type" : this.tr("Тип"),
+            "visit_count" : this.tr("Посетило")
         })
-                .set({
-            "useColumns" : ["name", "mdate", "template"],
+          .set({
+            "useColumns" : useColumns || ["name", "mdate", "template"],
             "rowdataUrl" : sm.cms.Application.ACT.getUrl("select.pages"),
             "rowcountUrl" : sm.cms.Application.ACT.getUrl("select.pages.count")
         });
@@ -46,6 +47,10 @@ qx.Class.define("sm.cms.page.PageTable", {
         var cInd = tm.getColumnIndexById("mdate");
         if (cInd != null) {
             tcm.setDataCellRenderer(cInd, new sm.table.renderer.DateTimeCellRenderer());
+        }
+        cInd = tm.getColumnIndexById("visit_count");
+        if (cInd != null) {
+            tcm.getBehavior().setWidth(cInd, 80);
         }
     },
 
