@@ -32,7 +32,7 @@ qx.Class.define("sm.cms.page.PageSelectorExecutor", {
                       "refpage" : doc["refpage"] ? doc["refpage"]["oid"] : null,
                       "type" : doc["type"],
                       "id" : doc["_id"],
-                      "visit_count" : doc["visit_count"] || "N/A"
+                      "visit_count" : doc["visit_count"] || ""
                   };
                   rarr.push(item);
               }).exec(function(err) {

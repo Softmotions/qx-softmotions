@@ -15,9 +15,9 @@ qx.Class.define("sm.cms.page.PageTable", {
             "template" : this.tr("Шаблон"),
             "refpage" : this.tr("Связана с"),
             "type" : this.tr("Тип"),
-            "visit_count" : this.tr("Количество посещений")
+            "visit_count" : this.tr("Посетило")
         })
-                .set({
+          .set({
             "useColumns" : ["name", "mdate", "template", "visit_count"],
             "rowdataUrl" : sm.cms.Application.ACT.getUrl("select.pages"),
             "rowcountUrl" : sm.cms.Application.ACT.getUrl("select.pages.count")
@@ -47,6 +47,10 @@ qx.Class.define("sm.cms.page.PageTable", {
         var cInd = tm.getColumnIndexById("mdate");
         if (cInd != null) {
             tcm.setDataCellRenderer(cInd, new sm.table.renderer.DateTimeCellRenderer());
+        }
+        cInd = tm.getColumnIndexById("visit_count");
+        if (cInd != null) {
+            tcm.getBehavior().setWidth(cInd, 80);
         }
     },
 
