@@ -6,7 +6,7 @@
 qx.Class.define("sm.cms.page.PageTable", {
     extend  : qx.ui.table.Table,
 
-    construct : function() {
+    construct : function(useColumns) {
 
         var tm = new sm.model.RemoteVirtualTableModel({
             "name" : this.tr("Название"),
@@ -18,7 +18,7 @@ qx.Class.define("sm.cms.page.PageTable", {
             "visit_count" : this.tr("Посетило")
         })
           .set({
-            "useColumns" : ["name", "mdate", "template", "visit_count"],
+            "useColumns" : useColumns || ["name", "mdate", "template"],
             "rowdataUrl" : sm.cms.Application.ACT.getUrl("select.pages"),
             "rowcountUrl" : sm.cms.Application.ACT.getUrl("select.pages.count")
         });
