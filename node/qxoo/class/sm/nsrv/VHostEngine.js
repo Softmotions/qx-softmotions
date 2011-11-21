@@ -1137,7 +1137,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //store
             if (sessOpts["store"] == "mongo") {
                 qx.log.Logger.info("Using sm.mongo.SessionStore as session storage");
-                sessOpts["store"] = new sm.mongo.SessionStore(sm.app.Env.getDefault().getMongo().collection("sessions"));
+                sessOpts["store"] = new sm.mongo.SessionStore(sm.app.Env.getDefault().getMongo().collection(sessOpts["collection"] || "sessions"));
             } else {
                 delete sessOpts["store"];
             }
