@@ -5,6 +5,7 @@
 
 qx.Class.define("sm.cms.Env", {
     extend  : sm.app.Env,
+    type : "abstract",
 
     construct : function(envBase, appBase, options) {
         this.base(arguments, envBase, appBase, options);

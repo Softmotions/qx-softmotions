@@ -9,6 +9,7 @@
  */
 qx.Class.define("sm.app.Env", {
     extend  : qx.core.Object,
+    type : "abstract",
 
     statics :
     {
