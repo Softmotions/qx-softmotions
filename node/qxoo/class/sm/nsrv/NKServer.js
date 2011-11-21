@@ -112,8 +112,8 @@ qx.Class.define("sm.nsrv.NKServer", {
             }
 
             port = port || 3000;
-            host = host || "0.0.0.0";
-            qx.log.Logger.warn(this, "Starting web server at port: " + port + " on: " + host);
+            host = host || null;
+            qx.log.Logger.warn(this, "Starting web server at port: " + port + " on: " + (host || "INADDR_ANY"));
 
             var connect = $$node.require("connect");
             var chandlers = [];

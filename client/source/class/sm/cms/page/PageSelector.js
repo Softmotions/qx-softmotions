@@ -35,7 +35,7 @@ qx.Class.define("sm.cms.page.PageSelector", {
         }
     },
 
-    construct : function(constViewSpec) {
+    construct : function(constViewSpec, useColumns) {
         this.base(arguments);
         this._setLayout(new qx.ui.layout.VBox(4));
 
@@ -56,7 +56,7 @@ qx.Class.define("sm.cms.page.PageSelector", {
         sbox.add(sbut);
         this._add(sbox);
 
-        var pt = this.__table = new sm.cms.page.PageTable().set({
+        var pt = this.__table = new sm.cms.page.PageTable(useColumns).set({
             "statusBarVisible" : false,
             "showCellFocusIndicator" : false});
 

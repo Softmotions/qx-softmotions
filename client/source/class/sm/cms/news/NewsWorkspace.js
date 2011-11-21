@@ -53,7 +53,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         toolbar.add(mainPart);
 
         var createNewsBt = this.__createNewsBt =
-                new qx.ui.toolbar.Button(this.tr("Создать"), "sm/cms/icon/16/actions/newspaper_add.png").set({enabled : false});
+          new qx.ui.toolbar.Button(this.tr("Создать"), "sm/cms/icon/16/actions/newspaper_add.png").set({enabled : false});
         createNewsBt.addListener("execute", function(ev) {
             var options = {};
             var ps = this.__pageSelect;
@@ -110,7 +110,9 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         toolbar.add(prPart, {flex : 1});
         this.add(toolbar);
 
-        var ps = this.__pageSelector = new sm.cms.page.PageSelector().set({enabled : false});
+        var ps = this.__pageSelector =
+          new sm.cms.page.PageSelector(null, ["name", "mdate", "visit_count"])
+            .set({enabled : false});
         this.add(ps, {flex : 1});
 
         pageSelect.addListener("changeSelection", function(ev) {
@@ -133,6 +135,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
 
         //Table context menu
         var ptable = ps.getTable();
+
         ptable.addListener("cellDblclick", function(ev) {
             var page = ptable.getSelectedPage();
             this.fireDataEvent("editNews", page["id"]);
@@ -190,17 +193,17 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             var rmBt = new qx.ui.menu.Button(this.tr("Удалить"));
             rmBt.addListener("execute", function() {
                 sm.cms.Application.confirm(this.tr("Вы действительно желаете удалить") + " '" + page["name"] + "'?",
-                        function(res) {
-                            if (!res) {
-                                return;
-                            }
-                            var pid = page["id"];
-                            var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("nav.rmnode"), "GET", "application/json");
-                            req.setParameter("ref", ("pages." + pid), false);
-                            req.send(function(resp) {
-                                this.__pageSelector.updateViewSpec({});
-                            }, this);
-                        }, this);
+                  function(res) {
+                      if (!res) {
+                          return;
+                      }
+                      var pid = page["id"];
+                      var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("nav.rmnode"), "GET", "application/json");
+                      req.setParameter("ref", ("pages." + pid), false);
+                      req.send(function(resp) {
+                          this.__pageSelector.updateViewSpec({});
+                      }, this);
+                  }, this);
             }, this);
             contextMenu.add(rmBt);
 
@@ -216,8 +219,8 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             qx.core.Assert.assertString(pageId);
             qx.core.Assert.assertInArray(action, ["add", "remove"]);
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("news.roots.manage",
-                    "ref", pageId,
-                    "action", action), "GET", "application/json");
+              "ref", pageId,
+              "action", action), "GET", "application/json");
             req.send(function(resp) {
                 var ps = this.__pageSelect;
                 var items = ps.getChildren();
@@ -263,8 +266,8 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
 
     destruct : function() {
         this.__pageSelector = this.__pageSelect =
-                this.__addPageBt = this.__rmPageBt =
-                        this.__createNewsBt = null;
+          this.__addPageBt = this.__rmPageBt =
+            this.__createNewsBt = null;
     }
 });
 

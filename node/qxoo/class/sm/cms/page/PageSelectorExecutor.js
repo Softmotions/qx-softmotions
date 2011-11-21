@@ -31,7 +31,8 @@ qx.Class.define("sm.cms.page.PageSelectorExecutor", {
                       "template" : asm ? asm["name"] : null,
                       "refpage" : doc["refpage"] ? doc["refpage"]["oid"] : null,
                       "type" : doc["type"],
-                      "id" : doc["_id"]
+                      "id" : doc["_id"],
+                      "visit_count" : doc["visit_count"] || ""
                   };
                   rarr.push(item);
               }).exec(function(err) {
@@ -66,7 +67,8 @@ qx.Class.define("sm.cms.page.PageSelectorExecutor", {
                     "published" : 1,
                     "asm" : 1,
                     "type" : 1,
-                    "refpage" : 1
+                    "refpage" : 1,
+                    "visit_count" : 1
                 });
             } catch(e) {
                 qx.log.Logger.error(this, e);
