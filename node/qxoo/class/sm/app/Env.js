@@ -129,10 +129,10 @@ qx.Class.define("sm.app.Env", {
             sm.app.Env.registerDefault(this);
         }
 
-        this._openEnv(!!this._options["create"]);
-
         //Init initables after env opened
         this.addListenerOnce("opened", this.__initInitables, this);
+
+        this._openEnv(!!this._options["create"]);
     },
 
     members :
