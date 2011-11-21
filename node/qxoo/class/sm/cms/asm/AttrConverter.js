@@ -26,6 +26,20 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         },
 
 
+        saveAliasVal : function(attrVal, attrName, attrMeta, asm, page, cb, ctx) {
+            var req = ctx._req_;
+            if (req.isUserHasRoles("alias.admin")) {
+                // todo check if alias exists and if executor exists
+                cb(null, {
+                    value: attrVal
+                });
+            } else {
+                // maybe to report some kind of error instead if old value differs from new one?
+                cb(null);
+            }
+        },
+
+
         /**
          * Save attribute as direct page property
          */

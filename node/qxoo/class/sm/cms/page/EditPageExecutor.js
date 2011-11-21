@@ -312,6 +312,8 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
 
         __save : function(req, resp, ctx) {
             var me = this;
+            ctx._req_ = req;
+            ctx._resp_ = resp;
             if (qx.core.Environment.get("app.debug")) {
                 for (var pn in req.params) {
                     qx.log.Logger.debug(this, "save: req param " + pn + "=" + req.params[pn]);
@@ -526,7 +528,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                 attrs[attrName] = val;
                             }
                             cb(err);
-                        });
+                        }, ctx);
                     } catch(e) {
                         qx.log.Logger.error(this, "Error to call attribute converter, asm: " + asm["_name_"] +
                           ", attr: " + attrName, e);
