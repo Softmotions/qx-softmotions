@@ -558,7 +558,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         },
 
         /**
-         * Can be used for alias?
+         * Check if a file or handler doesn't exist.
          * @param webapp normalized path of webapp, for example "" or "/adm"
          * @param path path in the webapp to be checked, for example "foo/bar"
          * @param cb {function(bool)} will be called with result
@@ -596,8 +596,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb(false);
                 return;
             } else { //try to find regexp handler
-                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
-                    var rh = this.__regexpHandlers[i];
+                for (var j = 0; j < this.__regexpHandlers.length; ++j) {
+                    var rh = this.__regexpHandlers[j];
                     if (rh["$$re"].test("/" + path)) {
                         cb(false);
                         return;
