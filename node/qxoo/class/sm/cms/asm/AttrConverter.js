@@ -29,7 +29,7 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         saveAliasVal : function(attrVal, attrName, attrMeta, asm, page, cb, ctx) {
             if (ctx._req_.isUserHasRoles("alias.admin")) {
                 ctx._vhost_engine_.isPathFreeAndCanBeUsed("/exp", attrVal, function(result) {
-                    if (result) {
+                    if (result || attrVal == "") {
                         // todo check if alias exists
                         cb(null, {
                             value: attrVal
