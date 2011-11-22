@@ -67,7 +67,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
         this.base(arguments);
         this.__applyConfig(config);
-
     },
 
     members :
@@ -122,8 +121,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * require('utils/fsutils');
          */
         __fsutils : null,
-
-        __cleanupHandlersLastTime : 0,
 
         /**
          * Returns virtual host name
@@ -193,7 +190,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 throw new Error("Invalid vhost config, webapps section must be array: " + qx.lang.Json.stringify(this.__config));
             }
             var wapps = this.__config["webapps"];
-
             var wappsIds = {};
             var wappsCtx = {};
 
@@ -467,14 +463,17 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             JSON.stringify(asm, true));
                 }
             }
-
             for (var asn in this.__assembly) {
                 //Replace _extends_ string ref by real assembly instance
                 var asm = this.__assembly[asn];
-                if (asm["_extends_"]) {
-                    asm["_extends_"] = this.__assembly[asm["_extends_"]];
+                var asmEx = asm["_extends_"];
+                if (asmEx) {
+                    asm["_extends_"] = this.__assembly[asmEx];
+                    if (asm["_extends_"] === undefined) {
+                        qx.log.Logger.warn(this, "Assembly: '" + asn + "' extends unknown assembly: '" + asmEx + "'");
+                    }
                 }
-                if (asm["_extends_"] == asm) {
+                if (asm["_extends_"] === asm) { //Cyclic ref
                     delete asm["_extends_"];
                 }
                 //Remove asm["_ctx_provider_"] as unnecessary
@@ -482,34 +481,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     delete asm["_ctx_provider_"];
                 }
             }
-        },
-
-
-        /**
-         * Periodically recreate duty handlers
-         * to avoid possible cyclic refs with constant executors and closures
-         */
-        __cleanupHandlers : function() {
-            /*var me = this;
-             var now = new Date().getTime();
-             if (now - me.__cleanupHandlersLastTime < (1000 * 60 * 10)) { //todo 10min time hardcoded
-             return;
-             }
-             $$node.process.nextTick(function() {
-             me.__cleanupHandlersLastTime = now;
-             for (var hk in me.__handlers) {
-             var hconf = me.__handlers[hk];
-             var hinst = hconf["$$instance"];
-             if (hinst == null || hinst.$$duty === false || hinst.$$notrecreate === true) {
-             continue;
-             }
-             var ninst = new hinst.constructor();
-             ninst.$$duty = false;
-             delete hconf["$$instance"];
-             hconf["$$instance"] = ninst;
-             hinst.dispose();
-             }
-             });*/
         },
 
         /**
@@ -538,7 +509,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
 
                 var hinstance = new clazz();
-                hinstance.$$duty = false;
                 for (var lList in handlers) {
 
                     var hconf = handlers[lList];
@@ -693,16 +663,80 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
         },
 
+        __authenticateRequest : function(req, res, cb, self) {
+
+            if (req.internal || !req.info.webapp.security) {
+                cb.call(self);
+                return;
+            }
+            if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
+                cb.call(self);
+                return;
+            }
+            var security = self.__security[req.info.webapp.id];
+            var sconf = req.info.webapp.security;
+            var protect = sconf["protect"];
+            var secured = false;
+            var reqRoles = null;
+            if (!protect || protect.length === 0 || !security) {
+                cb.call(self);
+                return;
+            }
+            for (var i = 0; i < protect.length && !secured; ++i) {
+                var pc = protect[i];
+                var inc = pc["include"];
+                reqRoles = null;
+                for (var j = 0; inc && j < inc.length; ++j) {
+                    if (req.info.path.indexOf(inc[j]) === 0) {
+                        secured = true; //Included
+                        var exc = pc["exclude"];
+                        for (var k = 0; exc && k < exc.length; ++k) {
+                            if (req.info.path.indexOf(exc[k]) === 0) {
+                                secured = false; //Excluded
+                                break;
+                            }
+                        }
+                        reqRoles = (secured) ? pc["roles"] : null;
+                        break;
+                    }
+                }
+            }
+            if (!secured) {
+                cb.call(self);
+                return;
+            }
+            security.__filter.authenticate(req, res, function(err) {
+                if (err) {
+                    cb.call(self, err);
+                } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
+                    cb.call(self, "Unauthorized to access: '" + req.info.pathname +
+                            "' for roles: " + JSON.stringify(reqRoles));
+                } else {
+                    cb.call(self);
+                }
+            });
+        },
+
+        __handleReq : function(req, res, next) {
+            this.__authenticateRequest(req, res, function(err) {
+                if (err) {
+                    qx.log.Logger.warn(this, err);
+                    res.sendForbidden();
+                    return;
+                }
+                this.__handleReqInternal(req, res, next);
+            }, this);
+        },
+
         /**
          * Main routine to handle http request
          */
-        __handleReq : function(req, res, next) {
+        __handleReqInternal : function(req, res, next) {
 
             var me = this;
-
             //trying to find handlers
             var hconf = this.__handlers[req.info.pathname];
-            if (!hconf) { //try to find regexp handler
+            if (hconf === undefined) { //try to find regexp handler
                 var path = req.info.path;
                 for (var i = 0; i < this.__regexpHandlers.length; ++i) {
                     var rh = this.__regexpHandlers[i];
@@ -712,7 +746,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-
             var ctx = function(forward) {
                 if (!forward || forward["terminated"] != true) {
                     ctx.collectMessageHeaders();
@@ -737,67 +770,69 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             ctx._vhost_engine_ = this;
             req._ctx_ = ctx;
-            if (req.$$ctxParams) {
+            if (req.$$ctxParams != null) {
                 for (var k in req.$$ctxParams) {
                     if (ctx[k] === undefined) {
                         ctx[k] = req.$$ctxParams[k];
                     }
                 }
             }
-
-            if (hconf) { //found handlers
-
-                var hinst = hconf["$$instance"];
-                var exec = hinst[hconf["handler"]];
-                if (!qx.lang.Type.isFunction(exec)) {
-                    throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
-                }
-                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                    qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
-                }
-
-                var callback = function() {
-                    try {
-                        hinst.$$duty = true;
-                        exec.call(hinst, req, res, ctx);
-                    } catch(e) {
-                        var report = true;
-                        if (e instanceof sm.nsrv.Message) {
-                            report = e.isError();
-                        }
-                        if (report) {
-                            qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
-                        }
-                        next(e);
-                    }
-                };
-
-                var security;
-                var secured = this.__getHconfValue(hconf, "secured");
-                var roles = this.__getHconfValue(hconf, "roles") || [];
-
-                if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
-                    callback();
-                } else if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
-                    if (hconf["logout"]) {
-                        security.__filter.logout(req, res, callback);
-                    } else {
-                        security.__filter.authenticate(req, res, function(err) {
-                            if (err || !req.isUserHasRoles(roles)) {
-                                res.sendForbidden();
-                                return;
-                            }
-                            callback();
-                        });
-                    }
-                } else {
-                    callback();
-                }
-
+            if (hconf === undefined) { //handlers not found, server static content or templates
+                ctx(null);
                 return;
             }
 
-            ctx(null);
+            //Call executor
+            var hinst = hconf["$$instance"];
+            var exec = hinst[hconf["handler"]];
+            if (!qx.lang.Type.isFunction(exec)) {
+                throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
+            }
+            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
+            }
+
+            var callback = function() {
+                try {
+                    exec.call(hinst, req, res, ctx);
+                } catch(e) {
+                    var report = true;
+                    if (e instanceof sm.nsrv.Message) {
+                        report = e.isError();
+                    }
+                    if (report) {
+                        qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                    }
+                    next(e);
+                }
+            };
+
+            var security = null;
+            var secured = this.__getHconfValue(hconf, "secured");
+            var roles = this.__getHconfValue(hconf, "roles") || [];
+
+            if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
+                callback();
+                return;
+            }
+
+            if ((secured || hconf["logout"]) &&
+                    (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+                if (hconf["logout"]) {
+                    security.__filter.logout(req, res, callback);
+                } else {
+                    security.__filter.authenticate(req, res, function(err) {
+                        if (err || !req.isUserHasRoles(roles)) {
+                            res.sendForbidden();
+                            return;
+                        }
+                        callback();
+                    });
+                }
+            } else {
+                callback();
+            }
+            return;
         },
 
 
@@ -982,10 +1017,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         origEnd.apply(res, arguments);
                     } finally {
                         sm.nsrv.VHostEngine.cleanupRequest(req, res);
-                        me.__cleanupHandlers();
                         origEnd = null;
                     }
-
                     /*var gc = $$node.require("gc/gc");
                      var util = $$node.require("util");
                      var GC = new gc.GC();
@@ -1010,7 +1043,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if (!info.webapp) { //No webapp found, abort
-                if (info.pathname == "/" && this.__config["rootRedirect"]) { //if root redirect defined
+                if (info.pathname == "/" && this.__config["rootRedirect"] && this.__config["rootRedirect"] !== "/") { //if root redirect defined
                     res.sendSCode(301, {"Location" : this.__config["rootRedirect"]});
                 } else {
                     res.sendNotFound();

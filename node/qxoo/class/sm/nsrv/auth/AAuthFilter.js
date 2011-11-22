@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 qx.Class.define("sm.nsrv.auth.AAuthFilter", {
-    type      : 'abstract',
+    type      : "abstract",
     extend    : qx.core.Object,
     implement : sm.nsrv.auth.IAuthFilter,
 
@@ -19,12 +19,10 @@ qx.Class.define("sm.nsrv.auth.AAuthFilter", {
         if (!this._userProvider) {
             throw new Error('UserProvider must be provided');
         }
-
         this._securityStore = securityStore;
         if (!this._securityStore) {
             throw new Error('SecurityStore must be provided');
         }
-
         this._ignoreFailure = !!options["ignoreFailure"];
     },
 
@@ -34,25 +32,25 @@ qx.Class.define("sm.nsrv.auth.AAuthFilter", {
         _securityStore: null,
         _ignoreFailure: false,
 
-        login: function(request, response, user, callback) {
-            this._securityStore.setUser(request, user);
-            this.success(request, response, callback);
+        login: function(req, res, user, cb) {
+            this._securityStore.setUser(req, user);
+            this.success(req, res, cb);
         },
 
-        logout: function(request, response, callback) {
-            this._securityStore.setUser(request, null);
-            callback();
+        logout: function(req, res, cb) {
+            this._securityStore.setUser(req, null);
+            cb();
         },
 
-        success: function(request, response, callback) {
-            callback();
+        success: function(req, res, cb) {
+            cb();
         },
 
-        failure: function(request, response, callback) {
+        failure: function(req, res, cb) {
             if (!this._ignoreFailure) {
-                this.commence(request, response, null);
+                this.commence(req, res, null);
             } else {
-                callback();
+                cb();
             }
         }
     },

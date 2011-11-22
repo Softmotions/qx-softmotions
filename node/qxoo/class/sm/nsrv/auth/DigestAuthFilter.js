@@ -50,25 +50,23 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
         __nonces: null,
         __nonceExpire: null,
 
-        authenticate: function(request, response, callback) {
-            if (this._securityStore.isAuthenticated(request)) {
-                this.success(request, response, callback);
-            } else if (request.headers[sm.nsrv.auth.DigestAuthFilter.HEADER]) {
-                var header = request.headers[sm.nsrv.auth.DigestAuthFilter.HEADER];
+        authenticate: function(req, res, cb) {
+            if (this._securityStore.isAuthenticated(req)) {
+                this.success(req, res, cb);
+            } else if (req.headers[sm.nsrv.auth.DigestAuthFilter.HEADER]) {
+                var header = req.headers[sm.nsrv.auth.DigestAuthFilter.HEADER];
                 var match = header.match(sm.nsrv.auth.DigestAuthFilter.HEADER_MATCH);
                 if (match != null) {
                     var authinfo = this.__parseHeaderString(match[1]);
                     if (authinfo === false || !authinfo.username) {
-                        this.failure(request, response, callback);
+                        this.failure(req, res, cb);
                         return;
                     }
-
                     // check for expiration
                     if (!(authinfo.nonce in this.__nonces)) {
-                        this.failure(request, response, callback);
+                        this.failure(req, res, cb);
                         return;
                     }
-
                     this._userProvider.getAuthInfo(
                             authinfo.username,
                             (function(scope, auth) {
@@ -76,7 +74,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                     if (!err && user && user.user) {
                                         if (auth.qop == 'auth-int') {
                                             // TODO: implement auth-int
-                                            scope.failure(request, response, callback);
+                                            scope.failure(req, res, cb);
                                             return;
                                         }
 
@@ -86,7 +84,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                                 // get HA1 from user provider
                                                 ha1 = user.digestPassword;
                                             } else {
-                                                scope.failure(request, response, callback);
+                                                scope.failure(req, res, cb);
                                                 return;
                                             }
                                         } else {
@@ -94,7 +92,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                                 // calculate HA1
                                                 ha1 = scope.buildHash(user.login + ':' + scope.__realmName + ':' + user.plainPassword)
                                             } else {
-                                                scope.failure(request, response, callback);
+                                                scope.failure(req, res, cb);
                                                 return;
                                             }
                                         }
@@ -105,7 +103,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                         }
 
                                         // calculate a2
-                                        var ha2 = scope.buildHash(request.method + ':' + auth.uri);
+                                        var ha2 = scope.buildHash(req.method + ':' + auth.uri);
 
                                         // calculate request digest
                                         var digest;
@@ -115,7 +113,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                         } else {
                                             var nonceCount = parseInt(auth.nc, 16);
                                             if (nonceCount <= scope.__nonces[auth.nonce].count) {
-                                                scope.failure(request, response, callback);
+                                                scope.failure(req, res, cb);
                                                 return;
                                             }
                                             scope.__nonces[auth.nonce].count = nonceCount;
@@ -123,24 +121,24 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                                         }
 
                                         if (digest == auth.response) {
-                                            scope.login(request, response, user.user, callback);
+                                            scope.login(req, res, user.user, cb);
                                         } else {
-                                            scope.failure(request, response, callback);
+                                            scope.failure(req, res, cb);
                                         }
                                     } else {
-                                        scope.failure(request, response, callback);
+                                        scope.failure(req, res, cb);
                                     }
                                 }
                             })(this, authinfo));
                 } else {
-                    this.failure(request, response, callback);
+                    this.failure(req, res, cb);
                 }
             } else {
-                this.failure(request, response, callback);
+                this.failure(req, res, cb);
             }
         },
 
-        commence: function(request, response, error) {
+        commence: function(req, res, err) {
             var nonce = this.buildHash(new Date().getTime() + this.__realmName);
             this.__nonces[nonce] = {count: 0};
             setTimeout(
@@ -151,8 +149,7 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                     })(this),
                     this.__nonceExpire,
                     nonce);
-
-            response.sendSCode(401,
+            res.sendSCode(401,
                     { 'WWW-Authenticate': 'Digest realm="' + this.__realmName + '", qop="auth", nonce="' + nonce + '", opaque="' + this.__opaque + '"' });
         },
 

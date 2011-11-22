@@ -29,8 +29,7 @@ qx.Class.define("sm.nsrv.auth.Security", {
 
     construct: function(key) {
         this.base(arguments);
-
-        this.__user_key = '__nsrv_user_' + key;
+        this.__user_key = "_nsrv_user_" + key;
     },
 
     members:

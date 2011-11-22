@@ -26,24 +26,21 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         this.base(arguments, options, userProvider, securityStore);
 
         this.__cookies = $$node.require('cookies');
-        this.__crypto = $$node.require('crypto');
-
         this.__formUrl = options.formUrl;
         if (!this.__formUrl) {
-            throw new Error('FormUrl must be provided');
+            throw new Error('formUrl parameter must be provided');
         }
-
         this.__actionParameter = options.actionParameter || 'action';
         this.__actionName = options.action || 'login';
         this.__loginParameter = options.loginParameter || 'login';
         this.__passwordParameter = options.passwordParameter || 'password';
         if (options.rememberMe) {
-            this.__remember = {};
-            this.__remember.parameter = options.rememberMe.parameterName || 'rememberMe';
-            this.__remember.value = options.rememberMe.parameterValue || 'true';
-            this.__remember.secret = options.rememberMe.secret || '_nkserver_formAuth_remember_secrect_';
-            this.__remember.cookie = options.rememberMe.cookieName || 'nkserver_remember';
-            this.__remember.validFor = options.rememberMe.validFor || 1814400000; // 21 days
+            var rmb = this.__remember = {};
+            rmb.parameter = options.rememberMe.parameterName || 'rememberMe';
+            rmb.value = options.rememberMe.parameterValue || 'true';
+            rmb.secret = options.rememberMe.secret || '_nkserver_formAuth_remember_secrect_';
+            rmb.cookie = options.rememberMe.cookieName || 'nkserver_remember';
+            rmb.validFor = options.rememberMe.validFor || 1814400000; // 21 days
         }
     },
 
@@ -57,51 +54,48 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         __remember: null,
         __cookies: null,
 
-        authenticate: function(request, response, callback) {
+        authenticate: function(req, res, cb) {
             var doAuth = (function(me) {
                 return function() {
-                    if (me._securityStore.isAuthenticated(request)) {
-                        me.success(request, response, callback);
-                    } else if (request.params[me.__actionParameter] && me.__actionName == request.params[me.__actionParameter]) {
-                        var login = request.params[me.__loginParameter];
-                        var password = request.params[me.__passwordParameter];
+                    if (me._securityStore.isAuthenticated(req)) {
+                        me.success(req, res, cb);
+                    } else if (req.params[me.__actionParameter] && me.__actionName == req.params[me.__actionParameter]) {
+                        var login = req.params[me.__loginParameter];
+                        var password = req.params[me.__passwordParameter];
                         me._userProvider.login(login, password, (function(scope) {
                             return function(err, user) {
                                 if (!err && user) {
-                                    scope.login(request, response, user, callback);
+                                    scope.login(req, res, user, cb);
                                 } else {
-                                    scope.failure(request, response, callback);
+                                    scope.failure(req, res, cb);
                                 }
                             }
                         })(me));
-                    } else if (request.info.pathname == me.__formUrl) {
-                        me.success(request, response, callback);
+                    } else if (req.info.pathname == me.__formUrl) {
+                        me.success(req, res, cb);
                     } else {
-                        me.failure(request, response, callback);
+                        me.failure(req, res, cb);
                     }
                 }
             })(this);
 
             if (this.__remember) {
-                this.__tryAutoLogin(request, doAuth);
+                this.__tryAutoLogin(req, doAuth);
             } else {
                 doAuth();
             }
-
         },
 
-        __tryAutoLogin: function(request, callback) {
-            var cookies = new this.__cookies(request);
+        __tryAutoLogin: function(req, cb) {
+            var cookies = new this.__cookies(req);
             var token = cookies.get(this.__remember.cookie);
             if (!token) {
-                callback();
+                cb();
                 return;
             }
-
             for (var i = 0; i < token.length % 4; i++) {
                 token = token + '=';
             }
-
             var parts = new $$node.Buffer(token, 'base64').toString().split(/:/);
             if (parts[1] >= new Date()) {
                 this._userProvider.getAuthInfo(parts[0], (function(scope) {
@@ -109,21 +103,20 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                         if (!err && user && user.user) {
                             var hash = scope.__hash(user.login, parts[1], scope.__remember.secret);
                             if (hash === parts[2]) {
-                                scope._securityStore.setUser(request, user.user)
+                                scope._securityStore.setUser(req, user.user)
                             }
-                            callback();
+                            cb();
                         }
                     };
                 })(this));
             } else {
-                callback();
+                cb();
             }
         },
 
-        login: function(request, response, user, callback) {
-            if (this.__remember && request.params[this.__remember.parameter] == this.__remember.value) {
-                var cookies = new this.__cookies(request, response);
-
+        login: function(req, res, user, cb) {
+            if (this.__remember && req.params[this.__remember.parameter] == this.__remember.value) {
+                var cookies = new this.__cookies(req, res);
                 var validTo = +new Date() + this.__remember.validFor;
                 var hash = this.__hash(user.login, validTo, this.__remember.secret);
                 var token = new $$node.Buffer(user.login + ':' + validTo + ':' + hash).toString('base64');
@@ -134,26 +127,26 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 cookies.set(this.__remember.cookie, token, {expires : new Date(validTo)});
             }
 
-            this.base(arguments, request, response, user, callback);
+            this.base(arguments, req, res, user, cb);
         },
 
-        logout: function(request, response, callback) {
+        logout: function(req, res, cb) {
             if (this.__remember) {
-                var cookies = new this.__cookies(request, response);
+                var cookies = new this.__cookies(req, res);
                 cookies.set(this.__remember.cookie);
             }
 
-            this.base(arguments, request, response, callback);
+            this.base(arguments, req, res, cb);
         },
 
-        commence: function(request, response, error) {
-            response.sendSCode(302, { 'Location' : this.__formUrl });
+        commence: function(req, res, err) {
+            res.sendSCode(302, { 'Location' : this.__formUrl });
         },
 
         __hash: function(user, validTo, secret) {
+            var crypto = $$node.require('crypto');
             // TODO: надо что-нить хитрое встаивить в серединку хэша.
-            return this.__crypto
-                    .createHash('md5')
+            return crypto.createHash('md5')
                     .update(user + ':' + ':' + validTo + ':' + secret)
                     .digest('hex');
         }
@@ -161,9 +154,8 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
 
     destruct: function() {
         this.base(arguments);
-        this.__formUrl = null;
+        this.__formUrl = this.__remember = null;
         this.__actionParameter = this.__actionName = this.__loginParameter = this.__passwordParameter = null;
-        this.__crypto = this.__cookies = null;
-        this._disposeObjects('__remember');
+        this.__cookies = null;
     }
 });
