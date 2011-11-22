@@ -56,6 +56,84 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
         },
 
         /**
+         * Add message into response
+         */
+        addMessage : function(resp, msg, isErr) {
+            resp.messages.push(new sm.nsrv.Message(msg, !!isErr));
+        },
+
+
+        /**
+         * Add internal error message for internal requests/templates
+         */
+        addInternalError : function(ctx, msg) {
+            if (!ctx["_errors_"] || ctx["_errors_"].constructor !== Array) {
+                ctx["_errors_"] = [];
+            }
+            if (msg) {
+                ctx["_errors_"].push(msg.toString());
+            }
+        },
+
+
+        /**
+         * Add reference to invalid form field
+         * If msg is null it will be registered as internal error
+         *
+         * @param ctx
+         * @param ref {String?null} Field reference
+         * @param msg {String?null} Error message
+         * @see #addInternalError
+         */
+        addInvalidRef : function(ctx, ref, msg) {
+            if (!ctx["_invalid_refs_"] || typeof ctx["_invalid_refs_"] !== "object") {
+                ctx ["_invalid_refs_"] = {};
+            }
+            if (ref != null) {
+                ctx ["_invalid_refs_"][ref] = msg;
+            }
+            if (msg != null) {
+                this.addInternalError(ctx, msg);
+            }
+        },
+
+        /**
+         * Validate field by validation func.
+         * If validation func emmits exception this field will be marked as invalid
+         * and {@link #addInvalidRef} will be called with following arguments:
+         * 'ref' will be field name, 'msg' will be error message
+         *
+         * @param ctx {Executor context}
+         * @param fname {String} Field name
+         * @param val   {Object} Field value
+         * @param cf  {Function} Check function
+         *
+         * @return Non zero if val is invalid, 0 is val is valid
+         */
+        validateField : function(ctx, fname, val, cf) {
+            try {
+                cf(val);
+            } catch(e) {
+                this.addInvalidRef(ctx, fname, e.message ? e.message : e);
+                return 1;
+            }
+            return 0;
+        },
+
+        /**
+         * Add internal message for internal requests/templates
+         */
+        addInternalMessage : function(ctx, msg) {
+            if (!ctx["_messages_"] || ctx["_messages_"].constructor !== Array) {
+                ctx ["_messages_"] = [];
+            }
+            if (msg) {
+                ctx ["_messages_"].push(msg);
+            }
+        },
+
+
+        /**
          * Handle error, write error to the response headers
          *
          * @param resp {HTTP Response}

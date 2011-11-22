@@ -427,6 +427,17 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 },
 
                 /**
+                 * Print emit if ctx[prop] is not null otherwise empty stnring will be printed
+                 */
+                printIf : function(ctx, prop, emit, cb) {
+                    cb(ctx != null && ctx[prop] != null ? emit : "");
+                },
+
+                printIfInvalid : function(ctx, fname, emit, cb) {
+                    this.printIf(ctx ? ctx["_invalid_refs_"] : null, fname, emit, cb);
+                },
+
+                /**
                  * Format date
                  * @param date{Date|null} Date to format, if null current date will be used
                  * @param format{String|null} Date format if null default date represendations will be used
