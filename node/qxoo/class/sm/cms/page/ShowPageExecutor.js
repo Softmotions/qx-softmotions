@@ -14,9 +14,16 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                 cb("Assembly: " + name + " not found", null);
                 return;
             }
-            var pid = name.substring(1);
+
             var coll = sm.cms.page.PageMgr.getColl();
-            coll.findOne({"_id" : coll.toObjectID(pid)}, {fields : {"extra" : 0, "media" : 0, "access" : 0}}, function(err, doc) {
+            try {
+                var oid = coll.toObjectID(name.substring(1));
+            } catch(e) {
+                cb("Assembly: " + name + " not found", null);
+                return;
+            }
+
+            coll.findOne({"_id" : oid}, {fields : {"extra" : 0, "media" : 0, "access" : 0}}, function(err, doc) {
                 if (err) {
                     cb(err, null);
                     return;
@@ -123,7 +130,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
 
         __page : function(req, resp, ctx) {
             var path = req.info.path;
-            if (path.indexOf("/p") != 0) {
+            if (path.indexOf("/p") !== 0) {
                 this.handleError(resp, ctx, "Invalid request");
                 return;
             }
@@ -135,7 +142,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
         __preview : function(req, resp, ctx) {
             //todo check preview access rights
             var path = req.info.path;
-            if (path.indexOf("/pp") != 0) {
+            if (path.indexOf("/pp") !== 0) {
                 this.handleError(resp, ctx, "Invalid request");
                 return;
             }
