@@ -30,9 +30,15 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             if (ctx._req_.isUserHasRoles("alias.admin")) {
                 ctx._vhost_engine_.isPathFreeAndCanBeUsed("/exp", attrVal, function(result) {
                     if (result || attrVal == "") {
-                        // todo check if alias exists
-                        cb(null, {
-                            value: attrVal
+                        sm.cms.page.AliasRegistry.getInstance().findPageByAlias(attrVal, function(res) {
+                            if (res) {
+                                // todo report an error that user can't use this alias
+                                cb(null);
+                            } else {
+                                cb(null, {
+                                    value: attrVal
+                                })
+                            }
                         });
                     } else {
                         // todo report an error that user can't use this alias

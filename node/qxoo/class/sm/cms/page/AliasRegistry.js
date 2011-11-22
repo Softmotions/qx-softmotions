@@ -107,7 +107,6 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
             var me = this;
             var result = this.__getAlias(pageId);
             if (result === undefined) {
-                qx.log.Logger.info("fetching alias by page " + pageId);
                 sm.cms.page.PageMgr.fetchNodeById(pageId, function(err, document) {
                     if (err) {
                         qx.log.Logger.error(me, "find alias by page", err);
