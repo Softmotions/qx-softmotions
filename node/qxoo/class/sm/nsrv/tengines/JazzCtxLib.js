@@ -280,8 +280,8 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
         /**
          * Invoke assembly
          */
-        assembly : function(vhe, te, ctx, name, params, ctxParams, cb) {
-            this.assemblyExt(vhe, te, ctx, name, params, ctxParams, function(err, data) {
+        assembly : function(vhe, te, ctx, name, params, ctxParams, asmProps, cb) {
+            this.assemblyExt(vhe, te, ctx, name, params, ctxParams, asmProps, function(err, data) {
                 if (err) {
                     qx.log.Logger.error(this, err);
                 }
@@ -289,12 +289,29 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             })
         },
 
-        assemblyExt : function(vhe, te, ctx, name, params, ctxParams, cb) {
+        /**
+         *
+         * @param vhe       {sm.nsrv.VHostEngine}
+         * @param te        {sm.nsrv.ITemplateEngine}
+         * @param ctx       {Object} Request context
+         * @param name      {String} Name of assemble
+         * @param params    {Map?null} Internal request params
+         * @param ctxParams {Map?null} Extra context params
+         * @param asmProps  {Map?null} Extra assembly properties
+         * @param cb        {function(err, data)} Callback
+         */
+        assemblyExt : function(vhe, te, ctx, name, params, ctxParams, asmProps, cb) {
             var me = this;
             vhe.loadAssembly(name, function(err, asm, asmCtxParams) {
                 if (err) {
                     cb(err, null);
                     return;
+                }
+                if (asmProps != null && typeof asmProps === "object") {
+                    asm = qx.lang.Object.clone(asm);
+                    for (var k in asmProps) {
+                        asm[k] = asmProps[k];
+                    }
                 }
                 var req = ctx["_req_"];
                 var core = asm["_core_"];
@@ -338,9 +355,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
             }
             var jclib = sm.nsrv.tengines.JazzCtxLib;
             var req = ctx["_req_"];
-            if (val != undefined && val != null) {
+            if (val != null) {
                 if (val["_assembly_"]) {
-                    jclib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], cb);
+                    jclib.assembly(vhe, te, ctx, val["_assembly_"], req.params, val["_ctxParams_"], val["_props_"], cb);
                 } else if (val["_irequest_"]) {
                     jclib.irequest(vhe, te, ctx, val["_irequest_"], req.params, val["_ctxParams_"], cb);
                 } else if (val["_include_"]) {

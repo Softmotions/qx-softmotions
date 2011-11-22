@@ -106,7 +106,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                         qx.core.Assert.assert(te != null, "Missing template engine for jz files");
 
                         //Load assembly
-                        sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, function(err, data) {
+                        sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, null, function(err, data) {
                             if (err) {
                                 me.handleError(resp, ctx, err, true);
                                 return;
