@@ -558,13 +558,80 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         },
 
         /**
+         * Can be used for alias?
+         * @param webapp normalized path of webapp, for example "" or "/adm"
+         * @param path path in the webapp to be checked, for example "foo/bar"
+         * @param cb {function(bool)} will be called with result
+         */
+        isPathFreeAndCanBeUsed : function(webapp, path, cb) {
+            var me = this;
+
+            if (~path.indexOf("..")) { //Simple security checking
+                cb(false);
+                return;
+            }
+
+            var wapp = null;
+            var wapps = me.__config["webapps"];
+            for (var i = 0, l = wapps.length; i < l; ++i) {
+                var wa = wapps[i];
+                if (webapp == wa["contextPath"]) {
+                    wapp = wa;
+                    if (path == "" && wa["index"] != null) {
+                        cb(false);
+                        return;
+                    }
+                    break;
+                }
+            }
+
+            if (!wapp) { //No webapp found, abort
+                cb(false);
+                return;
+            }
+
+            //trying to find handlers
+            var hconf = this.__handlers[webapp + "/" + path];
+            if (hconf) {
+                cb(false);
+                return;
+            } else { //try to find regexp handler
+                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
+                    var rh = this.__regexpHandlers[i];
+                    if (rh["$$re"].test("/" + path)) {
+                        cb(false);
+                        return;
+                    }
+                }
+            }
+
+            // file on disk
+            if (path.length > 0 && path.charAt(0) != '/') {
+                path = '/' + path;
+            }
+            path = wapp["docRoot"] + path;
+            this.__mergeTemplate(path, null, {}, null, function(tengine, headers) {
+                tengine.createTemplate(path, function(err, template) {
+                    if (err) {
+                        qx.log.Logger.error(me, "Failed template, path: " + path, err);
+                        cb(false);
+                    } else {
+                        cb(template["notfound"]);
+                    }
+                });
+            });
+        },
+
+        /**
          * Render file template
          * @param req {http.ServerRequest}
          * @param res {http.ServerResponse}
          * @param ctx {Object}
          * @param forward {Object} forward object
+         * @param notFoundCb {function(default)} specify it when you want to handle non found stuff yourself. Default handler is the argument
          */
-        __renderTemplate : function(req, res, ctx, forward) {
+        __renderTemplate : function(req, res, ctx, forward, notFoundCb) {
+            var me = this;
 
             if (!req.info.contextPath) { //not in webapp
                 res.sendNotFound();
@@ -589,7 +656,23 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 path = '/' + path;
             }
             path = req.info.webapp["docRoot"] + path;
-            this.__mergeTemplate(path, req, res, ctx);
+            this.__mergeTemplate(path, req, res, ctx, function(tengine, headers) {
+                tengine.createTemplate(path, function(err, template) {
+                    if (err) {
+                        qx.log.Logger.error(me, "Failed template, path: " + path, err);
+                        res.sendError();
+                        return;
+                    }
+                    var defaultHandler = function() {
+                        tengine.mergeTemplate(me, template, req, res, ctx, headers);
+                    };
+                    if (notFoundCb && template["notfound"]) {
+                        notFoundCb(defaultHandler);
+                    } else {
+                        defaultHandler();
+                    }
+                });
+            });
         },
 
         __applyConfigHeaders : function(req, headers) {
@@ -749,7 +832,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var ctx = function(forward) {
                 if (!forward || forward["terminated"] != true) {
                     ctx.collectMessageHeaders();
-                    me.__renderTemplate(req, res, ctx, forward);
+                    me.__renderTemplate(req, res, ctx, forward/*, function() {
+
+                    }*/);
                 }
                 ctx = null;
             };

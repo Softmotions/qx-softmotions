@@ -27,11 +27,17 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
 
 
         saveAliasVal : function(attrVal, attrName, attrMeta, asm, page, cb, ctx) {
-            var req = ctx._req_;
-            if (req.isUserHasRoles("alias.admin")) {
-                // todo check if alias exists and if executor exists
-                cb(null, {
-                    value: attrVal
+            if (ctx._req_.isUserHasRoles("alias.admin")) {
+                ctx._vhost_engine_.isPathFreeAndCanBeUsed("/exp", attrVal, function(result) {
+                    if (result) {
+                        // todo check if alias exists
+                        cb(null, {
+                            value: attrVal
+                        });
+                    } else {
+                        // todo report an error that user can't use this alias
+                        cb(null);
+                    }
                 });
             } else {
                 // maybe to report some kind of error instead if old value differs from new one?
