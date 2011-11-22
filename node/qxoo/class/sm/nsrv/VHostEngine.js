@@ -586,7 +586,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            var path = (forward && qx.lang.Type.isString(forward.path)) ? forward.path : req.info.path;
+            if (forward && (typeof forward["redirect"] === "string")) {
+                res.outerResponse().sendSCode(301, {"Location" : forward["redirect"]});
+                return;
+            }
+
+            var path = (forward && (typeof forward.path === "string")) ? forward.path : req.info.path;
             if (path.length > 0 && path.charAt(0) != '/') {
                 path = '/' + path;
             }
