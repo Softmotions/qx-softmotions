@@ -55,30 +55,34 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         __cookies: null,
 
         authenticate: function(req, res, cb) {
-            var doAuth = (function(me) {
-                return function() {
-                    if (me._securityStore.isAuthenticated(req)) {
-                        me.success(req, res, cb);
-                    } else if (req.params[me.__actionParameter] && me.__actionName == req.params[me.__actionParameter]) {
-                        var login = req.params[me.__loginParameter];
-                        var password = req.params[me.__passwordParameter];
-                        me._userProvider.login(login, password, (function(scope) {
-                            return function(err, user) {
-                                if (!err && user) {
-                                    scope.login(req, res, user, cb);
-                                } else {
-                                    scope.failure(req, res, cb);
-                                }
-                            }
-                        })(me));
-                    } else if (req.info.pathname == me.__formUrl) {
-                        me.success(req, res, cb);
-                    } else {
-                        me.failure(req, res, cb);
-                    }
+            if (this._securityStore.isAuthenticated(req)) {
+                this.success(req, res, cb);
+                return;
+            }
+            var me = this;
+            var doAuth = function() {
+                if (me._securityStore.isAuthenticated(req)) {
+                    me.success(req, res, cb);
+                    return;
                 }
-            })(this);
-
+                if (req.params[me.__actionParameter] && me.__actionName == req.params[me.__actionParameter]) {
+                    var login = req.params[me.__loginParameter];
+                    var password = req.params[me.__passwordParameter];
+                    me._userProvider.login(login, password, (function(scope) {
+                        return function(err, user) {
+                            if (!err && user) {
+                                scope.login(req, res, user, cb);
+                            } else {
+                                scope.failure(req, res, cb);
+                            }
+                        }
+                    })(me));
+                } else if (req.info.pathname == me.__formUrl) {
+                    me.success(req, res, cb);
+                } else {
+                    me.failure(req, res, cb);
+                }
+            };
             if (this.__remember) {
                 this.__tryAutoLogin(req, doAuth);
             } else {
@@ -87,6 +91,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         },
 
         __tryAutoLogin: function(req, cb) {
+            var me = this;
             var cookies = new this.__cookies(req);
             var token = cookies.get(this.__remember.cookie);
             if (!token) {
@@ -97,21 +102,19 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 token = token + '=';
             }
             var parts = new $$node.Buffer(token, 'base64').toString().split(/:/);
-            if (parts[1] >= new Date()) {
-                this._userProvider.getAuthInfo(parts[0], (function(scope) {
-                    return function(err, user) {
-                        if (!err && user && user.user) {
-                            var hash = scope.__hash(user.login, parts[1], scope.__remember.secret);
-                            if (hash === parts[2]) {
-                                scope._securityStore.setUser(req, user.user)
-                            }
-                            cb();
-                        }
-                    };
-                })(this));
-            } else {
+            if (parts[1] < new Date()) {
                 cb();
+                return;
             }
+            this._userProvider.getAuthInfo(parts[0], function(err, user) {
+                if (!err && user && user.user) {
+                    var hash = me.__hash(user.login, parts[1], me.__remember.secret);
+                    if (hash === parts[2]) {
+                        me._securityStore.setUser(req, user.user)
+                    }
+                    cb();
+                }
+            });
         },
 
         login: function(req, res, user, cb) {
@@ -123,7 +126,6 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 while (token[token.length - 1] === '=') {
                     token = token.substring(0, token.length - 1);
                 }
-
                 cookies.set(this.__remember.cookie, token, {expires : new Date(validTo)});
             }
 
@@ -135,7 +137,6 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 var cookies = new this.__cookies(req, res);
                 cookies.set(this.__remember.cookie);
             }
-
             this.base(arguments, req, res, cb);
         },
 

@@ -21,14 +21,17 @@ qx.Class.define("sm.cms.auth.HybridUserProvider", {
 
     construct : function(options) {
         this.base(arguments, options);
+        this.__rolesConfig = options["rolesConfig"] || "security";
     },
 
     members :
     {
+        __rolesConfig : null,
+
         //overriden
         getRolesList: function(callback) {
             var env = sm.app.Env.getDefault();
-            var sconf = env.getJSONConfig("security");
+            var sconf = env.getJSONConfig(this.__rolesConfig);
             var roles = [];
             if (sconf["roles"]) {
                 var qxtype = qx.lang.Type;
@@ -45,7 +48,7 @@ qx.Class.define("sm.cms.auth.HybridUserProvider", {
     },
 
     destruct : function() {
-        //this._disposeObjects("__field_name");
+        this.__rolesConfig = null;
     }
 });
 
