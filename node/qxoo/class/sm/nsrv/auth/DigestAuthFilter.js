@@ -36,11 +36,9 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
         this.base(arguments, options, userProvider, securityStore);
 
         this.__crypto = $$node.require('crypto');
-
         this.__realmName = options.realmName || 'NKServer';
         this.__nonceExpire = options.nonceExpire || 1800000;
         this.__opaque = this.buildHash(options.opaque || this.__realmName);
-
         this.__nonces = {};
     },
 
@@ -56,83 +54,80 @@ qx.Class.define("sm.nsrv.auth.DigestAuthFilter", {
                 return;
             }
             var header = req.headers[sm.nsrv.auth.DigestAuthFilter.HEADER];
-            if (!header) {
+            if (header == null) {
                 this.failure(req, res, cb);
                 return;
             }
             var match = header.match(sm.nsrv.auth.DigestAuthFilter.HEADER_MATCH);
-            if (!match) {
+            if (match == null || match.length < 2) {
                 this.failure(req, res, cb);
                 return;
             }
-            var authinfo = this.__parseHeaderString(match[1]);
-            if (!authinfo || !authinfo.username || !(authinfo.nonce in this.__nonces)) {
+            var auth = this.__parseHeaderString(match[1]);
+            if (auth == null || auth.username == null || !(auth.nonce in this.__nonces)) {
                 this.failure(req, res, cb);
                 return;
             }
-            this._userProvider.getAuthInfo(
-                    authinfo.username,
-                    (function(scope, auth) {
-                        return function(err, user) {
-                            if (!err && user && user.user) {
-                                if (auth.qop == 'auth-int') {
-                                    // TODO: implement auth-int
-                                    scope.failure(req, res, cb);
-                                    return;
-                                }
-
-                                var ha1;
-                                if (user.realmName) {
-                                    if (user.realmName == scope.__realmName && user.digestPassword) {
-                                        // get HA1 from user provider
-                                        ha1 = user.digestPassword;
-                                    } else {
-                                        scope.failure(req, res, cb);
-                                        return;
-                                    }
-                                } else {
-                                    if (user.plainPassword) {
-                                        // calculate HA1
-                                        ha1 = scope.buildHash(user.login + ':' + scope.__realmName + ':' + user.plainPassword)
-                                    } else {
-                                        scope.failure(req, res, cb);
-                                        return;
-                                    }
-                                }
-
-                                if (auth.algorithm == 'MD5-sess') {
-                                    // RFC 2617 (MD5-sess)
-                                    ha1 = scope.buildHash(ha1 + ':' + auth.nonce + ':' + auth.cnonce);
-                                }
-
-                                // calculate a2
-                                var ha2 = scope.buildHash(req.method + ':' + auth.uri);
-
-                                // calculate request digest
-                                var digest;
-                                if (!('qop' in auth)) {
-                                    // For RFC 2069 compatibility
-                                    digest = scope.buildHash(ha1 + ':' + auth.nonce + ':' + ha2);
-                                } else {
-                                    var nonceCount = parseInt(auth.nc, 16);
-                                    if (nonceCount <= scope.__nonces[auth.nonce].count) {
-                                        scope.failure(req, res, cb);
-                                        return;
-                                    }
-                                    scope.__nonces[auth.nonce].count = nonceCount;
-                                    digest = scope.buildHash(ha1 + ':' + auth.nonce + ':' + auth.nc + ':' + auth.cnonce + ':' + auth.qop + ':' + ha2);
-                                }
-
-                                if (digest == auth.response) {
-                                    scope.login(req, res, user.user, cb);
-                                } else {
-                                    scope.failure(req, res, cb);
-                                }
+            var me = this;
+            this._userProvider.getAuthInfo(auth.username, function(err, user) {
+                        if (err || !user || !user.user) {
+                            if (err) {
+                                qx.log.Logger.error(me, err);
+                            }
+                            me.failure(req, res, cb);
+                            return;
+                        }
+                        if (auth.qop == 'auth-int') {
+                            // TODO: implement auth-int
+                            me.failure(req, res, cb);
+                            return;
+                        }
+                        var ha1;
+                        if (user.realmName) {
+                            if (user.realmName == me.__realmName && user.digestPassword) {
+                                // get HA1 from user provider
+                                ha1 = user.digestPassword;
                             } else {
-                                scope.failure(req, res, cb);
+                                me.failure(req, res, cb);
+                                return;
+                            }
+                        } else {
+                            if (user.plainPassword) {
+                                // calculate HA1
+                                ha1 = me.buildHash(user.login + ':' + me.__realmName + ':' + user.plainPassword)
+                            } else {
+                                me.failure(req, res, cb);
+                                return;
                             }
                         }
-                    })(this, authinfo));
+                        if (auth.algorithm == 'MD5-sess') {
+                            // RFC 2617 (MD5-sess)
+                            ha1 = me.buildHash(ha1 + ':' + auth.nonce + ':' + auth.cnonce);
+                        }
+                        // calculate a2
+                        var ha2 = me.buildHash(req.method + ':' + auth.uri);
+
+                        // calculate request digest
+                        var digest;
+                        if (!('qop' in auth)) {
+                            // For RFC 2069 compatibility
+                            digest = me.buildHash(ha1 + ':' + auth.nonce + ':' + ha2);
+                        } else {
+                            var nonceCount = parseInt(auth.nc, 16);
+                            if (nonceCount <= me.__nonces[auth.nonce].count) {
+                                me.failure(req, res, cb);
+                                return;
+                            }
+                            me.__nonces[auth.nonce].count = nonceCount;
+                            digest = me.buildHash(ha1 + ':' + auth.nonce + ':' + auth.nc + ':' + auth.cnonce + ':' + auth.qop + ':' + ha2);
+                        }
+                        if (digest == auth.response) {
+                            me.login(req, res, user.user, cb);
+                        } else {
+                            me.failure(req, res, cb);
+                        }
+                    }
+            );
         },
 
         commence: function(req, res, err) {
