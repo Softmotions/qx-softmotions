@@ -782,7 +782,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-            if (hconf === undefined) { //handlers not found, server static content or templates
+            if (hconf === undefined) { //handlers not found, serve static content or templates
                 ctx(null);
                 return;
             }
@@ -837,7 +837,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             } else {
                 callback();
             }
-            return;
         },
 
 

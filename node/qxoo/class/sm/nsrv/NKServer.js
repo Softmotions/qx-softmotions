@@ -15,7 +15,7 @@ qx.Class.define("sm.nsrv.NKServer", {
         __CS_INTERCEPTORS : [],
 
         registerConnectServerConfigInterceptor : function(ic) {
-            if (typeof ic == "function") {
+            if (typeof ic === "function") {
                 this.__CS_INTERCEPTORS.push(ic);
             }
         }
