@@ -630,7 +630,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * @param forward {Object} forward object
          * @param notFoundCb {function(default)} specify it when you want to handle non found stuff yourself. Default handler is the argument
          */
-        __renderTemplate : function(req, res, ctx, forward, notFoundCb) {
+        __renderTemplate : function(req, res, ctx, forward) {
             var me = this;
 
             if (!req.info.contextPath) { //not in webapp
@@ -663,14 +663,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         res.sendError();
                         return;
                     }
-                    var defaultHandler = function() {
-                        tengine.mergeTemplate(me, template, req, res, ctx, headers);
-                    };
-                    if (notFoundCb && template["notfound"]) {
-                        notFoundCb(defaultHandler);
-                    } else {
-                        defaultHandler();
-                    }
+                    tengine.mergeTemplate(me, template, req, res, ctx, headers);
                 });
             });
         },
@@ -832,9 +825,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var ctx = function(forward) {
                 if (!forward || forward["terminated"] != true) {
                     ctx.collectMessageHeaders();
-                    me.__renderTemplate(req, res, ctx, forward/*, function() {
-
-                    }*/);
+                    me.__renderTemplate(req, res, ctx, forward);
                 }
                 ctx = null;
             };
