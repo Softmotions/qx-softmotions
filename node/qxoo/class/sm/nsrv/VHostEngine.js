@@ -710,12 +710,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb.call(self);
                 return;
             }
-            security.__filter.authenticate(req, res, function(err) {
+            security.__filter.authenticate(req, res, function(err, redirect) {
                 if (err) {
                     cb.call(self, err);
                 } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
                     cb.call(self, "Unauthorized to access: '" + req.info.pathname +
                             "' for roles: " + JSON.stringify(reqRoles));
+                } else if (redirect != null) {
+                    res.sendSCode(302, {"Location" : redirect});
                 } else {
                     cb.call(self);
                 }
