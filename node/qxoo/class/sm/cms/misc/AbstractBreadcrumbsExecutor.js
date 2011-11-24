@@ -32,44 +32,80 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
         __build_page_breadcrumbs : function(req, resp, ctx, page) {
             var me = this;
             var coll = sm.cms.page.PageMgr.getColl();
+            var registry = sm.cms.page.AliasRegistry.getInstance();
 
             var breadcrumbs = [];
             ctx["breadcrumbs"] = breadcrumbs;
 
-            ctx["last_breadcrumb"] = {
-                name : page["name"],
-                published : !!page["published"],
-                link : ("p" + page["_id"])
-            };
+            registry.findAliasByPage(page["_id"], function(last_alias) {
+                ctx["last_breadcrumb"] = {
+                    name : page["name"],
+                    published : !!page["published"],
+                    link : last_alias
+                };
 
-            if (page["hierarchy"] == null) {
-                ctx();
-                return;
-            }
+                if (page["hierarchy"] == null) {
+                    ctx();
+                    return;
+                }
 
-            // hierarchy cache (items)
-            var hcache = {};
-            coll.createQuery({"_id" : {"$in" : page["hierarchy"]}}, {fields : {"_id" : 1, "name" : 1, "published" : 1}})
-              .each(function(index, hdoc) {
-                  hcache[hdoc["_id"]] = hdoc;
-              })
-              .exec(function(err) {
-                  if (err) {
-                      me.handleError(resp, ctx, err);
-                      return;
-                  }
-                  // build breadcrumb items for pages from node hierarchy
-                  var hierarchy = page["hierarchy"];
-                  for (var i = 0; i < hierarchy.length; ++ i) {
-                      var bcitem = hcache[hierarchy[i]] || {};
-                      breadcrumbs.push({
-                          name : bcitem["name"] || "",
-                          link : "/exp/p" + bcitem["_id"],
-                          published : !!bcitem["published"]
-                      });
-                  }
-                  ctx();
-              });
+                // hierarchy cache (items)
+                var hcache = {};
+                var subsites = sm.app.Env.getDefault().getConfig().subsites || {};
+                coll.createQuery({"_id" : {"$in" : page["hierarchy"]}}, {fields : {"_id" : 1, "name" : 1, "published" : 1, "cachedPath" : 1}})
+                  .each(function(index, hdoc) {
+                      hcache[hdoc["_id"]] = hdoc;
+                  })
+                  .exec(function(err) {
+                      if (err) {
+                          me.handleError(resp, ctx, err);
+                          return;
+                      }
+                      // build breadcrumb items for pages from node hierarchy
+                      var hierarchy = page["hierarchy"];
+                      for (var i = 0; i < hierarchy.length; ++ i) {
+                          var bcitem = hcache[hierarchy[i]] || {};
+                          var subsite = subsites[bcitem.cachedPath || ''];
+                          var breadcrumb = {
+                              name : subsite ? subsite.name : bcitem["name"] || "",
+                              __id : bcitem["_id"],
+                              published : !!bcitem["published"]
+                          };
+                          if (subsite) {
+                              breadcrumbs.length = 0; // clear all previous
+                              ctx["first_breadcrumb"] = breadcrumb;
+                          } else {
+                              breadcrumbs.push(breadcrumb);
+                          }
+                      }
+                      var fixFirstBreadcrumb = function() {
+                          if (ctx["first_breadcrumb"]) {
+                              registry.findAliasByPage(ctx["first_breadcrumb"].__id, function(alias) {
+                                  ctx["first_breadcrumb"].link = "/exp/" + alias;
+                                  ctx();
+                              });
+                          } else {
+                            ctx();
+                          }
+                      };
+                      if (breadcrumbs.length == 0) {
+                          fixFirstBreadcrumb();
+                      } else {
+                          var count = 0;
+                          for (i = 0; i < breadcrumbs.length; ++i) {
+                              (function(breadcrumb) {
+                                  registry.findAliasByPage(breadcrumb.__id, function(alias) {
+                                      breadcrumb.link = "/exp/" + alias;
+                                      count++;
+                                      if (count == breadcrumbs.length) {
+                                          fixFirstBreadcrumb();
+                                      }
+                                  })
+                              })(breadcrumbs[i]);
+                          }
+                      }
+                  });
+            });
         },
 
         // build custom breadcrumbs for news page
@@ -87,11 +123,13 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        ctx["first_breadcrumb"] = {
-                            name : doc["name"],
-                            link : "/exp/p" + doc["_id"]
-                        };
-                        ctx();
+                        sm.cms.page.AliasRegistry.getInstance().findAliasByPage(doc["_id"], function(alias) {
+                            ctx["first_breadcrumb"] = {
+                                name : doc["name"],
+                                link : "/exp/" + alias
+                            };
+                            ctx();
+                        });
                     });
                 } else {
                     ctx();
