@@ -77,6 +77,23 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                     cb(null, asm, {"_page_" : doc});
                 });
             });
+        },
+
+        __noExecutorAliasHandler : function(info, cb) {
+            if (info.contextPath == "/exp") {
+                var registry = sm.cms.page.AliasRegistry.getInstance();
+                registry.findPageByAlias(info.path.slice(1), function(pageId) {
+                    if (pageId) {
+                        info.path = "/p" + pageId;
+                        info.pathname = "/exp/p" + pageId;
+                        cb(true);
+                    } else {
+                        cb(false);
+                    }
+                });
+            } else {
+                cb(false);
+            }
         }
     },
 
@@ -174,6 +191,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
 
     defer : function(statics) {
         sm.nsrv.VHostEngine.registerAssemblyProvider(statics.__getPageAssembly);
+        sm.nsrv.VHostEngine.registerNoExecutorHandler(statics.__noExecutorAliasHandler);
     }
 
 });

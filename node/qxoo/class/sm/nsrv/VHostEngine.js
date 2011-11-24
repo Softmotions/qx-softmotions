@@ -17,6 +17,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __asmProvider : null,
 
+        /**
+         * Called when no handler is found for a request.
+         * Parameters: req.info, callback(changed : bool)
+         */
+        __noExecutorHandler : null,
+
         registerAssemblyProvider : function(provider) {
             if ((typeof provider) != "function") {
                 qx.log.Logger.warn(this, "Assembly provider must be a function()");
@@ -25,6 +31,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             this.__asmProvider = provider;
         },
 
+        registerNoExecutorHandler : function(handler) {
+            if ((typeof handler) != "function") {
+                qx.log.Logger.warn(this, "No-executor handler must be a function()");
+                return;
+            }
+            this.__noExecutorHandler = handler;
+        },
 
         cleanupRequest : function(req, res) {
             $$node.process.nextTick(function() {
@@ -592,7 +605,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             //trying to find handlers
             var hconf = this.__handlers[webapp + "/" + path];
-            if (hconf) {
+            if (hconf !== undefined) {
                 cb(false);
                 return;
             } else { //try to find regexp handler
@@ -804,24 +817,28 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }, this);
         },
 
+        __findHandler : function(info) {
+            var hconf = this.__handlers[info.pathname];
+            if (hconf === undefined) { //try to find regexp handler
+                var path = info.path;
+                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
+                    var rh = this.__regexpHandlers[i];
+                    if (rh["$$re"].test(path)) {
+                        return rh;
+                    }
+                }
+            } else {
+                return hconf;
+            }
+        },
+
         /**
          * Main routine to handle http request
          */
         __handleReqInternal : function(req, res, next) {
 
             var me = this;
-            //trying to find handlers
-            var hconf = this.__handlers[req.info.pathname];
-            if (hconf === undefined) { //try to find regexp handler
-                var path = req.info.path;
-                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
-                    var rh = this.__regexpHandlers[i];
-                    if (rh["$$re"].test(path)) {
-                        hconf = rh;
-                        break;
-                    }
-                }
-            }
+
             var ctx = function(forward) {
                 if (!forward || forward["terminated"] != true) {
                     ctx.collectMessageHeaders();
@@ -853,60 +870,85 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-            if (hconf === undefined) { //handlers not found, serve static content or templates
-                ctx(null);
-                return;
-            }
 
-            //Call executor
-            var hinst = hconf["$$instance"];
-            var exec = hinst[hconf["handler"]];
-            if (!qx.lang.Type.isFunction(exec)) {
-                throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
-            }
-            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
-            }
+            //trying to find handlers
+            var hconf;
 
-            var callback = function() {
-                try {
-                    exec.call(hinst, req, res, ctx);
-                } catch(e) {
-                    var report = true;
-                    if (e instanceof sm.nsrv.Message) {
-                        report = e.isError();
+            var useHConf = function() {
+                //Call executor
+                var hinst = hconf["$$instance"];
+                var exec = hinst[hconf["handler"]];
+                if (!qx.lang.Type.isFunction(exec)) {
+                    throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
+                }
+                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                    qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
+                }
+
+                var callback = function() {
+                    try {
+                        exec.call(hinst, req, res, ctx);
+                    } catch(e) {
+                        var report = true;
+                        if (e instanceof sm.nsrv.Message) {
+                            report = e.isError();
+                        }
+                        if (report) {
+                            qx.log.Logger.warn(me, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                        }
+                        next(e);
                     }
-                    if (report) {
-                        qx.log.Logger.warn(this, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                };
+
+                var security = null;
+                var secured = me.__getHconfValue(hconf, "secured");
+                var roles = me.__getHconfValue(hconf, "roles") || [];
+
+                if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
+                    callback();
+                    return;
+                }
+
+                if ((secured || hconf["logout"]) &&
+                  (security = me.__security[me.__getHconfValue(hconf, "webapp")])) {
+                    if (hconf["logout"]) {
+                        security.__filter.logout(req, res, callback);
+                    } else {
+                        security.__filter.authenticate(req, res, function(err) {
+                            if (err || !req.isUserHasRoles(roles)) {
+                                res.sendForbidden();
+                                return;
+                            }
+                            callback();
+                        });
                     }
-                    next(e);
+                } else {
+                    callback();
                 }
             };
 
-            var security = null;
-            var secured = this.__getHconfValue(hconf, "secured");
-            var roles = this.__getHconfValue(hconf, "roles") || [];
+            var reqInfo = req.info;
+            hconf = me.__findHandler(reqInfo);
 
-            if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
-                callback();
-                return;
-            }
-
-            if ((secured || hconf["logout"]) &&
-              (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
-                if (hconf["logout"]) {
-                    security.__filter.logout(req, res, callback);
-                } else {
-                    security.__filter.authenticate(req, res, function(err) {
-                        if (err || !req.isUserHasRoles(roles)) {
-                            res.sendForbidden();
-                            return;
+            if (hconf === undefined) {
+                if (sm.nsrv.VHostEngine.__noExecutorHandler) {
+                    sm.nsrv.VHostEngine.__noExecutorHandler(reqInfo, function(changed) {
+                        if (changed) {
+                            hconf = me.__findHandler(reqInfo);
+                            if (hconf === undefined) {
+                                ctx(null);//handlers not found, serve static content or templates
+                            } else {
+                                useHConf();
+                            }
+                        } else {
+                            ctx(null);//handlers not found, serve static content or templates
                         }
-                        callback();
                     });
+                } else {
+                    ctx(null);//handlers not found, serve static content or templates
                 }
             } else {
-                callback();
+                useHConf();
             }
         },
 
