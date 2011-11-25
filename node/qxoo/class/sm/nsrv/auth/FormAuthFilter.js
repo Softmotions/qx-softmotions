@@ -36,6 +36,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         this.__passwordParameter = options["passwordParameter"] || "password";
         this.__saveUrlKey = options["saveUrlKey"] || "fb411864d4fa48499ae84e77e6c5c119";
         this.__pageOnSuccess = options["pageOnSuccess"] || null;
+        this.__overrides = options["overrides"] || null;
         if (options.rememberMe) {
             var rmi = options.rememberMe;
             var rmb = this.__remember = {};
@@ -82,7 +83,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                                 }
                             }
                     );
-                } else if (req.info.pathname == me.__formUrl) {
+                } else if (req.info.pathname == me.__getFormUrl(req.info.pathname)) {
                     me.success(req, res, cb);
                 } else {
                     me.failure(req, res, cb);
@@ -136,9 +137,9 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                     cookies.set(me.__remember.cookie, token, {expires : new Date(validTo)});
                 })();
             }
-            var savedUrl = (req.session != null) ? req.session[me.__saveUrlKey] : null;
+            var savedUrl = this.__getSavedUrl(req);
             if (savedUrl == null) {
-                savedUrl = me.__pageOnSuccess;
+                savedUrl = this.__getPageOnSuccess(req.info.pathname);
             }
             this.base(arguments, req, res, user, function(err) {
                 cb(err, savedUrl);
@@ -150,29 +151,22 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 var cookies = new this.__cookies(req, res);
                 cookies.set(this.__remember.cookie);
             }
-            if (req.session != null && req.session[this.__saveUrlKey] != null) {
-                delete req.session[this.__saveUrlKey];
-                req.session.save();
-            }
+            this.__setSavedUrl(req, null);
             this.base(arguments, req, res, cb);
         },
 
         commence: function(req, res, err) {
             if (req.session != null &&
                     req.info.href != null &&
-                    req.info.pathname != this.__formUrl) {
-                req.session[this.__saveUrlKey] = req.info.href; //Save original url
-                req.session.save();
+                    req.info.pathname != this.__getFormUrl(req.info.pathname)) {
+                this.__setSavedUrl(req, req.info.href);
             }
-            res.sendSCode(302, { "Location" : this.__formUrl });
+            res.sendSCode(302, { "Location" : this.__getFormUrl(req.info.pathname) });
         },
 
         success: function(req, res, cb) {
-            if (req.info.pathname != this.__formUrl &&
-                    req.session != null &&
-                    req.session[this.__saveUrlKey] != null) {
-                delete req.session[this.__saveUrlKey];
-                req.session.save();
+            if (req.info.pathname != this.__formUrl) {
+                this.__setSavedUrl(req, null);
             }
             cb();
         },
@@ -183,6 +177,48 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
             return crypto.createHash("md5")
                     .update(user + ":" + validTo + ":" + secret)
                     .digest("hex");
+        },
+
+        __getFormUrl : function(path) {
+            if (this.__overrides == null || path == null) {
+                return this.__formUrl;
+            }
+            for (var p in this.__overrides) {
+                if (path.indexOf(p) === 0) {
+                    return this.__overrides[p].formUrl || this.__formUrl;
+                }
+            }
+            return this.__formUrl;
+        },
+
+        __getPageOnSuccess : function(path) {
+            if (this.__overrides == null || path == null) {
+                return this.__pageOnSuccess;
+            }
+            for (var p in this.__overrides) {
+                if (path.indexOf(p) === 0) {
+                    return this.__overrides[p].pageOnSuccess || this.__pageOnSuccess;
+                }
+            }
+            return this.__pageOnSuccess;
+        },
+
+        __getSavedUrl : function(req) {
+            return req.session ? req.session[this.__saveUrlKey] : null;
+        },
+
+        __setSavedUrl : function(req, url) {
+            if (req.session != null) {
+                if (url == null) {
+                    if (req.session[this.__saveUrlKey] != null) {
+                        delete req.session[this.__saveUrlKey];
+                        req.session.save();
+                    }
+                } else {
+                    req.session[this.__saveUrlKey] = url;
+                    req.session.save();
+                }
+            }
         }
     },
 
