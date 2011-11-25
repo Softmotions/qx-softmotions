@@ -136,6 +136,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             ctx["_ctx_"] = ctx;
             ctx["_req_"] = req;
             ctx["_res_"] = res;
+            ctx["_ctxpath_"] = req.info.contextPath;
             ctx["_headers_"] = headers;
             ctx["_ctype_"] = function(_ctype, _cb) {
                 sm.nsrv.tengines.JazzCtxLib.ctype(req, headers, _ctype, _cb);
