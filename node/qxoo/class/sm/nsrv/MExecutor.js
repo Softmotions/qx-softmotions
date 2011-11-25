@@ -159,6 +159,43 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             return sm.app.Env.getDefault();
         },
 
+
+        /**
+         * Generate assembly
+         * @param req
+         * @param resp
+         * @param ctx
+         * @param asmName  {String} Assembly name
+         * @param ctxParams {Map?null} Assembly ctx params
+         * @param asmProps {Map?null} Assembly props
+         * @param cb {function?} Callback when done
+         */
+        generateAssembly : function(req, resp, ctx, asmName, ctxParams, asmProps, cb) {
+
+            ctx["_ctx_"] = ctx;
+            ctx["_req_"] = req;
+            ctx["_res_"] = resp;
+
+            var me = this;
+            var vhe = ctx._vhost_engine_;
+            var te = vhe.getTemplateEngineForExt("jz");
+            qx.core.Assert.assert(te != null, "Missing template engine for jz files");
+
+            //Load assembly
+            sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, asmProps, function(err, data) {
+                if (err) {
+                    if (cb) {
+                        cb(err);
+                    }
+                    return;
+                }
+                if (cb) {
+                    cb(null, data);
+                }
+            });
+        },
+
+
         _doNotRecreateMe : function(val) {
             this.$$notrecreate = !!val;
         }

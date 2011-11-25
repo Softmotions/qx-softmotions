@@ -165,7 +165,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         },
 
         success: function(req, res, cb) {
-            if (req.info.pathname != this.__formUrl) {
+            if (req.info.pathname != this.__getFormUrl(req.info.pathname)) {
                 this.__setSavedUrl(req, null);
             }
             cb();
@@ -223,7 +223,6 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
     },
 
     destruct: function() {
-        this.base(arguments);
         this.__formUrl = this.__remember = this.__saveUrlKey = null;
         this.__actionParameter = this.__actionName = this.__loginParameter = this.__passwordParameter = null;
         this.__cookies = this.__pageOnSuccess = null;
