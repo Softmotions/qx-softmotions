@@ -27,7 +27,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
 
         cleanupRequest : function(req, res) {
-            $$node.process.nextTick(function() {
+            $$node.process.nextTick((function(req, res) {
                 if (req._ctx_) { //agressive prune associated context
                     for (var rk in req._ctx_) {
                         if (req._ctx_.hasOwnProperty(rk)) {
@@ -45,7 +45,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         delete res[rk];
                     }
                 }
-            });
+            })(req, res));
         }
     },
 

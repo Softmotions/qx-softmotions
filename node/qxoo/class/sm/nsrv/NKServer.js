@@ -144,11 +144,12 @@ qx.Class.define("sm.nsrv.NKServer", {
                 chandlers.push(this.__vhost(ve.getVHostName(), srv));
             }
 
-            $$node.process.nextTick(function() {
-                me.__server = new connect.HTTPServer(chandlers);
-                me.__server.listen(port, host);
-                me.fireDataEvent("started", this);
-            });
+            $$node.process.nextTick(
+                    function() {
+                        this.__server = new connect.HTTPServer(chandlers);
+                        this.__server.listen(port, host);
+                        this.fireDataEvent("started", this);
+                    }.bind(this));
         },
 
         __vhost : function(hostname, server) {
