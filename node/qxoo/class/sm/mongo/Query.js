@@ -15,7 +15,6 @@ qx.Class.define("sm.mongo.Query", {
         this.__collection = collection;
         this.__query = query || {};
         this.__options = options || {};
-        this.__callbacks = {};
     },
 
     members :
@@ -109,6 +108,9 @@ qx.Class.define("sm.mongo.Query", {
         },
 
         __registerCallback : function(name, callback) {
+            if (!this.__callbacks) {
+                this.__callbacks = {}
+            }
             var carr = this.__callbacks[name];
             if (!carr) {
                 carr = this.__callbacks[name] = [];
@@ -121,8 +123,7 @@ qx.Class.define("sm.mongo.Query", {
          * @param callback {function(err)}
          */
         exec : function(callback) {
-            if (qx.lang.Object.isEmpty(this.__callbacks)) {
-                //nothing todo
+            if (this.__callbacks == null) {
                 return this;
             }
             var me = this;
@@ -173,12 +174,12 @@ qx.Class.define("sm.mongo.Query", {
             var count = 0;
             var lastDoc = null;
             var error = null;
-            var items = me.__callbacks["all"] ? [] : null;
+            var items = (me.__callbacks && me.__callbacks["all"]) ? [] : null;
 
             stream.addListener("end", function() {
                 try {
-                    if (!error) {
-                        if (items) {
+                    if (error === null) {
+                        if (items !== null) {
                             me.__callRecordCallbacks("all", count, items);
                         }
                         if (lastDoc) {
@@ -187,11 +188,7 @@ qx.Class.define("sm.mongo.Query", {
                     }
                 } finally {  //cleanup
                     stream.removeAllListeners();
-                    delete me.__callbacks["first"];
-                    delete me.__callbacks["last"];
-                    delete me.__callbacks["each"];
-                    delete me.__callbacks["all"];
-                    me.__callbacks = {};
+                    me.__callbacks = null;
                     if (callback) {
                         callback(error);
                     }
@@ -201,7 +198,7 @@ qx.Class.define("sm.mongo.Query", {
 
             stream.addListener("data", function(doc) {
                 lastDoc = doc;
-                if (count++ == 0) {
+                if (count++ === 0) {
                     if ("$err" in doc) { //Got error document
                         error = doc["$err"];
                         me.__collection._onError(error);
@@ -210,18 +207,18 @@ qx.Class.define("sm.mongo.Query", {
                     me.__callRecordCallbacks("first", count, doc);
                 }
                 me.__callRecordCallbacks("each", count, doc);
-                if (items) {
+                if (items !== null) {
                     items.push(doc);
                 }
             });
         },
 
         __callRecordCallbacks : function(group, index, data) {
-            var callbacks = this.__callbacks[group];
-            if (!callbacks) {
+            var callbacks = this.__callbacks[group] || null;
+            if (callbacks == null) {
                 return;
             }
-            var first = (group == "first");
+            var first = (group === "first");
             for (var i = 0; i < callbacks.length; ++i) {
                 var cb = callbacks[i];
                 if (first) {

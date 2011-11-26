@@ -13,7 +13,6 @@ qx.Class.define("sm.mongo.Collection", {
         this.base(arguments);
         this.__name = name;
         this.__mongo = mongo;
-        this.__callQueue = [];
     },
 
     members :
@@ -200,13 +199,16 @@ qx.Class.define("sm.mongo.Collection", {
                 return this.__nativeCollection[name].apply(this.__nativeCollection, args);
             } else {
                 //todo check for __callQueue size
+                if (this.__callQueue == null) {
+                    this.__callQueue = [];
+                }
                 this.__callQueue.push([name, args]);
             }
         },
 
         _wrapNativeCollection : function(ncoll) {
             this.__nativeCollection = ncoll;
-            if (this.__nativeCollection) {
+            if (this.__nativeCollection && this.__callQueue != null) {
                 //Apply queued calls
                 var c;
                 while (c = this.__callQueue.shift()) {
