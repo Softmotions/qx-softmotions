@@ -176,7 +176,6 @@ qx.Mixin.define("sm.nsrv.MExecutor", {
             ctx["_req_"] = req;
             ctx["_res_"] = resp;
 
-            var me = this;
             var vhe = ctx._vhost_engine_;
             var te = vhe.getTemplateEngineForExt("jz");
             qx.core.Assert.assert(te != null, "Missing template engine for jz files");

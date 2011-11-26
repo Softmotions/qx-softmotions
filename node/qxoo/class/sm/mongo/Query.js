@@ -232,8 +232,6 @@ qx.Class.define("sm.mongo.Query", {
     },
 
     destruct : function() {
-        this.__collection = this.__query =
-                this.__options = this.__callbacks = null;
-        //this._disposeObjects("__field_name");
+        this.__collection = this.__query = this.__options = this.__callbacks = null;
     }
 });

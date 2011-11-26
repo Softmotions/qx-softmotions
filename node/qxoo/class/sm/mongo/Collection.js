@@ -27,7 +27,6 @@ qx.Class.define("sm.mongo.Collection", {
          */
         __mongo : null,
 
-
         /**
          * Native mongodb collection
          */
@@ -57,7 +56,6 @@ qx.Class.define("sm.mongo.Collection", {
         toObjectID : function(oid) {
             return this.__mongo.toObjectID(oid);
         },
-
 
         /**
          * Drop the collection
@@ -95,7 +93,6 @@ qx.Class.define("sm.mongo.Collection", {
             this._applyNativeMethod("insert", arguments);
         },
 
-
         /**
          * Remove elements from collection
          *
@@ -104,7 +101,6 @@ qx.Class.define("sm.mongo.Collection", {
         remove : function(selector, options, callback) {
             this._applyNativeMethod("remove", arguments);
         },
-
 
         /**
          * Count collection elements
@@ -115,14 +111,12 @@ qx.Class.define("sm.mongo.Collection", {
             this._applyNativeMethod("count", arguments);
         },
 
-
         /**
          * Distinct elements in collection
          */
         distinct : function(key, query, callback) {
             this._applyNativeMethod("distinct", arguments);
         },
-
 
         /**
          * Group
@@ -140,12 +134,15 @@ qx.Class.define("sm.mongo.Collection", {
             return new sm.mongo.Query(this, query, options);
         },
 
-
         /**
          * Find one
          */
         findOne : function(queryObject, options, callback) {
             this._applyNativeMethod("findOne", arguments);
+        },
+
+        findAndModify : function(query, sort, doc, options, callback) {
+            this._applyNativeMethod("findAndModify", arguments);
         },
 
         ensureIndex : function(spec, options, callback) {
@@ -158,10 +155,9 @@ qx.Class.define("sm.mongo.Collection", {
             var indexes = [];
             var fieldHash = {};
             spec.forEach(function(indexArray) {
-                var indexArrayFinal = indexArray;
-                if (indexArrayFinal.length == 1) indexArrayFinal[1] = 1;
-                fieldHash[indexArrayFinal[0]] = indexArrayFinal[1];
-                indexes.push(indexArrayFinal[0] + "_" + indexArrayFinal[1]);
+                if (indexArray.length == 1) indexArray[1] = 1;
+                fieldHash[indexArray[0]] = indexArray[1];
+                indexes.push(indexArray[0] + "_" + indexArray[1]);
             });
             // Generate the index name
             var indexName = indexes.join("_");
@@ -193,9 +189,8 @@ qx.Class.define("sm.mongo.Collection", {
             return this.__nativeCollection;
         },
 
-
         _applyNativeMethod : function(name, args) {
-            if (this.__nativeCollection) {
+            if (this.__nativeCollection !== null) {
                 return this.__nativeCollection[name].apply(this.__nativeCollection, args);
             } else {
                 //todo check for __callQueue size
@@ -207,15 +202,13 @@ qx.Class.define("sm.mongo.Collection", {
         },
 
         _wrapNativeCollection : function(ncoll) {
-            this.__nativeCollection = ncoll;
+            this.__nativeCollection = ncoll || null;
             if (this.__nativeCollection && this.__callQueue != null) {
                 //Apply queued calls
                 var c;
                 while (c = this.__callQueue.shift()) {
                     this.__nativeCollection[c[0]].apply(this.__nativeCollection, c[1]);
                 }
-            } else {
-                //todo cleanup?
             }
         },
 

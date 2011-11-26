@@ -4,7 +4,7 @@
  */
 
 /**
- * Virtual host managers
+ * Virtual host manager
  */
 qx.Class.define("sm.nsrv.VHostEngine", {
     extend  : qx.core.Object,
@@ -48,14 +48,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 req = res = null;
             });
         }
-    },
-
-    events :
-    {
-    },
-
-    properties :
-    {
     },
 
     construct : function(config) {
@@ -172,10 +164,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     if (typeof sext !== "string") {
                         continue;
                     }
-                    if (sext.charAt(0) == ".") {
+                    if (sext.charAt(0) === ".") {
                         sext = sext.substring(1);
                     }
-                    if (sext.length == 0) {
+                    if (sext.length === 0) {
                         continue;
                     }
                     if (this.__tengines[sext] === undefined) {
@@ -212,17 +204,17 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 //normalize context path
                 var waCtx = wa["context"];
-                if (!qx.lang.Type.isString(waCtx) || waCtx.length == 0) {
+                if (!qx.lang.Type.isString(waCtx) || waCtx.length === 0) {
                     waCtx = wa["context"] = "/";
                 }
-                if (waCtx != "/" && waCtx.charAt(waCtx.length - 1) == '/') {
+                if (waCtx != "/" && waCtx.charAt(waCtx.length - 1) === '/') {
                     waCtx = wa["context"] = waCtx.substring(0, waCtx.length - 1);
                 }
                 if (wappsCtx[waCtx]) {
                     throw new Error("Duplicated webapp 'context' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 wappsCtx[waCtx] = true;
-                wa["contextPath"] = (waCtx == "/") ? "" : waCtx;
+                wa["contextPath"] = (waCtx === "/") ? "" : waCtx;
 
                 if (!this.__fsutils.isAbsolutePath(wa["docRoot"])) {
                     wa["docRoot"] = this.__path.join($$node.dirname, wa["docRoot"]);
@@ -283,7 +275,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return (w2["context"].length - w1["context"].length);
             });
 
-            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+            if (qx.core.Environment.get("sm.nsrv.debug")) {
                 qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.lang.Json.stringify(this.__config));
             }
 
@@ -357,7 +349,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     ret = wapp["handlerDefaults"][key];
                 }
             }
-            if (!ret && key == "webapp") {
+            if (!ret && key === "webapp") {
                 ret = this.__getDefaultWebappId();
             }
             return ret;
@@ -407,7 +399,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
                 var wappId = null;
                 for (var asn in assembly) {
-                    if (asn == "_webapp_") {
+                    if (asn === "_webapp_") {
                         wappId = assembly[asn];
                     }
                 }
@@ -419,7 +411,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     continue; //Now our webapp
                 }
                 for (var asn in assembly) {
-                    if (asn == "_webapp_") {
+                    if (asn === "_webapp_") {
                         continue;
                     }
                     if (this.__assembly[asn]) {
@@ -431,7 +423,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             //Postprocess assembly
             for (var asn in this.__assembly) {
-                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
                       " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
@@ -449,7 +441,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         if (!qx.lang.Type.isArray(pstack)) {
                             pstack = asm["_ctx_provider_stack_"] = [];
                         }
-                        if (pstack.indexOf(ep) == -1) {
+                        if (pstack.indexOf(ep) === -1) {
                             pstack.unshift(ep);
                         }
                     }
@@ -459,7 +451,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     asm["name"] = name;
                 }
 
-                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
                       JSON.stringify(asm, true));
                 }
@@ -517,10 +509,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                     for (var i = 0; i < lArr.length; ++i) {
                         var hl = lArr[i];
-                        if (hl.charAt(0) == "/") {
+                        if (hl.charAt(0) === "/") {
                             hl = hl.substring(1);
                         }
-                        if (hl.charAt(hl.length - 1) == "/") {
+                        if (hl.charAt(hl.length - 1) === "/") {
                             hl = hl.substring(0, hl.length - 1);
                         }
 
@@ -535,7 +527,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             cpath += "/";
                         }
                         hl = (cpath + hl);
-                        if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                        if (qx.core.Environment.get("sm.nsrv.debug")) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
                               "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
@@ -579,11 +571,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+            if (qx.core.Environment.get("sm.nsrv.debug")) {
                 qx.log.Logger.debug("Forward: " + qx.lang.Json.stringify(forward));
             }
 
-            if (forward && forward["terminated"] == true) { //executor takes control of the request
+            if (forward && forward["terminated"]) { //executor takes control of the request
                 return;
             }
 
@@ -611,7 +603,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                     if (hspec.$$re.test(req.info.path)) {
                         for (var hname in hspec) {
-                            if (hname == "$$re" || headers[hname] != null) {
+                            if (hname === "$$re" || headers[hname] != null) {
                                 continue;
                             }
                             headers[hname] = hspec[hname];
@@ -650,7 +642,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             //write template
-            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+            if (qx.core.Environment.get("sm.nsrv.debug")) {
                 qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
             }
 
@@ -933,7 +925,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             //Response with specified status page
-            if (path.length > 0 && path.charAt(0) != '/') {
+            if (path.length > 0 && path.charAt(0) !== '/') {
                 path = '/' + path;
             }
             path = webapp["docRoot"] + path;
