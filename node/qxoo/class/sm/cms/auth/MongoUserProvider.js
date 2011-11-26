@@ -28,43 +28,47 @@ qx.Class.define('sm.cms.auth.MongoUserProvider', {
             var me = this;
             var env = sm.app.Env.getDefault();
             env.getMongo()
-                    .collection(this.__usersColl)
-                    .findOne({"login": login, "password": me.buildHash(password)},
-                    function(err, user) {
-                        if (err || user == null || user["disabled"] == true) {
-                            callback(err, null);
-                            return;
-                        }
-                        me.buildUserData(user, callback);
-                    });
+              .collection(this.__usersColl)
+              .findOne({"login": login, "password": me.buildHash(password)},
+              function(err, user) {
+                  if (err || user == null || user["disabled"] == true) {
+                      callback(err, null);
+                      return;
+                  }
+                  me.buildUserData(user, callback);
+              });
         },
 
         getAuthInfo: function(login, callback) {
             var me = this;
             var env = sm.app.Env.getDefault();
             env.getMongo()
-                    .collection(this.__usersColl)
-                    .findOne({"login": login},
-                    function(err, user) {
-                        if (user.roles == null || user.roles.constructor !== Array) {
-                            user.roles = [];
-                        }
-                        (err || !user) ? callback(err, null) : me.buildUserAuth(user, callback);
-                    });
+              .collection(this.__usersColl)
+              .findOne({"login": login},
+              function(err, user) {
+                  if (err || !user) {
+                      callback(err, null);
+                      return;
+                  }
+                  if (user.roles == null || user.roles.constructor !== Array) {
+                      user.roles = [];
+                  }
+                  me.buildUserAuth(user, callback);
+              });
         },
 
         getRolesList : function(callback) {
             var env = sm.app.Env.getDefault();
             var roles = [];
             env.getMongo()
-                    .collection(this.__rolesColl)
-                    .createQuery()
-                    .each(function(index, role) {
-                        roles.push(role);
-                    })
-                    .exec(function(err) {
-                        callback(err, roles)
-                    });
+              .collection(this.__rolesColl)
+              .createQuery()
+              .each(function(index, role) {
+                  roles.push(role);
+              })
+              .exec(function(err) {
+                  callback(err, roles)
+              });
         },
 
         buildHash: function(data) {

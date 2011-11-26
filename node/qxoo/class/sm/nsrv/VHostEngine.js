@@ -27,7 +27,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
 
         cleanupRequest : function(req, res) {
-            $$node.process.nextTick((function(req, res) {
+            $$node.process.nextTick(function() {
                 if (req._ctx_) { //agressive prune associated context
                     for (var rk in req._ctx_) {
                         if (req._ctx_.hasOwnProperty(rk)) {
@@ -45,7 +45,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         delete res[rk];
                     }
                 }
-            })(req, res));
+                req = res = null;
+            });
         }
     },
 
@@ -148,7 +149,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < teArr.length; ++i) { //Process custom template engines
 
                 qx.core.Assert.assertInterface(teArr[i], sm.nsrv.ITemplateEngine,
-                        "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
+                  "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
 
                 if (config["templateOptions"] != null) {
                     var topts = config["templateOptions"];
@@ -432,7 +433,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                            " [" + this.__vhostName + "]:[" + wappId + "]");
+                      " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -460,7 +461,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                            JSON.stringify(asm, true));
+                      JSON.stringify(asm, true));
                 }
             }
             for (var asn in this.__assembly) {
@@ -536,7 +537,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                                    "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                              "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -545,7 +546,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + hlSlot["$$class"] + "#" + (hlSlot["handler"]) +
-                                        "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
+                                  "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -715,7 +716,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     cb.call(self, err);
                 } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
                     cb.call(self, "Unauthorized to access: '" + req.info.pathname +
-                            "' for roles: " + JSON.stringify(reqRoles));
+                      "' for roles: " + JSON.stringify(reqRoles));
                 } else if (redirect != null) {
                     res.sendSCode(302, {"Location" : redirect});
                 } else {
@@ -824,7 +825,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if ((secured || hconf["logout"]) &&
-                    (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+              (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
                 if (hconf["logout"]) {
                     security.__filter.logout(req, res, callback);
                 } else {
@@ -863,7 +864,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var m = res.messages[i];
                 var isErr = m.isError();
                 res.headers[(isErr ? ("Softmotions-Msg-Err" + errC) : ("Softmotions-Msg-Reg" + nerrC))]
-                        = encodeURIComponent(m.getMessage());
+                  = encodeURIComponent(m.getMessage());
                 if (isErr) {
                     ++errC;
                 } else {
@@ -1199,27 +1200,27 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //EOF session staff
 
             this.__server = connect.createServer(
-                    function (req, res, next) {
-                        if (req.internal === true) {
-                            next()
-                        } else {
-                            cookieParser(req, res, next);
-                        }
-                    },
-                    function (req, res, next) {
-                        me.__initRequestHandler(req, res, next);
-                    },
-                    session
-                    ,
-                    function (req, res, next) {
-                        me.__populateRequestParams(req, res, next);
-                    },
-                    function (req, res, next) {
-                        me.__handleReq(req, res, next);
-                    },
-                    function (err, req, res, next) {
-                        me.__handleError(err, req, res, next);
-                    });
+              function (req, res, next) {
+                  if (req.internal === true) {
+                      next()
+                  } else {
+                      cookieParser(req, res, next);
+                  }
+              },
+              function (req, res, next) {
+                  me.__initRequestHandler(req, res, next);
+              },
+              session
+              ,
+              function (req, res, next) {
+                  me.__populateRequestParams(req, res, next);
+              },
+              function (req, res, next) {
+                  me.__handleReq(req, res, next);
+              },
+              function (err, req, res, next) {
+                  me.__handleError(err, req, res, next);
+              });
 
             return this.__server;
         },

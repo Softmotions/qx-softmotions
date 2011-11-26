@@ -73,10 +73,11 @@ qx.Class.define("sm.nsrv.tengines.StaticTemplateEngine", {
             }
             res.writeHead((res.statusCode || 200), headers);
             var rs = $$node.fs.createReadStream(template["path"], {fd : template["fd"]});
-            $$node.process.nextTick((function(rs) { //small hack =)
+            $$node.process.nextTick(function() { //small hack =)
                 rs.emit("open", rs.fd);
                 rs.resume();
-            })(rs));
+                rs = null;
+            });
             this.__io.responseHTTPump(rs, res, function(err) {
                 if (err) {
                     qx.log.Logger.warn(me, "File pumping error: " + template["path"], err);
