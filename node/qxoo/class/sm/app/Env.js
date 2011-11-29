@@ -200,9 +200,9 @@ qx.Class.define("sm.app.Env", {
          * @param notCheckTemplate{Boolean?false} If true do not try to load template file
          * @return {Object} Json config
          */
-        getJSONConfig : function(name, notCheckTemplate) {
+        getJSONConfig : function(name, notCheckTemplate, refresh) {
             var c = this.__jsonConfigCache[name];
-            if (c) {
+            if (c && !refresh) {
                 return c;
             }
             var fname = name + ".json";
@@ -261,6 +261,10 @@ qx.Class.define("sm.app.Env", {
             var cfg = this.getJSONConfig(name);
             qx.lang.Object.mergeWith(cfg, object, true);
             this.setJSONConfig(name, cfg, cb);
+        },
+
+        clearJSONConfigCache : function(name) {
+            delete this.__jsonConfigCache[name];
         },
 
         _readFileJSONTemplate : function(path) {
