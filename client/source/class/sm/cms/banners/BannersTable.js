@@ -113,7 +113,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             tce = new sm.model.CalendarCellEditor();
             cmodel.setCellEditorFactory(4, tce);
             cmodel.setDataCellRenderer(4, new qx.ui.table.cellrenderer.Date().set({
-                dateFormat: new qx.util.format.DateFormat('dd.MM.yyyy')
+                dateFormat: new qx.util.format.DateFormat("dd.MM.yyyy")
             }));
 
             var rr = new sm.table.renderer.CustomRowRenderer();
