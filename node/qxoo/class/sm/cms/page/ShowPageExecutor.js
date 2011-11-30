@@ -80,12 +80,12 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
         },
 
         __noExecutorAliasHandler : function(info, cb) {
-            if (info.contextPath == "/exp") {
+            if (info.webapp.id == "exp") {
                 var registry = sm.cms.page.AliasRegistry.getInstance();
                 registry.findPageByAlias(info.path.slice(1), function(pageId) {
                     if (pageId) {
                         info.path = "/p" + pageId;
-                        info.pathname = "/exp/p" + pageId;
+                        info.pathname = info.contextPath + "/p" + pageId;
                         cb(true);
                     } else {
                         cb(false);
@@ -165,6 +165,43 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             }
             var pid = path.substring("/pp".length);
             this.__pageInternal(req, resp, ctx, pid, true);
+        },
+
+        __main : function(req, resp, ctx) {
+            var session = req.session || {};
+            var langs = [];
+            if (req.params.lang) {
+                langs.push(req.params.lang);
+            }
+            if (session.language) {
+                langs.push(session.language);
+            }
+            var httpLangs = req.headers["accept-language"];
+            if (httpLangs) {
+                httpLangs.split(',').forEach(function(lang) {
+                    langs.push(lang.split(';', 1)[0].toLowerCase());
+                });
+            }
+            var config = sm.app.Env.getDefault().getConfig();
+            var subsites = config.subsites || {};
+            var defLang = config.defaultLanguage || "en";
+            langs.push(defLang);
+            // todo handle languages like "en-gb" and "ru-ru"?
+            for (var i = 0, l = langs.length; i < l; ++i) {
+                var language = langs[i];
+                if (language == defLang) {
+                    session.language = language;
+                    ctx();
+                    return;
+                }
+                var subsite = subsites["/" + language];
+                if (subsite) {
+                    session.language = language;
+                    this.__pageInternal(req, resp, ctx, subsite.id);
+                    return;
+                }
+            }
+            qx.core.Assert.assert(false, "The for loop should have returned");
         }
     },
 
@@ -186,6 +223,14 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             webapp : "exp",
             handler : "__preview",
             matching : "regexp"
+        },
+
+        /**
+         * Main page
+         */
+        "/index.jz" : {
+            webapp : "exp",
+            handler : "__main"
         }
     },
 

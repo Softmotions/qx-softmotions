@@ -18,46 +18,46 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         /**
          * Update sort order if user wants it to be on top again
          */
-        popupNewsOnTop : function(attrVal, attrName, attrMeta, asm, page, cb) {
-            if (attrVal || page["popupdate"] == null) {
-                page["popupdate"] = +new Date();
+        popupNewsOnTop : function(opts) {
+            if (opts.attrVal || opts.page["popupdate"] == null) {
+                opts.page["popupdate"] = +new Date();
             }
-            cb(null);
+            opts.cb(null);
         },
 
 
-        saveAliasVal : function(attrVal, attrName, attrMeta, asm, page, cb, ctx) {
-            if (ctx._req_.isUserHasRoles("alias.admin")) {
-                ctx._vhost_engine_.isPathFreeAndCanBeUsed("/exp", attrVal, function(result) {
-                    if (result || attrVal == "") {
-                        sm.cms.page.AliasRegistry.getInstance().findPageByAlias(attrVal, function(res) {
-                            if (res) {
-                                // todo report an error that user can't use this alias
-                                cb(null);
-                            } else {
-                                cb(null, {
-                                    value: attrVal
-                                })
-                            }
-                        });
-                    } else {
-                        // todo report an error that user can't use this alias
+        saveAliasVal : function(opts) {
+            var attrVal = opts.attrVal;
+            var cb = opts.cb;
+            if (!opts.req.isUserHasRoles("alias.admin")) {
+                cb(null);
+                return;
+            }
+            var webapp = "exp";
+            opts.ctx._vhost_engine_.isPathFreeAndCanBeUsed(webapp, attrVal, function(result) {
+                if (!result && attrVal != "") {
+                    cb(null);
+                    return;
+                }
+                sm.cms.page.AliasRegistry.getInstance().findPageByAlias(attrVal, function(res) {
+                    if (res) {
                         cb(null);
+                    } else {
+                        cb(null, {
+                            value: attrVal
+                        })
                     }
                 });
-            } else {
-                // maybe to report some kind of error instead if old value differs from new one?
-                cb(null);
-            }
+            });
         },
 
 
         /**
          * Save attribute as direct page property
          */
-        savePageProperty : function(attrVal, attrName, attrMeta, asm, page, cb) {
-            page[attrName] = attrVal;
-            cb(null, null);
+        savePageProperty : function(opts) {
+            opts.page[opts.attrName] = opts.attrVal;
+            opts.cb(null, null);
         },
 
 
@@ -72,17 +72,19 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         /**
          * If attribute is page tags
          */
-        saveTagsVal : function(attrVal, attrName, attrMeta, asm, page, cb) {
+        saveTagsVal : function(opts) {
             var value = {};
             var tags;
+            var page = opts.page;
             value["value"] = page["tags"] || [];
+            var attrVal = opts.attrVal;
             try {
                 page["tags"] = JSON.parse(attrVal) || [];
             } catch(e) {
-                qx.log.Logger.error(this, "Failed to parse as json object. asm: " + asm["_name_"] +
-                  ", attr: " + attrName + ", attrValue: " + attrVal, e);
+                qx.log.Logger.error(this, "Failed to parse as json object. asm: " + opts.asm["_name_"] +
+                  ", attr: " + opts.attrName + ", attrValue: " + attrVal, e);
             }
-            cb(null, value);
+            opts.cb(null, value);
         },
 
         loadTagsVal : function(attrName, attrVal, page, cb) {
@@ -90,7 +92,7 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         },
 
 
-        saveWikiVal : function(attrVal, attrName, attrMeta, asm, page, cb) {
+        saveWikiVal : function(opts) {
             var http = $$node.require("http");
             var env = sm.app.Env.getDefault();
             var ropts = env.getJServiceRequestOpts();
@@ -98,6 +100,10 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             ropts["method"] = "POST";
             var me = this;
             var html = [];
+            var cb = opts.cb;
+            var attrVal = opts.attrVal;
+            var page = opts.page;
+            var attrName = opts.attrName;
             var req = http.request(ropts, function(res) {
                 if (res.statusCode != 200) {
                     var msg = "Invalid response, status=" + res.statusCode;

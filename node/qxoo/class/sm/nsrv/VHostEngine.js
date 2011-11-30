@@ -4,7 +4,7 @@
  */
 
 /**
- * Virtual host manager
+ * Virtual host managers
  */
 qx.Class.define("sm.nsrv.VHostEngine", {
     extend  : qx.core.Object,
@@ -20,6 +20,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         /**
          * Called when no handler is found for a request.
          * Parameters: req.info, callback(changed : bool)
+         * changed = true iff req.info was changed and need to rehandle request
          */
         __noExecutorHandler : null,
 
@@ -58,9 +59,16 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         delete res[rk];
                     }
                 }
-                req = res = null;
             });
         }
+    },
+
+    events :
+    {
+    },
+
+    properties :
+    {
     },
 
     construct : function(config) {
@@ -136,6 +144,15 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return this.__vhostName;
         },
 
+        /**
+         *
+         * @param id webapp
+         */
+        getContextPath : function(id) {
+            var wapp = this.__getWebappConfig(id);
+            return wapp.contextPath;
+        },
+
         __applyConfig : function(config) {
 
             this.__config = config;
@@ -177,10 +194,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     if (typeof sext !== "string") {
                         continue;
                     }
-                    if (sext.charAt(0) === ".") {
+                    if (sext.charAt(0) == ".") {
                         sext = sext.substring(1);
                     }
-                    if (sext.length === 0) {
+                    if (sext.length == 0) {
                         continue;
                     }
                     if (this.__tengines[sext] === undefined) {
@@ -217,17 +234,17 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 //normalize context path
                 var waCtx = wa["context"];
-                if (!qx.lang.Type.isString(waCtx) || waCtx.length === 0) {
+                if (!qx.lang.Type.isString(waCtx) || waCtx.length == 0) {
                     waCtx = wa["context"] = "/";
                 }
-                if (waCtx != "/" && waCtx.charAt(waCtx.length - 1) === '/') {
+                if (waCtx != "/" && waCtx.charAt(waCtx.length - 1) == '/') {
                     waCtx = wa["context"] = waCtx.substring(0, waCtx.length - 1);
                 }
                 if (wappsCtx[waCtx]) {
                     throw new Error("Duplicated webapp 'context' in config: " + qx.lang.Json.stringify(this.__config));
                 }
                 wappsCtx[waCtx] = true;
-                wa["contextPath"] = (waCtx === "/") ? "" : waCtx;
+                wa["contextPath"] = (waCtx == "/") ? "" : waCtx;
 
                 if (!this.__fsutils.isAbsolutePath(wa["docRoot"])) {
                     wa["docRoot"] = this.__path.join($$node.dirname, wa["docRoot"]);
@@ -288,7 +305,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return (w2["context"].length - w1["context"].length);
             });
 
-            if (qx.core.Environment.get("sm.nsrv.debug")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                 qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.lang.Json.stringify(this.__config));
             }
 
@@ -362,7 +379,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     ret = wapp["handlerDefaults"][key];
                 }
             }
-            if (!ret && key === "webapp") {
+            if (!ret && key == "webapp") {
                 ret = this.__getDefaultWebappId();
             }
             return ret;
@@ -412,7 +429,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
                 var wappId = null;
                 for (var asn in assembly) {
-                    if (asn === "_webapp_") {
+                    if (asn == "_webapp_") {
                         wappId = assembly[asn];
                     }
                 }
@@ -424,7 +441,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     continue; //Now our webapp
                 }
                 for (var asn in assembly) {
-                    if (asn === "_webapp_") {
+                    if (asn == "_webapp_") {
                         continue;
                     }
                     if (this.__assembly[asn]) {
@@ -436,7 +453,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
             //Postprocess assembly
             for (var asn in this.__assembly) {
-                if (qx.core.Environment.get("sm.nsrv.debug")) {
+                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
                       " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
@@ -454,7 +471,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         if (!qx.lang.Type.isArray(pstack)) {
                             pstack = asm["_ctx_provider_stack_"] = [];
                         }
-                        if (pstack.indexOf(ep) === -1) {
+                        if (pstack.indexOf(ep) == -1) {
                             pstack.unshift(ep);
                         }
                     }
@@ -464,7 +481,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     asm["name"] = name;
                 }
 
-                if (qx.core.Environment.get("sm.nsrv.debug")) {
+                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
                       JSON.stringify(asm, true));
                 }
@@ -522,10 +539,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                     for (var i = 0; i < lArr.length; ++i) {
                         var hl = lArr[i];
-                        if (hl.charAt(0) === "/") {
+                        if (hl.charAt(0) == "/") {
                             hl = hl.substring(1);
                         }
-                        if (hl.charAt(hl.length - 1) === "/") {
+                        if (hl.charAt(hl.length - 1) == "/") {
                             hl = hl.substring(0, hl.length - 1);
                         }
 
@@ -540,7 +557,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             cpath += "/";
                         }
                         hl = (cpath + hl);
-                        if (qx.core.Environment.get("sm.nsrv.debug")) {
+                        if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
                               "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
@@ -584,27 +601,18 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            var wapp = null;
-            var wapps = me.__config["webapps"];
-            for (var i = 0, l = wapps.length; i < l; ++i) {
-                var wa = wapps[i];
-                if (webapp == wa["contextPath"]) {
-                    wapp = wa;
-                    if (path == "" && wa["index"] != null) {
-                        cb(false);
-                        return;
-                    }
-                    break;
-                }
-            }
-
+            var wapp = me.__getWebappConfig(webapp, false);
             if (!wapp) { //No webapp found, abort
+                cb(false);
+                return;
+            }
+            if (path == "" && wapp.index != null) {
                 cb(false);
                 return;
             }
 
             //trying to find handlers
-            var hconf = this.__handlers[webapp + "/" + path];
+            var hconf = this.__handlers[wapp.contextPath + "/" + path];
             if (hconf !== undefined) {
                 cb(false);
                 return;
@@ -641,7 +649,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * @param res {http.ServerResponse}
          * @param ctx {Object}
          * @param forward {Object} forward object
-         * @param notFoundCb {function(default)} specify it when you want to handle non found stuff yourself. Default handler is the argument
          */
         __renderTemplate : function(req, res, ctx, forward) {
             var me = this;
@@ -651,11 +658,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
 
-            if (qx.core.Environment.get("sm.nsrv.debug")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                 qx.log.Logger.debug("Forward: " + qx.lang.Json.stringify(forward));
             }
 
-            if (forward && forward["terminated"]) { //executor takes control of the request
+            if (forward && forward["terminated"] == true) { //executor takes control of the request
                 return;
             }
 
@@ -692,7 +699,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                     if (hspec.$$re.test(req.info.path)) {
                         for (var hname in hspec) {
-                            if (hname === "$$re" || headers[hname] != null) {
+                            if (hname == "$$re" || headers[hname] != null) {
                                 continue;
                             }
                             headers[hname] = hspec[hname];
@@ -731,7 +738,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             //write template
-            if (qx.core.Environment.get("sm.nsrv.debug")) {
+            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                 qx.log.Logger.debug("Merging: '" + path + "', template engine: " + tengine);
             }
 
@@ -792,14 +799,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb.call(self);
                 return;
             }
-            security.__filter.authenticate(req, res, function(err, redirect) {
+            security.__filter.authenticate(req, res, function(err) {
                 if (err) {
                     cb.call(self, err);
                 } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
                     cb.call(self, "Unauthorized to access: '" + req.info.pathname +
                       "' for roles: " + JSON.stringify(reqRoles));
-                } else if (redirect != null) {
-                    res.sendSCode(302, {"Location" : redirect});
                 } else {
                     cb.call(self);
                 }
@@ -872,83 +877,83 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             //trying to find handlers
-            var hconf;
+            var reqInfo = req.info;
+            var hconf = me.__findHandler(reqInfo);
 
-            var useHConf = function() {
-                //Call executor
-                var hinst = hconf["$$instance"];
-                var exec = hinst[hconf["handler"]];
-                if (!qx.lang.Type.isFunction(exec)) {
-                    throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
-                }
-                if (qx.core.Environment.get("sm.nsrv.debug") == true) {
-                    qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
-                }
-
-                var callback = function() {
-                    try {
-                        exec.call(hinst, req, res, ctx);
-                    } catch(e) {
-                        var report = true;
-                        if (e instanceof sm.nsrv.Message) {
-                            report = e.isError();
-                        }
-                        if (report) {
-                            qx.log.Logger.warn(me, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
-                        }
-                        next(e);
-                    }
-                };
-
-                var security = null;
-                var secured = me.__getHconfValue(hconf, "secured");
-                var roles = me.__getHconfValue(hconf, "roles") || [];
-
-                if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
-                    callback();
+            if (hconf !== undefined) {
+                me.__useHandler(hconf, req, res, ctx, next);
+                return;
+            }
+            var eh = sm.nsrv.VHostEngine.__noExecutorHandler;
+            if (!eh) {
+                ctx(null);//handlers not found, serve static content or templates
+                return;
+            }
+            eh(reqInfo, function(changed) {
+                if (!changed) {
+                    ctx(null);//handlers not found, serve static content or templates
                     return;
                 }
-
-                if ((secured || hconf["logout"]) &&
-                  (security = me.__security[me.__getHconfValue(hconf, "webapp")])) {
-                    if (hconf["logout"]) {
-                        security.__filter.logout(req, res, callback);
-                    } else {
-                        security.__filter.authenticate(req, res, function(err) {
-                            if (err || !req.isUserHasRoles(roles)) {
-                                res.sendForbidden();
-                                return;
-                            }
-                            callback();
-                        });
-                    }
+                hconf = me.__findHandler(reqInfo);
+                if (hconf === undefined) {
+                    ctx(null);//handlers not found, serve static content or templates
                 } else {
-                    callback();
+                    me.__useHandler(hconf, req, res, ctx, next);
+                }
+            });
+        },
+
+        __useHandler : function(hconf, req, res, ctx, next) {
+            //Call executor
+            var me = this;
+            var hinst = hconf["$$instance"];
+            var exec = hinst[hconf["handler"]];
+            if (!qx.lang.Type.isFunction(exec)) {
+                throw new Error("No handler function: " + hconf["handler"] + " in " + hconf["$$class"]);
+            }
+            if (qx.core.Environment.get("sm.nsrv.debug") == true) {
+                qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
+            }
+
+            var callback = function() {
+                try {
+                    exec.call(hinst, req, res, ctx);
+                } catch(e) {
+                    var report = true;
+                    if (e instanceof sm.nsrv.Message) {
+                        report = e.isError();
+                    }
+                    if (report) {
+                        qx.log.Logger.warn(me, "Handler: " + hconf["$$class"] + "#" + (hconf["handler"]) + "() throws exception: " + e.message);
+                    }
+                    next(e);
                 }
             };
 
-            var reqInfo = req.info;
-            hconf = me.__findHandler(reqInfo);
+            var security = null;
+            var secured = me.__getHconfValue(hconf, "secured");
+            var roles = me.__getHconfValue(hconf, "roles") || [];
 
-            if (hconf === undefined) {
-                if (sm.nsrv.VHostEngine.__noExecutorHandler) {
-                    sm.nsrv.VHostEngine.__noExecutorHandler(reqInfo, function(changed) {
-                        if (changed) {
-                            hconf = me.__findHandler(reqInfo);
-                            if (hconf === undefined) {
-                                ctx(null);//handlers not found, serve static content or templates
-                            } else {
-                                useHConf();
-                            }
-                        } else {
-                            ctx(null);//handlers not found, serve static content or templates
-                        }
-                    });
+            if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
+                callback();
+                return;
+            }
+
+            if ((secured || hconf["logout"]) &&
+              (security = me.__security[me.__getHconfValue(hconf, "webapp")])) {
+                if (hconf["logout"]) {
+                    security.__filter.logout(req, res, callback);
                 } else {
-                    ctx(null);//handlers not found, serve static content or templates
+                    security.__filter.authenticate(req, res, function(err) {
+                        if (err || !req.isUserHasRoles(roles)) {
+                            res.sendForbidden();
+                            return;
+                        }
+                        callback();
+                    });
                 }
             } else {
-                useHConf();
+                callback();
             }
         },
 
@@ -1043,7 +1048,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             //Response with specified status page
-            if (path.length > 0 && path.charAt(0) !== '/') {
+            if (path.length > 0 && path.charAt(0) != '/') {
                 path = '/' + path;
             }
             path = webapp["docRoot"] + path;
@@ -1287,7 +1292,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //store
             if (sessOpts["store"] == "mongo") {
                 qx.log.Logger.info("Using sm.mongo.SessionStore as session storage");
-                sessOpts["store"] = new sm.mongo.SessionStore(sm.app.Env.getDefault().getMongo().collection("sessions"));
+                sessOpts["store"] = new sm.mongo.SessionStore(sessOpts);
             } else {
                 delete sessOpts["store"];
             }

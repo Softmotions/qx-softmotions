@@ -13,24 +13,26 @@ qx.Class.define("sm.cms.wiki.WikiMarkupExecutor", {
          */
         __wiki : function(req, resp, ctx) {
             var html = ctx["html"] || "";
+            var webapp = "exp";
             var registry = sm.cms.page.AliasRegistry.getInstance();
-            var re = /href="(?:http:\/\/[\w.]+)?\/exp\/p([0-9a-f]{24})"/g;
+            var ctxpath = ctx._vhost_engine_.getContextPath(webapp);
+            var re = new RegExp('href="(?:http:\\/\\/[\\w.]+)?\\' + ctxpath + '\\/p([0-9a-f]{24})"', "g");
             function searchNext() {
                 var res = re.exec(html);
-                if (res) {
-                    // replace and continue
-                    registry.findAliasByPage(res[1], function(alias) {
-                        var before = html.slice(0, res.index);
-                        var after = html.slice(res.index + res[0].length);
-                        var replace = 'href="/exp/' + alias + '"';
-                        html = before + replace + after;
-                        re.lastIndex += replace.length - res[0].length;
-                        searchNext();
-                    });
-                } else {
+                if (!res) {
                     resp.end(html);
                     ctx({"terminated" : true});
+                    return;
                 }
+                // replace and continue
+                registry.findAliasByPage(res[1], function(alias) {
+                    var before = html.slice(0, res.index);
+                    var after = html.slice(res.index + res[0].length);
+                    var replace = 'href="' + ctxpath + "/" + alias + '"';
+                    html = before + replace + after;
+                    re.lastIndex += replace.length - res[0].length;
+                    searchNext();
+                });
             }
             searchNext();
         }
