@@ -150,6 +150,8 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             this.__pageInternal(req, resp, ctx, pid, true);
         },
 
+
+        //todo move me into mixin
         __main : function(req, resp, ctx) {
             var session = req.session || {};
             var langs = [];
@@ -204,14 +206,6 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             webapp : "exp",
             handler : "__preview",
             matching : "regexp"
-        },
-
-        /**
-         * Main page
-         */
-        "/index.jz" : {
-            webapp : "exp",
-            handler : "__main"
         }
     },
 
