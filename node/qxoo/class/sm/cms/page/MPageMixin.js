@@ -23,41 +23,41 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
             var me = this;
             var coll = sm.cms.page.PageMgr.getColl();
             coll.findOne({"_id" : coll.toObjectID(pid)}, {fields : {"access" : 0, "media" : 0}},
-                    function(err, doc) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        if (!doc || (!preview && !doc.published)) { //Page not published
-                            resp.sendNotFound();
-                            return;
-                        }
-                        ctx["_ctx_"] = ctx;
-                        ctx["_req_"] = req;
-                        ctx["_res_"] = resp;
+              function(err, doc) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  if (!doc || (!preview && !doc.published)) { //Page not published
+                      resp.sendNotFound();
+                      return;
+                  }
+                  ctx["_ctx_"] = ctx;
+                  ctx["_req_"] = req;
+                  ctx["_res_"] = resp;
 
-                        sm.cms.Events.getInstance().fireDataEvent("pageShowing", [doc, ctx]);
+                  sm.cms.Events.getInstance().fireDataEvent("pageShowing", [doc, ctx]);
 
-                        var ctxParams = {};
-                        var asmName = "p" + pid;
-                        var vhe = ctx._vhost_engine_;
-                        var te = vhe.getTemplateEngineForExt("jz");
-                        qx.core.Assert.assert(te != null, "Missing template engine for jz files");
+                  var ctxParams = {};
+                  var asmName = "p" + pid;
+                  var vhe = ctx._vhost_engine_;
+                  var te = vhe.getTemplateEngineForExt("jz");
+                  qx.core.Assert.assert(te != null, "Missing template engine for jz files");
 
-                        //Load assembly
-                        sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, null, function(err, data) {
-                            if (err) {
-                                me.handleError(resp, ctx, err, true);
-                                return;
-                            }
-                            var ctype = sm.nsrv.HTTPUtils.selectForUserAgent(
-                                    { "default" : "application/xhtml+xml; charset=UTF-8",
-                                        "MSIE 7" : "text/html; charset=UTF-8",
-                                        "MSIE 8" : "text/html; charset=UTF-8"}, req.headers);
-                            me.writeHead(resp, ctx, 200, { "Content-Type": ctype });
-                            resp.end(data);
-                        });
-                    });
+                  //Load assembly
+                  sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, null, function(err, data) {
+                      if (err) {
+                          me.handleError(resp, ctx, err, true);
+                          return;
+                      }
+                      var ctype = sm.nsrv.HTTPUtils.selectForUserAgent(
+                        { "default" : "application/xhtml+xml; charset=UTF-8",
+                            "MSIE 7" : "text/html; charset=UTF-8",
+                            "MSIE 8" : "text/html; charset=UTF-8"}, req.headers);
+                      me.writeHead(resp, ctx, 200, { "Content-Type": ctype });
+                      resp.end(data);
+                  });
+              });
         },
 
 
@@ -88,10 +88,10 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
         _pageForLanguage : function(req, resp, ctx) {
             var session = req.session || {};
             var langs = [];
-            if (req.params["lang"]) {
+            if (req.params["lang"] != null) {
                 langs.push(req.params["lang"]);
             }
-            if (session["lang"]) {
+            if (session["lang"] != null) {
                 langs.push(session["lang"]);
             }
             var httpLangs = req.headers["accept-language"];
@@ -107,14 +107,14 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
             for (var i = 0, l = langs.length; i < l; ++i) {
                 var lang = langs[i];
                 if (lang.indexOf(defLang) === 0) {
-                    session.language = lang;
+                    session.lang = lang;
                     ctx();
                     return;
                 }
                 var subsite = subsites["/" + lang];
                 if (subsite) {
                     session["lang"] = lang;
-                    this._pageInternal(req, resp, ctx, subsite["id"]);
+                    this._pageInternal(req, resp, ctx, subsite["id"], false);
                     return;
                 }
             }
