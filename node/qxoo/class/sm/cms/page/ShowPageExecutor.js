@@ -5,7 +5,7 @@
 
 qx.Class.define("sm.cms.page.ShowPageExecutor", {
     extend  : qx.core.Object,
-    include : [sm.nsrv.MExecutor],
+    include : [sm.nsrv.MExecutor, sm.cms.page.MPageMixin],
 
     statics :
     {
@@ -83,51 +83,6 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
     members :
     {
 
-        __pageInternal : function(req, resp, ctx, pid, preview) {
-            if (!/^\w{24}$/.test(pid)) { //mongodb ID
-                this.handleError(resp, ctx, "Invalid request");
-                return;
-            }
-            var me = this;
-            var coll = sm.cms.page.PageMgr.getColl();
-            coll.findOne({"_id" : coll.toObjectID(pid)}, {fields : {"access" : 0, "media" : 0}},
-                    function(err, doc) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        if (!doc || (!preview && !doc.published)) { //Page not published
-                            resp.sendNotFound();
-                            return;
-                        }
-                        ctx["_ctx_"] = ctx;
-                        ctx["_req_"] = req;
-                        ctx["_res_"] = resp;
-
-                        sm.cms.Events.getInstance().fireDataEvent("pageShowing", [doc, ctx]);
-
-                        var ctxParams = {};
-                        var asmName = "p" + pid;
-                        var vhe = ctx._vhost_engine_;
-                        var te = vhe.getTemplateEngineForExt("jz");
-                        qx.core.Assert.assert(te != null, "Missing template engine for jz files");
-
-                        //Load assembly
-                        sm.nsrv.tengines.JazzCtxLib.assemblyExt(vhe, te, ctx, asmName, req.params, ctxParams, null, function(err, data) {
-                            if (err) {
-                                me.handleError(resp, ctx, err, true);
-                                return;
-                            }
-                            var ctype = sm.nsrv.HTTPUtils.selectForUserAgent(
-                                    { "default" : "application/xhtml+xml; charset=UTF-8",
-                                        "MSIE 7" : "text/html; charset=UTF-8",
-                                        "MSIE 8" : "text/html; charset=UTF-8"}, req.headers);
-                            me.writeHead(resp, ctx, 200, { "Content-Type": ctype });
-                            resp.end(data);
-                        });
-                    });
-        },
-
         __page : function(req, resp, ctx) {
             var path = req.info.path;
             if (path.indexOf("/p") !== 0) {
@@ -135,8 +90,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                 return;
             }
             var pid = path.substring("/p".length);
-            this.__pageInternal(req, resp, ctx, pid);
-
+            this._pageInternal(req, resp, ctx, pid);
         },
 
         __preview : function(req, resp, ctx) {
@@ -147,44 +101,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                 return;
             }
             var pid = path.substring("/pp".length);
-            this.__pageInternal(req, resp, ctx, pid, true);
-        },
-
-
-        //todo move me into mixin
-        __main : function(req, resp, ctx) {
-            var session = req.session || {};
-            var langs = [];
-            if (req.params["lang"]) {
-                langs.push(req.params["lang"]);
-            }
-            if (session["language"]) {
-                langs.push(session["language"]);
-            }
-            var httpLangs = req.headers["accept-language"];
-            if (httpLangs) {
-                httpLangs.split(",").forEach(function(lang) {
-                    langs.push(lang.split(";", 1)[0].toLowerCase());
-                });
-            }
-            var config = sm.app.Env.getDefault().getConfig();
-            var subsites = config["subsites"] || {};
-            var defLang = config["defaultLanguage"] || "en";
-            langs.push(defLang);
-            for (var i = 0, l = langs.length; i < l; ++i) {
-                var language = langs[i];
-                if (language.indexOf(defLang) === 0) {
-                    session.language = language;
-                    ctx();
-                    return;
-                }
-                var subsite = subsites["/" + language];
-                if (subsite) {
-                    session["language"] = language;
-                    this.__pageInternal(req, resp, ctx, subsite["id"]);
-                    return;
-                }
-            }
+            this._pageInternal(req, resp, ctx, pid, true);
         }
     },
 
