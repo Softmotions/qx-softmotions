@@ -148,6 +148,41 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             }
             var pid = path.substring("/pp".length);
             this.__pageInternal(req, resp, ctx, pid, true);
+        },
+
+        __main : function(req, resp, ctx) {
+            var session = req.session || {};
+            var langs = [];
+            if (req.params["lang"]) {
+                langs.push(req.params["lang"]);
+            }
+            if (session["language"]) {
+                langs.push(session["language"]);
+            }
+            var httpLangs = req.headers["accept-language"];
+            if (httpLangs) {
+                httpLangs.split(",").forEach(function(lang) {
+                    langs.push(lang.split(";", 1)[0].toLowerCase());
+                });
+            }
+            var config = sm.app.Env.getDefault().getConfig();
+            var subsites = config["subsites"] || {};
+            var defLang = config["defaultLanguage"] || "en";
+            langs.push(defLang);
+            for (var i = 0, l = langs.length; i < l; ++i) {
+                var language = langs[i];
+                if (language.indexOf(defLang) === 0) {
+                    session.language = language;
+                    ctx();
+                    return;
+                }
+                var subsite = subsites["/" + language];
+                if (subsite) {
+                    session["language"] = language;
+                    this.__pageInternal(req, resp, ctx, subsite["id"]);
+                    return;
+                }
+            }
         }
     },
 
@@ -169,6 +204,14 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
             webapp : "exp",
             handler : "__preview",
             matching : "regexp"
+        },
+
+        /**
+         * Main page
+         */
+        "/index.jz" : {
+            webapp : "exp",
+            handler : "__main"
         }
     },
 
