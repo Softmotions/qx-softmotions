@@ -205,7 +205,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
                       }, this);
                   }, this);
             }, this);
-            contextMenu.add(rmBt);
+            //contextMenu.add(rmBt);
 
             return true;
         },
