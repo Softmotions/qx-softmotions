@@ -48,8 +48,7 @@ qx.Class.define("sm.cms.editor.SelectBoxEditor", {
 
         getValue : function() {
             var ms = this.getModelSelection();
-            var val = (ms && ms.length > 0 ? ms.getItem(0) : null);
-            return val;
+            return ms && ms.length > 0 ? ms.getItem(0) : null;
         }
     },
 

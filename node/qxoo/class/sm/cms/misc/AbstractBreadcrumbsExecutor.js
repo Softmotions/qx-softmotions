@@ -49,35 +49,40 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
 
             // hierarchy cache (items)
             var hcache = {};
-            var subsites = sm.app.Env.getDefault().getConfig()["subsites"] || {};
-            coll.createQuery({"_id" : {"$in" : page["hierarchy"]}}, {fields : {"_id" : 1, "name" : 1, "published" : 1, "cachedPath" : 1}})
-                    .each(function(index, hdoc) {
-                        hcache[hdoc["_id"]] = hdoc;
-                    })
-                    .exec(function(err) {
-                        if (err) {
-                            me.handleError(resp, ctx, err);
-                            return;
-                        }
-                        // build breadcrumb items for pages from node hierarchy
-                        var hierarchy = page["hierarchy"];
-                        for (var i = 0; i < hierarchy.length; ++ i) {
-                            var bcitem = hcache[hierarchy[i]] || {};
-                            var subsite = subsites[bcitem.cachedPath || ""];
-                            var breadcrumb = {
-                                name : subsite ? subsite.name : bcitem["name"] || "",
-                                link : "/exp/p" + bcitem["_id"],
-                                published : !!bcitem["published"]
-                            };
-                            if (subsite) {
-                                breadcrumbs.length = 0; // clear all previous
-                                ctx["first_breadcrumb"] = breadcrumb;
-                            } else {
-                                breadcrumbs.push(breadcrumb);
-                            }
-                        }
-                        ctx();
-                    });
+            var nconf = this.getDefaultEnv().getJSONConfig("navigation");
+            var lroots = nconf["langRoots"] || {};
+
+            coll.createQuery(
+              {"_id" : {"$in" : page["hierarchy"]}},
+              {fields : {"_id" : 1, "name" : 1, "published" : 1, "cachedPath" : 1}})
+              .each(
+              function(index, hdoc) {
+                  hcache[hdoc["_id"]] = hdoc;
+              })
+              .exec(function(err) {
+                  if (err) {
+                      me.handleError(resp, ctx, err);
+                      return;
+                  }
+                  // build breadcrumb items for pages from node hierarchy
+                  var hierarchy = page["hierarchy"];
+                  for (var i = 0; i < hierarchy.length; ++ i) {
+                      var bcitem = hcache[hierarchy[i]] || {};
+                      var lroot = bcitem["cachedPath"] ? lroots[bcitem["cachedPath"].substring(1)] : null;
+                      var breadcrumb = {
+                          name : (lroot ? lroot["name"] : bcitem["name"]) || "",
+                          link : "/exp/p" + bcitem["_id"],
+                          published : !!bcitem["published"]
+                      };
+                      if (lroot) {
+                          breadcrumbs.length = 0; // clear all previous
+                          ctx["first_breadcrumb"] = breadcrumb;
+                      } else {
+                          breadcrumbs.push(breadcrumb);
+                      }
+                  }
+                  ctx();
+              });
         },
 
         // build custom breadcrumbs for news page

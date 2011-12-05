@@ -426,7 +426,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     var anames = [];
                     for (var pn in req.params) {
                         var pv = req.params[pn];
-                        if (pn.indexOf("attr.") == 0) {
+                        if (pn.indexOf("attr.") === 0) {
                             anames.push([pn.substring("attr.".length), pv]);
                         }
                     }

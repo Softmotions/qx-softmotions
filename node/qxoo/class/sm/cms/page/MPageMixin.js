@@ -62,20 +62,21 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
 
 
         /**
-         * Select page for current language which derived from:
+         * Setup session.lang for current language which derived from:
          *  * accept-language headers
          *  * session.language key
          *  * default language for site in config.json
          *
          *  config.json:
          *  {
-         *      "defaultLang" : "en", //Default language
+         *      "langs" : ["ru", "en"], //Default language will be first element
          *      "subsites" : {
-         *          "/en" : { //Start page for en lang
-         *              "id" : "837fff4dc460a94d00000000"
+         *          "en" : { //Start page for en lang
+         *              "id" : "837fff4dc460a94d00000000",
          *          },
-         *          "/ru" : { //Start page for ru lang
-         *              "id" : "e68bf74daa6d3b2c13000000"
+         *          "ru" : { //Start page for ru lang
+         *              "id" : "e68bf74daa6d3b2c13000000",
+         *              "name" : "Russian" //optional page name
          *          }
          *      }
          *  }
@@ -85,7 +86,7 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
          * @param resp
          * @param ctx
          */
-        _pageForLanguage : function(req, resp, ctx) {
+        _setupSessionLang : function(req, resp, ctx) {
             var session = req.session || {};
             var langs = [];
             if (req.params["lang"] != null) {
@@ -100,25 +101,22 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
                     langs.push(lang.split(";", 1)[0].toLowerCase());
                 });
             }
-            var config = sm.app.Env.getDefault().getConfig();
-            var subsites = config["subsites"] || {};
-            var defLang = config["defaultLang"] || "en";
+            var env = sm.app.Env.getDefault();
+            var defLang = env.getDefaultLanguage();
             langs.push(defLang);
             for (var i = 0, l = langs.length; i < l; ++i) {
                 var lang = langs[i];
                 if (lang.indexOf(defLang) === 0) {
-                    session.lang = lang;
-                    ctx();
-                    return;
-                }
-                var subsite = subsites["/" + lang];
-                if (subsite) {
                     session["lang"] = lang;
-                    this._pageInternal(req, resp, ctx, subsite["id"], false);
-                    return;
+                    break;
+                }
+                var mp = env.getNavConfigProp(lang, "main_page");
+                if (mp != null) { //Main page for this language exists
+                    session["lang"] = lang;
+                    break;
                 }
             }
-            qx.core.Assert.assert(false, "This point must be never reached");
+            ctx();
         }
     }
 });

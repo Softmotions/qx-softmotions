@@ -236,10 +236,10 @@ qx.Class.define("sm.app.Env", {
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
             var oldConfig = this.__jsonConfigCache[name];
-            this.__jsonConfigCache[name] = (object != null) ? object : this.__jsonConfigCache[name];
-            this.__lfsutils.writeFileLock(cpath, JSON.stringify(object), "utf8", function(err) {
+            var newConfig = this.__jsonConfigCache[name] = ((object != null) ? object : this.__jsonConfigCache[name]);
+            this.__lfsutils.writeFileLock(cpath, JSON.stringify(newConfig), "utf8", function(err) {
                 if (!nofire) {
-                    me.fireDataEvent("configChanged", [name, object, oldConfig]);
+                    me.fireDataEvent("configChanged", [name, newConfig, oldConfig]);
                 }
                 if (err) {
                     qx.log.Logger.error(me, "setJSONConfig", err);
@@ -259,7 +259,9 @@ qx.Class.define("sm.app.Env", {
          */
         updateJSONConfig : function(name, object, cb) {
             var cfg = this.getJSONConfig(name);
-            qx.lang.Object.mergeWith(cfg, object, true);
+            if (object != null) {
+                qx.lang.Object.mergeWith(cfg, object, true);
+            }
             this.setJSONConfig(name, cfg, cb);
         },
 
