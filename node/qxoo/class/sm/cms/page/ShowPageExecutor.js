@@ -42,12 +42,18 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                         cb(err, null);
                         return;
                     }
-                    var meta = parent["_meta_"] || {};
+                    var meta = {};
+                    var metaParent = parent;
+                    while (metaParent != null) {
+                        if (metaParent["_meta_"]) {
+                            qx.lang.Object.mergeWith(meta, metaParent["_meta_"], false);
+                        }
+                        metaParent = metaParent["_extends_"];
+                    }
                     var asm = {
                         _name_ : name
                     };
-
-                    qx.lang.Object.carefullyMergeWith(asm, parent);
+                    qx.lang.Object.mergeWith(asm, parent, false);
 
                     if (doc["attrs"] == null) {
                         doc["attrs"] = {};

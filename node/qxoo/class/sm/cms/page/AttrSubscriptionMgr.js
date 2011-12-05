@@ -36,8 +36,9 @@ qx.Class.define("sm.cms.page.AttrSubscriptionMgr", {
         addSubscription: function(parentId, subscriberId, attribute, cb) {
             var coll = this.getColl();
             var pcoll = this.getPageColl();
-
-            coll.update({"subscriber": pcoll.toObjectID(subscriberId), "attribute": attribute}, {"$set": {"parent": pcoll.toObjectID(parentId)}}, {"upsert" : true}, cb);
+            coll.update(
+                    {"subscriber": pcoll.toObjectID(subscriberId), "attribute": attribute},
+                    {"$set": {"parent": pcoll.toObjectID(parentId)}}, {"upsert" : true, "safe" : true}, cb);
         },
 
         /**
