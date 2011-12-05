@@ -36,8 +36,17 @@ qx.Class.define("sm.cms.page.AttrSubscriptionMgr", {
         addSubscription: function(parentId, subscriberId, attribute, cb) {
             var coll = this.getColl();
             var pcoll = this.getPageColl();
+            var me = this;
 
-            coll.update({"subscriber": pcoll.toObjectID(subscriberId), "attribute": attribute}, {"$set": {"parent": pcoll.toObjectID(parentId)}}, {"upsert" : true}, cb);
+            coll.update({"subscriber": pcoll.toObjectID(subscriberId), "attribute": attribute},
+              {"$set": {"parent": pcoll.toObjectID(parentId)}}, {"upsert" : true}, function(err) {
+                  if (err) {
+                      cb(err);
+                      return;
+                  }
+                  // wait until it is successfully written.
+                  me.__getMongo().collection("$cmd").findOne({getlasterror:1}, {}, cb);
+            });
         },
 
         /**
