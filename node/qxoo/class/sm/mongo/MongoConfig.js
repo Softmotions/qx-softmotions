@@ -20,6 +20,7 @@
 //                {
 //                    "collection" : "mediainfo",
 //                    "unique" : true,
+//                    "dropDups" : true,
 //                    "spec" : [
 //                        ["file", 1]
 //                    ]
@@ -128,7 +129,11 @@ qx.Class.define("sm.mongo.MongoConfig", {
                 return;
             }
             var coll = this.__mongo.collection(cname);
-            coll.ensureIndex(spec, {"unique" : !!cfg["unique"], "sparse" : !!cfg["sparse"]}, cb);
+            var opts = {"unique" : !!cfg["unique"], "sparse" : !!cfg["sparse"]};
+            if (cfg["dropDups"] != null) {
+                opts["dropDups"] = !!cfg["dropDups"];
+            }
+            coll.ensureIndex(spec, opts, cb);
         }
     },
 
