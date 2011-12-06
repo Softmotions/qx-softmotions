@@ -17,19 +17,29 @@ qx.Class.define("sm.mongo.SessionStore", {
 
     /**
      * MongoDB session store
-     * @param collection {sm.mongo.Collection}
      * @param options {Object} extra options for session store
      */
-    construct : function(collection, options) {
+    construct : function(options) {
         options = options || {};
         sm.mongo.SessionStore.__STORE.call(this, options);
-        this.__coll = collection;
+        this.__coll = sm.app.Env.getDefault().getMongo().collection(options["collection"] || "sessions");
+        var ims = parseInt(options["cleanupInterval"]);
+        if (!isNaN(ims)) {
+            qx.log.Logger.info(this, "Setup sessions cleanup interval: " + ims + " ms");
+            this.__cleanupInterval = setInterval(this.__cleanup.bind(this), ims);
+        }
     },
 
     members :
     {
-
         __coll : null,
+
+        __cleanupInterval : null,
+
+        __cleanup : function() {
+            var cdate = +new Date();
+            this.__coll.remove({"expires" : {$lt : cdate}});
+        },
 
         get : function(sid, cb) {
             var me = this;
@@ -93,6 +103,18 @@ qx.Class.define("sm.mongo.SessionStore", {
                     cb();
                 }
             });
+        }
+    },
+
+    destruct : function() {
+        if (this.__cleanupInterval) {
+            try {
+                clearInterval(this.__cleanupInterval);
+            } catch(e) {
+                qx.log.Logger.warn(this, e);
+            } finally {
+                this.__cleanupInterval = null;
+            }
         }
     },
 
