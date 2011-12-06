@@ -1176,9 +1176,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     var redis = $$node.require("redis");
                     var RedisStore = $$node.require("connect-redis")(connect);
                     var storeOpts = sopts["storeOptions"] = sopts["storeOptions"] || {};
-                    if (storeOpts.socket) { //avoid back with socket
-                        storeOpts.client = redis.createClient(storeOpts.socket, storeOpts);
-                    }
                     sopts["store"] = new RedisStore(storeOpts);
                 } else {
                     delete sopts["store"];
