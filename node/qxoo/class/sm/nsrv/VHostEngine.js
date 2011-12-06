@@ -1166,13 +1166,24 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (conf["session"]) {
                 qx.lang.Object.mergeWith(sopts, conf["session"]);
             }
-            //store
-            if (sopts["store"] == "mongo") {
-                qx.log.Logger.info("Using sm.mongo.SessionStore as session storage");
-                sopts["store"] = new sm.mongo.SessionStore(sopts["storeOptions"] || {});
-            } else {
-                delete sopts["store"];
-            }
+            (function() {
+                //store
+                if (sopts["store"] === "mongo") {
+                    qx.log.Logger.info("Using sm.mongo.SessionStore as session storage");
+                    sopts["store"] = new sm.mongo.SessionStore(sopts["storeOptions"] || {});
+                } else if (sopts["store"] === "redis") {
+                    qx.log.Logger.info("Using 'connect-redis' as session storage");
+                    var redis = $$node.require("redis");
+                    var RedisStore = $$node.require("connect-redis")(connect);
+                    var storeOpts = sopts["storeOptions"] = sopts["storeOptions"] || {};
+                    if (storeOpts.socket) { //avoid back with socket
+                        storeOpts.client = redis.createClient(storeOpts.socket, storeOpts);
+                    }
+                    sopts["store"] = new RedisStore(storeOpts);
+                } else {
+                    delete sopts["store"];
+                }
+            })();
 
             var ignoreSessFor = qx.lang.Type.isArray(sopts["ignore"]) ? sopts["ignore"] : [];
             var connectSession = connect.session(sopts);
