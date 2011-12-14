@@ -95,12 +95,13 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
             if (session["lang"] != null) {
                 langs.push(session["lang"]);
             }
-            var httpLangs = req.headers["accept-language"];
-            if (httpLangs) {
-                httpLangs.split(",").forEach(function(lang) {
-                    langs.push(lang.split(";", 1)[0].toLowerCase());
-                });
-            }
+            //todo enable
+            /*var httpLangs = req.headers["accept-language"];
+             if (httpLangs) {
+             httpLangs.split(",").forEach(function(lang) {
+             langs.push(lang.split(";", 1)[0].toLowerCase());
+             });
+             }*/
             var env = sm.app.Env.getDefault();
             var defLang = env.getDefaultLanguage();
             langs.push(defLang);
