@@ -45,8 +45,12 @@ qx.Class.define("sm.cms.Env", {
          * @param ctx {Object} Request context
          */
         getMainPageAsm : function(req) {
-            var mp = this.getNavConfigProp(this.getRequestLang(req), "main_page");
+            var mp = this.getMainPageID(req);
             return mp != null ? "p" + mp : null;
+        },
+
+        getMainPageID : function(req) {
+            return this.getNavConfigProp(this.getRequestLang(req), "main_page");
         },
 
         getDefaultLanguage : function() {

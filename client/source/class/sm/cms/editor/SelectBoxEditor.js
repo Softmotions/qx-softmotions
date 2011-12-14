@@ -18,6 +18,7 @@ qx.Class.define("sm.cms.editor.SelectBoxEditor", {
 
     construct : function(options) {
         this.base(arguments);
+        this.setAllowGrowY(false);
         if (qx.lang.Type.isArray(options["items"])) {
             var items = options["items"];
             for (var i = 0; i < items.length; ++i) {
