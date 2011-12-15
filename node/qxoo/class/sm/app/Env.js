@@ -329,15 +329,28 @@ qx.Class.define("sm.app.Env", {
                         qx.log.Logger.info("Initables:");
                     }
                     try {
-                        var initable = new clazz();
-                        qx.log.Logger.info("\t" + clazz.classname + "[" + initable.$$hash + "]");
-                        this.__initables.push(initable);
-                        initable.init(this);
+                        var it = new clazz();
+                        this.__initables.push(it);
                     } catch(e) {
                         qx.log.Logger.error(this, e);
                     }
                 }
             }
+
+            this.__initables.sort(function(i1, i2) {
+                var fcn1 = i1.constructor.classname || "";
+                var fcn2 = i2.constructor.classname || "";
+                var cn1 = fcn1.lastIndexOf(".") !== -1 ? fcn1.substring(fcn1.lastIndexOf(".") + 1) : fcn1;
+                var cn2 = fcn2.lastIndexOf(".") !== -1 ? fcn2.substring(fcn2.lastIndexOf(".") + 1) : fcn2;
+                return cn1.localeCompare(cn2);
+
+            });
+
+            this.__initables.forEach(function(it) {
+                var clazz = it.constructor;
+                qx.log.Logger.info("\t" + clazz.classname + "[" + it.$$hash + "]");
+                it.init(this);
+            }, this);
         },
 
         close : function() {
