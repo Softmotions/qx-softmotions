@@ -60,6 +60,8 @@ qx.Class.define("sm.nsrv.NKServer", {
          */
         __vengines : null,
 
+        __venginesById : null,
+
         /**
          * Init server config
          */
@@ -73,6 +75,7 @@ qx.Class.define("sm.nsrv.NKServer", {
             }
 
             this.__vengines = {};
+            this.__venginesById = {};
 
             var i = 0;
             for (; i < config.length; ++i) {
@@ -87,11 +90,26 @@ qx.Class.define("sm.nsrv.NKServer", {
                 if (this.__vengines[vhost]) {
                     throw new Error("Duplicated vhost config, for virtual host: " + vhost);
                 }
-                this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf);
+                var vId = vconf["id"] || vconf["vhost"];
+                this.__venginesById[vId] = this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf);
             }
             if (this.__vengines["__default__"] && i > 1) {
                 throw new Error("Ony one default virtual host must be configured");
             }
+        },
+
+
+        getDefaultVHE : function() {
+            return this.getVHE["__default__"];
+        },
+
+
+        /**
+         * Get virtual host engine (sm.nsrv.VHostEngine)
+         * @param id {String} virtual host ID
+         */
+        getVHE : function(id) {
+            return this.__venginesById[id];
         },
 
 

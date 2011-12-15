@@ -95,7 +95,7 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
             if (session["lang"] != null) {
                 langs.push(session["lang"]);
             }
-            //todo temporaly disabled
+            //todo enable
             /*var httpLangs = req.headers["accept-language"];
              if (httpLangs) {
              httpLangs.split(",").forEach(function(lang) {
@@ -107,7 +107,7 @@ qx.Mixin.define("sm.cms.page.MPageMixin", {
             langs.push(defLang);
             for (var i = 0, l = langs.length; i < l; ++i) {
                 var lang = langs[i];
-                if (lang.indexOf(defLang) === 0) {
+                if (lang === defLang) {
                     session["lang"] = lang;
                     break;
                 }

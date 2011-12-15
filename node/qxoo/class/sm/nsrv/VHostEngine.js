@@ -177,10 +177,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if (!this.__vhostName) {
-                throw new Error("Invalid vhost config: " + qx.lang.Json.stringify(this.__config));
+                throw new Error("Invalid vhost config: " + JSON.stringify(this.__config));
             }
             if (!qx.lang.Type.isArray(this.__config["webapps"])) {
-                throw new Error("Invalid vhost config, webapps section must be array: " + qx.lang.Json.stringify(this.__config));
+                throw new Error("Invalid vhost config, webapps section must be array: " + JSON.stringify(this.__config));
             }
             var wapps = this.__config["webapps"];
             var wappsIds = {};
@@ -192,13 +192,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 var wa = wapps[i];
                 if (!qx.lang.Type.isString(wa["id"])) {
-                    throw new Error("Missing webapp 'id' in config: " + qx.lang.Json.stringify(this.__config));
+                    throw new Error("Missing webapp 'id' in config: " + JSON.stringify(this.__config));
                 }
                 if (!qx.lang.Type.isString(wa["docRoot"])) {
-                    throw new Error("Missing webapp 'docRoot' in config: " + qx.lang.Json.stringify(this.__config));
+                    throw new Error("Missing webapp 'docRoot' in config: " + JSON.stringify(this.__config));
                 }
                 if (wappsIds[wa["id"]]) {
-                    throw new Error("Duplicated webapp 'id' in config: " + qx.lang.Json.stringify(this.__config));
+                    throw new Error("Duplicated webapp 'id' in config: " + JSON.stringify(this.__config));
                 }
                 wappsIds[wa["id"]] = true;
 
@@ -211,7 +211,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     waCtx = wa["context"] = waCtx.substring(0, waCtx.length - 1);
                 }
                 if (wappsCtx[waCtx]) {
-                    throw new Error("Duplicated webapp 'context' in config: " + qx.lang.Json.stringify(this.__config));
+                    throw new Error("Duplicated webapp 'context' in config: " + JSON.stringify(this.__config));
                 }
                 wappsCtx[waCtx] = true;
                 wa["contextPath"] = (waCtx === "/") ? "" : waCtx;
@@ -228,44 +228,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 // configure security
                 if (wa["security"]) {
-                    var sconf = wa["security"];
-                    var security = this.__security[wa["id"]] = {};
-                    var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
-
-                    if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
-                        throw new Error("Missing user provider type in config: " + qx.lang.Json.stringify(this.__config));
-                    }
-
-                    var uconf = sconf["userProvider"];
-                    var upName = uconf["type"];
-                    var upClass;
-                    if (qx.lang.Type.isString(upName)) {
-                        upClass = qx.Class.getByName(upName);
-                    } else if (qx.lang.Type.isFunction(upName)) {
-                        upClass = upName;
-                    }
-                    if (!upClass || !qx.lang.Type.isFunction(upClass)) {
-                        throw new Error("Invalid user provider type in config: " + qx.lang.Json.stringify(this.__config));
-                    }
-
-                    var userProvider = security._userProvider = new upClass(uconf["options"]);
-
-                    if (!sconf["auth"] || !sconf["auth"]["type"]) {
-                        throw new Error("Missing auth filter type in config: " + qx.lang.Json.stringify(this.__config));
-                    }
-
-                    var aconf = sconf["auth"];
-                    var aName = aconf["type"];
-                    var aClass;
-                    if (qx.lang.Type.isString(aName)) {
-                        aClass = qx.Class.getByName(aName);
-                    } else if (qx.lang.Type.isFunction(aName)) {
-                        aClass = aName;
-                    }
-                    if (!aClass || !qx.lang.Type.isFunction(aClass)) {
-                        throw new Error("Invalid auth filter type in config: " + qx.lang.Json.stringify(this.__config));
-                    }
-                    security.__filter = new aClass(aconf["options"], userProvider, securityStore);
+                    this.__setWappSecurity(wa, wa["security"]);
                 }
             }
 
@@ -276,11 +239,52 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             });
 
             if (qx.core.Environment.get("sm.nsrv.debug")) {
-                qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + qx.lang.Json.stringify(this.__config));
+                qx.log.Logger.debug("VHost[" + this.__vhostName + "] config: " + JSON.stringify(this.__config));
             }
 
             this.__loadHandlers();
             this.__loadAssembly();
+        },
+
+
+        __setWappSecurity : function(wa, sconf) {
+            if (!sconf) {
+                return;
+            }
+            var security = this.__security[wa["id"]] = {};
+            var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
+            if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
+                throw new Error("Missing user provider type in config: " + JSON.stringify(this.__config));
+            }
+
+            var uconf = sconf["userProvider"];
+            var upName = uconf["type"];
+            var upClass;
+            if (typeof upName === "string") {
+                upClass = qx.Class.getByName(upName);
+            } else if (typeof upName === "function") {
+                upClass = upName;
+            }
+            if (!upClass || typeof upClass !== "function") {
+                throw new Error("Invalid user provider type in config: " + JSON.stringify(this.__config));
+            }
+            var userProvider = security._userProvider = new upClass(uconf["options"]);
+
+            if (!sconf["auth"] || !sconf["auth"]["type"]) {
+                throw new Error("Missing auth filter type in config: " + JSON.stringify(this.__config));
+            }
+            var aconf = sconf["auth"];
+            var aName = aconf["type"];
+            var aClass;
+            if (typeof aName === "string") {
+                aClass = qx.Class.getByName(aName);
+            } else if (typeof aName === "function") {
+                aClass = aName;
+            }
+            if (!aClass || typeof aClass !== "function") {
+                throw new Error("Invalid auth filter type in config: " + JSON.stringify(this.__config));
+            }
+            security.__filter = new aClass(aconf["options"], userProvider, securityStore);
         },
 
         /**
@@ -291,7 +295,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * @return {Map}
          */
         __getWebappConfig : function(id, failIfNotfound) {
-
             if (failIfNotfound == null) {
                 failIfNotfound = true;
             }
@@ -572,7 +575,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             if (qx.core.Environment.get("sm.nsrv.debug")) {
-                qx.log.Logger.debug("Forward: " + qx.lang.Json.stringify(forward));
+                qx.log.Logger.debug("Forward: " + JSON.stringify(forward));
             }
 
             if (forward && forward["terminated"]) { //executor takes control of the request
@@ -1029,7 +1032,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < wapps.length; ++i) {
                 var wa = wapps[i];
                 var cpath = wa["contextPath"] + "/";
-                if (qx.lang.String.startsWith(info.pathname, cpath)) {
+                if (info.pathname.indexOf(cpath) === 0) {
                     info.webapp = wa;
                     info.path = info.pathname.substring(cpath.length - 1, info.pathname.length);
                     info.contextPath = wa["contextPath"];

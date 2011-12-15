@@ -78,7 +78,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
 
             var pageId = ctx["_page_"] ? ctx["_page_"]._id : null;
             if (pageId == null) { //try to get main
-                pageId = this.getDefaultEnv().getNavConfigProp(null, "main_page");
+                pageId = this.getDefaultEnv().getMainPageID(req);
                 if (pageId == null) {
                     qx.log.Logger.warn(this, "Cannot find page to fetch news");
                     ctx();
@@ -136,7 +136,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
 
             var refpage = req.params["refpage"];
             if (refpage == null) { //main refpage will be used
-                refpage = this.getDefaultEnv().getConfig()["main_page"];
+                refpage = this.getDefaultEnv().getMainPageID(req);
             }
 
             var qspec = {
@@ -265,7 +265,7 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
         _news_archive_breadcrumbs : function(req, resp, ctx) {
             var refpage = req.params["refpage"];
             if (sm.lang.String.isEmpty(refpage)) {
-                refpage = this.getDefaultEnv().getConfig()["main_page"];
+                refpage = this.getDefaultEnv().getMainPageID(req);
             }
             if (sm.lang.String.isEmpty(refpage)) {
                 ctx();
