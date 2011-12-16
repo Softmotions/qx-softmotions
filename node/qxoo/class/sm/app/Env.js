@@ -198,6 +198,7 @@ qx.Class.define("sm.app.Env", {
          * notify observers
          * @param name{String} Name of config
          * @param notCheckTemplate{Boolean?false} If true do not try to load template file
+         * @param refresh {Boolean?false} If true config cache will be invalidated and confgig file will be loaded again
          * @return {Object} Json config
          */
         getJSONConfig : function(name, notCheckTemplate, refresh) {
@@ -221,6 +222,17 @@ qx.Class.define("sm.app.Env", {
                 c = this.__jsonConfigCache[name] = this._readFileJSON(cpath);
             }
             return c;
+        },
+
+        /**
+         * Load content of JSON config template
+         * @param name {String} Config name
+         * @param cb {function(err, coobject)?null} If provided this function will be async
+         */
+        getJSONConfigTemplate : function(name, cb) {
+            var fname = name + ".json";
+            var tpath = this.getTmplDir() + fname;
+            return this._readFileJSONTemplate(tpath, cb);
         },
 
         /**
@@ -269,14 +281,35 @@ qx.Class.define("sm.app.Env", {
             delete this.__jsonConfigCache[name];
         },
 
-        _readFileJSONTemplate : function(path) {
-            var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
-            //todo use template engine!!!
-            var appBase = this.getAppBase();
-            //remove trailing slash
-            var installPath = appBase.substring(0, appBase.length - 1);
-            var data = fdata.replace(/\$\{install_path\}/g, installPath);
-            return JSON.parse(data);
+        _readFileJSONTemplate : function(path, cb) {
+            var me = this;
+            var processFdata = function(fdata) {
+                //todo use template engine!!!
+                var appBase = me.getAppBase();
+                //remove trailing slash
+                var installPath = appBase.substring(0, appBase.length - 1);
+                var data = fdata.replace(/\$\{install_path\}/g, installPath);
+                return JSON.parse(data);
+            };
+            if (cb) {
+                this.__lfsutils.readFileLock(path, "utf8", function(err, fdata) {
+                    if (err) {
+                        cb(err);
+                        return;
+                    }
+                    var res;
+                    try {
+                        res = processFdata(fdata);
+                    } catch(e) {
+                        cb(e);
+                        return;
+                    }
+                    cb(null, res);
+                });
+            } else {
+                var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
+                return processFdata(fdata);
+            }
         },
 
         _readFileJSON : function(path) {
