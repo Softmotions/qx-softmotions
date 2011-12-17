@@ -15,9 +15,11 @@ qx.Interface.define("sm.app.IInitable", {
         /**
          * Init function
          * @param env {sm.app.Env}
+         * @param cb {function(err)} Called on init() completion
          */
-        init : function(env) {
-
+        init : function(env, cb) {
+            qx.core.Assert.assertObject(env);
+            qx.core.Assert.assertFunction(cb);
         }
 
     }

@@ -50,7 +50,6 @@ qx.Class.define("sm.app.Env", {
          */
         "configChanged" : "qx.event.type.Data",
 
-
         /**
          * Fired if environment is going to be
          * <code>
@@ -67,11 +66,15 @@ qx.Class.define("sm.app.Env", {
          */
         "closed" : "qx.event.type.Data",
 
-
         /**
          * Env is opened
          */
-        "opened" : "qx.event.type.Data"
+        "opened" : "qx.event.type.Data",
+
+        /**
+         * Fired when env opened and all initables completed
+         */
+        "published" : "qx.event.type.Data"
     },
 
     properties :
@@ -130,15 +133,19 @@ qx.Class.define("sm.app.Env", {
             sm.app.Env.registerDefault(this);
         }
 
+        var me = this;
         //Init initables after env opened
-        this.addListenerOnce("opened", this.__initInitables, this);
+        me.addListenerOnce("opened", function() {
+            me.__initInitables(function() {
+                me.fireDataEvent("published", me);
+            });
+        });
 
         this._openEnv(!!this._options["create"]);
     },
 
     members :
     {
-
         /**
          * Env options
          */
@@ -230,9 +237,7 @@ qx.Class.define("sm.app.Env", {
          * @param cb {function(err, coobject)?null} If provided this function will be async
          */
         getJSONConfigTemplate : function(name, cb) {
-            var fname = name + ".json";
-            var tpath = this.getTmplDir() + fname;
-            return this._readFileJSONTemplate(tpath, cb);
+            return this._readFileJSONTemplate(this.getTmplDir() + name + ".json", cb);
         },
 
         /**
@@ -307,8 +312,7 @@ qx.Class.define("sm.app.Env", {
                     cb(null, res);
                 });
             } else {
-                var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
-                return processFdata(fdata);
+                return processFdata(this.__lfsutils.readFileLockSync(path, "utf8"));
             }
         },
 
@@ -345,8 +349,9 @@ qx.Class.define("sm.app.Env", {
         },
 
 
-        __initInitables : function() {
+        __initInitables : function(cb) {
             if (this._options["initables"] === false) { //Initables not enabled
+                cb();
                 return;
             }
             this._disposeArray("__initables");
@@ -379,11 +384,31 @@ qx.Class.define("sm.app.Env", {
 
             });
 
+            var me = this;
+            var async = $$node.require("async");
+            var tasks = [];
             this.__initables.forEach(function(it) {
-                var clazz = it.constructor;
-                qx.log.Logger.info("\t" + clazz.classname + "[" + it.$$hash + "]");
-                it.init(this);
+                tasks.push(function(_cb) {
+                    var iname = "\t" + it.constructor.classname + "[" + it.$$hash + "]";
+                    qx.log.Logger.info(iname);
+                    try {
+                        it.init(me, function(err) {
+                            if (err) {
+                                qx.log.Logger.error(me, iname, err);
+                            }
+                            _cb(err);
+                        });
+                    } catch(e) {
+                        qx.log.Logger.error(me, iname, e);
+                        _cb(e);
+                    }
+                });
             }, this);
+            async.series(tasks, function(err) {
+                if (cb) {
+                    cb(err);
+                }
+            });
         },
 
         close : function() {

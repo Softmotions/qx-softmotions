@@ -116,7 +116,7 @@ var readFileFd = module.exports.readFileFd = function(fd, enc, callback) {
         callback = function() {
         };
     }
-    var readStream = fs.createReadStream(null, {"fd" : fd});
+    var readStream = l_fs.createReadStream(null, {"fd" : fd});
     readStream.emit('open', fd);
     readStream.resume();
 
