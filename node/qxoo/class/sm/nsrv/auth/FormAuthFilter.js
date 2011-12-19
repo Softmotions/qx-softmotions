@@ -34,7 +34,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         this.__actionName = options["action"] || "login";
         this.__loginParameter = options["loginParameter"] || "login";
         this.__passwordParameter = options["passwordParameter"] || "password";
-        this.__saveUrlKey = options["saveUrlKey"] || "fb411864d4fa48499ae84e77e6c5c119";
+        this.__saveUrlKey = options["saveUrlKey"] || null;
         this.__pageOnSuccess = options["pageOnSuccess"] || null;
         this.__overrides = options["overrides"] || null;
         if (options.rememberMe) {
@@ -204,11 +204,11 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         },
 
         __getSavedUrl : function(req) {
-            return req.session ? req.session[this.__saveUrlKey] : null;
+            return (req.session && this.__saveUrlKey) ? req.session[this.__saveUrlKey] : null;
         },
 
         __setSavedUrl : function(req, url) {
-            if (req.session != null) {
+            if (req.session && this.__saveUrlKey) {
                 if (url == null) {
                     if (req.session[this.__saveUrlKey] != null) {
                         delete req.session[this.__saveUrlKey];
