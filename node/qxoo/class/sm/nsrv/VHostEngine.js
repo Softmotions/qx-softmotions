@@ -50,8 +50,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         }
     },
 
-    construct : function(config) {
+    construct : function(config, id) {
         //required libs
+        this.__id = id;
         this.__path = $$node.require("path");
         this.__fsutils = $$node.require("utils/fsutils");
         this.__url = $$node.require("url");
@@ -64,6 +65,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
     members :
     {
+
+        __id : null,
 
         /**
          * Name of virtual host
@@ -114,6 +117,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          * require('utils/fsutils');
          */
         __fsutils : null,
+
+
+        getId : function() {
+            return this.__id;
+        },
 
         /**
          * Returns virtual host name
@@ -1228,6 +1236,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return this.__server;
         },
 
+        getConnectServer : function() {
+            return this.__server;
+        },
 
         /**
          * Handle raw server request

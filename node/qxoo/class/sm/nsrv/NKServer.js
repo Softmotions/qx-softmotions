@@ -10,17 +10,6 @@
 qx.Class.define("sm.nsrv.NKServer", {
     extend  : qx.core.Object,
 
-    statics :
-    {
-        __CS_INTERCEPTORS : [],
-
-        registerConnectServerConfigInterceptor : function(ic) {
-            if (typeof ic === "function") {
-                this.__CS_INTERCEPTORS.push(ic);
-            }
-        }
-    },
-
     events :
     {
         /**
@@ -33,12 +22,13 @@ qx.Class.define("sm.nsrv.NKServer", {
          * Fired if NKServer going to shutdown
          * data: NKServer instance
          */
-        "goingshutdown" : "qx.event.type.Data"
-    },
+        "goingshutdown" : "qx.event.type.Data",
 
-    properties :
-    {
-
+        /**
+         * Fired if VHostEngine was configured
+         * Data: [sm.nsrv.VHostEngine, sm.nsrv.NKServer]
+         */
+        "configuredVHE" : "qx.event.type.Data"
     },
 
     construct : function(config) {
@@ -91,7 +81,7 @@ qx.Class.define("sm.nsrv.NKServer", {
                     throw new Error("Duplicated vhost config, for virtual host: " + vhost);
                 }
                 var vId = vconf["id"] || vconf["vhost"];
-                this.__venginesById[vId] = this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf);
+                this.__venginesById[vId] = this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf, vId);
             }
             if (this.__vengines["__default__"] && i > 1) {
                 throw new Error("Ony one default virtual host must be configured");
@@ -112,6 +102,10 @@ qx.Class.define("sm.nsrv.NKServer", {
             return this.__venginesById[id];
         },
 
+
+        getHTTPServer : function() {
+            return this.__server;
+        },
 
         /**
          * Server startup
@@ -146,20 +140,9 @@ qx.Class.define("sm.nsrv.NKServer", {
             var vengines = qx.lang.Object.getValues(this.__vengines);
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
-                var srv = ve.createConnectServer();
-
-                //Postconfigure connect HTTP server by custom config interceptors
-                var ciInst = null;
-                var ci = this.self(arguments).__CS_INTERCEPTORS;
-                while (ci.length > 0 && (ciInst = ci.shift()) != null) {
-                    try {
-                        ciInst.call(ciInst, srv, this);
-                    } catch(e) {
-                        qx.log.Logger.error(this, e);
-                    }
-                }
-
-                chandlers.push(this.__vhost(ve.getVHostName(), srv));
+                chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
+                this.fireDataEvent("configuredVHE", [ve, this]);
+                sm.nsrv.NKServerEvents.getInstance().fireDataEvent("configuredVHE", [ve, this]);
             }
 
             $$node.process.nextTick(
@@ -167,6 +150,7 @@ qx.Class.define("sm.nsrv.NKServer", {
                         this.__server = new connect.HTTPServer(chandlers);
                         this.__server.listen(port, host);
                         this.fireDataEvent("started", this);
+                        sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
                     }).bind(this));
         },
 
@@ -195,6 +179,7 @@ qx.Class.define("sm.nsrv.NKServer", {
             if (this.__server) {
                 var me = this;
                 this.fireDataEvent("goingshutdown", this);
+                sm.nsrv.NKServerEvents.getInstance().fireDataEvent("goingshutdown", this);
                 //$$node.process.nextTick(function() {
                 qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
                 try {
