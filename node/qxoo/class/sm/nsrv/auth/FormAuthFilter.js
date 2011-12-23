@@ -90,13 +90,13 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                 }
             };
             if (this.__remember) {
-                this.__tryAutoLogin(req, doAuth);
+                this._tryAutoLogin(req, doAuth);
             } else {
                 doAuth();
             }
         },
 
-        __tryAutoLogin: function(req, cb) {
+        _tryAutoLogin: function(req, cb) {
             var me = this;
             var cookies = new this.__cookies(req);
             var token = cookies.get(this.__remember.cookie);

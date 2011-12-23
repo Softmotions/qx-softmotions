@@ -50,9 +50,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         }
     },
 
-    construct : function(config, id) {
+    construct : function(config, id, nkserver) {
         //required libs
         this.__id = id;
+        this.__nkserver = nkserver;
         this.__path = $$node.require("path");
         this.__fsutils = $$node.require("utils/fsutils");
         this.__url = $$node.require("url");
@@ -66,7 +67,15 @@ qx.Class.define("sm.nsrv.VHostEngine", {
     members :
     {
 
+        /**
+         * VHE ID
+         */
         __id : null,
+
+        /**
+         * NKServer ref
+         */
+        __nkserver : null,
 
         /**
          * Name of virtual host
@@ -121,6 +130,10 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
         getId : function() {
             return this.__id;
+        },
+
+        getNKServer : function() {
+            return this.__nkserver;
         },
 
         /**
@@ -292,7 +305,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (!aClass || typeof aClass !== "function") {
                 throw new Error("Invalid auth filter type in config: " + JSON.stringify(this.__config));
             }
-            security.__filter = new aClass(aconf["options"], userProvider, securityStore);
+            security.__filter = new aClass(aconf["options"], userProvider, securityStore, this);
         },
 
         /**
@@ -1259,7 +1272,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
     destruct : function() {
         this.__config = this.__handlers = this.__regexpHandlers = this.__vhostName = null;
         this.__path = this.__fsutils = this.__url = this.__formidable = this.__querystring = null;
-        this.__server = null;
+        this.__nkserver = this.__server = null;
         //this._disposeObjects("__field_name");
     },
 

@@ -51,6 +51,7 @@ qx.Class.define('sm.nsrv.auth.InMemoryUserProvider', {
             var user = this.__users[login];
             if (!user) {
                 callback(null, null);
+                return;
             }
             var ai = {
                 login: user.login,

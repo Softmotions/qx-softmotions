@@ -81,7 +81,7 @@ qx.Class.define("sm.nsrv.NKServer", {
                     throw new Error("Duplicated vhost config, for virtual host: " + vhost);
                 }
                 var vId = vconf["id"] || vconf["vhost"];
-                this.__venginesById[vId] = this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf, vId);
+                this.__venginesById[vId] = this.__vengines[vhost] = new sm.nsrv.VHostEngine(vconf, vId, this);
             }
             if (this.__vengines["__default__"] && i > 1) {
                 throw new Error("Ony one default virtual host must be configured");
