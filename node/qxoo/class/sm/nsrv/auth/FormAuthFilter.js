@@ -161,7 +161,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
                     req.info.pathname != this.__getFormUrl(req.info.pathname)) {
                 this.__setSavedUrl(req, req.info.href);
             }
-            res.sendSCode(302, { "Location" : this.__getFormUrl(req.info.pathname) });
+            res.sendSCode(302, { "Location" : this.__getFormUrl(req.info.pathname), "Softmotions-Login" : "true"});
         },
 
         success: function(req, res, cb) {

@@ -13,7 +13,12 @@ qx.Class.define("sm.io.Request", {
 
     statics :
     {
-        __ALERT_WND : null
+        __ALERT_WND : null,
+
+        LOGIN_ACTION : function() {
+            alert(qx.locale.Manager.tr("Your user session expired! Please login again"));
+            window.location.reload(true);
+        }
     },
 
     events :
@@ -77,8 +82,8 @@ qx.Class.define("sm.io.Request", {
 
         _onfailed : function(e) {
             this.fireDataEvent("finished", e);
+            var got = this.__checkMessages(e);
             if (this.isShowMessages() == true) {
-                var got = this.__checkMessages(e);
                 if (!got) {
                     var cerr = this.tr("Connection error with address");
                     this.__addMessages(this.tr("Connection error"),
@@ -106,20 +111,17 @@ qx.Class.define("sm.io.Request", {
          * @return {Boolean} True если пришло сообщение об ошибке
          */
         __checkMessages : function(resp) {
-            if (this.isShowMessages() == false) {
-                return false;
-            }
             var headers = resp.getResponseHeaders();
             if (headers == null) {
                 return false;
             }
-            //qx.dev.Debug.debugObject(headers);
-            if (headers["Softmotions-Login"]) {
-                alert(this.tr("Your user session expired, Please login again"));
-                window.location.href = "/";
+            if (headers["Softmotions-Login"] && sm.io.Request.LOGIN_ACTION) {
+                sm.io.Request.LOGIN_ACTION();
+                return false;
             }
-
-
+            if (this.isShowMessages() == false) {
+                return false;
+            }
             var errors = [];
             var msgs = [];
             var eh = "Softmotions-Msg-Err";

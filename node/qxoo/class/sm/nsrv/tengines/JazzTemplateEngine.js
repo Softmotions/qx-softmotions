@@ -148,6 +148,10 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                             "MSIE 7" : "text/html; charset=UTF-8",
                             "MSIE 8" : "text/html; charset=UTF-8"}, _cb);
             };
+            ctx["_set_header_"] = function(headerName, headerVal, _cb) {
+                headers[headerName] = headerVal;
+                _cb("");
+            };
             ctx["_strip_"] = function(prefix) {
                 return req.stripParams(prefix);
             };
