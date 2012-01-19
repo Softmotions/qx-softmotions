@@ -318,7 +318,12 @@ qx.Class.define("sm.app.Env", {
 
         _readFileJSON : function(path) {
             var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
-            return JSON.parse(fdata);
+            try {
+                return JSON.parse(fdata);
+            } catch(e) {
+                qx.log.Logger.error(this, path, e.toString());
+                throw e;
+            }
         },
 
         /**
