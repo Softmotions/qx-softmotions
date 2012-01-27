@@ -1036,16 +1036,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (!res.internal) { //Cleanup memory
                 var origEnd = res.end;
                 res.end = function(data, enc) {
-                    try {
-                        origEnd.apply(res, arguments);
-                    } finally {
-                        sm.nsrv.VHostEngine.cleanupRequest(req, res);
-                        origEnd = null;
+                    if (origEnd) {
+                        try {
+                            origEnd.apply(res, arguments);
+                        } finally {
+                            sm.nsrv.VHostEngine.cleanupRequest(req, res);
+                            origEnd = null;
+                        }
                     }
-                    /*var gc = $$node.require("gc/gc");
-                     var util = $$node.require("util");
-                     var GC = new gc.GC();
-                     GC.collect();*/
                 };
             }
 

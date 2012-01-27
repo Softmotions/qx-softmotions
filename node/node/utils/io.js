@@ -10,10 +10,11 @@
  */
 module.exports.responseHTTPump = function(readStream, writeStream, callback) {
     var callbackCalled = false;
+    var len = 0;
 
-    function call(a, b, c) {
+    function done(err) {
         if (callback && !callbackCalled) {
-            callback(a, b, c);
+            callback(err, len);
             callbackCalled = true;
         }
     }
@@ -31,6 +32,7 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
     }
 
     readStream.addListener('data', function(chunk) {
+        len += chunk.length;
         try {
             writeStream.write(chunk); //removed if (writeStream.write(chunk) === false) readStream.pause();
         } catch(e) { //we can get: Error: Socket.end() called already; cannot write
@@ -55,7 +57,7 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
     });
 
     readStream.addListener('close', function() {
-        call();
+        done();
     });
 
     readStream.addListener('error', function(err) {
@@ -65,7 +67,7 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
             try {
                 writeStream.end();
             } finally {
-                call(err);
+                done(err);
             }
         }
     });
@@ -77,7 +79,7 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
             try {
                 readStream.destroy();
             } finally {
-                call(err);
+                done(err);
             }
         }
     });
