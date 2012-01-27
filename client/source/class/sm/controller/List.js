@@ -39,6 +39,9 @@ qx.Class.define("sm.controller.List", {
             if (spath == null || model == null) {
                 return;
             }
+            if (this.getSelection() == null) {
+                this.setSelection(new qx.data.Array());
+            }
             model.forEach(function(m) {
                 if (m.getSelected && m.getSelected() == true) {
                     this.getSelection().push(m);

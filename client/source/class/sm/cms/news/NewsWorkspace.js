@@ -58,7 +58,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             var options = {};
             var ps = this.__pageSelect;
             var pSelection = ps.getSelection();
-            if (pSelection.length == 1) {
+            if (pSelection != null && pSelection.length == 1) {
                 options["rootPage"] = {
                     "pageId" : pSelection[0].getModel(),
                     "name" : pSelection[0].getLabel()
@@ -100,7 +100,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         var rmPageBt = this.__rmPageBt = new qx.ui.toolbar.Button(null, "sm/cms/icon/16/actions/delete.png").set({enabled : false});
         rmPageBt.addListener("execute", function() {
             var sitems = pageSelect.getSelection();
-            if (sitems.length != 1) {
+            if (!sitems || sitems.length != 1) {
                 return;
             }
             this.__manageNewsRoot(sitems[0].getModel(), "remove");

@@ -29,7 +29,7 @@ qx.Class.define("sm.ui.list.RadioList", {
     },
 
     construct : function(model) {
-        this.base(arguments, model);
+        this.base(arguments, model || new qx.data.Array());
         this.getSelection().addListener("change", function(ev) {
             this.__setValue(this.getSelection().getLength() != 0)
         }, this);

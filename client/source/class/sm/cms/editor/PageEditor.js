@@ -157,7 +157,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             var syncTSelection = function() { //Select appropriate item in templates list
                 var selected = false;
                 for (var i = 0; i < tselectItems.length; ++i) {
-                    var tm = tselectItems[i].getModel();
+                    var tm = tselectItems[i].getModel() || {};
                     if (tm["asm"] == me._pageInfo["asm"]) {
                         tselect.setModelSelection([tm]);
                         if (tm["asm"] != null) {
