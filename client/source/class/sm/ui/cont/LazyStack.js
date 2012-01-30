@@ -85,6 +85,11 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         },
 
 
+        isActiveWidget : function(id) {
+            return (this.__slots[id] && this.__slots[id] === this.__active);
+        },
+
+
         /**
          * Return widget registered with specified id
          * @param id Widget id
