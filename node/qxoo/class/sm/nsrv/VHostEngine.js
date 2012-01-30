@@ -30,7 +30,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             $$node.process.nextTick(function() {
                 if (req._ctx_) { //agressive prune associated context
                     for (var rk in req._ctx_) {
-                        if (req._ctx_.hasOwnProperty(rk)) {
+                        if (req._ctx_.hasOwnProperty(rk) && rk !== "_finished_") {
                             delete req._ctx_[rk];
                         }
                     }
@@ -771,6 +771,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
             }
             var ctx = function(forward) {
+                if (ctx._finished_ === true) {
+                    qx.log.Logger.error(me, "Web 'ctx' end called twice!");
+                    return;
+                }
+                ctx._finished_ = true;
                 if (!forward || forward["terminated"] != true) {
                     ctx.collectMessageHeaders();
                     me.__renderTemplate(req, res, ctx, forward);
