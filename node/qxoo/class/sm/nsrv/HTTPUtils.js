@@ -11,6 +11,27 @@ qx.Class.define("sm.nsrv.HTTPUtils", {
 
     statics :
     {
+
+
+        /**
+         * List of browser supported ISO 639 alpha-2 language codes
+         * @param req Http request
+         */
+        getAlpha2LangCodes : function(req) {
+            var codes = [];
+            var httpLangs = req.headers["accept-language"];
+            if (httpLangs) {
+                httpLangs.split(",").forEach(function(lang) {
+                    var lng = lang.split(";", 1)[0].split("-", 1)[0].toLowerCase();
+                    if (codes.indexOf(lng) === -1) {
+                        codes.push(lng);
+                    }
+                });
+            }
+            return codes;
+        },
+
+
         /**
          * Returns true if request is form submit (file upload) request
          * @param req Nodejs request
