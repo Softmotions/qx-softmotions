@@ -42,9 +42,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
          * @param self {Object?factoryFunc} Self object for factoryFunc
          */
         registerWidget : function(id, factoryFunc, opts, self) {
-            if (qx.core.Environment.get("qx.debug")) {
-                qx.core.Assert.assertFunction(factoryFunc);
-            }
+            qx.core.Assert.assertFunction(factoryFunc);
             this.__slots[id] = {
                 id : id,
                 factory : factoryFunc,
@@ -94,6 +92,10 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             return this.__active ? this.__active["id"] : null;
         },
 
+        isRegisteredWidget : function(id) {
+            return !!this.__slots[id];
+        },
+
         /**
          * Return widget registered with specified id
          * @param id Widget id
@@ -112,7 +114,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 return slot.cached;
             }
             var widget = slot.factory.call(slot.self, id);
-            qx.core.Assert.assertObject(widget, "Factory function has not returned widget");
+            qx.core.Assert.assertObject(widget, "Factory function returns invalid widget");
             this._add(widget);
             slot.cached = widget;
             widget.hide();
