@@ -46,6 +46,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 qx.core.Assert.assertFunction(factoryFunc);
             }
             this.__slots[id] = {
+                id : id,
                 factory : factoryFunc,
                 opts : opts || {},
                 self : self || factoryFunc,
@@ -89,6 +90,9 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             return (this.__slots[id] && this.__slots[id] === this.__active);
         },
 
+        getActiveWidgetId : function() {
+            return this.__active ? this.__active["id"] : null;
+        },
 
         /**
          * Return widget registered with specified id
