@@ -609,7 +609,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
 
             var path = (forward && (typeof forward.path === "string")) ? forward.path : req.info.path;
-            if (forward["absolute"] !== true) {
+            if (!forward || forward["absolute"] !== true) {
                 path = this.__path.join(req.info.webapp["docRoot"], path);
             }
 
