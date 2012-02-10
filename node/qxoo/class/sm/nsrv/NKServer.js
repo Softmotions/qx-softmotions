@@ -110,25 +110,28 @@ qx.Class.define("sm.nsrv.NKServer", {
         /**
          * Server startup
          */
-        startup : function(port, host, filters) {
+        startup : function(port, host, opts) {
 
             var me = this;
-
             if (this.__server) {
                 this.shutdown(function() {
                     if (me.__server == null) {
-                        me.startup(port, host, filters);
+                        me.startup(port, host, opts);
                     }
                 });
                 return;
             }
 
+            opts = opts || {};
             port = port || 3000;
             host = host || null;
             qx.log.Logger.warn(this, "Starting web server at port: " + port + " on: " + (host || "INADDR_ANY"));
 
+            var filters = opts["filters"];
             var connect = $$node.require("connect");
             var chandlers = [];
+            var missingAssemblyHandler = null;
+            var missingExecutorHandler = null;
 
             //Processing custom filters
             if (filters != null && filters.constructor === Array) {
@@ -137,21 +140,30 @@ qx.Class.define("sm.nsrv.NKServer", {
                 }
             }
 
+            if (typeof opts["missingAssemblyHandler"] === "function") {
+                missingAssemblyHandler = opts["missingAssemblyHandler"];
+            }
+            if (typeof opts["missingExecutorHandler"] === "function") {
+                missingExecutorHandler = opts["missingExecutorHandler"];
+            }
+
             var vengines = qx.lang.Object.getValues(this.__vengines);
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
+                ve._setMissingAssemblyHandler(missingAssemblyHandler);
+                ve._setMissingExecutorHandler(missingExecutorHandler);
                 chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
                 this.fireDataEvent("configuredVHE", [ve, this]);
                 sm.nsrv.NKServerEvents.getInstance().fireDataEvent("configuredVHE", [ve, this]);
             }
 
             $$node.process.nextTick(
-                    (function() {
-                        this.__server = new connect.HTTPServer(chandlers);
-                        this.__server.listen(port, host);
-                        this.fireDataEvent("started", this);
-                        sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
-                    }).bind(this));
+              (function() {
+                  this.__server = new connect.HTTPServer(chandlers);
+                  this.__server.listen(port, host);
+                  this.fireDataEvent("started", this);
+                  sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
+              }).bind(this));
         },
 
         __vhost : function(hostname, server) {

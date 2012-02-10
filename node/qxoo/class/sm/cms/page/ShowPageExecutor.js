@@ -9,7 +9,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
 
     statics :
     {
-        __getPageAssembly : function(vhe, name, cb) {
+        missingAssemblyHandler : function(vhe, name, cb) {
             if (name.charAt(0) != "p") {
                 cb("Assembly: " + name + " not found", null);
                 return;
@@ -83,6 +83,22 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                     cb(null, asm, {"_page_" : doc});
                 });
             });
+        },
+
+        missingExecutorAliasHandler : function(req, cb) {
+            if (req.info.webapp.id !== "exp") {
+                cb(false);
+                return;
+            }
+            sm.cms.page.AliasRegistry.getInstance().findPageByAlias(req.info.path.slice(1), function(pageId) {
+                if (pageId == null) {
+                    cb(false);
+                    return;
+                }
+                req.info.path = "/p" + pageId;
+                req.info.pathname = req.info.contextPath + "/p" + pageId;
+                cb(true);
+            });
         }
     },
 
@@ -133,7 +149,9 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
     },
 
     defer : function(statics) {
-        sm.nsrv.VHostEngine.registerAssemblyProvider(statics.__getPageAssembly);
+        //todo review it!
+        //sm.nsrv.VHostEngine.setMissingAssemblyHandler(statics.missingAssemblyHandler.bind(statics));
+        //sm.nsrv.VHostEngine.setMissingExecutorHandler(statics.__missingExecutorAliasHandler.bind(statics));
     }
 
 });

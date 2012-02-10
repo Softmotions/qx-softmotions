@@ -14,26 +14,18 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             cb(null, val);
         },
 
-
-        /**
-         * Update sort order if user wants it to be on top again
-         */
-        popupNewsOnTop : function(attrVal, attrName, attrMeta, asm, page, cb) {
-            if (attrVal || page["popupdate"] == null) {
-                page["popupdate"] = +new Date();
-            }
-            cb(null);
-        },
+        ///////////////////////////////////////////////////////////////////////////
+        //                           Direct page props                           //
+        ///////////////////////////////////////////////////////////////////////////
 
 
         /**
          * Save attribute as direct page property
          */
-        savePageProperty : function(attrVal, attrName, attrMeta, asm, page, cb) {
-            page[attrName] = attrVal;
+        savePageProperty : function(opts, cb) {
+            opts.page[opts.attrName] = opts.attrVal;
             cb(null, null);
         },
-
 
         /**
          * Load attribute as direct page property
@@ -42,19 +34,21 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             cb(null, page[attrName]);
         },
 
+        ///////////////////////////////////////////////////////////////////////////
+        //                               Tags                                    //
+        ///////////////////////////////////////////////////////////////////////////
 
-        /**
-         * If attribute is page tags
-         */
-        saveTagsVal : function(attrVal, attrName, attrMeta, asm, page, cb) {
+        saveTagsVal : function(opts, cb) {
             var value = {};
             var tags;
+            var page = opts.page;
             value["value"] = page["tags"] || [];
+            var attrVal = opts.attrVal;
             try {
                 page["tags"] = JSON.parse(attrVal) || [];
             } catch(e) {
-                qx.log.Logger.error(this, "Failed to parse as json object. asm: " + asm["_name_"] +
-                  ", attr: " + attrName + ", attrValue: " + attrVal, e);
+                qx.log.Logger.error(this, "Failed to parse as json object. asm: " + opts.asm["_name_"] +
+                  ", attr: " + opts.attrName + ", attrValue: " + attrVal, e);
             }
             cb(null, value);
         },
@@ -63,8 +57,11 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             cb(null, page["tags"] || []);
         },
 
+        ///////////////////////////////////////////////////////////////////////////
+        //                             Wiki                                      //
+        ///////////////////////////////////////////////////////////////////////////
 
-        saveWikiVal : function(attrVal, attrName, attrMeta, asm, page, cb) {
+        saveWikiVal : function(opts, cb) {
             var http = $$node.require("http");
             var env = sm.app.Env.getDefault();
             var ropts = env.getJServiceRequestOpts();
@@ -72,6 +69,9 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             ropts["method"] = "POST";
             var me = this;
             var html = [];
+            var attrVal = opts.attrVal;
+            var page = opts.page;
+            var attrName = opts.attrName;
             var req = http.request(ropts, function(res) {
                 if (res.statusCode != 200) {
                     var msg = "Invalid response, status=" + res.statusCode;
@@ -103,5 +103,45 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         loadWikiVal : function(attrName, attrVal, page, cb) {
             cb(null, page["extra"] && page["extra"][attrName] ? page["extra"][attrName] : "");
         }
+    },
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                                Aliases                                //
+    ///////////////////////////////////////////////////////////////////////////
+
+    saveAliasVal : function(opts, cb) {
+        var alias = opts.attrVal;
+        if (!opts.req.isUserHasRoles("alias.admin")) {
+            cb(null);
+            return;
+        }
+        opts.ctx._vhost_engine_.isPathCanBeServed(opts.req.info.webapp.id, alias, function(result) {
+            if (result) {
+                cb(null);
+                return;
+            }
+            sm.cms.page.AliasRegistry.getInstance().findPageByAlias(alias, function(docId) {
+                var coll = sm.cms.page.PageMgr.getColl();
+                opts.page["alias"] = alias;
+                if (!sm.lang.String.isEmpty(alias)) { //reset this alias for other pages
+                    coll.update({"alias" : alias, "_id" : {"$ne" : coll.toObjectID(docId)}}, {"$unset" : {"alias" : 1}});
+                }
+                cb(null, null);
+            });
+        });
+    },
+
+    ///////////////////////////////////////////////////////////////////////////
+    //                                  MISC                                 //
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Update sort order if user wants it to be on top again
+     */
+    popupNewsOnTop : function(opts, cb) {
+        if (opts.attrVal || opts.page["popupdate"] == null) {
+            opts.page["popupdate"] = +new Date();
+        }
+        cb(null);
     }
 });

@@ -12,19 +12,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
     statics :
     {
-        /**
-         * Array of extra assembly providers
-         */
-        __asmProvider : null,
-
-        registerAssemblyProvider : function(provider) {
-            if ((typeof provider) != "function") {
-                qx.log.Logger.warn(this, "Assembly provider must be a function()");
-                return;
-            }
-            this.__asmProvider = provider;
-        },
-
 
         cleanupRequest : function(req, res) {
             $$node.process.nextTick(function() {
@@ -127,6 +114,18 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __fsutils : null,
 
+        /**
+         * Extra assembly provider
+         */
+        __missingAsmHandler : null,
+
+        /**
+         * Handler function for request for which no executor found
+         * Handler args: req, callback(changed: bool)
+         * If changed == true if req object was changed by this handler and need to rehandle request
+         */
+        __missingExecutorHandler : null,
+
 
         getId : function() {
             return this.__id;
@@ -134,6 +133,19 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
         getNKServer : function() {
             return this.__nkserver;
+        },
+
+        getConnectServer : function() {
+            return this.__server;
+        },
+
+        getContextPath : function(id) {
+            var wapp = this.__getWebappConfig(id, false);
+            return wapp ? wapp.contextPath : null;
+        },
+
+        getBuiltInAssemblyMap : function() {
+            return this.__assembly ? this.__assembly : {};
         },
 
         /**
@@ -144,16 +156,94 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return this.__vhostName;
         },
 
+        getTemplateEngineForExt : function(ext) {
+            return this.__tengines[ext];
+        },
+
+        loadAssembly : function(name, cb) {
+            if ((typeof name) != "string") {
+                cb("Invalid assembly name: " + name, null);
+                return;
+            }
+            var asm = this.__assembly[name];
+            if (asm) {
+                cb(null, asm, null);
+                return;
+            }
+            var ah = this.__missingAsmHandler;
+            if (!ah) {
+                cb("Assembly: " + name + " not found", null);
+                return;
+            }
+            try {
+                ah(this, name, cb);
+            } catch(e) {
+                cb(e, null);
+            }
+        },
+
+        /**
+         * Callback called with true if specified path can be served
+         * as static file or as result of executor
+         * @param wappId {String} Id of webapp
+         * @param path {String} path
+         * @param cb {function({Boolean})
+         */
+        isPathCanBeServed : function(wappId, path, cb) {
+            if (~path.indexOf("..") || sm.lang.String.isEmpty(path)) { //Simple security check
+                cb(false);
+                return;
+
+            }
+            var wapp = this.__getWebappConfig(wappId, false);
+            if (!wapp) { //No webapp found, abort
+                cb(false);
+                return;
+            }
+            if (path.charAt(0) !== '/') {
+                path = '/' + path;
+            }
+            var hconf = this.__findHandlerCfg({
+                info : {
+                    pathname : wapp.contextPath + path,
+                    path : path
+                }
+            });
+            if (hconf) {
+                cb(true);
+            }
+            //File or template on disk?
+            this.__path.exists(wapp["docRoot"] + path, function(exists) {
+                cb(exists);
+            });
+        },
+
+
+        _setMissingAssemblyHandler : function(handler) {
+            if (handler !== null && (typeof handler) !== "function") {
+                qx.log.Logger.warn(this, "Assembly provider must be a function");
+                return;
+            }
+            this.__missingAsmHandler = handler;
+        },
+
+
+        _setMissingExecutorHandler : function(handler) {
+            if (handler !== null && (typeof handler) !== "function") {
+                qx.log.Logger.warn(this, "MissingExecutorHandler handler must be a function");
+                return;
+            }
+            this.__missingExecutorHandler = handler;
+        },
+
         __applyConfig : function(config) {
 
             this.__config = config;
             this.__vhostName = this.__config["vhost"];
 
-
             var teArr = [ //list of custom template engines
                 new sm.nsrv.tengines.JazzTemplateEngine()
             ];
-
 
             this.__tengines = {
                 "*" : new sm.nsrv.tengines.StaticTemplateEngine() //hardcoded for any file types
@@ -162,7 +252,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < teArr.length; ++i) { //Process custom template engines
 
                 qx.core.Assert.assertInterface(teArr[i], sm.nsrv.ITemplateEngine,
-                        "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
+                  "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
 
                 if (config["templateOptions"] != null) {
                     var topts = config["templateOptions"];
@@ -266,7 +356,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             this.__loadHandlers();
             this.__loadAssembly();
         },
-
 
         __setWappSecurity : function(wa, sconf) {
             if (!sconf) {
@@ -379,32 +468,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return ret;
         },
 
-        loadAssembly : function(name, cb) {
-            if ((typeof name) != "string") {
-                cb("Invalid assembly name: " + name, null);
-                return;
-            }
-            var asm = this.__assembly[name];
-            if (asm) {
-                cb(null, asm, null);
-                return;
-            }
-            var provider = this.self(arguments).__asmProvider;
-            if (!provider) {
-                cb("Assembly: " + name + " not found", null);
-                return;
-            }
-            try {
-                provider(this, name, cb);
-            } catch(e) {
-                cb(e, null);
-            }
-        },
-
-        getBuiltInAssemblyMap : function() {
-            return this.__assembly ? this.__assembly : {};
-        },
-
         /**
          * Load web assembly
          */
@@ -449,7 +512,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                            " [" + this.__vhostName + "]:[" + wappId + "]");
+                      " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -477,7 +540,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                            JSON.stringify(asm, true));
+                      JSON.stringify(asm, true));
                 }
             }
             for (var asn in this.__assembly) {
@@ -553,7 +616,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug")) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                                    "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                              "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -562,7 +625,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + hlSlot["$$class"] + "#" + (hlSlot["handler"]) +
-                                        "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
+                                  "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -575,10 +638,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-        },
-
-        getTemplateEngineForExt : function(ext) {
-            return this.__tengines[ext];
         },
 
         /**
@@ -732,7 +791,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     cb.call(self, err);
                 } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
                     cb.call(self, "Unauthorized to access: '" + req.info.pathname +
-                            "' for roles: " + JSON.stringify(reqRoles));
+                      "' for roles: " + JSON.stringify(reqRoles));
                 } else if (redirect != null) {
                     res.sendSCode(302, {"Location" : redirect});
                 } else {
@@ -752,27 +811,30 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }, this);
         },
 
+        __findHandlerCfg : function(req) {
+            var hconf = this.__handlers[req.info.pathname];
+            if (hconf !== undefined) {
+                return hconf;
+            }
+            for (var j = 0; j < this.__regexpHandlers.length; ++j) {
+                var rh = this.__regexpHandlers[j];
+                if (rh["$$re"].test(req.info.path)) {
+                    return rh;
+                }
+            }
+            return null;
+        },
+
         /**
          * Main routine to handle http request
          */
         __handleReqInternal : function(req, res, next) {
-
             var me = this;
             //trying to find handlers
-            var hconf = this.__handlers[req.info.pathname];
-            if (hconf === undefined) { //try to find regexp handler
-                var path = req.info.path;
-                for (var i = 0; i < this.__regexpHandlers.length; ++i) {
-                    var rh = this.__regexpHandlers[i];
-                    if (rh["$$re"].test(path)) {
-                        hconf = rh;
-                        break;
-                    }
-                }
-            }
+            var hconf = this.__findHandlerCfg(req);
             var ctx = function(forward) {
                 if (ctx._finished_ === true) {
-                    qx.log.Logger.error(me, "Web 'ctx' end called twice!");
+                    qx.log.Logger.error(me, "Web ctx.end() called twice!");
                     return;
                 }
                 ctx._finished_ = true;
@@ -796,7 +858,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     return false;
                 }
             };
-
             ctx._vhost_engine_ = this;
             req._ctx_ = ctx;
             if (req.$$ctxParams != null) {
@@ -806,11 +867,33 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-            if (hconf === undefined) { //handlers not found, serve static content or templates
+            if (hconf !== undefined) { //handlers found
+                this.__execHandler(hconf, req, res, ctx, next);
+                return;
+            }
+            var eh = this.__missingExecutorHandler;
+            if (eh == null) {
                 ctx(null);
                 return;
             }
+            eh(req, function(changed) {
+                if (!changed) {
+                    ctx(null);
+                    return;
+                }
+                hconf = me.__findHandlerCfg(req);
+                if (hconf) {
+                    me.__execHandler(hconf, req, res, ctx, next);
+                } else {
+                    ctx(null);
+                }
+            });
+        },
 
+        /**
+         * Execute request executor
+         */
+        __execHandler : function(hconf, req, res, ctx, next) {
             //Call executor
             var hinst = hconf["$$instance"];
             var exec = hinst[hconf["handler"]];
@@ -820,7 +903,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (qx.core.Environment.get("sm.nsrv.debug") == true) {
                 qx.log.Logger.debug("Executing handler: '" + hconf["$$class"] + "#" + (hconf["handler"]) + "()");
             }
-
             var callback = function() {
                 try {
                     exec.call(hinst, req, res, ctx);
@@ -840,13 +922,11 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var secured = this.__getHconfValue(hconf, "secured");
             var roles = this.__getHconfValue(hconf, "roles") || [];
 
-            if (qx.core.Environment.get("sm.nsrv.security.suppress") == true) {
+            if (qx.core.Environment.get("sm.nsrv.security.suppress")) {
                 callback();
                 return;
             }
-
-            if ((secured || hconf["logout"]) &&
-                    (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
+            if ((secured || hconf["logout"]) && (security = this.__security[this.__getHconfValue(hconf, "webapp")])) {
                 if (hconf["logout"]) {
                     security.__filter.logout(req, res, callback);
                 } else {
@@ -885,7 +965,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 var m = res.messages[i];
                 var isErr = m.isError();
                 res.headers[(isErr ? ("Softmotions-Msg-Err" + errC) : ("Softmotions-Msg-Reg" + nerrC))]
-                        = encodeURIComponent(m.getMessage());
+                  = encodeURIComponent(m.getMessage());
                 if (isErr) {
                     ++errC;
                 } else {
@@ -1227,32 +1307,28 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             //EOF session staff
 
             this.__server = connect.createServer(
-                    function (req, res, next) {
-                        if (req.internal === true) {
-                            next()
-                        } else {
-                            cookieParser(req, res, next);
-                        }
-                    },
-                    function (req, res, next) {
-                        me.__initRequestHandler(req, res, next);
-                    },
-                    session
-                    ,
-                    function (req, res, next) {
-                        me.__populateRequestParams(req, res, next);
-                    },
-                    function (req, res, next) {
-                        me.__handleReq(req, res, next);
-                    },
-                    function (err, req, res, next) {
-                        me.__handleError(err, req, res, next);
-                    });
+              function (req, res, next) {
+                  if (req.internal === true) {
+                      next()
+                  } else {
+                      cookieParser(req, res, next);
+                  }
+              },
+              function (req, res, next) {
+                  me.__initRequestHandler(req, res, next);
+              },
+              session
+              ,
+              function (req, res, next) {
+                  me.__populateRequestParams(req, res, next);
+              },
+              function (req, res, next) {
+                  me.__handleReq(req, res, next);
+              },
+              function (err, req, res, next) {
+                  me.__handleError(err, req, res, next);
+              });
 
-            return this.__server;
-        },
-
-        getConnectServer : function() {
             return this.__server;
         },
 

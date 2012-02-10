@@ -435,14 +435,15 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         finish();
                     } else {
                         for (var i = 0; i < anames.length; ++i) {
-                            me.__setupAttrValue(doc, attrs, anames[i][0], anames[i][1], asm, ctx, function(err) {
-                                if (err) {
-                                    errCount++;
-                                }
-                                if (--ac == 0) {
-                                    finish();
-                                }
-                            });
+                            me.__setupAttrValue(doc, attrs, anames[i][0], anames[i][1], asm, req, ctx,
+                              function(err) {
+                                  if (err) {
+                                      errCount++;
+                                  }
+                                  if (--ac == 0) {
+                                      finish();
+                                  }
+                              });
                         }
                     }
                 });
@@ -497,7 +498,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             }
         },
 
-        __setupAttrValue : function(page, attrs, attrName, rawValue, asm, ctx, cb) {
+        __setupAttrValue : function(page, attrs, attrName, rawValue, asm, req, ctx, cb) {
             this.__asmMeta(asm, ctx, function(err, asmMeta) {
                 if (err || !asmMeta || !asmMeta[attrName]) {
                     cb();
@@ -521,7 +522,15 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 }
                 if ((typeof saveAs) === "function") {
                     try {
-                        saveAs(rawValue, attrName, attrMeta, asm, page, function(err, val) {
+                        saveAs({
+                            attrVal: rawValue,
+                            attrName: attrName,
+                            attrMeta: attrMeta,
+                            asm: asm,
+                            page: page,
+                            req: req,
+                            ctx: ctx
+                        }, function(err, val) {
                             if (!err && val !== undefined) {
                                 attrs[attrName] = val;
                             }
