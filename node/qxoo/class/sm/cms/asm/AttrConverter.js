@@ -122,9 +122,11 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             }
             sm.cms.page.AliasRegistry.getInstance().findPageByAlias(alias, function(docId) {
                 var coll = sm.cms.page.PageMgr.getColl();
-                opts.page["alias"] = alias;
                 if (!sm.lang.String.isEmpty(alias)) { //reset this alias for other pages
+                    opts.page["alias"] = alias;
                     coll.update({"alias" : alias, "_id" : {"$ne" : coll.toObjectID(docId)}}, {"$unset" : {"alias" : 1}});
+                } else {
+                    delete opts.page["alias"];
                 }
                 cb(null, null);
             });
