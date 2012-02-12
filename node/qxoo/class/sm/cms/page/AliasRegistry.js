@@ -8,154 +8,86 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
     type : "singleton",
 
     construct: function() {
-        var size = sm.app.Env.getDefaultConfig()["aliasesCacheSize"];
-        if (isNaN(size) || size <= 0) {
-            size = 1024;
+        var mlen = sm.app.Env.getDefaultConfig()["aliasesCacheSize"];
+        if (isNaN(mlen) || mlen <= 0) {
+            mlen = 1024;
         }
-        this.__maxLength = size;
-        this.__lruList = new sm.lang.DoubleLinkedList();
+        var LRUCache = $$node.require("lru-cache");
+        this.__a2pageCache = new LRUCache(mlen);
+        this.__p2aliasCache = new LRUCache(mlen);
     },
 
     members : {
 
-        __mapABP : {},
-        __mapPBA : {},
-        __lruList : null,
-        __length : 0,
-        __maxLength : null,
+        /**
+         * Alias -> pages LRU cache
+         */
+        __a2pageCache : null,
 
-        __hOP : function(obj, key) {
-            return Object.prototype.hasOwnProperty.call(obj, key);
-        },
+        /**
+         * Page -> alias LRU cache
+         */
+        __p2aliasCache : null,
 
-        __set : function(id, alias) {
-            if (this.__hOP(this.__mapABP, id)) {
-                this.__delId(id);
-            }
-            if (this.__hOP(this.__mapPBA, alias)) {
-                this.__delAlias(id);
-            }
-            var hit = {
-                id: id,
-                alias: alias
-            };
-            this.__mapABP[id] = this.__mapPBA[alias] = hit;
-            this.__lruList.add(hit);
-            this.__length++;
-            if (this.__length > this.__maxLength) {
-                this.__trim();
-            }
-        },
 
-        __getId : function(alias) {
-            if (!this.__hOP(this.__mapPBA, alias)) return undefined;
-            var hit = this.__mapPBA[alias];
-            this.__lruList.del(hit);
-            this.__lruList.add(hit);
-            return hit.id;
-        },
-
-        __getAlias : function(id) {
-            if (!this.__hOP(this.__mapABP, id)) return undefined;
-            var hit = this.__mapABP[id];
-            this.__lruList.del(hit);
-            this.__lruList.add(hit);
-            return hit.alias;
-        },
-
-        __delId : function(id) {
-            if (!this.__hOP(this.__mapABP, id)) return undefined;
-            var hit = this.__mapABP[id];
-            delete this.__mapABP[id];
-            delete this.__mapPBA[hit.alias];
-            this.__lruList.del(hit);
-            this.__length--;
-        },
-
-        __delAlias : function(alias) {
-            if (!this.__hOP(this.__mapPBA, alias)) return undefined;
-            var hit = this.__mapPBA[alias];
-            delete this.__mapPBA[alias];
-            delete this.__mapABP[hit.id];
-            this.__lruList.del(hit);
-            this.__length--;
-        },
-
-        __trim : function() {
-            if (this.__length <= this.__maxLength) return undefined;
-            for (var i = 0, l = this.__length - this.__maxLength; i < l; ++i) {
-                this.__lruList.del(this.__lruList.getTail());
-            }
-            this.__length = this.__maxLength;
-        },
-
-        __aliasForPage : function(doc) {
+        __aliasForPage : function(doc, pageId) {
             doc = doc || {};
-            if (doc.alias) {
+            if (doc.alias != null) {
                 return doc.alias;
             }
-            if (doc._id) {
-                return "p" + doc._id.toString();
+            return "p" + (doc._id != null ? doc._id : pageId);
+        },
+
+        __onPageSaved : function(doc) {
+            if (doc.alias != null) {
+                this.__a2pageCache.del(doc.alias);
             }
-            return null;
+            if (doc._id != null) {
+                this.__p2aliasCache.del(doc._id.toString());
+            }
         },
 
         findAliasByPage : function(pageId, cb) {
             var me = this;
-            var alias = this.__getAlias(pageId);
+            var alias = this.__p2aliasCache.get(pageId);
             if (alias !== undefined) {
-                cb(alias);
+                cb(null, alias);
                 return;
             }
             var coll = sm.cms.page.PageMgr.getColl();
             coll.findOne({"_id" : coll.toObjectID(pageId)}, {"fields" : {"alias" : 1}}, function(err, doc) {
                 if (err) {
-                    qx.log.Logger.error(me, "find alias by page", err);
-                    cb("p" + pageId);
+                    cb(err);
                     return;
                 }
-                doc = doc || {
-                    _id : pageId
-                };
-                alias = me.__aliasForPage(doc);
-                me.__set(pageId, alias);
-                if (alias != null) {
-                    cb(alias)
-                } else {
-                    cb("p" + pageId);
-                }
+                alias = me.__aliasForPage(doc, pageId);
+                me.__p2aliasCache.set(pageId, alias);
+                cb(null, alias);
             });
         },
 
         findPageByAlias : function(alias, cb) {
             var me = this;
-            var result = this.__getId(alias);
-            if (result === undefined) {
-                var coll = sm.cms.page.PageMgr.getColl();
-                coll.findOne({"alias" : alias}, function(err, doc) {
-                    if (err) {
-                        qx.log.Logger.error(me, "find page by alias", err);
-                        cb(null);
-                        return;
-                    }
-                    if (doc) {
-                        var id = doc._id.toString();
-                        me.__set(id, alias);
-                        cb(id);
-                    } else {
-                        cb(null);
-                    }
-                });
-            } else {
-                cb(result);
-            }
-        },
-
-        __onPageSaved : function(doc) {
-            if (doc == null || doc._id == null) {
+            var pid = this.__a2pageCache.get(alias);
+            if (pid !== undefined) {
+                cb(pid);
                 return;
             }
-            this.__set(doc._id.toString(), this.__aliasForPage(doc));
+            var coll = sm.cms.page.PageMgr.getColl();
+            coll.findOne({"alias" : alias}, function(err, doc) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+                var pid = doc ? doc._id.toString() : null;
+                me.__a2pageCache.set(alias, pid);
+                cb(null, pid);
+            });
+        },
+
+        invalidate : function() {
+            this.__a2pageCache.reset();
+            this.__p2aliasCache.reset();
         }
     },
 

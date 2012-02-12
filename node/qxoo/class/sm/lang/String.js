@@ -38,6 +38,9 @@ qx.Class.define("sm.lang.String", {
          * Transliterate russian encoded string into ascii lating string
          */
         translitRussian : function(str) {
+            if (str == null) {
+                return str;
+            }
             var res = [];
             for (var i = 0; i < str.length; ++i) {
                 var tc = this.RU_EN_MAP[str.charAt(i)];

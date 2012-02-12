@@ -23,6 +23,8 @@
  *    media : [fnames],
  *    hierarchy : [nodeIds], //parent nodes ids (with out current node id)
  *    cachedPath : String,
+ *    alias : String,        //Page alias
+ *    aliasFix : String      //User defined page alias, instead transliterated page name will be used
  *    creator : String       //Page creator user ID
  *    owner : String         //Page owner user ID
  *    category : String      //News category, only for news pages
@@ -109,6 +111,24 @@ qx.Class.define("sm.cms.page.PageMgr", {
             });
         },
 
+
+        /**
+         * Return full page alias as if page is direct child of the parent
+         * @param parent
+         * @param doc
+         */
+        getPageAliasFromParent : function(parent, doc) {
+            doc["alias"] = (parent ? parent["alias"] || "" : "") + "/" + this.getPageAliasSuffix(doc)
+        },
+
+        /**
+         * Return atomic alias suffix of given page.
+         * Full hierarchy page alias doc['alias'] computed during page saving
+         */
+        getPageAliasSuffix : function(doc) {
+            return sm.lang.String.isEmpty(doc["aliasFix"]) ? sm.lang.String.translitRussian(doc["name"]) : doc["aliasFix"];
+        },
+
         /**
          * Create new node for specified parent
          *
@@ -139,6 +159,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
                 var save = function(parent) {
                     doc["cachedPath"] = (parent ? parent["cachedPath"] || "" : "") + "/" + doc["name"];
+                    doc["alias"] = me.getPageAliasFromParent(parent, doc);
                     doc["hierarchy"] = parent ? (parent["hierarchy"] ? [].concat(parent["hierarchy"]).concat(parent["_id"]) : [parent["_id"]]) : [];
                     doc["owner"] = doc["creator"] = userId;
                     if (doc["cdate"] == null) {
@@ -185,11 +206,11 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 me._updateNode(nodeId, {
-                            "name": qx.lang.String.trim(name),
-                            "mdate": qx.lang.Date.now()
-                        },
-                        options,
-                        cb);
+                      "name": qx.lang.String.trim(name),
+                      "mdate": qx.lang.Date.now()
+                  },
+                  options,
+                  cb);
             });
         },
 
@@ -227,7 +248,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                             cb(err);
                             return;
                         }
-                        me.updateNodeCachedPath(doc, cb);
+                        me.updateNodeCachedData(doc, cb);
                     });
                 };
 
@@ -613,8 +634,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
                 //Check news page
                 if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] &&
-                        (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
-
+                  (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
                     if (req.isUserInRoles(["news.admin"])) { //if we news admin
                         cb(null, pushModes("e", "d", "r").join(""));
                         return;
@@ -638,14 +658,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
 
             var coll = this.getColl();
             coll.findOne({_id : coll.toObjectID(pageId)},
-                    {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
-                    function(err, doc) {
-                        if (err) {
-                            cb(err, "");
-                            return;
-                        }
-                        checkAccess(doc);
-                    });
+              {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
+              function(err, doc) {
+                  if (err) {
+                      cb(err, "");
+                      return;
+                  }
+                  checkAccess(doc);
+              });
         },
 
 
@@ -655,14 +675,14 @@ qx.Class.define("sm.cms.page.PageMgr", {
         ///////////////////////////////////////////////////////////////////////////
 
         /**
-         * Updates node cachedPath for all nodes, witch contains specified node in hierarchy
+         * Updates node cachedPath|alias for all nodes, witch contains specified node in hierarchy
          *
          * @param node {String} modified node
          */
-        updateNodeCachedPath : function(node, cb) {
+        updateNodeCachedData : function(node, cb) {
+            var me = this;
             var mongo = this.__getMongo();
             var coll = this.getColl();
-
             var iteration = 0;
             var errors = [];
             var gcb = function(err) {
@@ -675,44 +695,44 @@ qx.Class.define("sm.cms.page.PageMgr", {
             };
 
             // recursion for updating cached path
-            var update = function(cnode, parentPath) {
+            var update = function(cnode, parent) {
                 ++iteration;
+                var parentPath = parent["cachedPath"] || "";
                 var path = (parentPath || "") + "/" + cnode["name"]; // current path = parent path + / + current name
+                var alias = me.getPageAliasFromParent(parent, cnode);
                 var cnodeId = mongo.toObjectID(cnode["_id"]);
-                coll.update({"_id" : cnodeId}, {"$set" : {"cachedPath" : path}}, function(err) {
+                coll.update({"_id" : cnodeId}, {"$set" : {"cachedPath" : path, "alias" : alias}}, function(err) {
                     if (err) {
                         gcb(err);
                         return;
                     }
-
                     coll.createQuery({"parent" : coll.toDBRef(cnodeId)}, {"fields" : {"_id" : 1, "name" : 1}})
-                            .each(function(index, unode) {
-                                update(unode, path);
-                            })
-                            .exec(function(err) {
-                                gcb(err);
-                            });
+                      .each(
+                      function(index, unode) {
+                          update(unode, path);
+                      }).exec(function(err) {
+                          gcb(err);
+                      });
                 });
             };
 
             // search for parent (getting parent cached path)
             if (node["parent"]) {
                 coll.findOne({"_id" : mongo.toObjectID(node["parent"]["oid"])},
-                        {"fields" : {"cachedPath": 1}},
-                        function(err, parent) {
-                            if (err) {
-                                cb(err);
-                                return;
-                            }
-                            if (!parent) {
-                                cb("Parent not found");
-                                return;
-                            }
-                            update(node, parent["cachedPath"]);
-                        });
-
+                  {"fields" : {"cachedPath": 1, "alias" : 1}},
+                  function(err, parent) {
+                      if (err) {
+                          cb(err);
+                          return;
+                      }
+                      if (!parent) {
+                          cb("Parent not found");
+                          return;
+                      }
+                      update(node, parent);
+                  });
             } else {
-                update(node, "");
+                update(node, {});
             }
         }
     },

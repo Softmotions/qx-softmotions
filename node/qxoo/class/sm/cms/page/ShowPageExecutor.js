@@ -90,8 +90,8 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                 cb(false);
                 return;
             }
-            sm.cms.page.AliasRegistry.getInstance().findPageByAlias(req.info.path.slice(1), function(pageId) {
-                if (pageId == null) {
+            sm.cms.page.AliasRegistry.getInstance().findPageByAlias(req.info.path.slice(1), function(err, pageId) {
+                if (err || pageId == null) {
                     cb(false);
                     return;
                 }

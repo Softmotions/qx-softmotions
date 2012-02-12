@@ -1066,10 +1066,12 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 if (intoDoc != null) {
                     subjDoc["parent"] = coll.toDBRef(intoDoc["_id"]);
                     subjDoc["cachedPath"] = intoDoc["cachedPath"] + "/" + subjDoc["name"];
+                    subjDoc["alias"] = pmgr.getPageAliasFromParent(intoDoc, subjDoc);
                     subjDoc["hierarchy"] = [].concat(intoDoc["hierarchy"]).concat(intoDoc["_id"]);
                 } else {
                     delete subjDoc["parent"];
                     subjDoc["cachedPath"] = "/" + subjDoc["name"];
+                    subjDoc["alias"] = pmgr.getPageAliasFromParent(null, subjDoc);
                     subjDoc["hierarchy"] = [];
                 }
                 coll.save(subjDoc, function(err) {
@@ -1077,7 +1079,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         me.handleError(resp, ctx, err);
                         return;
                     }
-                    pmgr.updateNodeCachedPath(subjDoc, function() {
+                    pmgr.updateNodeCachedData(subjDoc, function() {
                         me.writeJSONObject({}, resp, ctx);
                     });
                 });

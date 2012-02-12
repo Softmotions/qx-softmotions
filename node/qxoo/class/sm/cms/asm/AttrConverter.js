@@ -120,7 +120,12 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
                 cb(null);
                 return;
             }
-            sm.cms.page.AliasRegistry.getInstance().findPageByAlias(alias, function(docId) {
+            var areg = sm.cms.page.AliasRegistry.getInstance();
+            areg.findPageByAlias(alias, function(err, docId) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
                 var coll = sm.cms.page.PageMgr.getColl();
                 if (!sm.lang.String.isEmpty(alias)) { //reset this alias for other pages
                     opts.page["alias"] = alias;
