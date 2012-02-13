@@ -42,7 +42,6 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
             var me = this;
             var alias = this.__p2aliasCache.get(pageId);
             if (alias !== undefined) {
-                qx.log.Logger.info("Get cached alias=" + alias + ", for=" + pageId);
                 cb(null, alias);
                 return;
             }
@@ -53,7 +52,6 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                     return;
                 }
                 alias = me.__aliasForPage(doc);
-                //qx.log.Logger.info("cache alias=" + alias + ", for=" + pageId);
                 me.__p2aliasCache.set(pageId, alias);
                 cb(null, alias);
             });
