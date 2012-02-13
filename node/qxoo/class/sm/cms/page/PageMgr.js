@@ -118,7 +118,10 @@ qx.Class.define("sm.cms.page.PageMgr", {
          * @param doc
          */
         getPageAliasFromParent : function(parent, doc) {
-            doc["alias"] = (parent ? parent["alias"] || "" : "") + "/" + this.getPageAliasSuffix(doc)
+            if (doc["alias"] === "-") {
+                return doc["alias"];
+            }
+            return (parent && parent["alias"] && parent["alias"] !== "-" ? parent["alias"] : "") + "/" + this.getPageAliasSuffix(doc)
         },
 
         /**
@@ -126,7 +129,57 @@ qx.Class.define("sm.cms.page.PageMgr", {
          * Full hierarchy page alias doc['alias'] computed during page saving
          */
         getPageAliasSuffix : function(doc) {
-            return sm.lang.String.isEmpty(doc["aliasFix"]) ? sm.lang.String.translitRussian(doc["name"]) : doc["aliasFix"];
+            var suff = sm.lang.String.isEmpty(doc["aliasFix"]) ? sm.lang.String.translitRussian(doc["name"]) : doc["aliasFix"];
+            suff = suff.replace(/\s+/g, '_').replace(/\W+/g, '').trim().toLocaleLowerCase();
+            if (doc.type == this.TYPE_NEWS_PAGE) {
+                var cdate = doc["cdate"] ? new Date(doc["cdate"]) : new Date();
+                suff = (cdate.getFullYear() + "_" + (cdate.getMonth() + 1) + "_" + cdate.getDate()) + "/" + suff;
+            }
+            return suff;
+        },
+
+
+        /**
+         * Override page alias by user-defined value
+         * @param page
+         * @param aliasFix
+         * @param cb
+         */
+        fixPageAlias : function(page, aliasFix, cb) {
+            var me = this;
+            aliasFix = sm.lang.String.isEmpty(aliasFix) ? null : aliasFix.trim();
+            var coll = me.getColl();
+            if (page["aliasFix"] === aliasFix) {
+                cb();
+                return;
+            }
+            page["aliasFix"] = aliasFix;
+            if (aliasFix === "-") {
+                page["alias"] = "-";
+            } else if (aliasFix == null) {
+                delete page["aliasFix"];
+            }
+            var getParent = function(pref, cb) {
+                if (pref == null || pref["oid"] == null) {
+                    cb(null, null)
+                } else {
+                    coll.findOne({"_id" : coll.toObjectID(pref["oid"])}, {"fields" : {"alias" : 1, "type" : 1, "name" : 1}}, cb);
+                }
+            };
+            getParent(page["parent"], function(err, parent) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+                var alias = me.getPageAliasFromParent(parent, page);
+                if (alias !== "-") {
+                    coll.update({"alias" : alias, "_id" : {"$ne" : coll.toObjectID(page._id)}}, {"$unset" : {"alias" : 1}}, function() {
+                        me.updateNodeCachedData(page, cb);
+                    });
+                } else {
+                    me.updateNodeCachedData(page, cb);
+                }
+            });
         },
 
         /**
@@ -683,6 +736,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
             var me = this;
             var mongo = this.__getMongo();
             var coll = this.getColl();
+            var areg = sm.cms.page.AliasRegistry.getInstance();
             var iteration = 0;
             var errors = [];
             var gcb = function(err) {
@@ -695,21 +749,22 @@ qx.Class.define("sm.cms.page.PageMgr", {
             };
 
             // recursion for updating cached path
-            var update = function(cnode, parent) {
+            var update = function(cnode, parentPath, parentAlias) {
                 ++iteration;
-                var parentPath = parent["cachedPath"] || "";
                 var path = (parentPath || "") + "/" + cnode["name"]; // current path = parent path + / + current name
-                var alias = me.getPageAliasFromParent(parent, cnode);
+                var alias = (cnode["alias"] === "-") ? cnode["alias"] : ((parentAlias && parentAlias !== "-" ? parentAlias : "") + "/" + me.getPageAliasSuffix(cnode));
                 var cnodeId = mongo.toObjectID(cnode["_id"]);
+                //qx.log.Logger.info("alias=" + alias + " id=" + cnodeId);
                 coll.update({"_id" : cnodeId}, {"$set" : {"cachedPath" : path, "alias" : alias}}, function(err) {
                     if (err) {
                         gcb(err);
                         return;
                     }
-                    coll.createQuery({"parent" : coll.toDBRef(cnodeId)}, {"fields" : {"_id" : 1, "name" : 1}})
+                    areg.invalidateFor(cnodeId, alias);
+                    coll.createQuery({"parent" : coll.toDBRef(cnodeId)}, {"fields" : {"_id" : 1, "name" : 1, "type" : 1, "cdate" : 1}})
                       .each(
                       function(index, unode) {
-                          update(unode, path);
+                          update(unode, path, alias);
                       }).exec(function(err) {
                           gcb(err);
                       });
@@ -729,10 +784,10 @@ qx.Class.define("sm.cms.page.PageMgr", {
                           cb("Parent not found");
                           return;
                       }
-                      update(node, parent);
+                      update(node, parent["cachedPath"], parent["alias"]);
                   });
             } else {
-                update(node, {});
+                update(node, null, null);
             }
         }
     },

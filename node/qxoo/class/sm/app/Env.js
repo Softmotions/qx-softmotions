@@ -389,6 +389,7 @@ qx.Class.define("sm.app.Env", {
 
             });
 
+
             var me = this;
             var async = $$node.require("async");
             var tasks = [];
@@ -409,11 +410,14 @@ qx.Class.define("sm.app.Env", {
                     }
                 });
             }, this);
-            async.series(tasks, function(err) {
-                if (cb) {
-                    cb(err);
-                }
-            });
+
+            setTimeout(function() {
+                async.series(tasks, function(err) {
+                    if (cb) {
+                        cb(err);
+                    }
+                });
+            }, 100); //todo duty hack, take timeout to startup mongodb staff
         },
 
         close : function() {

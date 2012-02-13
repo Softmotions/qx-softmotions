@@ -7,15 +7,27 @@ qx.Class.define("sm.cms.wiki.WikiMarkupExecutor", {
     extend  : qx.core.Object,
     include : [sm.nsrv.MExecutor],
 
+    construct: function() {
+        this.__reCache = {};
+    },
+
     members :
     {
+
+
+        __reCache : null,
+
         /**
          * Generate html code based on markup
          */
         __wiki : function(req, resp, ctx) {
             var ar = sm.cms.page.AliasRegistry.getInstance();
             var ctxpath = req.info.contextPath;
-            var re = new RegExp('href="(?:http:\\/\\/[\\w.]+)?\\' + qx.lang.String.escapeRegexpChars(ctxpath) + '\\/p([0-9a-f]{24})"', "g");
+            var re = this.__reCache[ctxpath];
+            if (re === undefined) {
+                re = this.__reCache[ctxpath] = new RegExp('href=(?:\'|\")(?:http:\\/\\/[\\w.]+)?' + qx.lang.String.escapeRegexpChars(ctxpath) + '\\/p([0-9a-z]{24})((#.*)?|(\\?.*))(?:\'|\")', "g");
+            }
+            re.lastIndex = 0;
             var beforeIndex = 0;
             var data = ctx["html"] || "";
             var out = [];
@@ -33,9 +45,9 @@ qx.Class.define("sm.cms.wiki.WikiMarkupExecutor", {
                 ar.findAliasByPage(pid, function(err, alias) {
                     out.push(data.slice(beforeIndex, res.index));
                     if (err || alias == null) {
-                        alias = "p" + pid;
+                        alias = "/p" + pid;
                     }
-                    out.push('href="' + ctx + "/" + alias + '"');
+                    out.push('href="' + ctxpath + qx.lang.String.stripTags(alias) + (res[2] || "") + '"');
                     searchNext();
                 });
             }

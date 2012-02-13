@@ -30,27 +30,19 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
         __p2aliasCache : null,
 
 
-        __aliasForPage : function(doc, pageId) {
-            doc = doc || {};
-            if (doc.alias != null) {
-                return doc.alias;
-            }
-            return "p" + (doc._id != null ? doc._id : pageId);
+        __aliasForPage : function(doc) {
+            return (doc != null && doc.alias != null) ? doc.alias : null;
         },
 
         __onPageSaved : function(doc) {
-            if (doc.alias != null) {
-                this.__a2pageCache.del(doc.alias);
-            }
-            if (doc._id != null) {
-                this.__p2aliasCache.del(doc._id.toString());
-            }
+            this.invalidateForPage(doc);
         },
 
         findAliasByPage : function(pageId, cb) {
             var me = this;
             var alias = this.__p2aliasCache.get(pageId);
             if (alias !== undefined) {
+                qx.log.Logger.info("Get cached alias=" + alias + ", for=" + pageId);
                 cb(null, alias);
                 return;
             }
@@ -60,7 +52,8 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                     cb(err);
                     return;
                 }
-                alias = me.__aliasForPage(doc, pageId);
+                alias = me.__aliasForPage(doc);
+                //qx.log.Logger.info("cache alias=" + alias + ", for=" + pageId);
                 me.__p2aliasCache.set(pageId, alias);
                 cb(null, alias);
             });
@@ -68,13 +61,17 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
 
         findPageByAlias : function(alias, cb) {
             var me = this;
+            if (alias === "-") {
+                cb(null, null);
+                return;
+            }
             var pid = this.__a2pageCache.get(alias);
             if (pid !== undefined) {
-                cb(pid);
+                cb(null, pid);
                 return;
             }
             var coll = sm.cms.page.PageMgr.getColl();
-            coll.findOne({"alias" : alias}, function(err, doc) {
+            coll.findOne({"alias" : alias}, {"fields" : {"_id" : 1}}, function(err, doc) {
                 if (err) {
                     cb(err);
                     return;
@@ -83,6 +80,19 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                 me.__a2pageCache.set(alias, pid);
                 cb(null, pid);
             });
+        },
+
+        invalidateFor : function(pid, alias) {
+            if (alias != null) {
+                this.__a2pageCache.del(alias);
+            }
+            if (pid != null) {
+                this.__p2aliasCache.del(pid.toString());
+            }
+        },
+
+        invalidateForPage : function(doc) {
+            this.invalidateFor(doc._id, doc.alias);
         },
 
         invalidate : function() {

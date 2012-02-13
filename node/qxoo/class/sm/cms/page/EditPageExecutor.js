@@ -25,7 +25,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 throw new sm.nsrv.Message("Invalid request", true);
             }
             parent = parent.substring("pages.".length);//+ dot symbol
-            if (parent == "root") {
+            if (parent === "root") {
                 parent = null;
             }
 
@@ -51,7 +51,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
          * @return true If current user is allowed to use asm with asmId
          */
         _isAllowedAsm : function(req, asmId) {
-            if (asmId == "" || asmId == null) {
+            if (sm.lang.String.isEmpty(asmId)) {
                 return req.isUserInRoles(["template:*"]);
             }
             return req.isUserInRoles(["template:*", "template:" + asmId]);
@@ -71,7 +71,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             var asms = [];
             for (var an in amap) {
                 var asm = amap[an];
-                if ((typeof asm["name"]) !== "string" || asm["name"].length == 0 ||
+                if ((typeof asm["name"]) !== "string" || asm["name"].length === 0 ||
                   !this._isAllowedAsm(req, asm["_name_"])) {
                     continue;
                 }
@@ -102,7 +102,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
             }
 
             var c = asms.length;
-            if (c == 0) {
+            if (c === 0) {
                 this.writeJSONObject(res, resp, ctx);
                 return;
             }
@@ -114,7 +114,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         "name" : asm["name"],
                         "meta" : meta
                     });
-                    if (c == 0) {
+                    if (c === 0) {
                         res.sort(function(a, b) {
                             return a["name"].localeCompare(b["name"]);
                         });
@@ -286,7 +286,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         }
 
                         //Use custom loaders to get attr value
-                        if (loadTasks.length == 0) {
+                        if (loadTasks.length === 0) {
                             finish();
                         } else {
                             var tc = loadTasks.length;
@@ -299,7 +299,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                     } else {
                                         attrs[an] = {"value" : val};
                                     }
-                                    if (--tc == 0) {
+                                    if (--tc === 0) {
                                         finish();
                                     }
                                 });
@@ -358,7 +358,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        if (mask.indexOf("e") == -1) {
+                        if (mask.indexOf("e") === -1) {
                             me.handleError(resp, ctx,
                               me.tr("У вас недостаточно прав для редактирования страницы"),
                               false, true);
@@ -431,7 +431,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         }
                     }
                     var ac = anames.length;
-                    if (ac == 0) {
+                    if (ac === 0) {
                         finish();
                     } else {
                         for (var i = 0; i < anames.length; ++i) {
@@ -440,7 +440,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                   if (err) {
                                       errCount++;
                                   }
-                                  if (--ac == 0) {
+                                  if (--ac === 0) {
                                       finish();
                                   }
                               });

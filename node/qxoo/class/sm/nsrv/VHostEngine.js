@@ -813,7 +813,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
         __findHandlerCfg : function(req) {
             var hconf = this.__handlers[req.info.pathname];
-            if (hconf !== undefined) {
+            if (hconf != null) {
                 return hconf;
             }
             for (var j = 0; j < this.__regexpHandlers.length; ++j) {
@@ -867,12 +867,12 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     }
                 }
             }
-            if (hconf !== undefined) { //handlers found
+            if (hconf != null) { //handlers found
                 this.__execHandler(hconf, req, res, ctx, next);
                 return;
             }
             var eh = this.__missingExecutorHandler;
-            if (eh == null) {
+            if (eh == null || req.internal) {
                 ctx(null);
                 return;
             }

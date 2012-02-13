@@ -141,6 +141,10 @@ qx.Class.define("sm.mongo.Collection", {
             this._applyNativeMethod("findOne", arguments);
         },
 
+        find : function() {
+            this._applyNativeMethod("find", arguments);
+        },
+
         findAndModify : function(query, sort, doc, options, callback) {
             this._applyNativeMethod("findAndModify", arguments);
         },
@@ -164,21 +168,21 @@ qx.Class.define("sm.mongo.Collection", {
             var icoll = this.__mongo.collection("system.indexes");
             var indData = null;
             icoll.createQuery({"name" : indexName}).first(
-                    function(data) {
-                        indData = data;
-                    }).exec(function(err) {
-                        if (err || indData) {
-                            if (callback) {
-                                callback(err, false);
-                            }
-                            return;
-                        }
-                        me._applyNativeMethod("createIndex", [spec, options, function(err) {
-                            if (callback) {
-                                callback(err, true);
-                            }
-                        }]);
-                    });
+              function(data) {
+                  indData = data;
+              }).exec(function(err) {
+                  if (err || indData) {
+                      if (callback) {
+                          callback(err, false);
+                      }
+                      return;
+                  }
+                  me._applyNativeMethod("createIndex", [spec, options, function(err) {
+                      if (callback) {
+                          callback(err, true);
+                      }
+                  }]);
+              });
         },
 
         indexInformation : function(callback) {
@@ -197,6 +201,7 @@ qx.Class.define("sm.mongo.Collection", {
                 if (this.__callQueue == null) {
                     this.__callQueue = [];
                 }
+                qx.log.Logger.info("push " + name);
                 this.__callQueue.push([name, args]);
             }
         },
