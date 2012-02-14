@@ -108,7 +108,12 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
 
         fixUrls : function(ctxpath, data, cb) {
             var me = this;
-            var re = new RegExp('(http:\\/\\/[\\w.]+)?' + qx.lang.String.escapeRegexpChars(ctxpath) + '\\/p([0-9a-z]{24})((#\\S*)?|(\\?\\S*))', "g");
+            var re = this.__reCache[ctxpath];
+            if (re === undefined) {
+                re = new RegExp('(http:\\/\\/[\\w.]+)?' + qx.lang.String.escapeRegexpChars(ctxpath) + '\\/p([0-9a-z]{24})((#\\S*)?|(\\?\\S*))', "g");
+                this.__reCache[ctxpath] = re;
+            }
+
             re.lastIndex = 0;
             var beforeIndex = 0;
             var out = [];
@@ -117,19 +122,33 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                 beforeIndex = re.lastIndex;
                 var res = re.exec(data);
                 if (!res) {
-                    out.push(data.slice(beforeIndex));
-                    cb(out.join(""));
+                    if (out.length > 0) {
+                        out.push(data.slice(beforeIndex));
+                        cb(out.join(""));
+                    } else {
+                        cb(data);
+                    }
                     return;
                 }
                 var pid = res[2];
-                me.findAliasByPage(pid, function(err, alias) {
+                var alias = me.__p2aliasCache.get(pid);
+                var handleAlias = function(err, alias) {
                     out.push(data.slice(beforeIndex, res.index));
                     if (err || alias == null || alias === "-") {
                         alias = "/p" + pid;
                     }
                     out.push((res[1] || "") + ctxpath + qx.lang.String.stripTags(alias) + (res[3] || ""));
                     searchNext();
-                });
+                };
+                if (alias !== undefined) {
+                    handleAlias(null, alias);
+                } else { //we have to make async mongodb query
+                    //clone cached RE to avoid race condition on RE obj during parallel async searches
+                    var cre = new RegExp(re.source, "g");
+                    cre.lastIndex = re.lastIndex;
+                    re = cre;
+                    me.findAliasByPage(pid, handleAlias);
+                }
             }
 
             searchNext();

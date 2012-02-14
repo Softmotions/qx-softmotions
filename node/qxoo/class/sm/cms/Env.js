@@ -129,14 +129,19 @@ qx.Class.define("sm.cms.Env", {
         },
 
         _jazzTemplateLib : function() {
-            return {
+            var lib = {
                 "url2alias" : function(url, cb) {
                     var ar = sm.cms.page.AliasRegistry.getInstance();
                     ar.fixUrls("/exp", url, function(data) {
                         cb(data);
                     });
+                },
+
+                "page2url" : function(pid, cb) {
+                    lib.url2alias("/exp/p" + pid, cb);
                 }
-            }
+            };
+            return lib;
         }
     },
 
