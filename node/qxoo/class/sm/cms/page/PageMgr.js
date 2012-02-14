@@ -171,7 +171,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     cb(err);
                     return;
                 }
-                var alias = me.getPageAliasFromParent(parent, page);
+                var alias = page["alias"] = me.getPageAliasFromParent(parent, page);
                 if (alias !== "-") {
                     coll.update({"alias" : alias, "_id" : {"$ne" : coll.toObjectID(page._id)}}, {"$unset" : {"alias" : 1}}, function() {
                         me.updateNodeCachedData(page, cb);
@@ -754,7 +754,6 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 var path = (parentPath || "") + "/" + cnode["name"]; // current path = parent path + / + current name
                 var alias = (cnode["alias"] === "-") ? cnode["alias"] : ((parentAlias && parentAlias !== "-" ? parentAlias : "") + "/" + me.getPageAliasSuffix(cnode));
                 var cnodeId = mongo.toObjectID(cnode["_id"]);
-                //qx.log.Logger.info("alias=" + alias + " id=" + cnodeId);
                 coll.update({"_id" : cnodeId}, {"$set" : {"cachedPath" : path, "alias" : alias}}, function(err) {
                     if (err) {
                         gcb(err);

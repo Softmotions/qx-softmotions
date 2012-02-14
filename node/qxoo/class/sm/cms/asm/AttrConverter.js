@@ -111,10 +111,22 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         saveAliasFixVal : function(opts, cb) {
             var page = opts["page"];
             var aliasFix = opts.attrVal;
-            sm.cms.page.PageMgr.fixPageAlias(page, aliasFix, cb);
+            aliasFix = sm.lang.String.isEmpty(aliasFix) ? null : aliasFix.trim();
+            if (aliasFix != null) {
+                aliasFix = sm.lang.String.translitRussian(aliasFix);
+            }
+            sm.cms.page.PageMgr.fixPageAlias(page, aliasFix, function(err) {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+                cb(null, aliasFix);
+            });
         },
 
-        loadAliasFixVal : this.loadPageProperty,
+        loadAliasFixVal : function(attrName, attrVal, page, cb) {
+            cb(null, page[attrName]);
+        },
 
         ///////////////////////////////////////////////////////////////////////////
         //                                  MISC                                 //
