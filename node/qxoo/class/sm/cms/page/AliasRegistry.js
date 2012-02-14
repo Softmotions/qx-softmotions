@@ -15,6 +15,7 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
         var LRUCache = $$node.require("lru-cache");
         this.__a2pageCache = new LRUCache(mlen);
         this.__p2aliasCache = new LRUCache(mlen);
+        this.__reCache = {};
     },
 
     members : {
@@ -28,6 +29,12 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
          * Page -> alias LRU cache
          */
         __p2aliasCache : null,
+
+
+        /**
+         * Regexp cache for {@link #fixUrls}
+         */
+        __reCache : null,
 
 
         __aliasForPage : function(doc) {
@@ -96,6 +103,36 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
         invalidate : function() {
             this.__a2pageCache.reset();
             this.__p2aliasCache.reset();
+        },
+
+
+        fixUrls : function(ctxpath, data, cb) {
+            var me = this;
+            var re = new RegExp('(http:\\/\\/[\\w.]+)?' + qx.lang.String.escapeRegexpChars(ctxpath) + '\\/p([0-9a-z]{24})((#\\S*)?|(\\?\\S*))', "g");
+            re.lastIndex = 0;
+            var beforeIndex = 0;
+            var out = [];
+
+            function searchNext() {
+                beforeIndex = re.lastIndex;
+                var res = re.exec(data);
+                if (!res) {
+                    out.push(data.slice(beforeIndex));
+                    cb(out.join(""));
+                    return;
+                }
+                var pid = res[2];
+                me.findAliasByPage(pid, function(err, alias) {
+                    out.push(data.slice(beforeIndex, res.index));
+                    if (err || alias == null || alias === "-") {
+                        alias = "/p" + pid;
+                    }
+                    out.push((res[1] || "") + ctxpath + qx.lang.String.stripTags(alias) + (res[3] || ""));
+                    searchNext();
+                });
+            }
+
+            searchNext();
         }
     },
 

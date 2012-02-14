@@ -119,10 +119,23 @@ qx.Class.define("sm.cms.Env", {
         },
 
         getWebappRuntimeOptions : function() {
+            var me = this;
             var sp = sm.cms.page.ShowPageExecutor;
             return {
                 "missingAssemblyHandler" : sp.missingAssemblyHandler.bind(sp),
-                "missingExecutorHandler" : sp.missingExecutorAliasHandler.bind(sp)
+                "missingExecutorHandler" : sp.missingExecutorAliasHandler.bind(sp),
+                "jazzTemplateLib" : me._jazzTemplateLib()
+            }
+        },
+
+        _jazzTemplateLib : function() {
+            return {
+                "url2alias" : function(url, cb) {
+                    var ar = sm.cms.page.AliasRegistry.getInstance();
+                    ar.fixUrls("/exp", url, function(data) {
+                        cb(data);
+                    });
+                }
             }
         }
     },

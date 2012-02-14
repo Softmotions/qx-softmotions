@@ -213,12 +213,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     continue;
                 }
                 var wopts = opts[k] || {};
-                if (typeof wopts["missingAssemblyHandler"] === "function") {
-                    wc.missingAssemblyHandler = wopts["missingAssemblyHandler"];
-                }
-                if (typeof wopts["missingExecutorHandler"] === "function") {
-                    wc.missingExecutorHandler = wopts["missingExecutorHandler"];
-                }
+                qx.lang.Object.mergeWith(wc, wopts, true);
             }
         },
 

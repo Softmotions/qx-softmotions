@@ -144,9 +144,9 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             };
             ctx["_ctype_xhtml_"] = function(_cb) {
                 sm.nsrv.tengines.JazzCtxLib.ctype(req, headers,
-                        {"default" : "application/xhtml+xml; charset=UTF-8",
-                            "MSIE 7" : "text/html; charset=UTF-8",
-                            "MSIE 8" : "text/html; charset=UTF-8"}, _cb);
+                  {"default" : "application/xhtml+xml; charset=UTF-8",
+                      "MSIE 7" : "text/html; charset=UTF-8",
+                      "MSIE 8" : "text/html; charset=UTF-8"}, _cb);
             };
             ctx["_set_header_"] = function(headerName, headerVal, _cb) {
                 headers[headerName] = headerVal;
@@ -187,16 +187,23 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
             };
             ctx["_utils_"] = sm.nsrv.tengines.JazzCtxLib.utils();
 
+            if (ctx._webapp_.jazzTemplateLib) {
+                for (var k in ctx._webapp_.jazzTemplateLib) {
+                    if (ctx[k] === undefined && typeof ctx._webapp_.jazzTemplateLib[k] === "function") {
+                        ctx[k] = ctx._webapp_.jazzTemplateLib[k];
+                    }
+                }
+            }
             try {
                 tjazz.process(ctx,
-                        function(data, opts, dynamic) { //Mediator todo XHTML mediator hardcoded!
-                            if (data == null || !dynamic || (opts && opts["escaping"] === false) || me.getEscapeXML() == false) {
-                                return data;
-                            }
-                            return sm.lang.String.escapeXML(data);
-                        }, function(data) { //Data
-                            cb(false, null, data);
-                        }
+                  function(data, opts, dynamic) { //Mediator todo XHTML mediator hardcoded!
+                      if (data == null || !dynamic || (opts && opts["escaping"] === false) || me.getEscapeXML() == false) {
+                          return data;
+                      }
+                      return sm.lang.String.escapeXML(data);
+                  }, function(data) { //Data
+                      cb(false, null, data);
+                  }
                 );
             } catch(err) {
                 qx.log.Logger.error(me, "Jazz template merging failed! Path: " + template["path"], err);
