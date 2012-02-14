@@ -114,18 +114,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          */
         __fsutils : null,
 
-        /**
-         * Extra assembly provider
-         */
-        __missingAsmHandler : null,
-
-        /**
-         * Handler function for request for which no executor found
-         * Handler args: req, callback(changed: bool)
-         * If changed == true if req object was changed by this handler and need to rehandle request
-         */
-        __missingExecutorHandler : null,
-
 
         getId : function() {
             return this.__id;
@@ -160,7 +148,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             return this.__tengines[ext];
         },
 
-        loadAssembly : function(name, cb) {
+        loadAssembly : function(ctx, name, cb) {
             if ((typeof name) != "string") {
                 cb("Invalid assembly name: " + name, null);
                 return;
@@ -170,13 +158,13 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb(null, asm, null);
                 return;
             }
-            var ah = this.__missingAsmHandler;
+            var ah = ctx._webapp_.missingAssemblyHandler;
             if (!ah) {
                 cb("Assembly: " + name + " not found", null);
                 return;
             }
             try {
-                ah(this, name, cb);
+                ah(this, ctx, name, cb);
             } catch(e) {
                 cb(e, null);
             }
@@ -218,22 +206,20 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             });
         },
 
-
-        _setMissingAssemblyHandler : function(handler) {
-            if (handler !== null && (typeof handler) !== "function") {
-                qx.log.Logger.warn(this, "Assembly provider must be a function");
-                return;
+        _setWebappsRuntimeOptions : function(opts) {
+            for (var k in opts) {
+                var wc = this.__getWebappConfig(k, false);
+                if (wc == null) {
+                    continue;
+                }
+                var wopts = opts[k] || {};
+                if (typeof wopts["missingAssemblyHandler"] === "function") {
+                    wc.missingAssemblyHandler = wopts["missingAssemblyHandler"];
+                }
+                if (typeof wopts["missingExecutorHandler"] === "function") {
+                    wc.missingExecutorHandler = wopts["missingExecutorHandler"];
+                }
             }
-            this.__missingAsmHandler = handler;
-        },
-
-
-        _setMissingExecutorHandler : function(handler) {
-            if (handler !== null && (typeof handler) !== "function") {
-                qx.log.Logger.warn(this, "MissingExecutorHandler handler must be a function");
-                return;
-            }
-            this.__missingExecutorHandler = handler;
         },
 
         __applyConfig : function(config) {
@@ -859,6 +845,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 }
             };
             ctx._vhost_engine_ = this;
+            ctx._webapp_ = req.info.webapp;
             req._ctx_ = ctx;
             if (req.$$ctxParams != null) {
                 for (var k in req.$$ctxParams) {
@@ -871,7 +858,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 this.__execHandler(hconf, req, res, ctx, next);
                 return;
             }
-            var eh = this.__missingExecutorHandler;
+            var eh = ctx._webapp_.missingExecutorHandler;
             if (eh == null || req.internal) {
                 ctx(null);
                 return;

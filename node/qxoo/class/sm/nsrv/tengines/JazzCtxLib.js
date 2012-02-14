@@ -302,7 +302,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
          */
         assemblyExt : function(vhe, te, ctx, name, params, ctxParams, asmProps, cb) {
             var me = this;
-            vhe.loadAssembly(name, function(err, asm, asmCtxParams) {
+            vhe.loadAssembly(ctx, name, function(err, asm, asmCtxParams) {
                 if (err) {
                     cb(err, null);
                     return;

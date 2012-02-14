@@ -9,7 +9,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
 
     statics :
     {
-        missingAssemblyHandler : function(vhe, name, cb) {
+        missingAssemblyHandler : function(vhe, ctx, name, cb) {
             if (name.charAt(0) != "p") {
                 cb("Assembly: " + name + " not found", null);
                 return;
@@ -37,7 +37,7 @@ qx.Class.define("sm.cms.page.ShowPageExecutor", {
                     return;
                 }
 
-                vhe.loadAssembly(doc["asm"], function(err, parent) {
+                vhe.loadAssembly(ctx, doc["asm"], function(err, parent) {
                     if (err) {
                         cb(err, null);
                         return;

@@ -118,13 +118,12 @@ qx.Class.define("sm.cms.Env", {
             return langs.indexOf(val) !== -1 ? val : null;
         },
 
-        getNKServerCMSOptions : function() {
+        getWebappRuntimeOptions : function() {
             var sp = sm.cms.page.ShowPageExecutor;
             return {
                 "missingAssemblyHandler" : sp.missingAssemblyHandler.bind(sp),
                 "missingExecutorHandler" : sp.missingExecutorAliasHandler.bind(sp)
             }
-
         }
     },
 

@@ -130,8 +130,6 @@ qx.Class.define("sm.nsrv.NKServer", {
             var filters = opts["filters"];
             var connect = $$node.require("connect");
             var chandlers = [];
-            var missingAssemblyHandler = null;
-            var missingExecutorHandler = null;
 
             //Processing custom filters
             if (filters != null && filters.constructor === Array) {
@@ -140,18 +138,10 @@ qx.Class.define("sm.nsrv.NKServer", {
                 }
             }
 
-            if (typeof opts["missingAssemblyHandler"] === "function") {
-                missingAssemblyHandler = opts["missingAssemblyHandler"];
-            }
-            if (typeof opts["missingExecutorHandler"] === "function") {
-                missingExecutorHandler = opts["missingExecutorHandler"];
-            }
-
             var vengines = qx.lang.Object.getValues(this.__vengines);
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
-                ve._setMissingAssemblyHandler(missingAssemblyHandler);
-                ve._setMissingExecutorHandler(missingExecutorHandler);
+                ve._setWebappsRuntimeOptions(opts["webapps"] || {});
                 chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
                 this.fireDataEvent("configuredVHE", [ve, this]);
                 sm.nsrv.NKServerEvents.getInstance().fireDataEvent("configuredVHE", [ve, this]);

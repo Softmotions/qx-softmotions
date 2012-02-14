@@ -156,7 +156,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 cb(null, meta);
             };
             if ((typeof asm) === "string") {
-                ctx._vhost_engine_.loadAssembly(asm, fr);
+                ctx._vhost_engine_.loadAssembly(ctx, asm, fr);
             } else {
                 fr(null, asm);
             }
@@ -227,7 +227,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         delete res["access"]; //Always disable access-map field
 
                         if (doc["asm"] && req.params["_news_"]) { //Want to get news options
-                            ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
+                            ctx._vhost_engine_.loadAssembly(ctx, doc["asm"], function(err, asm) {
                                 if (err) {
                                     me.handleError(resp, ctx, err);
                                     return;
@@ -415,7 +415,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                     return;
                 }
                 //Load document assembly
-                ctx._vhost_engine_.loadAssembly(doc["asm"], function(err, asm) {
+                ctx._vhost_engine_.loadAssembly(ctx, doc["asm"], function(err, asm) {
                     if (err) {
                         qx.log.Logger.error(me, err);
                         me.handleError(resp, ctx, err);
