@@ -3,6 +3,11 @@
  * All Rights Reserved.
  */
 
+/*
+ #asset(sm/icons/misc/help16.png)
+ #asset(sm/icons/misc/door_in16.png)
+ */
+
 qx.Class.define("sm.cms.Application", {
     extend : qx.application.Standalone,
     include : [qx.locale.MTranslation],
@@ -120,6 +125,8 @@ qx.Class.define("sm.cms.Application", {
             var layout = new qx.ui.layout.Dock().set({separatorY : "separator-vertical"});
             var comp = new qx.ui.container.Composite(layout);
             this.getRoot().add(comp, {edge : 0});
+
+            comp.add(this.__createMainToolbar(), {edge:"north"});
 
             var hsp = new qx.ui.splitpane.Pane();
             comp.add(hsp);
@@ -251,6 +258,31 @@ qx.Class.define("sm.cms.Application", {
 
             //Init completed
             this.fireEvent("guiInitialized");
+        },
+
+        __createMainToolbar : function() {
+            var toolbar = new qx.ui.toolbar.ToolBar().set({overflowHandling : false});
+            this.addListenerOnce("guiInitialized", function() {
+                var apps = sm.cms.Application.APP_STATE;
+                if (apps.getHelpSite()) {
+                    var helpButton = new qx.ui.toolbar.Button(this.tr("Справка"), "sm/icons/misc/help16.png");
+                    helpButton.addListener("execute", function() {
+                        qx.bom.Window.open(apps.getHelpSite());
+                    });
+                    helpButton.setToolTipText(this.tr("Справка"));
+                    toolbar.add(helpButton);
+                }
+                var logoff = new qx.ui.toolbar.Button(this.tr("Выход"), "sm/icons/misc/door_in16.png");
+                logoff.setToolTipText(this.tr("Выход"));
+                logoff.addListener("execute", function() {
+                    if (confirm(this.tr("Вы действительно хотите выйти из системы?"))) {
+                        window.location.href = "/adm/logout";
+                    }
+                }, this);
+                toolbar.add(logoff);
+                toolbar.set({"show" : "icon"});
+            }, this);
+            return toolbar;
         },
 
         __navTreeCtxMenuHandler : function(col, row, table, dataModel, contextMenu) {

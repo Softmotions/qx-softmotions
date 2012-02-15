@@ -32,12 +32,6 @@ qx.Class.define("sm.cms.auth.AuthExecutor", {
             this.writeHead(resp, ctx, 302, {"Location": "/adm/index.html"});
             resp.end();
             ctx({"terminated" : true});
-        },
-
-        __logout : function(req, resp, ctx) {
-            this.writeHead(resp, ctx, 302, {"Location": "/exp/index.jz"});
-            resp.end();
-            ctx({"terminated" : true});
         }
     },
 
@@ -59,13 +53,6 @@ qx.Class.define("sm.cms.auth.AuthExecutor", {
         "/login" : {
             webapp : "adm",
             handler : "__adm_loginaction"
-        },
-
-        //Logout form
-        "/logout" : {
-            webapp : "adm",
-            handler : "__logout",
-            logout: true
         }
     }
 });
