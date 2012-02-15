@@ -47,7 +47,6 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
                         "label" : this.tr("Новости").toString(),
                         "opened" : false
                     });
-
                     if (req.isUserInRoles("users.admin")) {
                         res.push({
                             "id" : "users.root",

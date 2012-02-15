@@ -119,7 +119,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
          */
         getPageAliasFromParent : function(parent, doc) {
             if (doc["alias"] === "-") {
-                return doc["alias"];
+                return "-";
             }
             return (parent && parent["alias"] && parent["alias"] !== "-" ? parent["alias"] : "") + "/" + this.getPageAliasSuffix(doc)
         },
@@ -129,15 +129,25 @@ qx.Class.define("sm.cms.page.PageMgr", {
          * Full hierarchy page alias doc['alias'] computed during page saving
          */
         getPageAliasSuffix : function(doc) {
-            var suff = sm.lang.String.isEmpty(doc["aliasFix"]) ? sm.lang.String.translitRussian(doc["name"]) : doc["aliasFix"];
-            suff = suff.replace(/\s+/g, '_').replace(/\W+/g, '').trim().toLocaleLowerCase();
+            var suff = sm.lang.String.isEmpty(doc["aliasFix"]) ? doc["name"] : doc["aliasFix"];
+            suff = this._normalizeAliasString(suff);
             if (doc.type == this.TYPE_NEWS_PAGE) {
                 var cdate = doc["cdate"] ? new Date(doc["cdate"]) : new Date();
-                suff = (cdate.getFullYear() + "_" + (cdate.getMonth() + 1) + "_" + cdate.getDate()) + "/" + suff;
+                suff = (cdate.getFullYear() + "/" + (cdate.getMonth() + 1) + "/" + cdate.getDate()) + "/" + suff;
             }
             return suff;
         },
 
+        _normalizeAliasString : function(alias) {
+            if (sm.lang.String.isEmpty(alias)) {
+                return null;
+            }
+            alias = alias.trim();
+            if (alias === "-") {
+                return alias;
+            }
+            return sm.lang.String.translitRussian(alias).replace(/\s+/g, '_').replace(/\W+/g, '').toLocaleLowerCase();
+        },
 
         /**
          * Override page alias by user-defined value
@@ -147,7 +157,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
          */
         fixPageAlias : function(page, aliasFix, cb) {
             var me = this;
-            aliasFix = sm.lang.String.isEmpty(aliasFix) ? null : aliasFix.trim();
+            aliasFix = this._normalizeAliasString(aliasFix);
             var coll = me.getColl();
             if (page["aliasFix"] === aliasFix) {
                 cb();
@@ -157,6 +167,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
             if (aliasFix === "-") {
                 page["alias"] = "-";
             } else if (aliasFix == null) {
+                delete page["alias"];
                 delete page["aliasFix"];
             }
             var getParent = function(pref, cb) {
@@ -170,6 +181,9 @@ qx.Class.define("sm.cms.page.PageMgr", {
                 if (err) {
                     cb(err);
                     return;
+                }
+                if (page["alias"] === "-" && page["alias"] != aliasFix) {
+                    delete page["alias"];
                 }
                 var alias = page["alias"] = me.getPageAliasFromParent(parent, page);
                 if (alias !== "-") {

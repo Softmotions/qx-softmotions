@@ -25,13 +25,13 @@ qx.Class.define("sm.nsrv.auth.FixedAuthFilter", {
             } else {
                 var me = this;
                 this._userProvider.login(this.__user, this.__password,
-                        function(err, user) {
-                            if (!err && user) {
-                                me.login(request, response, user, callback);
-                            } else {
-                                me.failure(request, response, callback);
-                            }
-                        }
+                  function(err, user) {
+                      if (!err && user) {
+                          me.login(request, response, user, callback);
+                      } else {
+                          me.failure(request, response, callback);
+                      }
+                  }
                 );
             }
         },

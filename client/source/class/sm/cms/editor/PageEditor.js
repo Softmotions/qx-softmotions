@@ -59,7 +59,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         var header = new qx.ui.container.Composite(new qx.ui.layout.VBox(5)).set({margin : 10});
         this._grefs["hdr"] = header;
         var el = this._grefs["hdr.pageName"] = new qx.ui.basic.Label("")
-                .set({font : new qx.bom.Font(16, ["Verdana", "sans-serif"])}); //todo theme it!
+          .set({font : new qx.bom.Font(16, ["Verdana", "sans-serif"])}); //todo theme it!
         header.add(el);
 
         //Horizontal header container
@@ -254,6 +254,10 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         __setupPageAttr : function(form, attrName, mItem, pageInfo, index) {
             var res = null;
 
+            if (mItem.role != null && !sm.cms.Application.userInRoles(mItem.role)) { //Field access
+                return;
+            }
+
             var editor = mItem["editor"];
             var edName = qx.lang.Type.isString(editor) ? editor : (editor ? editor["name"] : null);
             var edOptions = (edName == editor || editor == null ? {} : editor);
@@ -297,8 +301,8 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                 res.setRequired(true);
             }
             form.add(res, (mItem.label ? mItem.label : ""),
-                    ((typeof res.getValidator === "function") ? res.getValidator() : null),
-                    "attr." + attrName);
+              ((typeof res.getValidator === "function") ? res.getValidator() : null),
+              "attr." + attrName);
             this.__setupElementValue(res, attrName, mItem, pageInfo);
             return res;
         },
@@ -346,8 +350,8 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             this.__savePage(function() {
                 var pp = sm.cms.Application.ACT.getUrl("page.preview");
                 qx.bom.Window.open(pp + this._pageInfo["_id"],
-                        "Preview",
-                        {}, false, false);
+                  "Preview",
+                  {}, false, false);
                 this.fireDataEvent("pageSaved", true); //preview flag
             }, this);
         },

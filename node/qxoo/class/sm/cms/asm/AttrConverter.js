@@ -111,10 +111,6 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         saveAliasFixVal : function(opts, cb) {
             var page = opts["page"];
             var aliasFix = opts.attrVal;
-            aliasFix = sm.lang.String.isEmpty(aliasFix) ? null : aliasFix.trim();
-            if (aliasFix != null) {
-                aliasFix = sm.lang.String.translitRussian(aliasFix);
-            }
             sm.cms.page.PageMgr.fixPageAlias(page, aliasFix, function(err) {
                 if (err) {
                     cb(err);
