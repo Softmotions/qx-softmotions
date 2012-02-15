@@ -30,6 +30,7 @@ qx.Class.define("sm.cms.AppStateExecutor", {
                 userId : uid,
                 userLogin : uid,
                 helpSite : conf["helpSite"],
+                wikiHelp : conf["wikiHelp"],
                 userFullName : "",
                 userNickname : uid,
                 properties : {}

@@ -5,6 +5,7 @@
 
 /*
  #asset(sm/cms/icon/16/wiki/*)
+ #asset(sm/icons/misc/help16.png)
  */
 
 qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
@@ -479,54 +480,78 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
 
 
         __createToolbarControls : function(toolbar) {
-            var h1 = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_heading_1.png").set({appearance : "textarea-editor-tbbt"});
-            h1.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Заголовок первого уровня")));
-            h1.addListener("execute", this.__insHeading1, this);
-            toolbar.add(h1);
-            var h2 = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_heading_2.png").set({appearance : "textarea-editor-tbbt"});
-            h2.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Заголовок второго уровня")));
-            h2.addListener("execute", this.__insHeading2, this);
-            toolbar.add(h2);
-            var h3 = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_heading_3.png").set({appearance : "textarea-editor-tbbt"});
-            h3.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Заголовок третьего уровня")));
-            h3.addListener("execute", this.__insHeading3, this);
-            toolbar.add(h3);
-            var b = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_bold.png").set({appearance : "textarea-editor-tbbt"});
-            b.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Жирный шрифт")));
-            b.addListener("execute", this.__insBold, this);
-            toolbar.add(b);
-            var it = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_italic.png").set({appearance : "textarea-editor-tbbt"});
-            it.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Курсив")));
-            it.addListener("execute", this.__insItalic, this);
-            toolbar.add(it);
-            var ul = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_list_bullets.png").set({appearance : "textarea-editor-tbbt"});
-            ul.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Список")));
-            ul.addListener("execute", this.__insUL, this);
-            toolbar.add(ul);
-            var ol = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/text_list_numbers.png").set({appearance : "textarea-editor-tbbt"});
-            ol.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Нумерованный список")));
-            ol.addListener("execute", this.__insOL, this);
-            toolbar.add(ol);
-            var pl = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/link_add.png").set({appearance : "textarea-editor-tbbt"});
-            pl.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Ссылка на другую страницу")));
-            pl.addListener("execute", this.__insPageRef, this);
-            toolbar.add(pl);
-            var img = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/image_add.png").set({appearance : "textarea-editor-tbbt"});
-            img.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Добавить изображение|ссылку на файл")));
-            img.addListener("execute", this.__insAttachment, this);
-            toolbar.add(img);
-            var tbl = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/table_add.png").set({appearance : "textarea-editor-tbbt"});
-            tbl.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Добавить таблицу")));
-            tbl.addListener("execute", this.__insTable, this);
-            toolbar.add(tbl);
-            var tree = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/tree_add.png").set({appearance : "textarea-editor-tbbt"});
-            tree.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Добавить дерево")));
-            tree.addListener("execute", this.__insTree, this);
-            toolbar.add(tree);
-            var note = new qx.ui.toolbar.Button("", "sm/cms/icon/16/wiki/note_add.png").set({appearance : "textarea-editor-tbbt"});
-            note.setToolTip(new qx.ui.tooltip.ToolTip(this.tr("Создать заметку")));
-            note.addListener("execute", this.__insNote, this);
-            toolbar.add(note);
+            var me = this;
+            var createBaseControls = function(cont, btClass, apperance) {
+                var h1 = new btClass("", "sm/cms/icon/16/wiki/text_heading_1.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                h1.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок первого уровня")));
+                h1.addListener("execute", me.__insHeading1, me);
+                cont.add(h1);
+                var h2 = new btClass("", "sm/cms/icon/16/wiki/text_heading_2.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                h2.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок второго уровня")));
+                h2.addListener("execute", me.__insHeading2, me);
+                cont.add(h2);
+                var h3 = new btClass("", "sm/cms/icon/16/wiki/text_heading_3.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                h3.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок третьего уровня")));
+                h3.addListener("execute", me.__insHeading3, me);
+                cont.add(h3);
+                var b = new btClass("Жирный", "sm/cms/icon/16/wiki/text_bold.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                b.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Жирный шрифт")));
+                b.addListener("execute", me.__insBold, me);
+                cont.add(b);
+                var it = new btClass("Курсив", "sm/cms/icon/16/wiki/text_italic.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                it.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Курсив")));
+                it.addListener("execute", me.__insItalic, me);
+                cont.add(it);
+                var ul = new btClass("Список", "sm/cms/icon/16/wiki/text_list_bullets.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                ul.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Список")));
+                ul.addListener("execute", me.__insUL, me);
+                cont.add(ul);
+                var ol = new btClass("Нумерованный", "sm/cms/icon/16/wiki/text_list_numbers.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                ol.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Нумерованный список")));
+                ol.addListener("execute", me.__insOL, me);
+                cont.add(ol);
+                var pl = new btClass("Ссылка", "sm/cms/icon/16/wiki/link_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                pl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Ссылка на другую страницу")));
+                pl.addListener("execute", me.__insPageRef, me);
+                cont.add(pl);
+                var img = new btClass("Медиа", "sm/cms/icon/16/wiki/image_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                img.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить изображение|ссылку на файл")));
+                img.addListener("execute", me.__insAttachment, me);
+                cont.add(img);
+                var tbl = new btClass("Таблица", "sm/cms/icon/16/wiki/table_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                tbl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить таблицу")));
+                tbl.addListener("execute", me.__insTable, me);
+                cont.add(tbl);
+                var tree = new btClass("Дерево", "sm/cms/icon/16/wiki/tree_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                tree.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить дерево")));
+                tree.addListener("execute", me.__insTree, me);
+                cont.add(tree);
+                var note = new btClass("Заметка", "sm/cms/icon/16/wiki/note_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
+                note.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Создать заметку")));
+                note.addListener("execute", me.__insNote, me);
+                cont.add(note);
+            };
+
+            if (!sm.lang.String.isEmpty(sm.cms.Application.APP_STATE._getStateConstant("wikiHelp"))) {
+                var helpButton = new qx.ui.toolbar.Button("Help", "sm/icons/misc/help16.png");
+                toolbar.add(helpButton);
+                helpButton.addListener("execute", function() {
+                    qx.bom.Window.open(sm.cms.Application.APP_STATE._getStateConstant("wikiHelp"));
+                });
+            }
+
+            createBaseControls(toolbar, qx.ui.toolbar.Button, "textarea-editor-tbbt");
+
+            var overflow = new qx.ui.toolbar.MenuButton("More...");
+            var overflowMenu = new qx.ui.menu.Menu();
+            overflow.setMenu(overflowMenu);
+            createBaseControls(overflowMenu, qx.ui.menu.Button, null);
+            toolbar.add(overflow);
+
+            toolbar.addSpacer();
+
+            toolbar.set({"show" : "icon"});
+            toolbar.setOverflowIndicator(overflow);
         }
     },
 
