@@ -379,12 +379,12 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     /*l_fs.readdir(startDir, function(cbErr, files) {
      me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
      });*/
-    this._rdQueue.push([
+    this._rdQueue.push([[
         startDir,
         function(cbErr, files) {
             me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
         }
-    ]);
+    ]]);
 
 };
 
