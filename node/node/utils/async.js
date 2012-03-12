@@ -3,6 +3,8 @@
  * All Rights Reserved.
  */
 
+var async = require("async");
+
 // additional async utilities
 
 // it is a copy of async.queue with another task receiving strategy
