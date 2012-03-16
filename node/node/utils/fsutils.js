@@ -453,6 +453,8 @@ const DirectoryScanner = function(rootDir, scanSpec) {
     this.rootDirArr = this.rootDir.split(FileSeparator);
     this._savedReadDirArgs = [];
 
+    this._scannedNodes = {};
+
     this._concurrency = 1;
     this._rdQueue = l_async.stack(function(task, cb) {
         l_fs.readdir(task[0], function(err, files) {
@@ -501,7 +503,7 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     }
     if (!fstat) {
         try {
-            fstat = l_fs.lstatSync(startDir);
+            fstat = l_fs.statSync(startDir);
         } catch(e) {
             callback(e, startDir, null);
             if (inodes.length == 0 && fcallback) {
@@ -561,14 +563,18 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
                 var err = null;
                 var lfstat = null;
                 try {
-                    lfstat = l_fs.lstatSync(file);
+                    lfstat = l_fs.statSync(file);
                 } catch(e) {
                     err = e;
                 }
                 if (!err) {
-                    var cres = callback(null, file, lfstat);
-                    if (cres && lfstat.isDirectory()) {
-                        this.traverseFiles(file, lfstat, callback, fcallback, inodes);
+                    // check symbolic link loops
+                    if (!this._scannedNodes[lfstat.ino]) {
+                        this._scannedNodes[lfstat.ino] = true;
+                        var cres = callback(null, file, lfstat);
+                        if (cres && lfstat.isDirectory()) {
+                            this.traverseFiles(file, lfstat, callback, fcallback, inodes);
+                        }
                     }
                 } else {
                     callback(err, file, null);
