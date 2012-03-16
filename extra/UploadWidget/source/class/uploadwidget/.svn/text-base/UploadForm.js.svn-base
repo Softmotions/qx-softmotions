@@ -115,7 +115,6 @@ qx.Class.define("uploadwidget.UploadForm",
   events:
   {
     "sending"    : "qx.event.type.Event",
-    "completedResponse"  : "qx.event.type.Data",
     "completed"  : "qx.event.type.Event"
   },
 
@@ -515,7 +514,8 @@ qx.Class.define("uploadwidget.UploadForm",
     {
       if (this.getIframeNode().readyState == "complete" && this.__isSent)
       {
-        this._completed();
+        this.fireEvent("completed");
+        delete this.__isSent;
       }
     },
 
@@ -531,18 +531,9 @@ qx.Class.define("uploadwidget.UploadForm",
     {
       if(this.__isSent)
       {
-        this._completed();
-      }
-    },
-
-    // added by softmotions
-    _completed : function() {
         this.fireEvent("completed");
         delete this.__isSent;
-        var resp = this.getIframeTextContent();
-        if (resp) {
-            this.fireDataEvent("completedResponse", resp);
-        }
+      }
     }
   }
 });
