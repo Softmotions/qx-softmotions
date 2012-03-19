@@ -9,6 +9,7 @@ var async = require("async");
 var l_fs = require("fs-ext");
 var l_path = require("path");
 var l_regexp = require("utils/regexp");
+var l_async = require("utils/async");
 
 const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
 module.exports.FileSeparator = FileSeparator;
@@ -194,7 +195,9 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         var i;
         buffer = new Buffer(nread);
         buffers.forEach(function(i) {
-            if (!i._bytesRead) return;
+            if (!i._bytesRead) {
+                return;
+            }
             i.copy(buffer, offset, 0, i._bytesRead);
             offset += i._bytesRead;
         });
@@ -206,7 +209,9 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         buffer = new Buffer(0);
     }
 
-    if (encoding) buffer = buffer.toString(encoding);
+    if (encoding) {
+        buffer = buffer.toString(encoding);
+    }
     return buffer;
 };
 
@@ -449,7 +454,7 @@ const DirectoryScanner = function(rootDir, scanSpec) {
     this._savedReadDirArgs = [];
 
     this._concurrency = 1;
-    this._rdQueue = async.queue(function(task, cb) {
+    this._rdQueue = l_async.stack(function(task, cb) {
         l_fs.readdir(task[0], function(err, files) {
             task[1](err, files);
             cb();
@@ -529,12 +534,14 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     /*l_fs.readdir(startDir, function(cbErr, files) {
      me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
      });*/
-    this._rdQueue.push([[
-        startDir,
-        function(cbErr, files) {
-            me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
-        }
-    ]]);
+    this._rdQueue.push([
+        [
+            startDir,
+            function(cbErr, files) {
+                me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
+            }
+        ]
+    ]);
 
 };
 
