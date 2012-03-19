@@ -227,13 +227,13 @@ qx.Class.define("uploadwidget.UploadButton",
                           this.__valueInputOnChange = true;
                           if (controlDom.files
                             && controlDom.files.length > 0) {
-							  var f = controlDom.files[0];
-							  var size = null;
-							  if (f.size !== undefined) {
-								  size = f.size;
-							  } else if (f.fileSize !== undefined) {
-								  size = f.fileSize;
-							  }
+                              var f = controlDom.files[0];
+                              var size = null;
+                              if (f.size !== undefined) {
+                                  size = f.size;
+                              } else if (f.fileSize !== undefined) {
+                                  size = f.fileSize;
+                              }
                               this.setFileSize(size);
                           }
                           var value = e.getData();
