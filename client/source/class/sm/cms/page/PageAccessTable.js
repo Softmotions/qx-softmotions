@@ -45,7 +45,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             this.__pageRef = ref;
 
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.acl", "ref", ref),
-                    "GET", "application/json");
+              "GET", "application/json");
 
             req.addListener("finished", function(ev) {
                 var err = ev.getData();
@@ -94,7 +94,8 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     }
                     // todo rolenames hardcoded
                     var rowSpec = [
-                        [user.login, user.name, (roles.indexOf("edit") != -1), (roles.indexOf("news") != -1)],
+                        [user.login, user.name,
+                            (roles.indexOf("edit") != -1), (roles.indexOf("news") != -1),  (roles.indexOf("recursive") != -1)],
                         user.login
                     ];
                     tdata.push(rowSpec);
@@ -128,6 +129,13 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     {
                         "title" : this.tr("Новости").toString(),
                         "id" : "role.news",
+                        "type" : "boolean",
+                        "editable" : true,
+                        "width" : "1*"
+                    },
+                    {
+                        "title" : this.tr("Рекурсивно").toString(),
+                        "id" : "role.recusive",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
@@ -186,9 +194,9 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
 
         __updateAccess : function(uid, mode, cb) {
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.update.acl",
-                    "ref", this.__pageRef,
-                    "uid", uid,
-                    "role", mode), "GET", "application/json");
+              "ref", this.__pageRef,
+              "uid", uid,
+              "role", mode), "GET", "application/json");
             req.addListener("finished", function(ev) {
                 var err = ev.getData();
                 if (cb) {
@@ -215,8 +223,8 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             mainPart.add(addBt);
 
             var rmBt = this.__rmBt =
-                    new qx.ui.toolbar.Button(this.tr("Убрать пользователя"), "sm/cms/icon/16/actions/user_delete.png")
-                            .set({enabled : false});
+              new qx.ui.toolbar.Button(this.tr("Убрать пользователя"), "sm/cms/icon/16/actions/user_delete.png")
+                .set({enabled : false});
             rmBt.addListener("execute", function(ev) {
                 var user = this.getSelectedRowData();
                 if (user == null) {
