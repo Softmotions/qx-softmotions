@@ -149,7 +149,8 @@ qx.Class.define("sm.nsrv.NKServer", {
 
             $$node.process.nextTick(
               (function() {
-                  this.__server = new connect.HTTPServer(chandlers);
+                  //todo fixme
+                  this.__server = connect.createServer(chandlers);
                   this.__server.listen(port, host);
                   this.fireDataEvent("started", this);
                   sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
