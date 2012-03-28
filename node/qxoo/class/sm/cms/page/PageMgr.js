@@ -753,7 +753,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 //move up on page hierarchy
-                getDocAccess(doc.parent.oid, ++lvl, amask, arguments.callee());
+                getDocAccess(doc.parent.oid, ++lvl, amask, arguments.callee);
             });
         },
 

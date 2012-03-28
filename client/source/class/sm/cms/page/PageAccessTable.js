@@ -88,7 +88,9 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     }
 
                     //Process edit & news
-                    if (roles.indexOf("edit") == -1 && roles.indexOf("news") == -1 && roles.indexOf("del")) {
+                    if (roles.indexOf("edit") == -1 &&
+                      roles.indexOf("news") == -1 &&
+                      roles.indexOf("del") == -1) {
                         //no edit/news flags, skipping
                         continue;
                     }
@@ -142,7 +144,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     },
                     {
                         "title" : this.tr("Рекурсивно").toString(),
-                        "id" : "role.recusive",
+                        "id" : "role.recursive",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
@@ -222,7 +224,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                 var dlg = new sm.cms.users.UsersSelectorDlg();
                 dlg.addListenerOnce("completed", function(ev) {
                     var user = ev.getData();
-                    this.addRow(user["login"], [user["login"], user["name"], false, false]);
+                    this.addRow(user["login"], [user["login"], user["name"], false, false, false, false]);
                     dlg.close();
                 }, this);
                 dlg.show();
