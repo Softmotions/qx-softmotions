@@ -88,14 +88,14 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     }
 
                     //Process edit & news
-                    if (roles.indexOf("edit") == -1 && roles.indexOf("news") == -1) {
+                    if (roles.indexOf("edit") == -1 && roles.indexOf("news") == -1 && roles.indexOf("del")) {
                         //no edit/news flags, skipping
                         continue;
                     }
                     // todo rolenames hardcoded
                     var rowSpec = [
                         [user.login, user.name,
-                            (roles.indexOf("edit") != -1), (roles.indexOf("news") != -1),  (roles.indexOf("recursive") != -1)],
+                            (roles.indexOf("edit") != -1), (roles.indexOf("news") != -1),   (roles.indexOf("del") != -1), (roles.indexOf("recursive") != -1)],
                         user.login
                     ];
                     tdata.push(rowSpec);
@@ -129,6 +129,13 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                     {
                         "title" : this.tr("Новости").toString(),
                         "id" : "role.news",
+                        "type" : "boolean",
+                        "editable" : true,
+                        "width" : "1*"
+                    },
+                    {
+                        "title" : this.tr("Удаление").toString(),
+                        "id" : "role.del",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
