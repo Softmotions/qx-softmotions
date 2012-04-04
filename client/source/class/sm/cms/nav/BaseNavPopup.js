@@ -9,17 +9,17 @@ qx.Class.define("sm.cms.nav.BaseNavPopup", {
     construct : function() {
         this.base(arguments);
         var vmgr = this._form.getValidationManager();
-        vmgr.setRequiredFieldMessage(this.tr("Это поле является обязательным"));
+        vmgr.setRequiredFieldMessage(this.tr("This field is required"));
     },
 
     members :
     {
         _configureFormButtons : function(form) {
-            var ok = new qx.ui.form.Button(this.tr("Сохранить"));
+            var ok = new qx.ui.form.Button(this.tr("Save"));
             ok.addListener("execute", this.save, this);
             form.addButton(ok);
 
-            var cancel = new qx.ui.form.Button(this.tr("Отмена"));
+            var cancel = new qx.ui.form.Button(this.tr("Cancel"));
             cancel.addListener("execute", this.hide, this);
             form.addButton(cancel);
         }

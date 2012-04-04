@@ -47,7 +47,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
 
     construct : function(options) {
         this.__options = options = options || {};
-        this.base(arguments, options["caption"] || this.tr("Ссылка на страницу"), null);
+        this.base(arguments, options["caption"] || this.tr("Link to page"), null);
         this.setLayout(new qx.ui.layout.VBox(5));
         this.set({
             modal         : true,
@@ -67,7 +67,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
             this.center();
         }, this);
 
-        this.__navCont = new sm.cms.nav.NavResources(this.tr("Выберите страницу или раздел"),
+        this.__navCont = new sm.cms.nav.NavResources(this.tr("Choose page or section"),
           "pages", options["qMods"]);
         this.add(this.__navCont, {flex : 1});
 
@@ -80,14 +80,14 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
             if (options.linkText != null && options.linkText != "") {
                 lname.setValue(options.linkText);
             }
-            form.add(lname, this.tr("Текст ссылки"));
+            form.add(lname, this.tr("Link text"));
         }
 
         var outLink = new qx.ui.form.TextField();
         outLink.setPlaceholder("http://");
 
         if (options["allowOuterLinks"] === true) {
-            form.add(outLink, this.tr("Или укажите внешнюю ссылку"));
+            form.add(outLink, this.tr("Or set external link"));
             outLink.addListener("input", function() {
                 ok.setEnabled((outLink.getValue() != "" && outLink.getValue() != null));
             });
@@ -97,7 +97,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
         this.add(fr);
 
         var footer = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"}));
-        var ok = new qx.ui.form.Button(options["oklabel"] ? options["oklabel"] : this.tr("Вставить ссылку"));
+        var ok = new qx.ui.form.Button(options["oklabel"] ? options["oklabel"] : this.tr("Insert link"));
         ok.addListener("execute", function(ev) {
             if (!form.validate()) {
                 return;
@@ -117,7 +117,7 @@ qx.Class.define("sm.cms.page.PageLinkDlg", {
                 this.fireDataEvent("otherSelected", [this.__otherId]);
             }
         }, this);
-        var cancel = new qx.ui.form.Button(this.tr("Отменить"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", function(ev) {
             this.close();
         }, this);

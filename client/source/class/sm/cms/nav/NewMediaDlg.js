@@ -16,7 +16,7 @@ qx.Class.define("sm.cms.nav.NewMediaDlg", {
      * @param pnode Parent node in navigation tree
      */
     construct : function(pnode, caption, icon) {
-        this.base(arguments, caption ? caption : this.tr("Добавление ресурса"), icon);
+        this.base(arguments, caption ? caption : this.tr("Add resource"), icon);
 
         this.__pnode = pnode;
         qx.core.Assert.assert(this.__pnode != null);
@@ -34,10 +34,10 @@ qx.Class.define("sm.cms.nav.NewMediaDlg", {
         this.__closeCmd = new qx.ui.core.Command("Esc");
         this.__closeCmd.addListener("execute", this.close, this);
 
-        var ok = new qx.ui.form.Button(this.tr("Сохранить"));
+        var ok = new qx.ui.form.Button(this.tr("Save"));
         ok.addListener("execute", this.save, this);
 
-        var cancel = new qx.ui.form.Button(this.tr("Отмена"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", this.close, this);
 
         var fileForm = this.__fileForm = new sm.ui.form.UploadForm("media_form", sm.cms.Application.ACT.getUrl("medialib.upload"));
@@ -83,8 +83,8 @@ qx.Class.define("sm.cms.nav.NewMediaDlg", {
                     errors.push(e.toString());
                 }
                 if (errors.length > 0) {
-                    var alert = new sm.alert.AlertMessages(this.tr("Внимание"));
-                    alert.addMessages(this.tr("Ошибки при загрузке файлов"), errors);
+                    var alert = new sm.alert.AlertMessages(this.tr("Alert"));
+                    alert.addMessages(this.tr("Errors when uploading files"), errors);
                     alert.show();
                 }
             }, this);

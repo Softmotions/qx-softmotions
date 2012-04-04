@@ -53,7 +53,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         toolbar.add(mainPart);
 
         var createNewsBt = this.__createNewsBt =
-          new qx.ui.toolbar.Button(this.tr("Создать"), "sm/cms/icon/16/actions/newspaper_add.png").set({enabled : false});
+          new qx.ui.toolbar.Button(this.tr("Create"), "sm/cms/icon/16/actions/newspaper_add.png").set({enabled : false});
         createNewsBt.addListener("execute", function(ev) {
             var options = {};
             var ps = this.__pageSelect;
@@ -86,7 +86,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         var addPageBt = this.__addPageBt = new qx.ui.toolbar.Button(null, "sm/cms/icon/16/actions/add.png");
         addPageBt.addListener("execute", function() {
             var dlg = new sm.cms.page.PageLinkDlg({
-                oklabel : this.tr("Добавить корневую страницу для новостей"),
+                oklabel : this.tr("Add root page for news"),
                 allowOuterLinks : false,
                 includeLinkName : false});
             dlg.addListener("pageSelected", function(ev) {
@@ -171,7 +171,7 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
                 return false;
             }
 
-            var renBt = new qx.ui.menu.Button(this.tr("Переименовать"));
+            var renBt = new qx.ui.menu.Button(this.tr("Rename"));
             renBt.addListener("execute", function(ev) {
                 var d = new sm.cms.nav.RenameNavDlg({$$data: "pages." + page["id"], label: page["name"]});
                 d.setPosition("bottom-right");
@@ -184,15 +184,15 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             }, this);
             contextMenu.add(renBt);
 
-            var edBt = new qx.ui.menu.Button(this.tr("Редактировать"));
+            var edBt = new qx.ui.menu.Button(this.tr("Edit"));
             edBt.addListener("execute", function() {
                 this.fireDataEvent("editNews", page["id"]);
             }, this);
             contextMenu.add(edBt);
 
-            var rmBt = new qx.ui.menu.Button(this.tr("Удалить"));
+            var rmBt = new qx.ui.menu.Button(this.tr("Delete"));
             rmBt.addListener("execute", function() {
-                sm.cms.Application.confirm(this.tr("Вы действительно желаете удалить") + " '" + page["name"] + "'?",
+                sm.cms.Application.confirm(this.tr("Do you really want to delete") + " '" + page["name"] + "'?",
                   function(res) {
                       if (!res) {
                           return;

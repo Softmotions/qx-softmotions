@@ -32,7 +32,7 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
 
 
     construct : function(options) {
-        this.base(arguments, this.tr("Создание новости"), null);
+        this.base(arguments, this.tr("Creating news"), null);
         this.setLayout(new qx.ui.layout.Grow());
         this.set({
             modal         : true,
@@ -66,7 +66,7 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
             }
         }, this);
         title.focus();
-        form.add(title, this.tr("Заголовок"), null, "name");
+        form.add(title, this.tr("Title"), null, "name");
 
         var ps = new sm.ui.form.ButtonField(null, "sm/cms/icon/16/actions/page_link.png");
 
@@ -82,7 +82,7 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
         ps.addListener("execute", function() {
             var dlg = new sm.cms.page.PageLinkDlg({allowOuterLinks : false,
                 includeLinkName : false,
-                oklabel : this.tr("Выбрать раздел")});
+                oklabel : this.tr("Choose section")});
             var pageSelected = function(ev) {
                 var sp = ev.getData();
                 pid = sp[0];
@@ -93,11 +93,11 @@ qx.Class.define("sm.cms.news.NewNewsDlg", {
             dlg.addListener("linkSelected", pageSelected, this);
             dlg.open();
         }, this);
-        form.add(ps, this.tr("Корневая страница"));
+        form.add(ps, this.tr("Root page"));
 
 
-        var cancel = new qx.ui.form.Button("Отменить");
-        var ok = new qx.ui.form.Button("Создать");
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
+        var ok = new qx.ui.form.Button(this.tr("Create"));
         ok.addListener("execute", function() {
             if (!form.validate()) {
                 return;

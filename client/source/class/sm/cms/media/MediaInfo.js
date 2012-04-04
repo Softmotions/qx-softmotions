@@ -31,7 +31,7 @@ qx.Class.define("sm.cms.media.MediaInfo", {
         iLayout.setColumnAlign(0, "right", "top");
         this.__infoSide.setLayout(iLayout);
 
-        this.__iPreviewBox = new qx.ui.groupbox.GroupBox(this.tr("Изображение"));
+        this.__iPreviewBox = new qx.ui.groupbox.GroupBox(this.tr("Image"));
         var pLayout = new qx.ui.layout.HBox(5, "center");
         this.__iPreviewBox.setLayout(pLayout);
 
@@ -65,23 +65,23 @@ qx.Class.define("sm.cms.media.MediaInfo", {
                 this._disposeArray(this.__infoSide.removeAll());
 
                 ++i;
-                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Название:")).set({font : "bold"}), {row : i, column : 0});
+                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Name") + ":").set({font : "bold"}), {row : i, column : 0});
                 this.__infoSide.add(new qx.ui.basic.Label(pi["name"] ? pi["name"] : ""), {row : i, column : 1});
 
                 ++i;
                 var cdate = isNaN(pi["cdate"]) ? "" : new Date(parseInt(pi["cdate"])).toLocaleString();
-                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Создано:")).set({font : "bold"}), {row : i, column : 0});
+                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Created:")).set({font : "bold"}), {row : i, column : 0});
                 this.__infoSide.add(new qx.ui.basic.Label(cdate), {row : i, column : 1});
 
                 ++i;
                 var mdate = isNaN(pi["mdate"]) ? "" : new Date(parseInt(pi["mdate"])).toLocaleString();
-                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Изменено:")).set({font : "bold"}), {row : i, column : 0});
+                this.__infoSide.add(new qx.ui.basic.Label(this.tr("Changed") + ":").set({font : "bold"}), {row : i, column : 0});
                 this.__infoSide.add(new qx.ui.basic.Label(mdate), {row : i, column : 1});
 
                 var msource = sm.cms.Application.ACT.getUrl("media.get", "ref", "media" + mediaRef);
                 if (pi["type"] == 1) {
                     ++i;
-                    var download = new qx.ui.form.Button(this.tr("Скачать"));
+                    var download = new qx.ui.form.Button(this.tr("Download"));
                     download.addListener("execute", function(event) {
                         qx.bom.Window.open(msource, "Download_window", {width : 500, height : 400, status : "no", toolbar : "no" ,menubar : "no"});
                     }, this);

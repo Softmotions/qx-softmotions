@@ -25,7 +25,7 @@ qx.Class.define("sm.cms.nav.NewPageDlg", {
                     this.save();
                 }
             }, this);
-            this._form.add(page, this.tr("Страница"), null, "name");
+            this._form.add(page, this.tr("Page"), null, "name");
             page.focus();
         },
 

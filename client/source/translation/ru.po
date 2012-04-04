@@ -1,0 +1,583 @@
+msgid ""
+msgstr ""
+
+#: sm/ui/form/UploadForm.js:54
+msgid "Add file"
+msgstr "Добавить файл"
+
+#: sm/cms/editor/ImageEditor.js:67 sm/cms/media/AttachDlg:66
+msgid "Upload"
+msgstr "Загрузить"
+
+#: sm/cms/editor/ImageEditor.js:101
+msgid "Need to upload image"
+msgstr "Необходимо загрузить изображение"
+
+#: sm/cms/editor/ImageEditor.js:156 sm/cms/editor/ImageEditor.js:163 sm/cms/media/AttachDlg:243 #: sm/cms/nav/NewMediaDlg.js:86
+msgid "Alert"
+msgstr "Внимание"
+
+#: sm/cms/editor/ImageEditor.js:157 sm/cms/media/AttachDlg:244 #: sm/cms/nav/NewMediaDlg.js:87
+msgid "Errors when uploading files"
+msgstr "Ошибки при загрузке файлов"
+
+#: sm/cms/editor/ImageEditor.js:164
+msgid "Image does not comply with the limits"
+msgstr "Изображение не соответствует ограничениям"
+
+#: sm/cms/editor/ImageEditor.js:186
+msgid "Image did not upload"
+msgstr "Изображение не было загружено"
+
+#: sm/cms/editor/ImageEditor.js:191
+msgid "Uploaded file is not image"
+msgstr "Загруженный файл не является изображением"
+
+#: sm/cms/editor/ImageEditor.js:198
+msgid "Image is of unknown size"
+msgstr "Изображение имеет неизвестные размеры"
+
+#: sm/cms/editor/ImageEditor.js:213
+msgid "Width of image isn't equal its height"
+msgstr "Ширина изображения не равна его высоте"
+
+#: sm/cms/editor/ImageEditor.js:223
+msgid "width"
+msgstr "ширина"
+
+#: sm/cms/editor/ImageEditor.js:223
+msgid "height"
+msgstr "высота"
+
+#: sm/cms/editor/ImageEditor.js:233
+msgid "images is not equal"
+msgstr "изображения не равна"
+
+#: sm/cms/editor/ImageEditor.js:237
+msgid "images less than"
+msgstr "изображения меньше чем"
+
+#: sm/cms/editor/ImageEditor.js:241
+msgid "images more than"
+msgstr "изображения больше чем"
+
+#: sm/cms/editor/PageEditor.js:79
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: sm/cms/editor/PageEditor.js:84 sm/cms/banner/BannersEditor.js:32 sm/cms/nav/BaseNavPopup.js:18 #: sm/cms/nav/NewMediaDlb.js:37
+msgid "Save"
+msgstr "Сохранить"
+
+#: sm/cms/editor/PageEditor.js:87
+msgid "Page has been successfully saved"
+msgstr "Страница была успешно сохранена"
+
+#: sm/cms/editor/PageEditor.js:189
+msgid "Template does not select/page does not exist"
+msgstr "Шаблон не выбран/страница не существует"
+
+#: sm/cms/editor/PageEditor.js:228 sm/cms/nav/BaseNavPopup.js:12
+msgid "This field is required"
+msgstr "Это поле является обязательным"
+
+#: sm/cms/editor/PageEditor.js:232 sm/cms/page/PageTable.js:14
+msgid "Published"
+msgstr "Опубликовано"
+
+#: sm/cms/editor/PageEditor.js:365
+msgid "Please complete all required fields of page template"
+msgstr "Пожалуйста, заполните все необходимые поля шаблона страницы"
+
+#: sm/cms/editor/TagsField.js:64
+msgid "Maximum number of elements exceeded %1"
+msgstr "Превышено максимальное количество элементов %1"
+
+#: sm/cms/editor/TagsField.js:68
+msgid "Maximum length of element exceeded %1"
+msgstr "Превышена максимальная длина элемента %1"
+
+#: sm/cms/editor/UniversalEditor.js:64
+msgid "field is avtive"
+msgstr "поле включено"
+
+#: sm/cms/editor/wiki/TableDlg.js:23 sm/cms/editor/wiki/TableDlg.js:54
+msgid "Insert table"
+msgstr "Вставить таблицу"
+
+#: sm/cms/editor/wiki/TableDlg.js:45
+msgid "Columns"
+msgstr"Столбцов"
+
+#: sm/cms/editor/wiki/TableDlg.js:47
+msgid "Rows"
+msgstr"Строк"
+
+#: sm/cms/editor/wiki/TableDlg.js:58 sm/cms/news/NewsEditor.js:22 sm/cms/news/NewNewsDlg.js:99 sm/cms/media/MediaLibLinkDlg.js:77 sm/cms/page/PageLinkDlg.js:120 sm/cms/nav/BaseNavPopup.js:22 #: sm/cms/nav/NewMediaDlg.js:40  sm/cms/users/EditUserDlg.js:91 sm/cms/users/UserSelectorDlg.js:60
+msgid "Cancel"
+msgstr "Отменить"
+
+#: sm/cms/editor/wiki/TableDlg.js:67
+msgid "Wide table"
+msgstr "Широкая таблица"
+
+#: sm/cms/editor/wiki/WikiEditor.js:174 sm/cms/editor/wiki/WikiEditor.js:178 sm/cms/editor/wiki/WikiEditor.js:182
+msgid "Header text"
+msgstr "Текст заголовка"
+
+#: sm/cms/editor/wiki/WikiEditor.js:186
+msgid "Text in bold"
+msgstr "Текст выделенный жирным"
+
+#: sm/cms/editor/wiki/WikiEditor.js:190
+msgid "Text in italics"
+msgstr "Текст выделенный курсивом"
+
+#: sm/cms/editor/wiki/WikiEditor.js:486
+msgid "Heading 1"
+msgstr "Заголовок первого уровня"
+
+#: sm/cms/editor/wiki/WikiEditor.js:490
+msgid "Heading 2"
+msgstr "Заголовок второго уровня"
+
+#: sm/cms/editor/wiki/WikiEditor.js:494
+msgid "Heading 3"
+msgstr "Заголовок третьего уровня"
+
+#: sm/cms/editor/wiki/WikiEditor.js:498
+msgid "Bold"
+msgstr "Жирный шрифт"
+
+#: sm/cms/editor/wiki/WikiEditor.js:502
+msgid "Italic"
+msgstr "Курсив"
+
+#: sm/cms/editor/wiki/WikiEditor.js:506
+msgid "Bullet list"
+msgstr "Список"
+
+#: sm/cms/editor/wiki/WikiEditor.js:510
+msgid "Numbered list"
+msgstr "Нумерованный список"
+
+#: sm/cms/editor/wiki/WikiEditor.js:514
+msgid "Link to another page"
+msgstr "Ссылка на другую страницу"
+
+#: sm/cms/editor/wiki/WikiEditor.js:518
+msgid "Add image|link to file"
+msgstr "Добавить изображение|ссылку на файл"
+
+#: sm/cms/editor/wiki/WikiEditor.js:522
+msgid "Add table"
+msgstr "Добавить таблицу"
+
+#: sm/cms/editor/wiki/WikiEditor.js:526
+msgid "Add tree"
+msgstr "Добавить дерево"
+
+#: sm/cms/editor/wiki/WikiEditor.js:530
+msgid "Create note"
+msgstr "Создать заметку"
+
+#: sm/cms/editor/MenuEditor.js:95
+msgid "change value"
+msgstr "переопределить"
+
+#: sm/cms/editor/MenuEditor.js:97
+msgid "settings"
+msgstr "настройки"
+
+#: sm/cms/editor/MenuEditor.js:116 #: sm/cms/users/UserSelectorDlg.js:53
+msgid "Select"
+msgstr "Выбрать"
+
+#: sm/cms/editor/MenuEditor.js:123
+msgid "Can not synchronize with the same page!"
+msgstr "Нельзя синхронизовывать с той же страницей!"
+
+#: sm/cms/editor/MenuEditor.js:135
+msgid "Can not synchronize with selected page!"
+msgstr "Невозможно синхронизоваться с выбранной страницей!"
+
+#: sm/cms/editor/MenuEditor.js:157
+msgid "Do you really want to turn off synchronization?"
+msgstr "Вы действительно хотите отключить синхронизацию?"
+
+#: sm/cms/editor/MenuTable.js:87
+msgid "New link"
+msgstr"Новая ссылка"
+
+#: sm/cms/editor/MenuTable.js:101 sm/cms/news/NewsWorkplace.js:193 sm/cms/media/AttachDlg:102 sm/cms/media/AttachDlg:268 sm/cms/Application.js:337 sm/cms/Application.js:381
+msgid "Delete"
+msgstr "Удалить"
+
+#: sm/cms/editor/MenuTable.js:143
+msgid "Enable"
+msgstr "Вкл."
+
+#: sm/cms/editor/MenuTable.js:154
+msgid "Disable"
+msgstr "Выкл."
+
+#: sm/cms/editor/MenuTable.js:193  sm/cms/banner/BannersTable.js:194 sm/cms/media/MediaInfo.js:68 sm/cms/page/PageInfo.js:43 sm/cms/page/PageTable.js:12
+msgid "Name"
+msgstr "Название"
+
+#: sm/cms/editor/MenuTable.js:199  sm/cms/banner/BannersTable.js:146 sm/cms/banner/BannersTable.js:216 sm/cms/banner/BannersTable.js:256
+msgid "Link"
+msgstr "Ссылка"
+
+#: sm/cms/editor/MenuTable.js:228
+msgid "synchronize with %1"
+msgstr "синхронизуется с %1"
+
+#: sm/cms/banner/BannersTable.js:38  sm/cms/banner/BannersTable.js:138
+msgid "inactive are shown"
+msgstr "неактивные показаны"
+
+#: sm/cms/banner/BannersTable.js:38  sm/cms/banner/BannersTable.js:138
+msgid "inactive are hidden"
+msgstr "неактивные скрыты"
+
+#: sm/cms/banner/BannersTable.js:131 sm/cms/banner/BannersTable.js:136
+msgid "Hide inactive"
+msgstr "Скрыть неактивные"
+
+#: sm/cms/banner/BannersTable.js:131 sm/cms/banner/BannersTable.js:136
+msgid "Show inactive"
+msgstr "Показать неактивные"
+
+#: sm/cms/banner/BannersTable.js:157 sm/cms/banner/BannersTable.js:269
+msgid "Turn on"
+msgstr "Включить"
+
+#: sm/cms/banner/BannersTable.js:171 sm/cms/banner/BannersTable.js:263
+msgid "Turn off"
+msgstr "Отключить"
+
+#: sm/cms/banner/BannersTable.js:200
+msgid "Description"
+msgstr "Описание"
+
+#: sm/cms/banner/BannersTable.js:208
+msgid "Weight"
+msgstr "Вес"
+
+#: sm/cms/banner/BannersEditor.js:63 sm/cms/media/MediaInfo.js:34  sm/cms/media/AttachDlg:93
+msgid "Image"
+msgstr "Изображение"
+
+#: sm/cms/banner/BannersEditor.js:82
+msgid "Location:"
+msgstr "Расположение:"
+
+
+#: sm/cms/banner/BannersEditor.js:86
+msgid "Media category:"
+msgstr "Медиа категория:"
+
+#: sm/cms/banner/BannersEditor.js:90
+msgid "Banners:"
+msgstr "Банеры:"
+
+#: sm/cms/banner/BannersEditor.js:238
+msgid "Banners settings has been saved"
+msgstr "Настройки банера были успешно сохранены"
+
+#: sm/cms/news/NewsEditor.js:24
+msgid "Going to management news page will destroy all unsaved changes! Continue?"
+msgstr "Переход на страницу управления новостями уничтожит несохраненные изменения! Продолжить?"
+
+#: sm/cms/news/NewsEditor.js:31
+msgid "Save and close"
+msgstr "Сохранить и закончить"
+
+#: sm/cms/news/NewsWorkplace.js:56 sm/cms/news/NewNewsDlg.js:100  sm/cms/users/EditUserDlg.js:87
+msgid "Create"
+msgstr "Создать"
+
+#: sm/cms/news/NewsWorkplace.js:89
+msgid "Add root page for news"
+msgstr "Добавить корневую страницу для новостей"
+
+#: sm/cms/news/NewsWorkplace.js:174 sm/cms/Application.js:317 sm/cms/Application.js:370
+msgid "Rename"
+msgstr "Переименовать"
+
+#: sm/cms/news/NewsWorkplace.js:187 sm/cms/page/PageSelector.js:123 sm/cms/users/EditUserDlg.js:37  sm/cms/users/EditUserDlg.js:87
+msgid "Edit"
+msgstr "Редактировать"
+
+#: sm/cms/news/NewsWorkplace.js:195 sm/cms/nav/NavResources.js:322 sm/cms/nav/NavResources.js:399
+msgid "Do you really want to delete"
+msgstr "Вы действительно хотите удалить"
+
+#: sm/cms/news/NewNewsDlg.js:35
+msgid "Creating news"
+msgstr "Создание новости"
+
+#: sm/cms/news/NewNewsDlg.js:69
+msgid "Title"
+msgstr "Заголовок"
+
+#: sm/cms/news/NewNewsDlg.js:85
+msgid "Choose section"
+msgstr "Выбрать раздел"
+
+#: sm/cms/news/NewNewsDlg.js:96
+msgid "Root page"
+msgstr "Корневая страница"
+
+#: sm/cms/media/MediaInfo.js:73
+msgid "Created:"
+msgstr "Создан:"
+
+#: sm/cms/media/MediaInfo.js:78 sm/cms/page/PageInfo.js:47 sm/cms/page/PageTable.js:13
+msgid "Changed"
+msgstr "Изменен"
+
+#: sm/cms/media/MediaInfo.js:84
+msgid "Download"
+msgstr "Скачать"
+
+#: sm/cms/media/AttachDlg:24
+msgid "managing files"
+msgstr "Управление файлами"
+
+#: sm/cms/media/AttachDlg:47
+msgid "File"
+msgstr "Файл"
+
+#: sm/cms/media/AttachDlg:47 sm/cms/page/PageTable.js:17
+msgid "Type"
+msgstr "Тип"
+
+#: sm/cms/media/AttachDlg:47
+msgid "Size"
+msgstr "Размер"
+
+#: sm/cms/media/AttachDlg:79 sm/cms/page/PageLinkDlg.js:83
+msgid "Link text"
+msgstr "Текст ссылки"
+
+#: sm/cms/media/AttachDlg:103
+msgid "Insert"
+msgstr "Вставить"
+
+#: sm/cms/media/AttachDlg:159 sm/cms/media/AttachDlg:270
+msgid "Do you really want to delete the selected file?"
+msgstr "Вы действительно хотите удалить выбранный файл?"
+
+#: sm/cms/media/MediaLibLinkDlg.js:36
+msgid "Link to media resource"
+msgstr "Ссылка на медиа ресурс"
+
+#: sm/cms/media/MediaLibLinkDlg.js:59
+msgid "Media resources"
+msgstr "Медиа ресурсы"
+
+#: sm/cms/media/MediaLibLinkDlg.js:63
+msgid "Choose"
+msgstr "Выбрать"
+
+#: sm/cms/page/PageSelector.js:43 sm/cms/users/UsersSelector.js:32
+msgid "Search"
+msgstr "Поиск"
+
+#: sm/cms/page/PageSelector.js:54 sm/cms/users/UsersSelector.js:43
+msgid "Find"
+msgstr "Искать"
+
+#: sm/cms/page/PageSelector.js:65
+msgid "View"
+msgstr "Просмотр"
+
+#: sm/cms/page/PageSelector.js:119
+msgid "This page can be displayed"
+msgstr "Эта страница может быть отображена"
+
+#: sm/cms/page/PageSelector.js:119
+msgid "This page not published"
+msgstr "Эта страница не опубликована"
+
+#: sm/cms/page/PageSelector.js:132 sm/cms/Application.js:303
+msgid "Create page"
+msgstr "Создать страницу"
+
+#: sm/cms/page/PageAccessTable.js:114 sm/cms/users/EditUserDlg.js:55 sm/cms/users/UserTable.js:12
+msgid "Login"
+msgstr "Логин"
+
+#: sm/cms/page/PageAccessTable.js:119
+msgid "User name"
+msgstr "Имя пользователя"
+
+#: sm/cms/page/PageAccessTable.js:125
+msgid "Editing"
+msgstr "Редактирование"
+
+#: sm/cms/page/PageAccessTable.js:132
+msgid "News"
+msgstr "Новости"
+
+#: sm/cms/page/PageAccessTable.js:139
+msgid "Deleting"
+msgstr "Удаление"
+
+#: sm/cms/page/PageAccessTable.js:146
+msgid "Recursive"
+msgstr "Рекурсивно"
+
+#: sm/cms/page/PageAccessTable.js:185
+msgid "Owner"
+msgstr "Владелец"
+
+#: sm/cms/page/PageAccessTable.js:222
+msgid "Add user"
+msgstr "Добавить пользователя"
+
+#: sm/cms/page/PageAccessTable.js:235
+msgid "Remove user"
+msgstr "Убрать пользователя"
+
+#: sm/cms/page/PageTable.js:15
+msgid "template"
+msgstr "Шаблон"
+
+#: sm/cms/page/PageTable.js:16
+msgid "Reference with"
+msgstr "Связана с"
+
+#: sm/cms/page/PageTable.js:18
+msgid "Visit"
+msgstr "Посетило"
+
+#: sm/cms/page/PageLinkDlg.js:50
+msgid "Link to page"
+msgstr "Ссылка на страницу"
+
+#: sm/cms/page/PageLinkDlg.js:70
+msgid "Choose page or section"
+msgstr "Выберите страницу или раздел"
+
+#: sm/cms/page/PageLinkDlg.js:90
+msgid "Or set external link"
+msgstr "Или укажите внешнюю ссылку"
+
+#: sm/cms/page/PageLinkDlg.js:100
+msgid "Insert link"
+msgstr "Вставить ссылку"
+
+#: sm/cms/nav/NavResources.js:77
+msgid "Navigation menu"
+msgstr "Меню навигации"
+
+#: sm/cms/nav/NavResources.js:324 sm/cms/nav/NavResources.js:402
+msgid "section"
+msgstr "раздел"
+
+#: sm/cms/nav/NavResources.js:326 sm/cms/nav/NavResources.js:405
+msgid "page"
+msgstr "страницу"
+
+#: sm/cms/nav/NavResources.js:359
+msgid "Page moving"
+msgstr "Перемещение страницы"
+
+#: sm/cms/nav/NavResources.js:360
+msgid "Move here"
+msgstr "Переместить сюда"
+
+#: sm/cms/nav/NewPageDlg.js:28
+msgid "Page"
+msgstr "Страница"
+
+#: sm/cms/nav/NewCategoryDlg.js:28
+msgid "Section"
+msgstr "Раздел"
+
+#: sm/cms/nav/NewMediaDlg.js:19
+msgid "Add resource"
+msgstr "Добавление ресурса"
+
+#: sm/cms/nav/RenameNavDlg.js:32
+msgid "New name"
+msgstr "Новое имя"
+
+#: sm/cms/Application.js:35
+msgid "Yes"
+msgstr "Да"
+
+#: sm/cms/Application.js:36
+msgid "No"
+msgstr "Нет"
+
+#: sm/cms/Application.js:268 sm/cms/Application.js:272
+msgid "Help"
+msgstr "Справка"
+
+#: sm/cms/Application.js:275 sm/cms/Application.js:276
+msgid "Logout"
+msgstr "Выход"
+
+#: sm/cms/Application.js:278
+msgid "Do you really want to logout?"
+msgstr "Вы действительно хотите выйти из системы?"
+
+#: sm/cms/Application.js:309 sm/cms/Application.js:362
+msgid "Create section"
+msgstr "Создать раздел"
+
+#: sm/cms/Application.js:328
+msgid "Move"
+msgstr "Переместить"
+
+#: sm/cms/Application.js:356
+msgid "Add resources"
+msgstr "Добавить ресурсы"
+
+#: sm/cms/users/UserRolesTable.js:98
+msgid "Role ID"
+msgstr "ID роли"
+
+#: sm/cms/users/UserRolesTable.js:103
+msgid "Role name"
+msgstr "Название роли"
+
+#: sm/cms/users/UserRolesTable.js:108
+msgid "Assign to"
+msgstr "Назначена"
+
+#: sm/cms/users/EditUserDlg.js:38 sm/cms/users/UserPanel.js:32
+msgid "New user"
+msgstr "Новый пользователь"
+
+#: sm/cms/users/EditUserDlg.js:64
+msgid "Field: password must be field"
+msgstr "Поле: пароль должно быть заполнено"
+
+#: sm/cms/users/EditUserDlg.js:70
+msgid "Password and confirm password do not match"
+msgstr "Пароль и подтверждение пароля не совпадают"
+
+#: sm/cms/users/EditUserDlg.js:84
+msgid "Password"
+msgstr "Пароль"
+
+#: sm/cms/users/EditUserDlg.js:85
+msgid "Confirm password"
+mststr "Повторите пароль"
+
+#: sm/cms/users/EditUserDlg.js:56 sm/cms/users/UserTable.js:13
+msgid "Username"
+msgstr "Имя"
+
+#: sm/cms/users/UserSelectorDlg.js:27
+msgid "Select user"
+msgstr "Выбор пользователя"
+
+#: sm/cms/users/UserPanel.js:36
+msgid "Change"
+msgstr "Изменить"

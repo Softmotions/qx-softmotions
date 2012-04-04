@@ -24,7 +24,7 @@ qx.Class.define("sm.cms.users.UsersSelectorDlg", {
     },
 
     construct : function(options) {
-        this.base(arguments, this.tr("Выбор пользователя"), null);
+        this.base(arguments, this.tr("Select user"), null);
 
         this.setLayout(new qx.ui.layout.VBox(4));
         this.set({
@@ -50,14 +50,14 @@ qx.Class.define("sm.cms.users.UsersSelectorDlg", {
 
 
         var footer = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"}));
-        var ok = new qx.ui.form.Button(this.tr("Выбрать")).set({enabled : false});
+        var ok = new qx.ui.form.Button(this.tr("Select")).set({enabled : false});
         ok.addListener("execute", function(ev) {
             var user = this.__selector.getSelectedUser();
             if (user) {
                 this.fireDataEvent("completed", user);
             }
         }, this);
-        var cancel = new qx.ui.form.Button(this.tr("Отменить"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", function(ev) {
             this.close();
         }, this);

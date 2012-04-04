@@ -34,8 +34,8 @@ qx.Class.define("sm.cms.users.EditUserDlg", {
      * @param user{Object?null} Users login if needs to edit user otherwise creating new user
      */
     construct : function(user) {
-        this.base(arguments, user ? (this.tr("Редактирование") + " " + user["name"]) :
-                             this.tr("Новый пользователь"), null);
+        this.base(arguments, user ? (this.tr("Edit") + " " + user["name"]) :
+                             this.tr("New user"), null);
         if (user) {
             this.__user = qx.lang.Object.clone(user);
         }
@@ -52,8 +52,8 @@ qx.Class.define("sm.cms.users.EditUserDlg", {
 
         var form = this.__form = new qx.ui.form.Form();
 
-        form.add(new qx.ui.form.TextField().set({required : true, maxLength : 64, readOnly : (user != null)}), this.tr("Логин"), null, "login");
-        form.add(new qx.ui.form.TextField().set({required : true, maxLength : 256}), this.tr("Имя"), null, "name");
+        form.add(new qx.ui.form.TextField().set({required : true, maxLength : 64, readOnly : (user != null)}), this.tr("Login"), null, "login");
+        form.add(new qx.ui.form.TextField().set({required : true, maxLength : 256}), this.tr("Username"), null, "name");
         form.add(new qx.ui.form.TextField().set({required : true, maxLength : 256}), this.tr("Email"),
                 qx.util.Validate.email(), "email");
 
@@ -61,13 +61,13 @@ qx.Class.define("sm.cms.users.EditUserDlg", {
             var items = form.getItems();
             if (items["password"].getValue() == null || items["password"].getValue() == "") {
                 if (!user) {
-                    throw new qx.core.ValidationError("Validation Error", this.tr("Поле: пароль должно быть заполнено"));
+                    throw new qx.core.ValidationError("Validation Error", this.tr("Field: password must be field"));
                 } else {
 
                 }
             }
             if (items["password"].getValue() != items["passwordConfirm"].getValue()) {
-                throw new qx.core.ValidationError("Validation Error", this.tr("Пароль и подтверждение пароля не совпадают"));
+                throw new qx.core.ValidationError("Validation Error", this.tr("Password and confirm password do not match"));
             }
         }, this);
 
@@ -81,14 +81,14 @@ qx.Class.define("sm.cms.users.EditUserDlg", {
             }
         }
 
-        form.add(new qx.ui.form.PasswordField().set({required : (user == null), maxLength : 64}), this.tr("Пароль"), pVal, "password");
-        form.add(new qx.ui.form.PasswordField().set({required : (user == null), maxLength : 64}), this.tr("Повторите пароль"), pVal, "passwordConfirm");
+        form.add(new qx.ui.form.PasswordField().set({required : (user == null), maxLength : 64}), this.tr("Password"), pVal, "password");
+        form.add(new qx.ui.form.PasswordField().set({required : (user == null), maxLength : 64}), this.tr("Confirm password"), pVal, "passwordConfirm");
 
-        var ok = new qx.ui.form.Button(user != null ? this.tr("Изменить") : this.tr("Создать"));
+        var ok = new qx.ui.form.Button(user != null ? this.tr("Edit") : this.tr("Create"));
         ok.addListener("execute", this.__createUser, this);
         form.addButton(ok);
 
-        var cancel = new qx.ui.form.Button(this.tr("Отменить"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", this.close, this);
         form.addButton(cancel);
 

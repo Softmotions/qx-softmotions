@@ -92,9 +92,9 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                 }
             };
             activeCheckBox.addListener("changeValue", activeCb, this);
-            form.add(activeCheckBox, this.tr("переопределить"), null, "_active_");
+            form.add(activeCheckBox, this.tr("change value"), null, "_active_");
 
-            form.add(this.__mtable, this.tr("настройки"), null, "_menu_");
+            form.add(this.__mtable, this.tr("settings"), null, "_menu_");
 
             view = new sm.ui.form.FlexFormRenderer(form);
 
@@ -113,14 +113,14 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
         __manageSync: function(enable) {
             if (enable) {
                 var dlg = new sm.cms.page.PageLinkDlg({
-                    "oklabel": this.tr("Выбрать"),
+                    "oklabel": this.tr("Select"),
                     "requireLinkName": false,
                     "allowOuterLinks" : false
                 });
                 dlg.addListener("pageSelected", function(ev) {
                     var data = ev.getData();
                     if (this.__options.pageInfo && this.__options.pageInfo["_id"] == data[0]) {
-                        sm.cms.Application.alert(this.tr("Нельзя синхронизовывать с тойже страницей!"));
+                        sm.cms.Application.alert(this.tr("Can not synchronize with the same page!"));
                         return;
                     }
 
@@ -132,7 +132,7 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                     req.send(function(resp) {
                         var state = resp.getContent();
                         if (!state || !state.state) {
-                            sm.cms.Application.alert(this.tr("Невозможно синхронизоваться с выбранной страницей!"));
+                            sm.cms.Application.alert(this.tr("Can not synchronize with selected page!"));
                             return;
                         }
 
@@ -154,7 +154,7 @@ qx.Class.define("sm.cms.editor.MenuEditor", {
                 }, this);
                 dlg.open();
             } else {
-                sm.cms.Application.confirm(this.tr("Вы действительно хотите отключить синхронизацию?"),
+                sm.cms.Application.confirm(this.tr("Do you really want to turn off synchronization?"),
                         qx.lang.Function.bind(function(res) {
                             if (res) {
                                 var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.update.attrsync"), "POST", "application/json");

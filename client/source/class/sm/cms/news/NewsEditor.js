@@ -19,16 +19,16 @@ qx.Class.define("sm.cms.news.NewsEditor", {
      */
     construct : function(ws) {
         this.base(arguments, {tmplCategory : "news", "pickFirstTemplate" : true});
-        var complete = new qx.ui.form.Button(this.tr("Отменить"));
+        var complete = new qx.ui.form.Button(this.tr("Cancel"));
         complete.addListener("execute", function() {
-            sm.cms.Application.confirm(this.tr("Переход в на страницу управления новостями уничтожит несохраненные изменения! Продолжить?"), function(res) {
+            sm.cms.Application.confirm(this.tr("Going to management news page will destroy all unsaved changes! Continue?"), function(res) {
                 if (res) {
                     this.disposeForm();
                     ws.fireEvent("activatePanel");
                 }
             }, this);
         }, this);
-        this._grefs["save"].setLabel(this.tr("Сохранить и закончить"));
+        this._grefs["save"].setLabel(this.tr("Save and close"));
         this._grefs["hdr.hcont"].add(complete);
         this.addListener("pageSaved", function(ev) {
             var preview = ev.getData();

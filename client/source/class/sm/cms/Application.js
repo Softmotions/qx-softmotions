@@ -32,8 +32,8 @@ qx.Class.define("sm.cms.Application", {
                 this.__CONFIRM = new dialog.Confirm({
                     "blockerOpacity" : root.getBlockerOpacity(),
                     "blockerColor" : root.getBlockerColor() || "transparent",
-                    "yesButtonLabel" : root.tr("Да"),
-                    "noButtonLabel" : root.tr("Нет")
+                    "yesButtonLabel" : root.tr("Yes"),
+                    "noButtonLabel" : root.tr("No")
                 });
             }
             this.__CONFIRM.set({ "message"     : message,
@@ -265,17 +265,17 @@ qx.Class.define("sm.cms.Application", {
             this.addListenerOnce("guiInitialized", function() {
                 var apps = sm.cms.Application.APP_STATE;
                 if (apps.getHelpSite()) {
-                    var helpButton = new qx.ui.toolbar.Button(this.tr("Справка"), "sm/icons/misc/help16.png");
+                    var helpButton = new qx.ui.toolbar.Button(this.tr("Help"), "sm/icons/misc/help16.png");
                     helpButton.addListener("execute", function() {
                         qx.bom.Window.open(apps.getHelpSite());
                     });
-                    helpButton.setToolTipText(this.tr("Справка"));
+                    helpButton.setToolTipText(this.tr("Help"));
                     toolbar.add(helpButton);
                 }
-                var logoff = new qx.ui.toolbar.Button(this.tr("Выход"), "sm/icons/misc/door_in16.png");
-                logoff.setToolTipText(this.tr("Выход"));
+                var logoff = new qx.ui.toolbar.Button(this.tr("Logout"), "sm/icons/misc/door_in16.png");
+                logoff.setToolTipText(this.tr("Logout"));
                 logoff.addListener("execute", function() {
-                    if (confirm(this.tr("Вы действительно хотите выйти из системы?"))) {
+                    if (confirm(this.tr("Do you really want to logout?"))) {
                         window.location.href = "/adm/logout";
                     }
                 }, this);
@@ -300,13 +300,13 @@ qx.Class.define("sm.cms.Application", {
                 if ((node.$$accessMask && node.$$accessMask.indexOf("e") != -1) || sm.cms.Application.userHasRole("structure.admin")) {
 
                     if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
-                        bt = new qx.ui.menu.Button(this.tr("Создать страницу"));
+                        bt = new qx.ui.menu.Button(this.tr("Create page"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._newPageDld(ev, node);
                         }, this);
                         contextMenu.add(bt);
 
-                        bt = new qx.ui.menu.Button(this.tr("Создать раздел"));
+                        bt = new qx.ui.menu.Button(this.tr("Create section"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._newCatDlg(ev, node);
                         }, this);
@@ -314,7 +314,7 @@ qx.Class.define("sm.cms.Application", {
                     }
 
                     if (nData != "pages.root") {
-                        bt = new qx.ui.menu.Button(this.tr("Переименовать"));
+                        bt = new qx.ui.menu.Button(this.tr("Rename"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._renameNodeDld(ev, node, function(removed) {
                                 if (removed) {
@@ -325,7 +325,7 @@ qx.Class.define("sm.cms.Application", {
                         }, this);
                         contextMenu.add(bt);
 
-                        bt = new qx.ui.menu.Button(this.tr("Переместить"));
+                        bt = new qx.ui.menu.Button(this.tr("Move"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._moveNavItem(ev, node, function() {
                                 me.__rightSideStack.showWidget("root");
@@ -334,7 +334,7 @@ qx.Class.define("sm.cms.Application", {
                         }, this);
                         contextMenu.add(bt);
 
-                        bt = new qx.ui.menu.Button(this.tr("Удалить"));
+                        bt = new qx.ui.menu.Button(this.tr("Delete"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._rmNavItem(ev, node, function(removed) {
                                 if (removed) {
@@ -353,13 +353,13 @@ qx.Class.define("sm.cms.Application", {
                 if (sm.cms.Application.userInRoles(["config.admin", "media.admin"])) {
 
                     if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
-                        bt = new qx.ui.menu.Button(this.tr("Добавить ресурсы"));
+                        bt = new qx.ui.menu.Button(this.tr("Add resources"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._newMediaDld(ev, node);
                         }, this);
                         contextMenu.add(bt);
 
-                        bt = new qx.ui.menu.Button(this.tr("Создать раздел"));
+                        bt = new qx.ui.menu.Button(this.tr("Create section"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._newCatDlg(ev, node);
                         }, this);
@@ -367,7 +367,7 @@ qx.Class.define("sm.cms.Application", {
                     }
 
                     if (nData != "media.root") {
-                        bt = new qx.ui.menu.Button(this.tr("Переименовать"));
+                        bt = new qx.ui.menu.Button(this.tr("Rename"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._renameNodeDld(ev, node, function(removed) {
                                 if (removed) {
@@ -378,7 +378,7 @@ qx.Class.define("sm.cms.Application", {
                         }, this);
                         contextMenu.add(bt);
 
-                        bt = new qx.ui.menu.Button(this.tr("Удалить"));
+                        bt = new qx.ui.menu.Button(this.tr("Delete"));
                         bt.addListener("execute", function(ev) {
                             this.__nav._rmMediaItem(ev, node, function(removed) {
                                 if (removed) {

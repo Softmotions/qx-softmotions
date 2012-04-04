@@ -35,7 +35,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
         table.setContextMenuHandler(1, this.__bannersCtxMenuHandler, this);
         table.setContextMenuHandler(2, this.__bannersCtxMenuHandler, this);
         table.setContextMenuHandler(3, this.__bannersCtxMenuHandler, this);
-        var caption = this.__options.viewHidden ? this.tr(", неактивные показаны") : this.tr(", неактивные скрыты");
+        var caption = ", " + (this.__options.viewHidden ? this.tr("inactive are shown") : this.tr("inactive are hidden"));
         table.setAdditionalStatusBarText(caption);
 
         for (var i = 0; i < this.__active_on_item.length; ++i) {
@@ -128,14 +128,14 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             var mainPart = new qx.ui.toolbar.Part();
             toolbar.add(mainPart);
 
-            var caption = this.__options.viewHidden ? this.tr("Скрыть неактивные") : this.tr("Показать неактивные");
+            var caption = this.__options.viewHidden ? this.tr("Hide inactive") : this.tr("Show inactive");
             var shb = new qx.ui.toolbar.Button(caption);
             shb.addListener("execute", function(e) {
                 this.__options.viewHidden = !this.__options.viewHidden;
                 this.__refresh();
-                caption = this.__options.viewHidden ? this.tr("Скрыть неактивные") : this.tr("Показать неактивные");
+                caption = this.__options.viewHidden ? this.tr("Hide inactive") : this.tr("Show inactive");
                 shb.setLabel(caption);
-                caption = this.__options.viewHidden ? this.tr(", неактивные показаны") : this.tr(", неактивные скрыты");
+                caption = ", " + (this.__options.viewHidden ? this.tr("inactive are shown") : this.tr("inactive are hidden"));
                 this.getTable().setAdditionalStatusBarText(caption);
             }, this);
             mainPart.add(shb);
@@ -143,7 +143,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             var mb = new qx.ui.toolbar.Separator();
             mainPart.add(mb);
 
-            mb = new qx.ui.toolbar.Button(this.tr("Ссылка"), "sm/cms/icon/16/wiki/link_add.png");
+            mb = new qx.ui.toolbar.Button(this.tr("Link"), "sm/cms/icon/16/wiki/link_add.png");
             mb.addListener("execute", function(e) {
                 var bid = this.getSelectedRowData();
                 if (!bid) {
@@ -154,7 +154,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             this.__active_on_item.push({item: mb});
             mainPart.add(mb);
 
-            mb = new qx.ui.toolbar.Button(this.tr("Включить"), "icon/16/actions/list-add.png");
+            mb = new qx.ui.toolbar.Button(this.tr("Turn on"), "icon/16/actions/list-add.png");
             mb.addListener("execute", function(e) {
                 var bid = this.getSelectedRowData();
                 if (!bid) {
@@ -168,7 +168,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             }});
             mainPart.add(mb);
 
-            mb = new qx.ui.toolbar.Button(this.tr("Отключить"), "icon/16/actions/list-remove.png");
+            mb = new qx.ui.toolbar.Button(this.tr("Turn off"), "icon/16/actions/list-remove.png");
             mb.addListener("execute", function(e) {
                 var bid = this.getSelectedRowData();
                 if (!bid) {
@@ -191,13 +191,13 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                 "title" : "",
                 "columns" : [
                     {
-                        "title" : this.tr("Название").toString(),
+                        "title" : this.tr("Name").toString(),
                         "id" : "name",
                         "sortable" : true,
                         "width" : "2*"
                     },
                     {
-                        "title" : this.tr("Описание").toString(),
+                        "title" : this.tr("Description").toString(),
                         "id" : "description",
                         "sortable" : true,
                         "width" : "5*",
@@ -205,7 +205,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                         "editable" : true
                     },
                     {
-                        "title" : this.tr("Вес").toString(),
+                        "title" : this.tr("Weight").toString(),
                         "id" : "weight",
                         "sortable" : true,
                         "width" : "1*",
@@ -213,7 +213,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                         "editable" : true
                     },
                     {
-                        "title" : this.tr("Ссылка").toString(),
+                        "title" : this.tr("Link").toString(),
                         "id" : "link",
                         "sortable" : true,
                         "width" : "5*"
@@ -253,20 +253,20 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             }
             var bt;
 
-            bt = new qx.ui.menu.Button(this.tr("Ссылка"));
+            bt = new qx.ui.menu.Button(this.tr("Link"));
             bt.addListener("execute", function(ev) {
                 this.__manageLink(bid);
             }, this);
             contextMenu.add(bt);
 
             if (this.__banners[bid].weight > 0) {
-                bt = new qx.ui.menu.Button(this.tr("Отключить"));
+                bt = new qx.ui.menu.Button(this.tr("Turn off"));
                 bt.addListener("execute", function(ev) {
                     this.__banners[bid].weight = 0;
                     this.__refresh();
                 }, this);
             } else {
-                bt = new qx.ui.menu.Button(this.tr("Включить"));
+                bt = new qx.ui.menu.Button(this.tr("Turn on"));
                 bt.addListener("execute", function(ev) {
                     this.__banners[bid].weight = 1;
                     this.__refresh();

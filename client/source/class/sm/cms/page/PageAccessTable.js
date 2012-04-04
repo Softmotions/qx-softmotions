@@ -111,39 +111,39 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
                 "title" : "",
                 "columns" : [
                     {
-                        "title" : this.tr("Логин").toString(),
+                        "title" : this.tr("Login").toString(),
                         "id" : "login",
                         "width" : 60
                     },
                     {
-                        "title" : this.tr("Имя пользователя").toString(),
+                        "title" : this.tr("User name").toString(),
                         "id" : "name",
                         "width" : "2*"
                     },
                     // todo rolenames hardcode
                     {
-                        "title" : this.tr("Редактирование").toString(),
+                        "title" : this.tr("Editing").toString(),
                         "id" : "role.edit",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
                     },
                     {
-                        "title" : this.tr("Новости").toString(),
+                        "title" : this.tr("News").toString(),
                         "id" : "role.news",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
                     },
                     {
-                        "title" : this.tr("Удаление").toString(),
+                        "title" : this.tr("Deleting").toString(),
                         "id" : "role.del",
                         "type" : "boolean",
                         "editable" : true,
                         "width" : "1*"
                     },
                     {
-                        "title" : this.tr("Рекурсивно").toString(),
+                        "title" : this.tr("Recursive").toString(),
                         "id" : "role.recursive",
                         "type" : "boolean",
                         "editable" : true,
@@ -182,7 +182,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
         },
 
         _initPrecedingWidgets : function() {
-            var ownerBt = this.__ownerBt = new sm.ui.form.ButtonField(this.tr("Владелец"), "sm/cms/icon/16/actions/user.png");
+            var ownerBt = this.__ownerBt = new sm.ui.form.ButtonField(this.tr("Owner"), "sm/cms/icon/16/actions/user.png");
             ownerBt.setReadOnly(true);
             ownerBt.addListener("execute", function() {
                 var dlg = new sm.cms.users.UsersSelectorDlg();
@@ -219,7 +219,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             var mainPart = new qx.ui.toolbar.Part();
             toolbar.add(mainPart);
 
-            var addBt = new qx.ui.toolbar.Button(this.tr("Добавить пользователя"), "sm/cms/icon/16/actions/user_add.png");
+            var addBt = new qx.ui.toolbar.Button(this.tr("Add user"), "sm/cms/icon/16/actions/user_add.png");
             addBt.addListener("execute", function(ev) {
                 var dlg = new sm.cms.users.UsersSelectorDlg();
                 dlg.addListenerOnce("completed", function(ev) {
@@ -232,7 +232,7 @@ qx.Class.define("sm.cms.page.PageAccessTable", {
             mainPart.add(addBt);
 
             var rmBt = this.__rmBt =
-              new qx.ui.toolbar.Button(this.tr("Убрать пользователя"), "sm/cms/icon/16/actions/user_delete.png")
+              new qx.ui.toolbar.Button(this.tr("Remove user"), "sm/cms/icon/16/actions/user_delete.png")
                 .set({enabled : false});
             rmBt.addListener("execute", function(ev) {
                 var user = this.getSelectedRowData();

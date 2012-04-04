@@ -84,7 +84,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
             var mainPart = new qx.ui.toolbar.Part();
             toolbar.add(mainPart);
 
-            var mb = new qx.ui.toolbar.Button(this.tr("Новая ссылка"), "icon/16/actions/list-add.png");
+            var mb = new qx.ui.toolbar.Button(this.tr("New link"), "icon/16/actions/list-add.png");
             mb.addListener("execute", function(e) {
                 this.__manageLink();
             }, this);
@@ -98,7 +98,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
             mainPart.addSeparator();
 
-            mb = new qx.ui.toolbar.Button(this.tr("Удалить"), "icon/16/actions/list-remove.png");
+            mb = new qx.ui.toolbar.Button(this.tr("Delte"), "icon/16/actions/list-remove.png");
             mb.addListener("execute", function(e) {
                 this.removeRowByIndex(this.getSelectedRowIndex());
             }, this);
@@ -140,7 +140,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                 mb = new qx.ui.basic.Label("Синхронизация: ").set({alignY: "middle", marginRight: 5});
                 mainPart.add(mb);
 
-                mb = new qx.ui.toolbar.Button(this.tr("Вкл.")/*, "icon/16/actions/go-down.png"*/);
+                mb = new qx.ui.toolbar.Button(this.tr("Enable")/*, "icon/16/actions/go-down.png"*/);
                 mb.addListener("execute", function(ev) {
                     this.__manageSync(true);
                 }, this);
@@ -151,7 +151,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                 });
                 mainPart.add(mb);
 
-                mb = new qx.ui.toolbar.Button(this.tr("Выкл")/*, "icon/16/actions/go-down.png"*/);
+                mb = new qx.ui.toolbar.Button(this.tr("Disable")/*, "icon/16/actions/go-down.png"*/);
                 mb.addListener("execute", function(ev) {
                     this.__manageSync(false);
                 }, this);
@@ -190,13 +190,13 @@ qx.Class.define("sm.cms.editor.MenuTable", {
                 "title" : "",
                 "columns" : [
                     {
-                        "title" : this.tr("Название").toString(),
+                        "title" : this.tr("Name").toString(),
                         "id" : "name",
                         "sortable" : false,
                         "width" : "1*"
                     },
                     {
-                        "title" : this.tr("Ссылка").toString(),
+                        "title" : this.tr("Link").toString(),
                         "id" : "link",
                         "sortable" : false,
                         "width" : "1*"
@@ -225,7 +225,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
             if (this.__options["synchronizable"] && this.__synchronize) {
                 table.setEnabled(false);
-                table.setAdditionalStatusBarText(", " + this.tr("синхронизуется с %1", this.__synchronizeInfo["cachedPath"] || "").toString());
+                table.setAdditionalStatusBarText(", " + this.tr("synchronize with %1", this.__synchronizeInfo["cachedPath"] || "").toString());
             } else {
                 table.setEnabled(true);
                 table.setAdditionalStatusBarText("");

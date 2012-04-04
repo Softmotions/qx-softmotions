@@ -9,8 +9,8 @@ qx.Class.define("sm.cms.users.UsersTable", {
     construct : function() {
 
         var tm = new sm.model.RemoteVirtualTableModel({
-            "login" : this.tr("Логин"),
-            "name" : this.tr("Имя"),
+            "login" : this.tr("Login"),
+            "name" : this.tr("Username"),
             "email" : this.tr("Email")
         })
                 .set({

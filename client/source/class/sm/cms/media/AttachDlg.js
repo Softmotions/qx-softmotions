@@ -21,7 +21,7 @@ qx.Class.define("sm.cms.media.AttachDlg", {
     },
 
     construct : function(pageRef, caption, icon) {
-        this.base(arguments, caption ? caption : this.tr("Управление файлами"), icon);
+        this.base(arguments, caption ? caption : this.tr("Managing files"), icon);
 
         var me = this;
 
@@ -44,7 +44,7 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         }, this);
 
         var tm = new qx.ui.table.model.Simple();
-        tm.setColumns([this.tr("Файл").toString(), this.tr("Тип").toString(), this.tr("Размер").toString()],
+        tm.setColumns([this.tr("File").toString(), this.tr("Type").toString(), this.tr("Size").toString()],
                 ["fname", "ftype", "fsize"]);
 
         var custom = {
@@ -63,7 +63,7 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         rb.set(1, { width:"1*"});
         rb.set(2, { width:"1*"});
 
-        var uploadBt = new qx.ui.form.Button(this.tr("Загрузить")).set({enabled : false});
+        var uploadBt = new qx.ui.form.Button(this.tr("Upload")).set({enabled : false});
         uploadBt.addListener("execute", this.__uploadFiles, this);
 
         this.__fileForm = new sm.ui.form.UploadForm("attach_form", sm.cms.Application.ACT.getUrl("media.upload"));
@@ -76,8 +76,8 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         var form = this.__form = new qx.ui.form.Form();
         var linkText = new qx.ui.form.TextField().set({required : false});
         var linkTarget = new qx.ui.form.TextField().set({required : false});
-        form.add(linkText, this.tr("Текст ссылки"), null, "linkText");
-        form.add(linkTarget, this.tr("Сссылка"), null, "linkTarget");
+        form.add(linkText, this.tr("Link text"), null, "linkText");
+        form.add(linkTarget, this.tr("Link"), null, "linkTarget");
         var fr = new qx.ui.form.renderer.Single(form);
         fr._getLayout().setColumnFlex(0, 0);
         fr._getLayout().setColumnFlex(1, 1);
@@ -90,7 +90,7 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         var iparams = new qx.ui.container.Stack();
         iparams.add(new qx.ui.core.Widget());        //0
 
-        var imgParams = new qx.ui.groupbox.GroupBox(this.tr("Изображение"));
+        var imgParams = new qx.ui.groupbox.GroupBox(this.tr("Image"));
         imgParams.setLayout(new qx.ui.layout.HBox(5, "center"));
 
         var ipreview = new qx.ui.basic.Image();
@@ -99,8 +99,8 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         iparams.add(imgParams);                      //1
         //// EOF IPARAMS STACK
 
-        var dbutton = new qx.ui.form.Button(this.tr("Удалить")).set({enabled : false});
-        var ibutton = new qx.ui.form.Button(this.tr("Вставить")).set({enabled : false});
+        var dbutton = new qx.ui.form.Button(this.tr("Delete")).set({enabled : false});
+        var ibutton = new qx.ui.form.Button(this.tr("Insert")).set({enabled : false});
         ibutton.addListener("execute", this.__insertAction, this);
 
         infoSide.add(iparams, {flex : 0});
@@ -156,7 +156,7 @@ qx.Class.define("sm.cms.media.AttachDlg", {
             if (row == -1) {
                 return;
             }
-            sm.cms.Application.confirm(this.tr("Вы действительно хотите удалить выбранный файл?"), function(res) {
+            sm.cms.Application.confirm(this.tr("Do you really want to delete the selected file?"), function(res) {
                 if (res) {
                     this.__removeMediaFile(this.__table.getTableModel().getData()[row]);
                 }
@@ -245,8 +245,8 @@ qx.Class.define("sm.cms.media.AttachDlg", {
                     errors.push(e.toString());
                 }
                 if (errors.length > 0) {
-                    var alert = new sm.alert.AlertMessages(this.tr("Внимание"));
-                    alert.addMessages(this.tr("Ошибки при загрузке файлов"), errors);
+                    var alert = new sm.alert.AlertMessages(this.tr("Alert"));
+                    alert.addMessages(this.tr("Errors when uploading files"), errors);
                     alert.show();
                 }
             }, this);
@@ -265,9 +265,9 @@ qx.Class.define("sm.cms.media.AttachDlg", {
         },
 
         __contextMenuHandlerShow : function(col, row, table, dataModel, contextMenu) {
-            var menuEntry = new qx.ui.menu.Button(this.tr("Удалить"));
+            var menuEntry = new qx.ui.menu.Button(this.tr("Delete"));
             menuEntry.addListener("execute", function(e) {
-                sm.cms.Application.confirm(this.tr("Вы действительно хотите удалить выбранный файл?"), function(res) {
+                sm.cms.Application.confirm(this.tr("Do you really want to delete the selected file?"), function(res) {
                     if (res) {
                         this.__removeMediaFile(dataModel.getData()[row]);
                     }
