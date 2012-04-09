@@ -25,11 +25,10 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
         "newNews" : "qx.event.type.Data",
 
         /**
-         * Fired if user start to edit nes
+         * Fired if user start to edit news
          * data: pageId
          */
         "editNews" : "qx.event.type.Data",
-
 
         /**
          * Fired if user wants to remove news
@@ -184,11 +183,21 @@ qx.Class.define("sm.cms.news.NewsWorkspace", {
             }, this);
             contextMenu.add(renBt);
 
+            var vwBt = new qx.ui.menu.Button(this.tr("View"));
+            vwBt.addListener("execute", function() {
+                var pp = sm.cms.Application.ACT.getUrl("page.preview");
+                qx.bom.Window.open(pp + page["id"],
+                        "Preview",
+                        {}, false, false);
+            }, this);
+            contextMenu.add(vwBt);
+
             var edBt = new qx.ui.menu.Button(this.tr("Edit"));
             edBt.addListener("execute", function() {
                 this.fireDataEvent("editNews", page["id"]);
             }, this);
             contextMenu.add(edBt);
+
 
             var rmBt = new qx.ui.menu.Button(this.tr("Delete"));
             rmBt.addListener("execute", function() {
