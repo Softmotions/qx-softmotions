@@ -259,17 +259,16 @@ module.exports.mkdirsSync = function (dirname, mode) {
  * @param os {String? undefined} OS id
  */
 module.exports.isAbsolutePath = function(path) {
-
     var len = path.length;
     if (len == 0) {
         return false;
     }
     var c = path.charAt(0);
-    if (FileSeparator == '/') {
-        return (c == FileSeparator);
+    if (FileSeparator === '/') {
+        return (c === FileSeparator);
     } else {
         var colon = path.indexOf(':');
-        return ((c >= 'a' && c <= 'z') && colon == 1 && path.length > 2 && path.charAt(2) == FileSeparator);
+        return (colon === 1 && c >= 'A' && c <= 'Z');
     }
 };
 
@@ -287,13 +286,13 @@ const DirectoryScanner = function(rootDir, scanSpec) {
     this.excludes = scanSpec["excludes"] ? scanSpec["excludes"].concat() : [];
 
     for (var i = 0; i < this.excludes.length; ++i) {
-        this.excludes[i] = this._normPattern(this.excludes[i]).split(FileSeparator);
+        this.excludes[i] = this._normPattern(this.excludes[i]).split('/');
     }
     for (var i = 0; i < DEFAULTEXCLUDES.length; ++i) {
-        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split(FileSeparator));
+        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split('/'));
     }
     for (var i = 0; i < this.includes.length; ++i) {
-        this.includes[i] = this._normPattern(this.includes[i]).split(FileSeparator);
+        this.includes[i] = this._normPattern(this.includes[i]).split('/');
     }
     this.rootDirArr = this.rootDir.split(FileSeparator);
     this._savedReadDirArgs = [];
@@ -333,7 +332,6 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     if (!inodes) {
         inodes = [];
     }
-
     if (this.__abort === true) {
         if (inodes.length == 0 && fcallback) {
             process.nextTick(function() {
@@ -400,7 +398,7 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
         }
         if (files && this.__abort !== true) {
             for (var i = 0; i < files.length; ++i) {
-                var file = startDir + FileSeparator + files[i];
+                var file = l_path.join(startDir, files[i]);
                 var err = null;
                 var lfstat = null;
                 try {
@@ -456,11 +454,12 @@ DirectoryScanner.prototype._normPattern = function(pattern) {
     if (pattern === "") {
         return "**";
     }
-    while (pattern.length > 0 && pattern.charAt(0) == FileSeparator) {
+	pattern = pattern.replace(/\\/g, '/');
+    while (pattern.length > 0 && pattern.charAt(0) === '/') {
         pattern = pattern.substring(1);
     }
     var nlist = [];
-    var plist = pattern.split(FileSeparator);
+    var plist = pattern.split('/');
 
     var inMD = false; //if true we in **/pattern
     for (var i = 0; i < plist.length; ++i) {
@@ -478,7 +477,7 @@ DirectoryScanner.prototype._normPattern = function(pattern) {
         }
         nlist.push(pitem);
     }
-    return nlist.join(FileSeparator);
+    return nlist.join('/');
 };
 
 /**
@@ -495,8 +494,7 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
             //File is not suffix
             return false;
         }
-        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);
-        //console.log(farr.join("/"));
+        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);        
         var res = me.voteAll(farr);
         if (res) {
             //todo exception handling?
