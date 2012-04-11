@@ -9,7 +9,6 @@ var async = require("async");
 var l_fs = require("fs-ext");
 var l_path = require("path");
 var l_regexp = require("utils/regexp");
-var l_async = require("utils/async");
 
 const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
 module.exports.FileSeparator = FileSeparator;
@@ -195,9 +194,7 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         var i;
         buffer = new Buffer(nread);
         buffers.forEach(function(i) {
-            if (!i._bytesRead) {
-                return;
-            }
+            if (!i._bytesRead) return;
             i.copy(buffer, offset, 0, i._bytesRead);
             offset += i._bytesRead;
         });
@@ -209,9 +206,7 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         buffer = new Buffer(0);
     }
 
-    if (encoding) {
-        buffer = buffer.toString(encoding);
-    }
+    if (encoding) buffer = buffer.toString(encoding);
     return buffer;
 };
 
@@ -277,15 +272,18 @@ module.exports.isAbsolutePath = function(path) {
     }
 };
 
-
 ///////////////////////////////////////////////////////////////////////////
-//                      ant path pattern checker                         //
+//                            Directory scanner                          //
 ///////////////////////////////////////////////////////////////////////////
 
-const AntPathMatcher = function(patternSpec) {
+const DirectoryScanner = function(rootDir, scanSpec) {
+
+    this.rootDir = l_path.normalize(rootDir);
+    this._paused = false;
+
     //Clone scaneSpec data, because it will be modified during normalization
-    this.includes = patternSpec["includes"] ? patternSpec["includes"].concat() : ["**"];
-    this.excludes = patternSpec["excludes"] ? patternSpec["excludes"].concat() : [];
+    this.includes = scanSpec["includes"] ? scanSpec["includes"].concat() : ["**"];
+    this.excludes = scanSpec["excludes"] ? scanSpec["excludes"].concat() : [];
 
     for (var i = 0; i < this.excludes.length; ++i) {
         this.excludes[i] = this._normPattern(this.excludes[i]).split('/');
@@ -296,7 +294,136 @@ const AntPathMatcher = function(patternSpec) {
     for (var i = 0; i < this.includes.length; ++i) {
         this.includes[i] = this._normPattern(this.includes[i]).split('/');
     }
+    this.rootDirArr = this.rootDir.split(FileSeparator);
+    this._savedReadDirArgs = [];
+
+    this._concurrency = 1;
+    this._rdQueue = async.queue(function(task, cb) {
+        l_fs.readdir(task[0], function(err, files) {
+            task[1](err, files);
+            cb();
+        });
+    }, this._concurrency);
 };
+
+DirectoryScanner.prototype.pause = function() {
+    this._paused = true;
+};
+
+DirectoryScanner.prototype.resume = function() {
+    if (this._paused === true) {
+        this._paused = false;
+        while (this._savedReadDirArgs.length > 0) {
+            this._readDir.apply(this, this._savedReadDirArgs.shift());
+        }
+    }
+};
+
+/**
+ * Recusively traverses directory. If Callback function
+ * return true on dir then it will be traversed
+ *
+ * @param startDir {String}  Start directory
+ * @param callback {Function} Each filtered file callback
+ * @param fcallback {Function} Traverse finish callback
+ */
+//todo symlink loops check !!!
+DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, fcallback, inodes) {
+    if (!inodes) {
+        inodes = [];
+    }
+    if (this.__abort === true) {
+        if (inodes.length == 0 && fcallback) {
+            process.nextTick(function() {
+                if (inodes.length == 0 && fcallback) {
+                    fcallback();
+                }
+            });
+        }
+        return;
+    }
+    if (!fstat) {
+        try {
+            fstat = l_fs.lstatSync(startDir);
+        } catch(e) {
+            callback(e, startDir, null);
+            if (inodes.length == 0 && fcallback) {
+                process.nextTick(function() {
+                    if (inodes.length == 0 && fcallback) {
+                        fcallback();
+                    }
+                });
+            }
+            return;
+        }
+    }
+    if (!fstat.isDirectory()) {
+        if (inodes.length == 0 && fcallback) {
+            process.nextTick(function() {
+                if (inodes.length == 0 && fcallback) {
+                    fcallback();
+                }
+            });
+        }
+        return;
+    }
+    /*if (inodes.indexOf(fstat.ino) != -1) {
+     //avoid symbolic link loops
+     return;
+     }*/
+    var me = this;
+    inodes.push(fstat.ino);
+
+    /*l_fs.readdir(startDir, function(cbErr, files) {
+     me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
+     });*/
+    this._rdQueue.push([[
+        startDir,
+        function(cbErr, files) {
+            me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
+        }
+    ]]);
+
+};
+
+DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, startDir, callback, fcallback) {
+    if (this._paused) {
+        this._savedReadDirArgs.push([cbErr, files, fstat, inodes, startDir, callback, fcallback]);
+        return;
+    }
+    try {
+        if (cbErr) {
+            callback(cbErr, startDir, null);
+            return;
+        }
+        if (files && this.__abort !== true) {
+            for (var i = 0; i < files.length; ++i) {
+                var file = l_path.join(startDir, files[i]);
+                var err = null;
+                var lfstat = null;
+                try {
+                    lfstat = l_fs.lstatSync(file);
+                } catch(e) {
+                    err = e;
+                }
+                if (!err) {
+                    var cres = callback(null, file, lfstat);
+                    if (cres && lfstat.isDirectory()) {
+                        this.traverseFiles(file, lfstat, callback, fcallback, inodes);
+                    }
+                } else {
+                    callback(err, file, null);
+                }
+            }
+        }
+    } finally { //
+        qx.lang.Array.remove(inodes, fstat.ino);
+        if (inodes.length == 0 && fcallback) {
+            fcallback();
+        }
+    }
+};
+
 
 const DEFAULTEXCLUDES = [
     "**/*~",
@@ -315,18 +442,24 @@ const DEFAULTEXCLUDES = [
     "**/.DS_Store"
 ];
 
+
+DirectoryScanner.prototype.abort = function() {
+    this.__abort = true;
+};
+
 /**
  * Normalize ant path pattern
  */
-AntPathMatcher.prototype._normPattern = function(pattern) {
+DirectoryScanner.prototype._normPattern = function(pattern) {
     if (pattern === "") {
         return "**";
     }
-    while (pattern.length > 0 && pattern.charAt(0) == FileSeparator) {
+	pattern = pattern.replace(/\\/g, '/');
+    while (pattern.length > 0 && pattern.charAt(0) === '/') {
         pattern = pattern.substring(1);
     }
     var nlist = [];
-    var plist = pattern.split(FileSeparator);
+    var plist = pattern.split('/');
 
     var inMD = false; //if true we in **/pattern
     for (var i = 0; i < plist.length; ++i) {
@@ -344,10 +477,43 @@ AntPathMatcher.prototype._normPattern = function(pattern) {
         }
         nlist.push(pitem);
     }
-    return nlist.join(FileSeparator);
+    return nlist.join('/');
 };
 
-AntPathMatcher.prototype.voteAll = function(farr, onlyPrefix) {
+/**
+ * Scans directory
+ */
+DirectoryScanner.prototype.scan = function(callback, fcallback) {
+    var me = this;
+    this.traverseFiles(this.rootDir, null, function(err, file, fstat) {
+        if (err) {
+            callback(err, file, fstat);
+            return false;
+        }
+        if (file.indexOf(me.rootDir) != 0) {
+            //File is not suffix
+            return false;
+        }
+        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);        
+        var res = me.voteAll(farr);
+        if (res) {
+            //todo exception handling?
+            if (callback) {
+                callback(err, file, fstat);
+            }
+        }
+        if (res) {
+            //good voting returns true
+            return true;
+        } else {
+            //voting prefix only for directories
+            return (fstat && fstat.isDirectory()) ? me.voteAll(farr, true) : false;
+        }
+    }, fcallback, null);
+};
+
+DirectoryScanner.prototype.voteAll = function(farr, onlyPrefix) {
+
     if (!onlyPrefix) {
         for (var i = 0; i < this.excludes.length; ++i) {
             if (this.vote(farr, this.excludes[i])) {
@@ -364,7 +530,7 @@ AntPathMatcher.prototype.voteAll = function(farr, onlyPrefix) {
     return false;
 };
 
-AntPathMatcher.prototype.vote = function(farr, pattern, onlyPrefix) {
+DirectoryScanner.prototype.vote = function(farr, pattern, onlyPrefix) {
 
     //qx.log.Logger.warn("\nfarr=" + farr.join("|") + "\npatt=" + pattern.join("|"));
 
@@ -424,7 +590,8 @@ AntPathMatcher.prototype.vote = function(farr, pattern, onlyPrefix) {
     return true;
 };
 
-AntPathMatcher.prototype.match = function(val, pattern) {
+
+DirectoryScanner.prototype.match = function(val, pattern) {
 
     if (!this._rcache) {
         this._rcache = {};
@@ -438,231 +605,9 @@ AntPathMatcher.prototype.match = function(val, pattern) {
     return re.test(val);
 };
 
-///////////////////////////////////////////////////////////////////////////
-//                            Directory scanner                          //
-///////////////////////////////////////////////////////////////////////////
-
-const DirectoryScanner = function(rootDir, scanSpec) {
-
-    this.rootDir = l_path.normalize(rootDir);
-    this._paused = false;
-
-    this.pathMatcher = new AntPathMatcher(scanSpec);
-
-    this.rootDirArr = this.rootDir.split(FileSeparator);
-    this._savedReadDirArgs = [];
-
-    this._scannedNodes = {};
-
-    this._concurrency = 1;
-    this._rdQueue = l_async.stack(function(task, cb) {
-        l_fs.readdir(task[0], function(err, files) {
-            task[1](err, files);
-            cb();
-        });
-    }, this._concurrency);
-};
-
-DirectoryScanner.prototype.pause = function() {
-    this._paused = true;
-};
-
-DirectoryScanner.prototype.resume = function() {
-    if (this._paused === true) {
-        this._paused = false;
-        while (this._savedReadDirArgs.length > 0) {
-            this._readDir.apply(this, this._savedReadDirArgs.shift());
-        }
-    }
-};
-
-/**
- * Recusively traverses directory. If Callback function
- * return true on dir then it will be traversed
- *
- * @param startDir {String}  Start directory
- * @param callback {Function} Each filtered file callback
- * @param fcallback {Function} Traverse finish callback
- */
-//todo symlink loops check !!!
-DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, fcallback, inodes) {
-    if (!inodes) {
-        inodes = [];
-    }
-    if (this.__abort === true) {
-        if (inodes.length == 0 && fcallback) {
-            process.nextTick(function() {
-                if (inodes.length == 0 && fcallback) {
-                    fcallback();
-                }
-            });
-        }
-        return;
-    }
-    if (!fstat) {
-        try {
-            fstat = l_fs.statSync(startDir);
-        } catch(e) {
-            callback(e, startDir, null);
-            if (inodes.length == 0 && fcallback) {
-                process.nextTick(function() {
-                    if (inodes.length == 0 && fcallback) {
-                        fcallback();
-                    }
-                });
-            }
-            return;
-        }
-    }
-    if (!fstat.isDirectory()) {
-        if (inodes.length == 0 && fcallback) {
-            process.nextTick(function() {
-                if (inodes.length == 0 && fcallback) {
-                    fcallback();
-                }
-            });
-        }
-        return;
-    }
-    /*if (inodes.indexOf(fstat.ino) != -1) {
-     //avoid symbolic link loops
-     return;
-     }*/
-    var me = this;
-    inodes.push(fstat.ino);
-
-    /*l_fs.readdir(startDir, function(cbErr, files) {
-     me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
-     });*/
-    this._rdQueue.push([
-        [
-            startDir,
-            function(cbErr, files) {
-                me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
-            }
-        ]
-    ]);
-
-};
-
-DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, startDir, callback, fcallback) {
-    if (this._paused) {
-        this._savedReadDirArgs.push([cbErr, files, fstat, inodes, startDir, callback, fcallback]);
-        return;
-    }
-    try {
-        if (cbErr) {
-            callback(cbErr, startDir, null);
-            return;
-        }
-        if (files && this.__abort !== true) {
-            for (var i = 0; i < files.length; ++i) {
-                var file = l_path.join(startDir, files[i]);
-                var err = null;
-                var lfstat = null;
-                try {
-                    lfstat = l_fs.statSync(file);
-                } catch(e) {
-                    err = e;
-                }
-                if (!err) {
-                    // check symbolic link loops
-                    if (!this._scannedNodes[lfstat.ino]) {
-                        this._scannedNodes[lfstat.ino] = true;
-                        var cres = callback(null, file, lfstat);
-                        if (cres && lfstat.isDirectory()) {
-                            this.traverseFiles(file, lfstat, callback, fcallback, inodes);
-                        }
-                    }
-                } else {
-                    callback(err, file, null);
-                }
-            }
-        }
-    } finally { //
-        qx.lang.Array.remove(inodes, fstat.ino);
-        if (inodes.length == 0 && fcallback) {
-            fcallback();
-        }
-    }
-};
-
-
-DirectoryScanner.prototype.abort = function() {
-    this.__abort = true;
-};
-
-/**
-<<<<<<< HEAD
- * Normalize ant path pattern
- */
-DirectoryScanner.prototype._normPattern = function(pattern) {
-    if (pattern === "") {
-        return "**";
-    }
-	pattern = pattern.replace(/\\/g, '/');
-    while (pattern.length > 0 && pattern.charAt(0) === '/') {
-        pattern = pattern.substring(1);
-    }
-    var nlist = [];
-    var plist = pattern.split('/');
-
-    var inMD = false; //if true we in **/pattern
-    for (var i = 0; i < plist.length; ++i) {
-        var pitem = plist[i];
-        if (pitem === "**") {
-            if (inMD) {
-                continue;
-            }
-            inMD = true;
-        } else if (pitem === "*" && inMD) {
-            continue;
-        } else {
-            pitem = l_regexp.glob2Regexp(pitem);
-            inMD = false;
-        }
-        nlist.push(pitem);
-    }
-    return nlist.join('/');
-};
-
-/**
-=======
->>>>>>> 34a575724adf8b38a83807a3ab028fc343da17ac
- * Scans directory
- */
-DirectoryScanner.prototype.scan = function(callback, fcallback) {
-    var me = this;
-    this.traverseFiles(this.rootDir, null, function(err, file, fstat) {
-        if (err) {
-            callback(err, file, fstat);
-            return false;
-        }
-        if (file.indexOf(me.rootDir) != 0) {
-            //File is not suffix
-            return false;
-        }
-        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);        
-        var res = me.voteAll(farr);
-        if (res) {
-            //todo exception handling?
-            if (callback) {
-                callback(err, file, fstat);
-            }
-        }
-        if (res) {
-            //good voting returns true
-            return true;
-        } else {
-            //voting prefix only for directories
-            return (fstat && fstat.isDirectory()) ? me.pathMatcher.voteAll(farr, true) : false;
-        }
-    }, fcallback, null);
-};
 
 module.exports.DirectoryScanner = DirectoryScanner;
 
-module.exports.AntPathMatcher = AntPathMatcher;
 
 /**
  * Path scanner
