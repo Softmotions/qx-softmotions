@@ -65,6 +65,13 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         //Horizontal header container
         var hcont = this._grefs["hdr.hcont"] = new qx.ui.container.Composite(new qx.ui.layout.HBox(5));
 
+        //Select page type
+        el = this._grefs["hdr.pagetype"] = new qx.ui.form.SelectBox();
+        el.add(new qx.ui.form.ListItem(this.tr("Section"), null, "0"));
+        el.add(new qx.ui.form.ListItem(this.tr("Page"), null, "1"));
+        this._grefs["hdr.pagetype"].exclude();
+        hcont.add(el, {flex : 0});
+
         //Select template box
         el = this._grefs["hdr.templates"] = new qx.ui.form.SelectBox();
         el.getModelSelection().addListener("change", function(ev) {
@@ -129,6 +136,16 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             this._pageInfo = pageInfo;
             this._grefs["hdr.pageName"].setValue(pageInfo["name"]);
             this._loadPageTemplates(opts, cb);
+            if (this._pageInfo["_amask_"].indexOf("d") != -1 && (this._pageInfo["type"] == 0 || this._pageInfo["type"] == 1)) {
+                var val = this._pageInfo["type"]
+                if (!qx.lang.Type.isString(val)) {
+                    val = qx.lang.Json.stringify(val);
+                }
+                this._grefs["hdr.pagetype"].setModelSelection([val]);
+                this._grefs["hdr.pagetype"].show();
+            } else {
+                this._grefs["hdr.pagetype"].exclude();
+            }
         },
 
         setPage : function(pageRef, opts, cb) {
@@ -382,6 +399,15 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                             }
                         }
                     }
+                }
+            }
+
+            if (!this._grefs["hdr.pagetype"].isExcluded()) {
+                var val = this._grefs["hdr.pagetype"].getModelSelection().getItem(0);
+                if (qx.lang.Type.isString(val)) {
+                    req.setParameter("type", val, true);
+                } else {
+                    req.setParameter("type", qx.lang.Json.stringify(val), true);
                 }
             }
             this._grefs["save"].setEnabled(false);

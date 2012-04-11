@@ -353,61 +353,86 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
 
                 var errCount = 0;
                 var finish = function() {
-                    pmgr.getPageAccessMask(req, doc["_id"], function(err, mask) {
+                    coll.count({"parent": coll.toDBRef(doc["_id"])}, function(err,childCount){
                         if (err) {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        if (mask.indexOf("e") === -1) {
-                            me.handleError(resp, ctx,
-                              me.tr("У вас недостаточно прав для редактирования страницы"),
-                              false, true);
-                            return;
-                        }
-
-                        var doSave = function() {
-                            me.__setupPageKeywords(doc);
-
-                            //perform update
-                            coll.update({_id : ref}, doc, function(err, ret) {
-                                if (err) {
-                                    me.handleError(resp, ctx, err);
-                                    return;
-                                }
-                                if (errCount > 0) {
-                                    me.handleError(resp, ctx, me.tr("При сохранении страницы произошли ошибки"));
-                                    return;
-                                }
-                                try {
-                                    me.writeJSONObject({}, resp, ctx);
-                                } finally {
-                                    var ee = sm.cms.Events.getInstance();
-                                    ee.fireDataEvent("pageSaved", doc);
-                                }
-                            });
-                        };
-
-                        if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
-                            if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
+                        pmgr.getPageAccessMask(req, doc["_id"], function(err, mask) {
+                            if (err) {
+                                me.handleError(resp, ctx, err);
+                                return;
+                            }
+                            if (mask.indexOf("e") === -1) {
                                 me.handleError(resp, ctx,
-                                  me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
+                                  me.tr("У вас недостаточно прав для редактирования страницы"),
                                   false, true);
                                 return;
                             }
+                            if ("type" in req.params && doc["type"] != sm.cms.page.PageMgr.TYPE_NEWS_PAGE) {
+                                var type = req.params["type"];
+                                if (type != doc["type"]) {
+                                    if (mask.indexOf("d") == -1) {
+                                        me.handleError(resp, ctx,
+                                            me.tr("У вас недостаточно прав для изменения типа страницы"),
+                                            false, true);
+                                        return;
+                                    }
 
-                            // check all subscriptions
-                            me.__check_subscriptions(doc["_id"], oldAsm, doc["asm"], ctx, function(err) {
-                                if (err) {
-                                    me.handleError(resp, ctx, err);
+                                    if (childCount > 0) {
+                                        me.handleError(resp, ctx,
+                                            me.tr("Невозможно преобразовать раздел с дочерними элементами в страницу"),
+                                            false, true);
+                                        return;
+                                    }
+                                    doc["type"] = type;
+                                }
+                            }
+
+                            var doSave = function() {
+                                me.__setupPageKeywords(doc);
+
+                                //perform update
+                                coll.update({_id : ref}, doc, function(err, ret) {
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
+                                    if (errCount > 0) {
+                                        me.handleError(resp, ctx, me.tr("При сохранении страницы произошли ошибки"));
+                                        return;
+                                    }
+                                    try {
+                                        me.writeJSONObject({}, resp, ctx);
+                                    } finally {
+                                        var ee = sm.cms.Events.getInstance();
+                                        ee.fireDataEvent("pageSaved", doc);
+                                    }
+                                });
+                            };
+
+                            if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
+                                if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
+                                    me.handleError(resp, ctx,
+                                      me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
+                                      false, true);
                                     return;
                                 }
 
-                                doSave();
-                            });
-                        } else {
-                            doSave();
-                        }
+                                // check all subscriptions
+                                me.__check_subscriptions(doc["_id"], oldAsm, doc["asm"], ctx, function(err) {
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
 
+                                    doSave();
+                                });
+                            } else {
+                                doSave();
+                            }
+
+                        });
                     });
                 };
                 if (doc["asm"] == null) { //Removed assembly ref

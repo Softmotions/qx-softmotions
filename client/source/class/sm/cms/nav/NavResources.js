@@ -295,6 +295,11 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 if (node.cont) {
                     nnode.icon = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
                     nnode.iconSelected = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
+                    nnode.type = qx.ui.treevirtual.MTreePrimitive.Type.BRANCH;
+                } else {
+                    nnode.icon = null;
+                    nnode.iconSelected = null;
+                    nnode.type = qx.ui.treevirtual.MTreePrimitive.Type.LEAF;
                 }
                 this.__navTree.getDataModel().setData();
             }, this);
