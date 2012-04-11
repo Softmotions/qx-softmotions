@@ -46,7 +46,7 @@ qx.Class.define("sm.mongo.Mongo", {
     construct : function(dbname, host, port, options) {
         this.base(arguments);
         this.__cinfo = {"dbname" : dbname, "host" : host, "port" : port, "options" : options};
-        this._lib_mongo = $$node.require("mongodb");
+        this._lib_mongo = $$node.require("softmotions-mongodb");
         if (!qx.lang.Type.isObject(this.__cinfo["options"])) {
             this.__cinfo["options"] = {};
         }
@@ -160,14 +160,14 @@ qx.Class.define("sm.mongo.Mongo", {
             }
             var me = this;
             this.__db = new this._lib_mongo.Db(this.__cinfo["dbname"],
-                    new this._lib_mongo.Server(this.__cinfo["host"],
-                            this.__cinfo["port"],
-                            this.__cinfo["options"]),
-                    {native_parser : !!this.__cinfo["options"]["native_parser"]});
+              new this._lib_mongo.Server(this.__cinfo["host"],
+                this.__cinfo["port"],
+                this.__cinfo["options"]),
+              {native_parser : !!this.__cinfo["options"]["native_parser"]});
             this.__db.open(function(err) {
                 if (err) {
                     me._onError(err, "Error opening mongodb connection, connect spec: " +
-                            qx.lang.Json.stringify(me.__cinfo));
+                      qx.lang.Json.stringify(me.__cinfo));
                 } else {
                     me.fireEvent("opened");
                 }
@@ -193,7 +193,7 @@ qx.Class.define("sm.mongo.Mongo", {
          */
         openGridFile : function(fname, mode, ctype, metadata, cb) {
             var gfile = new this._lib_mongo
-                    .GridStore(this.getDB(), fname, mode, {content_type : ctype, metadata : metadata});
+              .GridStore(this.getDB(), fname, mode, {content_type : ctype, metadata : metadata});
             gfile.open(cb);
         },
 

@@ -652,90 +652,110 @@ qx.Class.define("sm.cms.page.PageMgr", {
          * @param pageId {String|ObjectID} Page ID
          * @param cb {function(err, accessMode)}
          */
-        getPageAccessMask : function(req, pageId, cb) {
-
+        getPageAccessMask : function(req, pageId, _cb) {
             if (pageId == null) {
-                cb(null, "");
+                _cb(null, "");
                 return;
             }
-
-            var amodes = [];
             var me = this;
+            var uid = req.getUserId();
+            var coll = this.getColl();
 
-            var pushModes = function() {
-                for (var i = 0; i < arguments.length; ++i) {
-                    var a = arguments[i];
-                    if (amodes.indexOf(a) == -1) {
-                        amodes.push(a);
+            function pushMask(amask, toadd) {
+                for (var i = 0; i < toadd.length; ++i) {
+                    if (amask.indexOf(toadd.charAt(i)) == -1) {
+                        amask.push(toadd.charAt(i));
                     }
                 }
-                return amodes;
-            };
+                return amask;
+            }
 
-            var checkAccess = function(doc) {
-                if (doc == null) {
-                    cb(null, "");
+            function getDoc(docId, cb) {
+                coll.findOne(
+                  {_id : coll.toObjectID(docId)},
+                  {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1, "parent" : 1}},
+                  cb);
+            }
+
+            function getDocAccess(docId, lvl, amask, cb) {
+                if (docId == null) {
+                    cb(null, null, amask);
                     return;
                 }
-                var uid = req.getUserId();
-                if (req.isUserInRoles(["structure.admin"]) || doc["creator"] == uid) {
-                    cb(null, pushModes("e", "n", "d", "r").join(""));
-                    return;
-                }
-                if (req.isUserInRoles(["news.admin"])) {
-                    pushModes("n");
-                }
-                if (doc["owner"] == uid) {
-                    pushModes("e", "n");
-                }
-
-                var access = doc["access"] || {};
-                var alist = access["edit"];
-                if (alist != null && alist.indexOf(uid) != -1) {
-                    pushModes("e");
-                }
-                alist = access["news"];
-                if (alist != null && alist.indexOf(uid) != -1) {
-                    pushModes("n");
-                }
-
-                //Check news page
-                if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] &&
-                  (amodes.indexOf("e") == -1 || amodes.indexOf("d") == -1)) { //Cheking for news page
-                    if (req.isUserInRoles(["news.admin"])) { //if we news admin
-                        cb(null, pushModes("e", "d", "r").join(""));
+                getDoc(docId, function(err, doc) {
+                    if (err || doc == null) {
+                        cb(err, doc, amask);
                         return;
                     }
-                    var ref = doc["refpage"];
-                    me.getPageAccessMask(req, ref.oid, function(err, pmodes) {
-                        if (err) {
-                            cb(err, "");
-                        }
-                        if (pmodes.indexOf("n") != -1) {
-                            pushModes("e", "d", "r");
-                        }
-                        cb(null, amodes.join(""));
-                    });
+                    if (doc["owner"] == uid) {
+                        pushMask(amask, "en");
+                    }
+                    if (doc["creator"] == uid) {
+                        pushMask(amask, "endr");
+                        cb(null, null, amask);
+                        return;
+                    }
 
-                } else {
-                    cb(null, amodes.join(""));
+                    if (lvl === 0) {
+                        if (req.isUserInRoles(["structure.admin"])) {
+                            pushMask(amask, "endr");
+                            cb(null, null, amask);
+                            return;
+                        }
+                        if (req.isUserInRoles(["news.admin"])) {
+                            pushMask(amask, "n");
+                        }
+                        if (doc["type"] == me.TYPE_NEWS_PAGE && doc["refpage"] && (amask.indexOf("e") == -1 || amask.indexOf("d") == -1)) { //Cheking for news page
+                            if (req.isUserInRoles(["news.admin"])) { //if we news admin
+                                cb(null, null, pushMask(amask, "edr"));
+                                return;
+                            }
+                            me.getPageAccessMask(req, doc["refpage"].oid, function(err, pmask) {
+                                if (err) {
+                                    cb(err);
+                                    return;
+                                }
+                                if (pmask.indexOf("n") != -1) {
+                                    pushMask(amask, "edr");
+                                }
+                                cb(null, null, amask);
+                            });
+                            return;
+                        }
+                    }
+                    var access = doc["access"] || {};
+                    if (lvl === 0 || (access["recursive"] != null && access["recursive"].indexOf(uid) !== -1)) {
+                        var alist = access["edit"];
+                        if (alist != null && alist.indexOf(uid) != -1) {
+                            pushMask(amask, "e");
+                        }
+                        alist = access["news"];
+                        if (alist != null && alist.indexOf(uid) != -1) {
+                            pushMask(amask, "n");
+                        }
+                        alist = access["del"];
+                        if (alist != null && alist.indexOf(uid) != -1) {
+                            pushMask(amask, "dr");
+                        }
+                    }
+                    cb(null, doc, amask);
+                });
+            }
+
+            var lvl = 0;
+            getDocAccess(pageId, lvl, [], function(err, doc, amask) {
+                if (err) {
+                    _cb(err, "");
+                    return;
                 }
-            };
-
-
-            var coll = this.getColl();
-            coll.findOne({_id : coll.toObjectID(pageId)},
-              {fields : {"owner" : 1, "creator" : 1, "access" : 1, "type" : 1, "refpage" : 1}},
-              function(err, doc) {
-                  if (err) {
-                      cb(err, "");
-                      return;
-                  }
-                  checkAccess(doc);
-              });
+                if (doc == null || doc.parent == null || doc.parent.oid == null || amask.length === "endr".length) {
+                    _cb(null, amask.join(""));
+                    return;
+                }
+                //move up on page hierarchy
+                getDocAccess(doc.parent.oid, ++lvl, amask, arguments.callee);
+            });
         },
-
-
 
         ///////////////////////////////////////////////////////////////////////////
         //                            System                                     //

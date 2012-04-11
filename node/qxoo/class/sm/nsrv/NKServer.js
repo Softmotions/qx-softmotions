@@ -129,6 +129,7 @@ qx.Class.define("sm.nsrv.NKServer", {
 
             var filters = opts["filters"];
             var connect = $$node.require("connect");
+            var http = $$node.require("http");
             var chandlers = [];
 
             //Processing custom filters
@@ -141,37 +142,40 @@ qx.Class.define("sm.nsrv.NKServer", {
             var vengines = qx.lang.Object.getValues(this.__vengines);
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
+                if (ve.getVHostName() === "__default__") {
+                    if (i == vengines.length - 1) {
+                        break;
+                    }
+                    //push default vhost to end of vhosts list
+                    vengines.splice(i, 1);
+                    vengines.push(ve);
+                    break;
+                }
+            }
+
+            for (var i = 0; i < vengines.length; ++i) {
+                var ve = vengines[i];
                 ve._setWebappsRuntimeOptions(opts["webapps"] || {});
-                chandlers.push(this.__vhost(ve.getVHostName(), ve.createConnectServer()));
+                if (ve.getVHostName() == "__default__") {
+                    chandlers.push(ve.createConnectApp());
+                } else {
+                    chandlers.push(connect.vhost(ve.getVHostName(), ve.createConnectApp()));
+                }
                 this.fireDataEvent("configuredVHE", [ve, this]);
                 sm.nsrv.NKServerEvents.getInstance().fireDataEvent("configuredVHE", [ve, this]);
             }
 
             $$node.process.nextTick(
               (function() {
-                  this.__server = new connect.HTTPServer(chandlers);
+                  var capp = connect();
+                  chandlers.forEach(function(h) {
+                      capp.use(h);
+                  });
+                  this.__server = http.createServer(capp);
                   this.__server.listen(port, host);
                   this.fireDataEvent("started", this);
                   sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
               }).bind(this));
-        },
-
-        __vhost : function(hostname, server) {
-            if (!hostname) throw new Error('vhost hostname required');
-            if (!server) throw new Error('vhost server required');
-            var regexp = new RegExp('^' + hostname.replace(/[*]/g, '(.*?)') + '$');
-            return function(req, res, next) {
-                var host = (req.headers.host && hostname != "__default__") ? req.headers.host.split(':')[0] : null;
-                if (host && (req.subdomains = regexp.exec(host))) {
-                    req.subdomains = req.subdomains.slice(1);
-                    server.emit("request", req, res, next);
-                } else if (hostname == "__default__") {
-                    //default vhost recieves all requests
-                    server.emit("request", req, res, next);
-                } else {
-                    next();
-                }
-            };
         },
 
         /**

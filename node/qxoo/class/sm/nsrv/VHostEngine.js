@@ -95,9 +95,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         __assembly : null,
 
         /**
-         * Current connect server
+         * Connect handler app
          */
-        __server : null,
+        __connectApp : null,
 
         /**
          * Security (by webapps)
@@ -121,10 +121,6 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
         getNKServer : function() {
             return this.__nkserver;
-        },
-
-        getConnectServer : function() {
-            return this.__server;
         },
 
         getContextPath : function(id) {
@@ -1241,13 +1237,9 @@ qx.Class.define("sm.nsrv.VHostEngine", {
          *
          * @return {Server} Connect server
          */
-        createConnectServer : function() {
-            var me = this;
+        createConnectApp : function() {
             var connect = $$node.require("connect");
             var conf = this.__config;
-
-            var cookieParser = connect.cookieParser();
-
             //Session staff
             var sopts = {
                 secret: "5bb1097b24bd420a82ef4e916e864a48" //todo review it!
@@ -1270,7 +1262,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     delete sopts["store"];
                 }
             })();
-
+            var cookieParser = connect.cookieParser(sopts["secret"]);
             var ignoreSessFor = qx.lang.Type.isArray(sopts["ignore"]) ? sopts["ignore"] : [];
             var connectSession = connect.session(sopts);
             var session = function(req, res, next) {
@@ -1287,31 +1279,20 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 connectSession(req, res, next);
             };
             //EOF session staff
-
-            this.__server = connect.createServer(
-              function (req, res, next) {
-                  if (req.internal === true) {
-                      next()
-                  } else {
-                      cookieParser(req, res, next);
-                  }
-              },
-              function (req, res, next) {
-                  me.__initRequestHandler(req, res, next);
-              },
-              session
-              ,
-              function (req, res, next) {
-                  me.__populateRequestParams(req, res, next);
-              },
-              function (req, res, next) {
-                  me.__handleReq(req, res, next);
-              },
-              function (err, req, res, next) {
-                  me.__handleError(err, req, res, next);
-              });
-
-            return this.__server;
+            var app = this.__connectApp = connect();
+            app.use(function (req, res, next) {
+                if (req.internal === true) {
+                    next()
+                } else {
+                    cookieParser(req, res, next);
+                }
+            });
+            app.use(this.__initRequestHandler.bind(this));
+            app.use(session);
+            app.use(this.__populateRequestParams.bind(this));
+            app.use(this.__handleReq.bind(this));
+            app.use(this.__handleError.bind(this));
+            return app;
         },
 
         /**
@@ -1326,14 +1307,14 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     req.$$ctxParams = ctxParams;
                 }
             }
-            this.__server.handle(req, res, cb);
+            this.__connectApp.handle(req, res, cb);
         }
     },
 
     destruct : function() {
         this.__config = this.__handlers = this.__regexpHandlers = this.__vhostName = null;
         this.__path = this.__fsutils = this.__url = this.__formidable = this.__querystring = null;
-        this.__nkserver = this.__server = null;
+        this.__nkserver = this.__connectApp = null;
         //this._disposeObjects("__field_name");
     },
 

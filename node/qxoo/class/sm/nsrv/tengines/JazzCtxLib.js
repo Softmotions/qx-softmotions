@@ -133,7 +133,6 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
 
                 //Internal request proxy
                 var ireq = {
-
                     internal : true,
                     url : url,
                     method : "GET",
@@ -147,7 +146,11 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                     //session & cookies
                     session : req.session,
                     sessionID : req.sessionID,
+                    sessionStore : req.sessionStore,
+                    secret : req.secret,
                     cookies : req.cookies,
+                    signedCookies : req.signedCookies,
+                    cookieHashes : req.cookieHashes,
                     //auth staff
                     isAuthenticated : req.isAuthenticated,
                     getUser : req.getUser,
@@ -240,7 +243,7 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                         }
                         if (this.statusCode != 200) {
                             qx.log.Logger.warn(me, "_irequest_() statusCode is not OK: " + ires.statusCode +
-                                    ", path: " + ireq.url);
+                              ", path: " + ireq.url);
                         }
 
                         cbc = true;

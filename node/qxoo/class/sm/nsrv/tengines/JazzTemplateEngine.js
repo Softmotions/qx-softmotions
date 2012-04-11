@@ -41,7 +41,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
         this.base(arguments);
         this.__path = $$node.require("path");
         this.__util = $$node.require("util");
-        this.__jazz = $$node.require("jazz");
+        this.__jazz = $$node.require("softmotions-jazz");
 
         //temlate cache
         this.__tcache = {};

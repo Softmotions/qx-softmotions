@@ -1,0 +1,40 @@
+--- UploadWidget/source/class/uploadwidget/UploadForm.js	2012-03-16 14:50:18.597543122 +0700
++++ sm-upload/source/class/uploadwidget/UploadForm.js	2012-03-16 15:04:25.781555715 +0700
+@@ -115,6 +115,7 @@ qx.Class.define("uploadwidget.UploadForm
+   events:
+   {
+     "sending"    : "qx.event.type.Event",
++    "completedResponse"  : "qx.event.type.Data",
+     "completed"  : "qx.event.type.Event"
+   },
+ 
+@@ -514,8 +515,7 @@ qx.Class.define("uploadwidget.UploadForm
+     {
+       if (this.getIframeNode().readyState == "complete" && this.__isSent)
+       {
+-        this.fireEvent("completed");
+-        delete this.__isSent;
++        this._completed();
+       }
+     },
+ 
+@@ -531,9 +531,18 @@ qx.Class.define("uploadwidget.UploadForm
+     {
+       if(this.__isSent)
+       {
++        this._completed();
++      }
++    },
++
++    // added by softmotions
++    _completed : function() {
+         this.fireEvent("completed");
+         delete this.__isSent;
+-      }
++        var resp = this.getIframeTextContent();
++        if (resp) {
++            this.fireDataEvent("completedResponse", resp);
++        }
+     }
+   }
+ });
