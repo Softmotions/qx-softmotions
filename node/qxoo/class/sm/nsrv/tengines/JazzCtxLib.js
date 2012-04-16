@@ -61,7 +61,9 @@ qx.Class.define("sm.nsrv.tengines.JazzCtxLib", {
                 var req = wrappedCtx["_req_"];
                 var res = wrappedCtx["_res_"];
                 var headers = ctx["_headers_"];
-                path = req.info.webapp["docRoot"] + path;
+                var lpath = $$node.require("path");
+
+                path = lpath.join(req.info.webapp["docRoot"], path);
                 te.createTemplate(path, function(err, template) {
                     if (err) {
                         qx.log.Logger.error(me, "Failed template, path: " + path, err);
