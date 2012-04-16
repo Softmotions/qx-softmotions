@@ -133,7 +133,7 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 return;
             }
             ctx["_global_"] = window;
-            ctx["_env_"] = sm.app.Env.getDefault();
+            ctx["_env_"] = sm.app.Env.getDefault(true);
             ctx["_ctx_"] = ctx;
             ctx["_req_"] = req;
             ctx["_res_"] = res;
