@@ -153,6 +153,7 @@ qx.Class.define("sm.nsrv.NKServer", {
                 }
             }
 
+            var capp = connect();
             this.__server = http.createServer(capp);
 
             for (var i = 0; i < vengines.length; ++i) {
@@ -169,7 +170,6 @@ qx.Class.define("sm.nsrv.NKServer", {
 
             $$node.process.nextTick(
               (function() {
-                  var capp = connect();
                   chandlers.forEach(function(h) {
                       capp.use(h);
                   });
