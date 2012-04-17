@@ -20,45 +20,46 @@ module.exports.FileSeparator = FileSeparator;
 
 
 var writeFileLock = module.exports.writeFileLock = function(path, data, enc, cb) {
-    l_fs.open(path, "w", null, function(err, fd) {
+    l_fs.open(path, "w", null, function(err, fd) {		
         if (err) {
             if (cb) {
                 cb(err);
             }
             return;
-        }
-        l_fs.flock(fd, "ex", function(err) {
+        }		
+        l_fs.flock(fd, "ex", function(err) {			
             if (err) {
                 l_fs.close(fd, function() {
-                    if (cb) {
-                        cb(err);
-                    }
-                });
+					if (cb) {
+						cb(err, data);
+					}
+				});
                 return;
             }
-            //fd, data, position, encoding, callback
-            l_fs.write(fd, data, 0, enc, function(err) {
-                l_fs.flock(fd, "un", function() {
-                    l_fs.close(fd, function() {
-                        if (cb) {
-                            cb(err);
-                        }
-                    });
-                });
-            });
+			l_fs.truncate(fd, 0, function() {				
+				l_fs.write(fd, data, 0, enc, function(err) {					
+					l_fs.flock(fd, "un", function() {
+						l_fs.close(fd, function() {
+							if (cb) {
+								cb(err, data);
+							}
+						});              
+					});
+				});			
+			});						            
         });
     });
 };
 
 var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
-    l_fs.open(path, "r", null, function(err, fd) {
+    l_fs.open(path, "r", null, function(err, fd) {		
         if (err) {
             if (cb) {
                 cb(err);
             }
             return;
         }
-        l_fs.flock(fd, "sh", function(err) {
+        l_fs.flock(fd, "sh", function(err) {			
             if (err) {
                 l_fs.close(fd, function() {
                     if (cb) {
@@ -67,8 +68,8 @@ var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
                 });
                 return;
             }
-            readFileFd(fd, enc, function(err, data) {
-                l_fs.flock(fd, "un", function() {
+            readFileFd(fd, enc, function(err, data) {				
+                l_fs.flock(fd, "un", function() {					
                     l_fs.close(fd, function() {
                         if (cb) {
                             cb(err, data);
