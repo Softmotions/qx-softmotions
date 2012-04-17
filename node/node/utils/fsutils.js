@@ -52,7 +52,7 @@ var writeFileLock = module.exports.writeFileLock = function(path, data, enc, cb)
 };
 
 var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
-    l_fs.open(path, "r", null, function(err, fd) {		
+    l_fs.open(path, "r", null, function(err, fd) {	
         if (err) {
             if (cb) {
                 cb(err);
@@ -69,12 +69,11 @@ var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
                 return;
             }
             readFileFd(fd, enc, function(err, data) {				
-                l_fs.flock(fd, "un", function() {					
-                    l_fs.close(fd, function() {
-                        if (cb) {
-                            cb(err, data);
-                        }
-                    });
+                l_fs.flock(fd, "un", function() {    
+					//we dont need to close fd - already closed					
+					if (cb) {							
+						cb(err, data);
+					}                    
                 });
             });
         });
@@ -92,7 +91,7 @@ var readFileLockSync = module.exports.readFileLockSync = function(path, enc) {
             l_fs.flockSync(fd, "un");
         }
     } finally {
-        l_fs.closeSync(fd);
+        l_fs.closeSync(fd); //need to close FD
     }
     return data;
 };
