@@ -153,6 +153,8 @@ qx.Class.define("sm.nsrv.NKServer", {
                 }
             }
 
+            this.__server = http.createServer(capp);
+
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
                 ve._setWebappsRuntimeOptions(opts["webapps"] || {});
@@ -171,7 +173,6 @@ qx.Class.define("sm.nsrv.NKServer", {
                   chandlers.forEach(function(h) {
                       capp.use(h);
                   });
-                  this.__server = http.createServer(capp);
                   this.__server.listen(port, host);
                   this.fireDataEvent("started", this);
                   sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
