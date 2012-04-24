@@ -35,7 +35,7 @@
         //"QXTHEME"      : "dialog.theme.modern.Theme",
         "QXTHEME"      : "qx.theme.Modern",
         "API_EXCLUDE"  : ["qx.test.*", "dialog.demo.*"],
-        "LOCALES"      : [ "en" ],
+        "LOCALES"      : [ "ru", "en" ],
         "CACHE"        : "${TMPDIR}/cache",
         "ROOT"         : "."
     }

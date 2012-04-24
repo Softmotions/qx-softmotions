@@ -209,7 +209,7 @@ qx.Class.define("sm.cms.user.UsersExecutor", {
                                 }
                             }
                             if (present && !active) { //Tryed to remove role but, other roles force it
-                                var msg = me.tr("Роль %1 не снята с пользователя, поскольку, другие явно назначенные роли предполагают ее наличие.", role);
+                                var msg = me.tr("Role %1 isn't remove form user because other clearly designated roles required it.", role);
                                 resp.messages.push(new sm.nsrv.Message(msg));
                             }
 

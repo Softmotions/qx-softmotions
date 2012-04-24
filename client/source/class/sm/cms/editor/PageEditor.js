@@ -137,10 +137,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             this._grefs["hdr.pageName"].setValue(pageInfo["name"]);
             this._loadPageTemplates(opts, cb);
             if (this._pageInfo["_amask_"].indexOf("d") != -1 && (this._pageInfo["type"] == 0 || this._pageInfo["type"] == 1)) {
-                var val = this._pageInfo["type"]
-                if (!qx.lang.Type.isString(val)) {
-                    val = qx.lang.Json.stringify(val);
-                }
+                var val = "" + this._pageInfo["type"]
                 this._grefs["hdr.pagetype"].setModelSelection([val]);
                 this._grefs["hdr.pagetype"].show();
             } else {
@@ -404,11 +401,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
             if (!this._grefs["hdr.pagetype"].isExcluded()) {
                 var val = this._grefs["hdr.pagetype"].getModelSelection().getItem(0);
-                if (qx.lang.Type.isString(val)) {
-                    req.setParameter("type", val, true);
-                } else {
-                    req.setParameter("type", qx.lang.Json.stringify(val), true);
-                }
+                req.setParameter("type", val, true);
             }
             this._grefs["save"].setEnabled(false);
             this._grefs["preview"].setEnabled(false);

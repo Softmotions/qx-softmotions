@@ -116,7 +116,7 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
             var breadcrumbs = [];
             var newsbc = {
                 published : !!news_root,
-                name : this.tr("Новости"),
+                name : this.tr("News"),
                 link : news_root || ""
             };
 
