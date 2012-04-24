@@ -269,7 +269,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 if (mask.indexOf("r") == -1) {
-                    cb(me.tr("НYou don't have access to change page name"));
+                    cb(me.tr("You don't have access to change page name"));
                     return;
                 }
                 me._updateNode(nodeId, {
