@@ -105,6 +105,28 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
         },
 
         ///////////////////////////////////////////////////////////////////////////
+        //                                Markdown                                //
+        ///////////////////////////////////////////////////////////////////////////
+        saveMarkdownVal: function(opts, cb) {
+            var marked = $$node.require("marked");
+            var attrVal = opts.attrVal;
+            var page = opts.page;
+            var attrName = opts.attrName;
+            var closedTags= ["img", "br", "hr", "area", "base", "col", "frame", "input", "link", "meta", "param"];
+
+            var xhtml = marked(attrVal);
+            for (var key in closedTags) {
+                xhtml = xhtml.replace(new RegExp("(<" + closedTags[key]+".*?)(?:/?)(>)","g"), "$1 /$2");
+            }
+            xhtml = "<div>" + xhtml + "</div>";
+            cb(null, {"ctx" : { "html" : xhtml}});
+
+        },
+
+        loadMarkdownVal : function(attrName, attrVal, page, cb) {
+            cb(null, page["extra"] && page["extra"][attrName] ? page["extra"][attrName] : "");
+        },
+        ///////////////////////////////////////////////////////////////////////////
         //                                Aliases                                //
         ///////////////////////////////////////////////////////////////////////////
 
