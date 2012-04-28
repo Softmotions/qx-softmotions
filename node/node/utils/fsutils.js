@@ -287,13 +287,13 @@ const AntPathMatcher = function(patternSpec) {
     this.excludes = patternSpec["excludes"] ? patternSpec["excludes"].concat() : [];
 
     for (var i = 0; i < this.excludes.length; ++i) {
-        this.excludes[i] = this._normPattern(this.excludes[i]).split(FileSeparator);
+        this.excludes[i] = this._normPattern(this.excludes[i]).split('/');
     }
     for (var i = 0; i < DEFAULTEXCLUDES.length; ++i) {
-        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split(FileSeparator));
+        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split('/'));
     }
     for (var i = 0; i < this.includes.length; ++i) {
-        this.includes[i] = this._normPattern(this.includes[i]).split(FileSeparator);
+        this.includes[i] = this._normPattern(this.includes[i]).split('/');
     }
 };
 
@@ -321,11 +321,12 @@ AntPathMatcher.prototype._normPattern = function(pattern) {
     if (pattern === "") {
         return "**";
     }
-    while (pattern.length > 0 && pattern.charAt(0) == FileSeparator) {
+	pattern = pattern.replace(/\\/g, '/');
+    while (pattern.length > 0 && pattern.charAt(0) === '/') {
         pattern = pattern.substring(1);
     }
     var nlist = [];
-    var plist = pattern.split(FileSeparator);
+    var plist = pattern.split('/');
 
     var inMD = false; //if true we in **/pattern
     for (var i = 0; i < plist.length; ++i) {
@@ -343,7 +344,7 @@ AntPathMatcher.prototype._normPattern = function(pattern) {
         }
         nlist.push(pitem);
     }
-    return nlist.join(FileSeparator);
+    return nlist.join('/');
 };
 
 AntPathMatcher.prototype.voteAll = function(farr, onlyPrefix) {
@@ -564,7 +565,8 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
                 }
                 if (!err) {
                     // check symbolic link loops
-                    if (!this._scannedNodes[lfstat.ino]) {
+                    // todo: check sym link loops in win systems
+                    if (lfstat.ino === 0 || !this._scannedNodes[lfstat.ino]) {
                         this._scannedNodes[lfstat.ino] = true;
                         var cres = callback(null, file, lfstat);
                         if (cres && lfstat.isDirectory()) {
