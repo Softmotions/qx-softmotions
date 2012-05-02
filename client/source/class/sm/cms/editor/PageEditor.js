@@ -280,7 +280,20 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
             switch (edName) {
                 case "wiki" :
-                    res = new sm.cms.editor.wiki.WikiEditor(edOptions).set({allowGrowX : true, allowGrowY : true, autoSize : true, minimalLineHeight : 6});
+                    var editor = sm.cms.Application.APP_STATE._getStateConstant("editor");
+                    var res = null;
+
+                    switch (editor) {
+                        case "wiki":
+                            res = new sm.cms.editor.wiki.WikiEditor(edOptions);
+                            break;
+                        case "markdown":
+                        default :
+                            res = new sm.cms.editor.MarkdownEditor(edOptions);
+                            break;
+                    }
+
+                    res.set({allowGrowX : true, allowGrowY : true, autoSize : true, minimalLineHeight : 6})
                     res.setPageRef(pageInfo["_id"]); //todo remove?
                     break;
                 case "checkbox" :

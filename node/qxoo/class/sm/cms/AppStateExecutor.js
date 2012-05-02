@@ -23,7 +23,6 @@ qx.Class.define("sm.cms.AppStateExecutor", {
             var env = sm.app.Env.getDefault();
             var conf = env.getConfig();
             var uid = req.getUserId();
-
             var state = {
                 appName : env.getAppName(),
                 sessionId : req.sessionID,
@@ -31,6 +30,7 @@ qx.Class.define("sm.cms.AppStateExecutor", {
                 userLogin : uid,
                 helpSite : conf["helpSite"],
                 wikiHelp : conf["wikiHelp"],
+                editor : conf["editor"],
                 userFullName : "",
                 userNickname : uid,
                 properties : {}
