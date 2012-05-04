@@ -100,13 +100,10 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             req.end();
         },
 
-        loadWikiVal : function(attrName, attrVal, page, cb) {
-            cb(null, page["extra"] && page["extra"][attrName] ? page["extra"][attrName] : "");
-        },
-
         ///////////////////////////////////////////////////////////////////////////
         //                                Markdown                                //
         ///////////////////////////////////////////////////////////////////////////
+
         saveMarkdownVal: function(opts, cb) {
             var marked = $$node.require("marked");
             var attrVal = opts.attrVal;
@@ -114,18 +111,39 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             var attrName = opts.attrName;
             var closedTags= ["img", "br", "hr", "area", "base", "col", "frame", "input", "link", "meta", "param"];
 
-            var xhtml = marked(attrVal);
+            var markdown = attrVal.replace(/\(page:/gi, "(/exp/p");
+            markdown = markdown.replace(/\(image:/gi, "(/exp/file?ref=");
+            markdown = markdown.replace(/\(media:/gi, "(/exp/ref/Media:");
+            var xhtml = marked(markdown);
             for (var key in closedTags) {
-                xhtml = xhtml.replace(new RegExp("(<" + closedTags[key]+".*?)(?:/?)(>)","g"), "$1 /$2");
+                xhtml = xhtml.replace(new RegExp("(<" + closedTags[key]+".*?)(?:/?)(>)","gi"), "$1 /$2");
             }
             xhtml = "<div>" + xhtml + "</div>";
             cb(null, {"ctx" : { "html" : xhtml}});
-
         },
 
-        loadMarkdownVal : function(attrName, attrVal, page, cb) {
+
+        ///////////////////////////////////////////////////////////////////////////
+        //                             Editor                                   //
+        ///////////////////////////////////////////////////////////////////////////
+
+        saveEditorVal : function(opts, cb) {
+            var conf = sm.app.Env.getDefault().getConfig();
+            switch (conf["editor"]) {
+                case "wiki" :
+                    sm.cms.asm.AttrConverter.saveWikiVal(opts, cb);
+                    break;
+                case "markdown" :
+                default :
+                    sm.cms.asm.AttrConverter.saveMarkdownVal(opts, cb);
+                    break;
+            }
+        },
+
+        loadEditorVal : function(attrName, attrVal, page, cb) {
             cb(null, page["extra"] && page["extra"][attrName] ? page["extra"][attrName] : "");
         },
+
         ///////////////////////////////////////////////////////////////////////////
         //                                Aliases                                //
         ///////////////////////////////////////////////////////////////////////////

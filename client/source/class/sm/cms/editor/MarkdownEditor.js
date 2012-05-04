@@ -300,7 +300,7 @@ qx.Class.define("sm.cms.editor.MarkdownEditor", {
 
                 var nval = [];
                 nval.push(value.substring(0, sStart));
-                var pspec = "[" + sp[1] + "](" + sp[0] + ")";
+                var pspec = "[" + sp[1] + (sp[0].indexOf("://") != -1 ? "](" : "](page:") + sp[0] + ")";
                 nval.push(pspec);
                 nval.push(value.substring(sEnd));
                 ta.setValue(nval.join(""));
@@ -352,12 +352,16 @@ qx.Class.define("sm.cms.editor.MarkdownEditor", {
                 } else if (isMedia) {
                     mspec.push(fname);
                 }
-                mspec.push("]");
-                mspec.push("(");
+                mspec.push("](");
+                if (isMedia) {
+                    mspec.push("media:");
+                } else {
+                    mspec.push("image:");
+                }
                 mspec.push(this.getPageRef() + fname);
                 if (!isMedia) {
                     if (ltext != null) {
-                        mspec.push("\"" + ltext + "\"");
+                        mspec.push(" \"" + ltext + "\"");
                     }
                 } else {
                     mspec.push("\"Media:" + this.getPageRef() + fname + "\"");
@@ -374,7 +378,7 @@ qx.Class.define("sm.cms.editor.MarkdownEditor", {
                     }
                     mspec.push(link);
                     if (ltext != null) {
-                        mspec.push("\"" + ltext + "\"");
+                        mspec.push(" \"" + ltext + "\"");
                     }
                     mspec.push(")");
                 }
