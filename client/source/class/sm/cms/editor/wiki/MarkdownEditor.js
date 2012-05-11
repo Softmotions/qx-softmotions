@@ -8,7 +8,7 @@
  #asset(sm/icons/misc/help16.png)
  */
 
-qx.Class.define("sm.cms.editor.MarkdownEditor", {
+qx.Class.define("sm.cms.editor.wiki.MarkdownEditor", {
     extend : qx.ui.core.Widget,
     implement : [
         qx.ui.form.IStringForm,

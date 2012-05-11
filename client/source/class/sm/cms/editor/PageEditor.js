@@ -289,7 +289,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                             break;
                         case "markdown":
                         default :
-                            res = new sm.cms.editor.MarkdownEditor(edOptions);
+                            res = new sm.cms.editor.wiki.MarkdownEditor(edOptions);
                             break;
                     }
 
