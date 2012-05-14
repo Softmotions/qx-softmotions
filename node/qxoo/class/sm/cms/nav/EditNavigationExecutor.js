@@ -10,9 +10,9 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
     statics :
     {
         CATEGORIES: [
-            {"path": "config", "label": "Конфигурация", "mgr" : sm.cms.nav.ConfigMgr, "roles": ["config.admin"]},
-            {"path": "pages", "label": "Страницы", "mgr" : sm.cms.page.PageMgr},
-            {"path": "media", "label": "Медиа", "mgr" : sm.cms.media.MediaMgr, "roles" : ["config.admin", "media.admin"]}
+            {"path": "config", "label": "Configuration", "mgr" : sm.cms.nav.ConfigMgr, "roles": ["config.admin"]},
+            {"path": "pages", "label": "Pages", "mgr" : sm.cms.page.PageMgr},
+            {"path": "media", "label": "Media", "mgr" : sm.cms.media.MediaMgr, "roles" : ["config.admin", "media.admin"]}
         ]
     },
 
@@ -216,7 +216,9 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
             var cats = this.self(arguments).CATEGORIES;
             for (var i = 0; i < cats.length; ++i) {
                 if (node.indexOf(cats[i].path + ".") == 0) {
-                    return cats[i];
+                    var trCat = cats[i];
+                    trCat["label"] = this.tr(cats[i]["label"]);
+                    return trCat;
                 }
             }
             return null;

@@ -37,7 +37,7 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
                 var node = nmgr.buildNewsNode({name : req.params["name"],
                     "refpage" : req.params["refpage"]});
                 if (node["aliasFix"] != "-")
-                    node["alias"] = nmgr.getPageAliasSuffix(node);
+                    node["alias"] = "/" + nmgr.getPageAliasSuffix(node);
                 coll.save(node, function(err, doc) {
                     if (err) {
                         me.handleError(resp, ctx, err);

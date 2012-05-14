@@ -119,6 +119,8 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
                 xhtml = xhtml.replace(new RegExp("(<" + closedTags[key]+".*?)(?:/?)(>)","gi"), "$1 /$2");
             }
             xhtml = "<div>" + xhtml + "</div>";
+            page["extra"]={}
+            page["extra"]["content"] = attrVal;
             cb(null, {"ctx" : { "html" : xhtml}});
         },
 
