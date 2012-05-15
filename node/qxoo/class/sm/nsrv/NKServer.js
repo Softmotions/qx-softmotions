@@ -169,14 +169,14 @@ qx.Class.define("sm.nsrv.NKServer", {
             }
 
             $$node.process.nextTick(
-              (function() {
-                  chandlers.forEach(function(h) {
-                      capp.use(h);
-                  });
-                  this.__server.listen(port, host);
-                  this.fireDataEvent("started", this);
-                  sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
-              }).bind(this));
+                    (function() {
+                        chandlers.forEach(function(h) {
+                            capp.use(h);
+                        });
+                        this.__server.listen(port, host);
+                        this.fireDataEvent("started", this);
+                        sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
+                    }).bind(this));
         },
 
         /**
@@ -188,14 +188,14 @@ qx.Class.define("sm.nsrv.NKServer", {
                 this.fireDataEvent("goingshutdown", this);
                 sm.nsrv.NKServerEvents.getInstance().fireDataEvent("goingshutdown", this);
                 try {
-					me.__server.once("close", function() {
-						if (cb) {
-							cb();
-						}
-					});
                     me.__server.close();
+                    if (cb) {
+                        $$node.process.nextTick(function() {
+                            cb();
+                        });
+                    }
                 } finally {
-                    me.__server = null;                    
+                    me.__server = null;
                 }
                 //});
             } else if (cb) {
