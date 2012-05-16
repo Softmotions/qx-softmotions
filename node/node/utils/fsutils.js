@@ -9,6 +9,7 @@ var async = require("async");
 var l_fs = require("fs-ext");
 var l_path = require("path");
 var l_regexp = require("utils/regexp");
+var l_async = require("utils/async");
 
 const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
 module.exports.FileSeparator = FileSeparator;
@@ -194,7 +195,9 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         var i;
         buffer = new Buffer(nread);
         buffers.forEach(function(i) {
-            if (!i._bytesRead) return;
+            if (!i._bytesRead) {
+                return;
+            }
             i.copy(buffer, offset, 0, i._bytesRead);
             offset += i._bytesRead;
         });
@@ -206,7 +209,9 @@ var readFileFdSync = module.exports.readFileFdSync = function(fd, encoding) {
         buffer = new Buffer(0);
     }
 
-    if (encoding) buffer = buffer.toString(encoding);
+    if (encoding) {
+        buffer = buffer.toString(encoding);
+    }
     return buffer;
 };
 
@@ -273,17 +278,13 @@ module.exports.isAbsolutePath = function(path) {
 };
 
 ///////////////////////////////////////////////////////////////////////////
-//                            Directory scanner                          //
+//                      ant path pattern checker                         //
 ///////////////////////////////////////////////////////////////////////////
 
-const DirectoryScanner = function(rootDir, scanSpec) {
-
-    this.rootDir = l_path.normalize(rootDir);
-    this._paused = false;
-
+const AntPathMatcher = function(patternSpec) {
     //Clone scaneSpec data, because it will be modified during normalization
-    this.includes = scanSpec["includes"] ? scanSpec["includes"].concat() : ["**"];
-    this.excludes = scanSpec["excludes"] ? scanSpec["excludes"].concat() : [];
+    this.includes = patternSpec["includes"] ? patternSpec["includes"].concat() : ["**"];
+    this.excludes = patternSpec["excludes"] ? patternSpec["excludes"].concat() : [];
 
     for (var i = 0; i < this.excludes.length; ++i) {
         this.excludes[i] = this._normPattern(this.excludes[i]).split('/');
@@ -294,11 +295,167 @@ const DirectoryScanner = function(rootDir, scanSpec) {
     for (var i = 0; i < this.includes.length; ++i) {
         this.includes[i] = this._normPattern(this.includes[i]).split('/');
     }
+};
+
+const DEFAULTEXCLUDES = [
+    "**/*~",
+    "**/#*#",
+    "**/.#*",
+    "**/%*%",
+    "**/._*",
+    "**/CVS",
+    "**/CVS/**",
+    "**/.cvsignore",
+    "**/SCCS",
+    "**/SCCS/**",
+    "**/vssver.scc",
+    "**/.svn",
+    "**/.svn/**",
+    "**/.DS_Store"
+];
+
+/**
+ * Normalize ant path pattern
+ */
+AntPathMatcher.prototype._normPattern = function(pattern) {
+    if (pattern === "") {
+        return "**";
+    }
+	pattern = pattern.replace(/\\/g, '/');
+    while (pattern.length > 0 && pattern.charAt(0) === '/') {
+        pattern = pattern.substring(1);
+    }
+    var nlist = [];
+    var plist = pattern.split('/');
+
+    var inMD = false; //if true we in **/pattern
+    for (var i = 0; i < plist.length; ++i) {
+        var pitem = plist[i];
+        if (pitem === "**") {
+            if (inMD) {
+                continue;
+            }
+            inMD = true;
+        } else if (pitem === "*" && inMD) {
+            continue;
+        } else {
+            pitem = l_regexp.glob2Regexp(pitem);
+            inMD = false;
+        }
+        nlist.push(pitem);
+    }
+    return nlist.join('/');
+};
+
+AntPathMatcher.prototype.voteAll = function(farr, onlyPrefix) {
+    if (!onlyPrefix) {
+        for (var i = 0; i < this.excludes.length; ++i) {
+            if (this.vote(farr, this.excludes[i])) {
+                return false;
+            }
+        }
+    }
+    for (var i = 0; i < this.includes.length; ++i) {
+        if (this.vote(farr, this.includes[i], onlyPrefix)) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+AntPathMatcher.prototype.vote = function(farr, pattern, onlyPrefix) {
+
+    //qx.log.Logger.warn("\nfarr=" + farr.join("|") + "\npatt=" + pattern.join("|"));
+
+    if (pattern.length == 1 && pattern[0] === "**") { //Simple case
+        return true;
+    }
+
+    var expectNext = null;
+    var expectNextInd = null;
+    var pInd = 0;
+    var traversedPatterns = [];
+
+    for (var i = 0; i < farr.length; ++i) {
+
+        var fa = farr[i];
+        var pv = pattern[pInd];
+        var gotExpectNext = false;
+
+        if (!pv) {
+            return false;
+        }
+        if (pv === "**") {
+            if (expectNext == null && pattern.length > pInd + 1) {
+                expectNext = pattern[pInd + 1];
+                expectNextInd = pInd + 1;
+                gotExpectNext = true;
+            }
+        }
+        if (!this.match(fa, pv)) {
+            return false;
+        }
+
+        traversedPatterns.push(pInd);
+
+        if (expectNext) {
+            if (this.match(fa, expectNext)) {
+                traversedPatterns.push(expectNextInd);
+                expectNext = null;
+                expectNextInd = null;
+                pInd += ((gotExpectNext) ? 1 : 2);
+            }
+        } else {
+            if (pv !== "**") {
+                ++pInd;
+            }
+        }
+    }
+
+    if (!onlyPrefix) {
+        for (var i = pInd; i < pattern.length; ++i) {
+            if (traversedPatterns.indexOf(i) == -1) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+};
+
+AntPathMatcher.prototype.match = function(val, pattern) {
+
+    if (!this._rcache) {
+        this._rcache = {};
+    }
+    var lpattern = (pattern === "**") ? ".*" : pattern;
+    var re = this._rcache[lpattern];
+    if (!re) {
+        re = new RegExp(lpattern, "i");
+        this._rcache[lpattern] = re;
+    }
+    return re.test(val);
+};
+
+///////////////////////////////////////////////////////////////////////////
+//                            Directory scanner                          //
+///////////////////////////////////////////////////////////////////////////
+
+const DirectoryScanner = function(rootDir, scanSpec) {
+
+    this.rootDir = l_path.normalize(rootDir);
+    this._paused = false;
+
+    this.pathMatcher = new AntPathMatcher(scanSpec);
+
     this.rootDirArr = this.rootDir.split(FileSeparator);
     this._savedReadDirArgs = [];
 
+    this._scannedNodes = {};
+
     this._concurrency = 1;
-    this._rdQueue = async.queue(function(task, cb) {
+    this._rdQueue = l_async.stack(function(task, cb) {
         l_fs.readdir(task[0], function(err, files) {
             task[1](err, files);
             cb();
@@ -407,9 +564,14 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
                     err = e;
                 }
                 if (!err) {
-                    var cres = callback(null, file, lfstat);
-                    if (cres && lfstat.isDirectory()) {
-                        this.traverseFiles(file, lfstat, callback, fcallback, inodes);
+                    // check symbolic link loops
+                    // todo: check sym link loops in win systems
+                    if (lfstat.ino === 0 || !this._scannedNodes[lfstat.ino]) {
+                        this._scannedNodes[lfstat.ino] = true;
+                        var cres = callback(null, file, lfstat);
+                        if (cres && lfstat.isDirectory()) {
+                            this.traverseFiles(file, lfstat, callback, fcallback, inodes);
+                        }
                     }
                 } else {
                     callback(err, file, null);
@@ -425,59 +587,8 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
 };
 
 
-const DEFAULTEXCLUDES = [
-    "**/*~",
-    "**/#*#",
-    "**/.#*",
-    "**/%*%",
-    "**/._*",
-    "**/CVS",
-    "**/CVS/**",
-    "**/.cvsignore",
-    "**/SCCS",
-    "**/SCCS/**",
-    "**/vssver.scc",
-    "**/.svn",
-    "**/.svn/**",
-    "**/.DS_Store"
-];
-
-
 DirectoryScanner.prototype.abort = function() {
     this.__abort = true;
-};
-
-/**
- * Normalize ant path pattern
- */
-DirectoryScanner.prototype._normPattern = function(pattern) {
-    if (pattern === "") {
-        return "**";
-    }
-	pattern = pattern.replace(/\\/g, '/');
-    while (pattern.length > 0 && pattern.charAt(0) === '/') {
-        pattern = pattern.substring(1);
-    }
-    var nlist = [];
-    var plist = pattern.split('/');
-
-    var inMD = false; //if true we in **/pattern
-    for (var i = 0; i < plist.length; ++i) {
-        var pitem = plist[i];
-        if (pitem === "**") {
-            if (inMD) {
-                continue;
-            }
-            inMD = true;
-        } else if (pitem === "*" && inMD) {
-            continue;
-        } else {
-            pitem = l_regexp.glob2Regexp(pitem);
-            inMD = false;
-        }
-        nlist.push(pitem);
-    }
-    return nlist.join('/');
 };
 
 /**
@@ -494,8 +605,8 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
             //File is not suffix
             return false;
         }
-        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);        
-        var res = me.voteAll(farr);
+        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);
+        var res = me.pathMatcher.voteAll(farr);
         if (res) {
             //todo exception handling?
             if (callback) {
@@ -507,107 +618,14 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
             return true;
         } else {
             //voting prefix only for directories
-            return (fstat && fstat.isDirectory()) ? me.voteAll(farr, true) : false;
+            return (fstat && fstat.isDirectory()) ? me.pathMatcher.voteAll(farr, true) : false;
         }
     }, fcallback, null);
 };
 
-DirectoryScanner.prototype.voteAll = function(farr, onlyPrefix) {
-
-    if (!onlyPrefix) {
-        for (var i = 0; i < this.excludes.length; ++i) {
-            if (this.vote(farr, this.excludes[i])) {
-                return false;
-            }
-        }
-    }
-    for (var i = 0; i < this.includes.length; ++i) {
-        if (this.vote(farr, this.includes[i], onlyPrefix)) {
-            return true;
-        }
-    }
-
-    return false;
-};
-
-DirectoryScanner.prototype.vote = function(farr, pattern, onlyPrefix) {
-
-    //qx.log.Logger.warn("\nfarr=" + farr.join("|") + "\npatt=" + pattern.join("|"));
-
-    if (pattern.length == 1 && pattern[0] === "**") { //Simple case
-        return true;
-    }
-
-    var expectNext = null;
-    var expectNextInd = null;
-    var pInd = 0;
-    var traversedPatterns = [];
-
-    for (var i = 0; i < farr.length; ++i) {
-
-        var fa = farr[i];
-        var pv = pattern[pInd];
-        var gotExpectNext = false;
-
-        if (!pv) {
-            return false;
-        }
-        if (pv === "**") {
-            if (expectNext == null && pattern.length > pInd + 1) {
-                expectNext = pattern[pInd + 1];
-                expectNextInd = pInd + 1;
-                gotExpectNext = true;
-            }
-        }
-        if (!this.match(fa, pv)) {
-            return false;
-        }
-
-        traversedPatterns.push(pInd);
-
-        if (expectNext) {
-            if (this.match(fa, expectNext)) {
-                traversedPatterns.push(expectNextInd);
-                expectNext = null;
-                expectNextInd = null;
-                pInd += ((gotExpectNext) ? 1 : 2);
-            }
-        } else {
-            if (pv !== "**") {
-                ++pInd;
-            }
-        }
-    }
-
-    if (!onlyPrefix) {
-        for (var i = pInd; i < pattern.length; ++i) {
-            if (traversedPatterns.indexOf(i) == -1) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-
-DirectoryScanner.prototype.match = function(val, pattern) {
-
-    if (!this._rcache) {
-        this._rcache = {};
-    }
-    var lpattern = (pattern === "**") ? ".*" : pattern;
-    var re = this._rcache[lpattern];
-    if (!re) {
-        re = new RegExp(lpattern, "i");
-        this._rcache[lpattern] = re;
-    }
-    return re.test(val);
-};
-
-
 module.exports.DirectoryScanner = DirectoryScanner;
 
+module.exports.AntPathMatcher = AntPathMatcher;
 
 /**
  * Path scanner
