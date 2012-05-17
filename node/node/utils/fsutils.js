@@ -21,45 +21,46 @@ module.exports.FileSeparator = FileSeparator;
 
 
 var writeFileLock = module.exports.writeFileLock = function(path, data, enc, cb) {
-    l_fs.open(path, "w", null, function(err, fd) {
+    l_fs.open(path, "w", null, function(err, fd) {		
         if (err) {
             if (cb) {
                 cb(err);
             }
             return;
-        }
-        l_fs.flock(fd, "ex", function(err) {
+        }		
+        l_fs.flock(fd, "ex", function(err) {			
             if (err) {
                 l_fs.close(fd, function() {
-                    if (cb) {
-                        cb(err);
-                    }
-                });
+					if (cb) {
+						cb(err, data);
+					}
+				});
                 return;
             }
-            //fd, data, position, encoding, callback
-            l_fs.write(fd, data, 0, enc, function(err) {
-                l_fs.flock(fd, "un", function() {
-                    l_fs.close(fd, function() {
-                        if (cb) {
-                            cb(err);
-                        }
-                    });
-                });
-            });
+			l_fs.truncate(fd, 0, function() {				
+				l_fs.write(fd, data, 0, enc, function(err) {					
+					l_fs.flock(fd, "un", function() {
+						l_fs.close(fd, function() {
+							if (cb) {
+								cb(err, data);
+							}
+						});              
+					});
+				});			
+			});						            
         });
     });
 };
 
 var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
-    l_fs.open(path, "r", null, function(err, fd) {
+    l_fs.open(path, "r", null, function(err, fd) {	
         if (err) {
             if (cb) {
                 cb(err);
             }
             return;
         }
-        l_fs.flock(fd, "sh", function(err) {
+        l_fs.flock(fd, "sh", function(err) {			
             if (err) {
                 l_fs.close(fd, function() {
                     if (cb) {
@@ -68,13 +69,12 @@ var readFileLock = module.exports.readFileLock = function(path, enc, cb) {
                 });
                 return;
             }
-            readFileFd(fd, enc, function(err, data) {
-                l_fs.flock(fd, "un", function() {
-                    l_fs.close(fd, function() {
-                        if (cb) {
-                            cb(err, data);
-                        }
-                    });
+            readFileFd(fd, enc, function(err, data) {				
+                l_fs.flock(fd, "un", function() {    
+					//we dont need to close fd - already closed					
+					if (cb) {							
+						cb(err, data);
+					}                    
                 });
             });
         });
@@ -92,7 +92,7 @@ var readFileLockSync = module.exports.readFileLockSync = function(path, enc) {
             l_fs.flockSync(fd, "un");
         }
     } finally {
-        l_fs.closeSync(fd);
+        l_fs.closeSync(fd); //need to close FD
     }
     return data;
 };
@@ -264,20 +264,18 @@ module.exports.mkdirsSync = function (dirname, mode) {
  * @param os {String? undefined} OS id
  */
 module.exports.isAbsolutePath = function(path) {
-
     var len = path.length;
     if (len == 0) {
         return false;
     }
     var c = path.charAt(0);
-    if (FileSeparator == '/') {
-        return (c == FileSeparator);
+    if (FileSeparator === '/') {
+        return (c === FileSeparator);
     } else {
         var colon = path.indexOf(':');
-        return ((c >= 'a' && c <= 'z') && colon == 1 && path.length > 2 && path.charAt(2) == FileSeparator);
+        return (colon === 1 && c >= 'A' && c <= 'Z');
     }
 };
-
 
 ///////////////////////////////////////////////////////////////////////////
 //                      ant path pattern checker                         //
@@ -289,13 +287,13 @@ const AntPathMatcher = function(patternSpec) {
     this.excludes = patternSpec["excludes"] ? patternSpec["excludes"].concat() : [];
 
     for (var i = 0; i < this.excludes.length; ++i) {
-        this.excludes[i] = this._normPattern(this.excludes[i]).split(FileSeparator);
+        this.excludes[i] = this._normPattern(this.excludes[i]).split('/');
     }
     for (var i = 0; i < DEFAULTEXCLUDES.length; ++i) {
-        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split(FileSeparator));
+        this.excludes.push(this._normPattern(DEFAULTEXCLUDES[i]).split('/'));
     }
     for (var i = 0; i < this.includes.length; ++i) {
-        this.includes[i] = this._normPattern(this.includes[i]).split(FileSeparator);
+        this.includes[i] = this._normPattern(this.includes[i]).split('/');
     }
 };
 
@@ -323,11 +321,12 @@ AntPathMatcher.prototype._normPattern = function(pattern) {
     if (pattern === "") {
         return "**";
     }
-    while (pattern.length > 0 && pattern.charAt(0) == FileSeparator) {
+	pattern = pattern.replace(/\\/g, '/');
+    while (pattern.length > 0 && pattern.charAt(0) === '/') {
         pattern = pattern.substring(1);
     }
     var nlist = [];
-    var plist = pattern.split(FileSeparator);
+    var plist = pattern.split('/');
 
     var inMD = false; //if true we in **/pattern
     for (var i = 0; i < plist.length; ++i) {
@@ -345,7 +344,7 @@ AntPathMatcher.prototype._normPattern = function(pattern) {
         }
         nlist.push(pitem);
     }
-    return nlist.join(FileSeparator);
+    return nlist.join('/');
 };
 
 AntPathMatcher.prototype.voteAll = function(farr, onlyPrefix) {
@@ -490,7 +489,6 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     if (!inodes) {
         inodes = [];
     }
-
     if (this.__abort === true) {
         if (inodes.length == 0 && fcallback) {
             process.nextTick(function() {
@@ -503,7 +501,7 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     }
     if (!fstat) {
         try {
-            fstat = l_fs.statSync(startDir);
+            fstat = l_fs.lstatSync(startDir);
         } catch(e) {
             callback(e, startDir, null);
             if (inodes.length == 0 && fcallback) {
@@ -536,14 +534,12 @@ DirectoryScanner.prototype.traverseFiles = function(startDir, fstat, callback, f
     /*l_fs.readdir(startDir, function(cbErr, files) {
      me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
      });*/
-    this._rdQueue.push([
-        [
-            startDir,
-            function(cbErr, files) {
-                me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
-            }
-        ]
-    ]);
+    this._rdQueue.push([[
+        startDir,
+        function(cbErr, files) {
+            me._readDir(cbErr, files, fstat, inodes, startDir, callback, fcallback);
+        }
+    ]]);
 
 };
 
@@ -559,17 +555,18 @@ DirectoryScanner.prototype._readDir = function(cbErr, files, fstat, inodes, star
         }
         if (files && this.__abort !== true) {
             for (var i = 0; i < files.length; ++i) {
-                var file = startDir + FileSeparator + files[i];
+                var file = l_path.join(startDir, files[i]);
                 var err = null;
                 var lfstat = null;
                 try {
-                    lfstat = l_fs.statSync(file);
+                    lfstat = l_fs.lstatSync(file);
                 } catch(e) {
                     err = e;
                 }
                 if (!err) {
                     // check symbolic link loops
-                    if (!this._scannedNodes[lfstat.ino]) {
+                    // todo: check sym link loops in win systems
+                    if (lfstat.ino === 0 || !this._scannedNodes[lfstat.ino]) {
                         this._scannedNodes[lfstat.ino] = true;
                         var cres = callback(null, file, lfstat);
                         if (cres && lfstat.isDirectory()) {
@@ -609,7 +606,6 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
             return false;
         }
         var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);
-        //console.log(farr.join("/"));
         var res = me.pathMatcher.voteAll(farr);
         if (res) {
             //todo exception handling?

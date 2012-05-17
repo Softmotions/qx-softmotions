@@ -46,7 +46,7 @@ qx.Class.define("sm.mongo.Mongo", {
     construct : function(dbname, host, port, options) {
         this.base(arguments);
         this.__cinfo = {"dbname" : dbname, "host" : host, "port" : port, "options" : options};
-        this._lib_mongo = $$node.require("softmotions-mongodb");
+        this._lib_mongo = $$node.require("mongodb");
         if (!qx.lang.Type.isObject(this.__cinfo["options"])) {
             this.__cinfo["options"] = {};
         }

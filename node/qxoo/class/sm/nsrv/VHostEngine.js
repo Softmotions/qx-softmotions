@@ -197,7 +197,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb(true);
             }
             //File or template on disk?
-            this.__path.exists(wapp["docRoot"] + path, function(exists) {
+            this.__path.exists(this.__path.join(wapp["docRoot"], path), function(exists) {
                 cb(exists);
             });
         },

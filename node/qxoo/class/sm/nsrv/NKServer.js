@@ -153,6 +153,9 @@ qx.Class.define("sm.nsrv.NKServer", {
                 }
             }
 
+            var capp = connect();
+            this.__server = http.createServer(capp);
+
             for (var i = 0; i < vengines.length; ++i) {
                 var ve = vengines[i];
                 ve._setWebappsRuntimeOptions(opts["webapps"] || {});
@@ -166,16 +169,14 @@ qx.Class.define("sm.nsrv.NKServer", {
             }
 
             $$node.process.nextTick(
-              (function() {
-                  var capp = connect();
-                  chandlers.forEach(function(h) {
-                      capp.use(h);
-                  });
-                  this.__server = http.createServer(capp);
-                  this.__server.listen(port, host);
-                  this.fireDataEvent("started", this);
-                  sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
-              }).bind(this));
+                    (function() {
+                        chandlers.forEach(function(h) {
+                            capp.use(h);
+                        });
+                        this.__server.listen(port, host);
+                        this.fireDataEvent("started", this);
+                        sm.nsrv.NKServerEvents.getInstance().fireDataEvent("started", this);
+                    }).bind(this));
         },
 
         /**
@@ -186,15 +187,15 @@ qx.Class.define("sm.nsrv.NKServer", {
                 var me = this;
                 this.fireDataEvent("goingshutdown", this);
                 sm.nsrv.NKServerEvents.getInstance().fireDataEvent("goingshutdown", this);
-                //$$node.process.nextTick(function() {
-                qx.log.Logger.info("Shutdown 'sm.nsrv.NKServer'...");
                 try {
                     me.__server.close();
+                    if (cb) {
+                        $$node.process.nextTick(function() {
+                            cb();
+                        });
+                    }
                 } finally {
                     me.__server = null;
-                    if (cb) {
-                        cb();
-                    }
                 }
                 //});
             } else if (cb) {

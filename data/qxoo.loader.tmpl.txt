@@ -1,8 +1,8 @@
 (function(){
 
-if (!this.window) window = this;
+if (!this.qxglobal) qxglobal = this;
 
-if (!window.navigator) window.navigator = {
+if (!qxglobal.navigator) qxglobal.navigator = {
   userAgent: "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_4; de-de) AppleWebKit/533.17.8 (KHTML, like Gecko) Version/5.0.1 Safari/533.17.8",
   product: "",
   cpuClass: "",
@@ -11,7 +11,7 @@ if (!window.navigator) window.navigator = {
   platform: ["linux", "sunos", "freebsd"].indexOf(process.platform) ? "Linux" : "Windows"
 };
 
-if (!window.qx) window.qx = {};
+if (!qxglobal.qx) qxglobal.qx = {};
 qx.$$start = new Date();
 
 if (!qx.$$environment) qx.$$environment = {};
@@ -24,7 +24,7 @@ qx.$$packageData = {};
 qx.$$loader = {};
 
 
-window.document = {
+qxglobal.document = {
     location : {
         toString : function() {
             return "localhost"
@@ -34,11 +34,11 @@ window.document = {
     documentElement : {style : {}},
     createElement : function(){return {}}
 };
-window.location = window.document.location;
+qxglobal.location = qxglobal.document.location;
 //todo window.Worker
 
 //Publish global nodejs objects
-if (!window.$$node) window.$$node = {};
+if (!qxglobal.$$node) qxglobal.$$node = {};
 $$node.global = global;
 $$node.require = require;
 $$node.process = process;
@@ -49,7 +49,7 @@ $$node.filename = __filename;
 $$node.script = (process.version.indexOf("v0.4") === 0) ? process.binding('evals').Script : require("vm");
 $$node.fs = require('fs');
 
-window.execScript = function(data) {
+qxglobal.execScript = function(data) {
     return $$node.script.runInThisContext(data, "eval");
 }
 })();

@@ -201,7 +201,6 @@ qx.Class.define("sm.mongo.Collection", {
                 if (this.__callQueue == null) {
                     this.__callQueue = [];
                 }
-                qx.log.Logger.info("push " + name);
                 this.__callQueue.push([name, args]);
             }
         },

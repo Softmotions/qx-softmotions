@@ -132,8 +132,8 @@ qx.Class.define("sm.nsrv.tengines.JazzTemplateEngine", {
                 cb(true, null, null);
                 return;
             }
-            ctx["_global_"] = window;
-            ctx["_env_"] = sm.app.Env.getDefault();
+            ctx["_global_"] = qxglobal;
+            ctx["_env_"] = sm.app.Env.getDefault(true);
             ctx["_ctx_"] = ctx;
             ctx["_req_"] = req;
             ctx["_res_"] = res;

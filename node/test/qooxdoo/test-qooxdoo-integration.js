@@ -14,7 +14,7 @@ module.exports.testNewInstance = function (test) {
 
 
 module.exports.testWindowAndDoc = function(test) {
-    var i = window.execScript("i = 0; ++i");
+    var i = qxglobal.execScript("i = 0; ++i");
     test.equal(1, i);
     test.done();
 };
