@@ -284,12 +284,12 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                     var res = null;
 
                     switch (editor) {
-                        case "wiki":
-                            res = new sm.cms.editor.wiki.WikiEditor(edOptions);
-                            break;
                         case "markdown":
-                        default :
                             res = new sm.cms.editor.wiki.MarkdownEditor(edOptions);
+                            break;
+                        case "wiki":
+                        default :
+                            res = new sm.cms.editor.wiki.WikiEditor(edOptions);
                             break;
                     }
 

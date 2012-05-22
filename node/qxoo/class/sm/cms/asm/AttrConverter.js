@@ -100,6 +100,10 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
             req.end();
         },
 
+        loadWikiVal : function(attrName, attrVal, page, cb) {
+            cb(null, page["extra"] && page["extra"][attrName] ? page["extra"][attrName] : "");
+        },
+
         ///////////////////////////////////////////////////////////////////////////
         //                                Markdown                                //
         ///////////////////////////////////////////////////////////////////////////
