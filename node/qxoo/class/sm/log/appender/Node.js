@@ -70,9 +70,9 @@ qx.Class.define("sm.log.appender.Node", {
         var util = $$node.require("util");
         statics.__log = function(style, msg) {
             if (style) {
-                util.log(style + msg + "\x1B[0m");
+                $$node.console.error(style + msg + "\x1B[0m");
             } else {
-                util.log(msg);
+                $$node.console.error(msg);
             }
         };
         var sys = $$node.require("sys");
