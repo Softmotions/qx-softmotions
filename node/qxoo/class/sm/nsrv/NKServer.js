@@ -184,18 +184,24 @@ qx.Class.define("sm.nsrv.NKServer", {
          */
         shutdown : function(cb) {
             if (this.__server) {
-                var me = this;
-                this.fireDataEvent("goingshutdown", this);
-                sm.nsrv.NKServerEvents.getInstance().fireDataEvent("goingshutdown", this);
                 try {
+                    var me = this;
+                    try {
+                        this.fireDataEvent("goingshutdown", this);
+                        sm.nsrv.NKServerEvents.getInstance().fireDataEvent("goingshutdown", this);
+                    } catch(e) {
+                        qx.log.Logger.error(me, e);
+                    }
                     me.__server.close();
+                } catch(e) {
+                    qx.log.Logger.error(me, e);
+                } finally {
+                    me.__server = null;
                     if (cb) {
                         $$node.process.nextTick(function() {
                             cb();
                         });
                     }
-                } finally {
-                    me.__server = null;
                 }
                 //});
             } else if (cb) {
