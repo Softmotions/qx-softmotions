@@ -66,15 +66,15 @@ qx.Class.define("sm.log.appender.Node", {
     },
 
 
-    defer : function(statics) {
-        var util = $$node.require("util");
+    defer : function(statics) {        
         statics.__log = function(style, msg) {
-            if (style) {
+            if (style && sm.log.appender.Node._nocolors !== true) {
                 $$node.console.error(style + msg + "\x1B[0m");
             } else {
                 $$node.console.error(msg);
             }
         };
+		var util = $$node.require("util");
         var sys = $$node.require("sys");
         util.error = sys.error = function(arg) {
             qx.log.Logger.error(arg);
