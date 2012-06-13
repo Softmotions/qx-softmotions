@@ -33,7 +33,7 @@ qx.Class.define("sm.cms.media.MediaLibLinkDlg", {
     },
 
     construct : function(options, caption, icon) {
-        this.base(arguments, caption ? caption : this.tr("Ссылка на медиа ресурс"), icon);
+        this.base(arguments, caption ? caption : this.tr("Link to media resource"), icon);
         this.setLayout(new qx.ui.layout.VBox(5));
         this.set({
             modal         : true,
@@ -56,11 +56,11 @@ qx.Class.define("sm.cms.media.MediaLibLinkDlg", {
             this.center();
         }, this);
 
-        this.__navCont = new sm.cms.nav.NavResources(this.tr("Медиа ресурсы"), "media");
+        this.__navCont = new sm.cms.nav.NavResources(this.tr("Media resources"), "media");
         this.add(this.__navCont, {flex : 1});
 
         var footer = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"}));
-        var ok = new qx.ui.form.Button(options["oklabel"] || this.tr("Выбрать"));
+        var ok = new qx.ui.form.Button(options["oklabel"] || this.tr("Choose"));
 
         ok.addListener("execute", function(ev) {
             if (this.__currentMedia == null) {
@@ -74,7 +74,7 @@ qx.Class.define("sm.cms.media.MediaLibLinkDlg", {
             this.fireDataEvent(ename, [this.__currentMedia, hr]);
         }, this);
 
-        var cancel = new qx.ui.form.Button(this.tr("Отменить"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", function(ev) {
             this.close();
         }, this);

@@ -74,7 +74,7 @@ qx.Class.define("sm.cms.nav.NavResources", {
             this.setNavMode(navMode);
         }
 
-        this.__navTree = new qx.ui.treevirtual.TreeVirtual(treeCaption != null ? treeCaption : this.tr("Меню навигации"));
+        this.__navTree = new qx.ui.treevirtual.TreeVirtual(treeCaption != null ? treeCaption : this.tr("Navigation menu"));
         this.__navTree.setUseTreeLines(false);
         this.__navTree.setExcludeFirstLevelTreeLines(true);
         this.__navTree.setAlwaysShowOpenCloseSymbol(true);
@@ -295,6 +295,11 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 if (node.cont) {
                     nnode.icon = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
                     nnode.iconSelected = (node.asm != null) ? sm.cms.nav.NavResources.BRANCH_PAGE_ICON : null;
+                    nnode.type = qx.ui.treevirtual.MTreePrimitive.Type.BRANCH;
+                } else {
+                    nnode.icon = null;
+                    nnode.iconSelected = null;
+                    nnode.type = qx.ui.treevirtual.MTreePrimitive.Type.LEAF;
                 }
                 this.__navTree.getDataModel().setData();
             }, this);
@@ -319,11 +324,11 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 }
                 return;
             }
-            var msg = (this.tr("Вы действительно хотите удалить").toString() + " ");
+            var msg = (this.tr("Do you really want to delete").toString() + " ");
             if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
-                msg += this.tr("раздел").toString();
+                msg += this.tr("section").toString();
             } else {
-                msg += this.tr("страницу").toString();
+                msg += this.tr("page").toString();
             }
             msg += (" '" + this.nodeGetLabel(node) + "'?");
             sm.cms.Application.confirm(msg, function(result) {
@@ -356,8 +361,8 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 return;
             }
             var ldlg = new sm.cms.page.PageLinkDlg({
-                caption : this.tr("Перемещение страницы"),
-                oklabel : this.tr("Переместить сюда"),
+                caption : this.tr("Page moving"),
+                oklabel : this.tr("Move here"),
                 allowOuterLinks : false,
                 includeLinkName : false,
                 withNoAsm : true,
@@ -396,13 +401,13 @@ qx.Class.define("sm.cms.nav.NavResources", {
                 return;
             }
             var url;
-            var msg = (this.tr("Вы действительно хотите удалить").toString() + " ");
+            var msg = (this.tr("Do you really want to delete").toString() + " ");
             if (node.type == qx.ui.treevirtual.MTreePrimitive.Type.BRANCH) {
                 url = sm.cms.Application.ACT.getUrl("nav.rmnode");
-                msg += this.tr("раздел").toString();
+                msg += this.tr("section").toString();
             } else {
                 url = sm.cms.Application.ACT.getUrl("medialib.remove");
-                msg += this.tr("страницу").toString();
+                msg += this.tr("page").toString();
             }
             msg += (" '" + this.nodeGetLabel(node) + "'?");
             sm.cms.Application.confirm(msg, function(result) {

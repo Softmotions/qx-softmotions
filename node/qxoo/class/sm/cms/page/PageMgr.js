@@ -75,7 +75,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 if (mask.indexOf("d") == -1) {
-                    cb(me.tr("Недостаточно прав доступа для удаления страницы"));
+                    cb(me.tr("You don't have access to delete page"));
                     return;
                 }
                 var coll = me.getColl();
@@ -94,7 +94,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                             return;
                         }
                         if (count > 0) {
-                            cb(me.tr("У данного раздела есть подстраницы, пожалуйста удалите сначала их"));
+                            cb(me.tr("This section have subpages, please remove them first"));
                             return;
                         }
                         coll.remove({"_id" : coll.toObjectID(nodeId)}, function(err) {
@@ -218,7 +218,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 if (doc) {
-                    cb(me.tr("Страница с именем: %1 уже существует", node.name), null);
+                    cb(me.tr("Page with name: %1 already exists", node.name), null);
                     return;
                 }
 
@@ -269,7 +269,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                     return;
                 }
                 if (mask.indexOf("r") == -1) {
-                    cb(me.tr("Недостаточно прав доступа для изменения имени страницы"));
+                    cb(me.tr("You don't have access to change page name"));
                     return;
                 }
                 me._updateNode(nodeId, {
@@ -332,7 +332,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
                             return;
                         }
                         if (cand) {
-                            cb(me.tr("Страница с именем: %1 уже существует", node.name));
+                            cb(me.tr("Page with name: %1 already exists", node.name));
                             return;
                         }
                         doUpdate();

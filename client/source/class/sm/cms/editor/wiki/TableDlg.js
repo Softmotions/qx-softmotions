@@ -20,7 +20,7 @@ qx.Class.define("sm.cms.editor.wiki.TableDlg", {
     },
 
     construct : function() {
-        this.base(arguments, this.tr("Вставить таблицу"));
+        this.base(arguments, this.tr("Insert table"));
         this.setLayout(new qx.ui.layout.Dock(5, 5));
         this.set({
             modal         : true,
@@ -42,20 +42,20 @@ qx.Class.define("sm.cms.editor.wiki.TableDlg", {
         this.__spRows = new qx.ui.form.Spinner(1, 2, 100);
         this.__spRows.addListener("changeValue", this._setupTable, this);
 
-        header.add(new qx.ui.basic.Label("Столбцов"));
+        header.add(new qx.ui.basic.Label(this.tr("Columns")));
         header.add(this.__spCols);
-        header.add(new qx.ui.basic.Label("Строк"));
+        header.add(new qx.ui.basic.Label(this.tr("Rows")));
         header.add(this.__spRows);
         this.add(header, {edge : "north"});
 
         this._setupTable();
 
         var footer = new qx.ui.container.Composite(new qx.ui.layout.HBox(5).set({alignX : "right"}));
-        var ok = new qx.ui.form.Button(this.tr("Вставить таблицу"));
+        var ok = new qx.ui.form.Button(this.tr("Insert table"));
         ok.addListener("execute", function(ev) {
             this.fireDataEvent("insertTable", [this.__table.getTableModel(), wideCb.getValue()]);
         }, this);
-        var cancel = new qx.ui.form.Button(this.tr("Отменить"));
+        var cancel = new qx.ui.form.Button(this.tr("Cancel"));
         cancel.addListener("execute", function(ev) {
             this.close();
         }, this);
@@ -64,7 +64,7 @@ qx.Class.define("sm.cms.editor.wiki.TableDlg", {
         footer.add(cancel);
         this.add(footer, {edge : "south"});
 
-        var wideCb = new qx.ui.form.CheckBox(this.tr("Широкая таблица"));
+        var wideCb = new qx.ui.form.CheckBox(this.tr("Wide table"));
         wideCb.setValue(true);
         this.add(wideCb, {edge : "south"});
 

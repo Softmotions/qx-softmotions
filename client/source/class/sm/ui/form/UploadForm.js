@@ -51,7 +51,7 @@ qx.Class.define("sm.ui.form.UploadForm", {
         this.add(controlCont);
 
         if (!this.__options ["singleUpload"]) {
-            this.__addButton = new qx.ui.form.Button(this.tr("Добавить файл"), "sm/icons/misc/folder_add.png");
+            this.__addButton = new qx.ui.form.Button(this.tr("Add file"), "sm/icons/misc/folder_add.png");
             controlCont.add(this.__addButton, {flex : 1});
             this.add(controlCont);
 

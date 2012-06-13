@@ -29,7 +29,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
         this.__grefs["name"] = new qx.ui.basic.Label("");
 
         // кнопка сохранить
-        var save = new qx.ui.form.Button(this.tr("Сохранить"));
+        var save = new qx.ui.form.Button(this.tr("Save"));
         save.addListener("execute", this.__saveBanner, this);
         this.__grefs["save"] = save;
 
@@ -60,7 +60,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
         iLayout.setColumnAlign(0, "right", "top");
         this.__infoSide.setLayout(iLayout);
 
-        this.__iPreviewBox = new qx.ui.groupbox.GroupBox(this.tr("Изображение"));
+        this.__iPreviewBox = new qx.ui.groupbox.GroupBox(this.tr("Image"));
         var pLayout = new qx.ui.layout.HBox(5, "center");
         this.__iPreviewBox.setLayout(pLayout);
 
@@ -79,15 +79,15 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
 
         // помещаем полученные элементы  на экран
         ++i;
-        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Расположение:")), {row : i, column : 0});
+        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Location:")), {row : i, column : 0});
         this.__infoSide.add(hcont, {row : i, column : 1});
 
         ++i;
-        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Медиа категория:")), {row : i, column : 0});
+        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Media category:")), {row : i, column : 0});
         this.__infoSide.add(this.__grefs["category"], {row : i, column : 1});
 
         ++i;
-        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Банеры:")), {row : i, column : 0});
+        this.__infoSide.add(new qx.ui.basic.Label(this.tr("Banners:")), {row : i, column : 0});
         this.__infoSide.add(this.__grefs["banners"], {row : i, column : 1});
     },
 
@@ -235,7 +235,7 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
             this.__grefs["save"].setEnabled(false);
 
             req.send(function(resp) {
-                sm.cms.Application.alert(this.tr("Настройки банера были успешно сохранены"));
+                sm.cms.Application.alert(this.tr("Banners settings has been saved"));
                 // после сохранения обновляем информацию на странице
                 this.__loadBannerData(resp);
             }, this);

@@ -40,11 +40,11 @@ qx.Class.define("sm.cms.page.PageInfo", {
 
         var grefs = this.__grefs = {};
 
-        ic.add(new qx.ui.basic.Label(this.tr("Название:")).set({font : "bold"}), {row : 0, column : 0});
+        ic.add(new qx.ui.basic.Label(this.tr("Name") + ":").set({font : "bold"}), {row : 0, column : 0});
         grefs["nameLabel"] = new qx.ui.basic.Label("");
         ic.add(grefs["nameLabel"], {row : 0, column : 1});
 
-        ic.add(new qx.ui.basic.Label(this.tr("Изменена:")).set({font : "bold"}), {row : 1, column : 0});
+        ic.add(new qx.ui.basic.Label(this.tr("Changed") + ":").set({font : "bold"}), {row : 1, column : 0});
         grefs["changedLabel"] = new qx.ui.basic.Label("");
         ic.add(grefs["changedLabel"], {row : 1, column : 1});
 
@@ -62,7 +62,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
         grefs["editButton"].addListener("execute", this._editPage, this);
         cRow.add(grefs["editButton"]);
 
-        grefs["viewButton"] = new qx.ui.form.Button(this.tr("Просмотр"));
+        grefs["viewButton"] = new qx.ui.form.Button(this.tr("View"));
         grefs["viewButton"].addListener("execute", this._viewPage, this);
         cRow.add(grefs["viewButton"]);
 
@@ -116,11 +116,11 @@ qx.Class.define("sm.cms.page.PageInfo", {
             var status = grefs["statusAtom"];
 
             if (pi["asm"] != null) {
-                status.setLabel(pi["published"] ? this.tr("Эта страница может быть отображена") : this.tr("Эта страница не опубликована"));
+                status.setLabel(pi["published"] ? this.tr("This page can be displayed") : this.tr("This page not published"));
                 status.setBackgroundColor(pi["published"] ? "#C0FFC0" : "#FFFFBF");
                 status.show();
 
-                grefs["editButton"].setLabel(this.tr("Редактировать"));
+                grefs["editButton"].setLabel(this.tr("Edit"));
                 if (pi["_amask_"] == null || pi["_amask_"].indexOf("e") == -1) { //Access mask
                     grefs["editButton"].exclude();
                 } else {
@@ -129,7 +129,7 @@ qx.Class.define("sm.cms.page.PageInfo", {
                 grefs["viewButton"].show();
             } else {
                 status.exclude();
-                grefs["editButton"].setLabel(this.tr("Создать страницу"));
+                grefs["editButton"].setLabel(this.tr("Create page"));
                 grefs["editButton"].show();
                 grefs["viewButton"].exclude();
             }

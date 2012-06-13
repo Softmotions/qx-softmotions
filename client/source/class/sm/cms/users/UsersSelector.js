@@ -29,7 +29,7 @@ qx.Class.define("sm.cms.users.UsersSelector", {
         this._setLayout(new qx.ui.layout.VBox(4));
 
         var sbox = new qx.ui.container.Composite(new qx.ui.layout.HBox(4).set({alignY : "middle"})).set({padding : [5, 5, 0, 5] });
-        sbox.add(new qx.ui.basic.Label(this.tr("Поиск")));
+        sbox.add(new qx.ui.basic.Label(this.tr("Search")));
 
         var stext = this.__stext = new qx.ui.form.TextField().set({maxLength : 64});
         stext.addListener("keydown", function(ev) {
@@ -40,7 +40,7 @@ qx.Class.define("sm.cms.users.UsersSelector", {
         }, this);
         sbox.add(stext, {flex : 1});
 
-        var sbut = new qx.ui.form.Button(this.tr("Искать"));
+        var sbut = new qx.ui.form.Button(this.tr("Find"));
         sbut.addListener("execute", this.__search, this);
         sbox.add(sbut);
         this._add(sbox);

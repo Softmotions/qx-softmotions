@@ -12,7 +12,7 @@
         "APPLICATION"  : "qx-softmotions-node",
         "QOOXDOO_PATH" : "@@QOOXDOO_PATH@@",
         "API_EXCLUDE"  : ["qx.legacy.*","qx.test.*"],
-        "LOCALES"      : [ "en" ],
+        "LOCALES"      : [ "ru", "en" ],
         "CACHE"        : "${TMPDIR}/qxserver${QOOXDOO_VERSION}/cache"
     },
 

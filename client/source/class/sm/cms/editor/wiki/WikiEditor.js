@@ -171,23 +171,23 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
         },
 
         __insHeading1 : function() {
-            this.__insSurround(1, "=", this.tr("Текст заголовка"), " ");
+            this.__insSurround(1, "=", this.tr("Header text"), " ");
         },
 
         __insHeading2 : function() {
-            this.__insSurround(2, "=", this.tr("Текст заголовка"), " ");
+            this.__insSurround(2, "=", this.tr("Header text"), " ");
         },
 
         __insHeading3 : function() {
-            this.__insSurround(3, "=", this.tr("Текст заголовка"), " ");
+            this.__insSurround(3, "=", this.tr("Header text"), " ");
         },
 
         __insBold : function() {
-            this.__insSurround(1, "'''", this.tr("Текст выделенный жирным"));
+            this.__insSurround(1, "'''", this.tr("Bold text"));
         },
 
         __insItalic : function() {
-            this.__insSurround(1, "''", this.tr("Текст выделенный курсивом"));
+            this.__insSurround(1, "''", this.tr("Italics text"));
         },
 
         __insOL : function() {
@@ -483,51 +483,51 @@ qx.Class.define("sm.cms.editor.wiki.WikiEditor", {
             var me = this;
             var createBaseControls = function(cont, btClass, apperance) {
                 var h1 = new btClass("", "sm/cms/icon/16/wiki/text_heading_1.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                h1.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок первого уровня")));
+                h1.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Heading 1")));
                 h1.addListener("execute", me.__insHeading1, me);
                 cont.add(h1);
                 var h2 = new btClass("", "sm/cms/icon/16/wiki/text_heading_2.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                h2.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок второго уровня")));
+                h2.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Heading 2")));
                 h2.addListener("execute", me.__insHeading2, me);
                 cont.add(h2);
                 var h3 = new btClass("", "sm/cms/icon/16/wiki/text_heading_3.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                h3.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Заголовок третьего уровня")));
+                h3.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Heading 3")));
                 h3.addListener("execute", me.__insHeading3, me);
                 cont.add(h3);
                 var b = new btClass("Жирный", "sm/cms/icon/16/wiki/text_bold.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                b.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Жирный шрифт")));
+                b.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Bold")));
                 b.addListener("execute", me.__insBold, me);
                 cont.add(b);
                 var it = new btClass("Курсив", "sm/cms/icon/16/wiki/text_italic.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                it.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Курсив")));
+                it.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Italic")));
                 it.addListener("execute", me.__insItalic, me);
                 cont.add(it);
                 var ul = new btClass("Список", "sm/cms/icon/16/wiki/text_list_bullets.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                ul.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Список")));
+                ul.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Bullet list")));
                 ul.addListener("execute", me.__insUL, me);
                 cont.add(ul);
                 var ol = new btClass("Нумерованный", "sm/cms/icon/16/wiki/text_list_numbers.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                ol.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Нумерованный список")));
+                ol.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Numbered list")));
                 ol.addListener("execute", me.__insOL, me);
                 cont.add(ol);
                 var pl = new btClass("Ссылка", "sm/cms/icon/16/wiki/link_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                pl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Ссылка на другую страницу")));
+                pl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Link to another page")));
                 pl.addListener("execute", me.__insPageRef, me);
                 cont.add(pl);
                 var img = new btClass("Медиа", "sm/cms/icon/16/wiki/image_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                img.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить изображение|ссылку на файл")));
+                img.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Add image|link to file")));
                 img.addListener("execute", me.__insAttachment, me);
                 cont.add(img);
                 var tbl = new btClass("Таблица", "sm/cms/icon/16/wiki/table_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                tbl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить таблицу")));
+                tbl.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Add table")));
                 tbl.addListener("execute", me.__insTable, me);
                 cont.add(tbl);
                 var tree = new btClass("Дерево", "sm/cms/icon/16/wiki/tree_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                tree.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Добавить дерево")));
+                tree.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Add tree")));
                 tree.addListener("execute", me.__insTree, me);
                 cont.add(tree);
                 var note = new btClass("Заметка", "sm/cms/icon/16/wiki/note_add.png").set(apperance ? {appearance : "textarea-editor-tbbt"} : {});
-                note.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Создать заметку")));
+                note.setToolTip(new qx.ui.tooltip.ToolTip(me.tr("Create note")));
                 note.addListener("execute", me.__insNote, me);
                 cont.add(note);
             };

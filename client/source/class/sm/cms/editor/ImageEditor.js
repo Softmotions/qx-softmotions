@@ -64,7 +64,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
         hrow.add(fileForm, {flex : 1});
 
         fileForm.getControlContainer().getLayout().set({alignX : "left"}); //todo hack!
-        var uploadBt = new qx.ui.form.Button(this.tr("Загрузить")).set({allowGrowY : false});
+        var uploadBt = new qx.ui.form.Button(this.tr("Upload")).set({allowGrowY : false});
         uploadBt.addListener("execute", this.__uploadFile, this);
         fileForm.getControlContainer().add(uploadBt, {flex : 0});
         if (opts["comment"]) {
@@ -98,7 +98,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                     throw new qx.core.ValidationError("Validation Error", me.__errors.join("\n"));
                 }
                 if (me.isRequired() && (me.__file == null || me.__file == "")) {
-                    throw new qx.core.ValidationError("Validation Error", me.tr("Необходимо загрузить изображение"));
+                    throw new qx.core.ValidationError("Validation Error", me.tr("Need to upload image"));
                 }
                 return true;
             };
@@ -153,15 +153,15 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                 }
                 this.__errors = errors;
                 if (errors.length > 0) {
-                    var alert = new sm.alert.AlertMessages(this.tr("Внимание"));
-                    alert.addMessages(this.tr("Ошибки при загрузке файлов"), errors);
+                    var alert = new sm.alert.AlertMessages(this.tr("Alert"));
+                    alert.addMessages(this.tr("Errors when uploading files"), errors);
                     alert.show();
                     return;
                 }
                 var imgErrors = this.__checkImageConstrains(resp.files);
                 if (imgErrors.length > 0) {
-                    var alert = new sm.alert.AlertMessages(this.tr("Внимание"));
-                    alert.addMessages(this.tr("Изображение не соответствует ограничениям"), imgErrors);
+                    var alert = new sm.alert.AlertMessages(this.tr("Alert"));
+                    alert.addMessages(this.tr("Image does not comply with the limits"), imgErrors);
                     alert.show();
                     //if image invalid, try to remove it
                     if (resp.files.length == 1 && resp.files[0]["gfname"]) {
@@ -183,19 +183,19 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
             var errors = [];
             if (!qx.lang.Type.isArray(files) || files.length != 1) {
                 qx.log.Logger.warn(this, "Got invalid file meta response: " + qx.lang.Json.stringify(files));
-                errors.push(this.tr("Изображение не было загружено"));
+                errors.push(this.tr("Image did not upload"));
                 return errors;
             }
             var meta = files[0];
             if (!qx.lang.Type.isString(meta["type"]) || meta["type"].indexOf("image/") != 0 || !meta["features"]) {
-                errors.push(this.tr("Загруженный файл не является изображением"));
+                errors.push(this.tr("Uploaded file is not image"));
                 return errors;
             }
             var features = meta["features"];
             var width = features["width"];
             var height = features["height"];
             if (isNaN(width) || isNaN(height)) {
-                errors.push(this.tr("Изображение имеет неизвестные размеры"));
+                errors.push(this.tr("Image is of unknown size"));
                 return errors;
             }
 
@@ -210,7 +210,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                     continue;
                 }
                 if (ctr.indexOf("square") == 0 && (width != height)) {
-                    errors.push(this.tr("Ширина изображения не равна его высоте"));
+                    errors.push(this.tr("Width of image isn't equal its height"));
                     return errors;
                 }
                 var dim = null;
@@ -220,7 +220,7 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                     dim = "height";
                 }
                 if (dim) {
-                    var hdim = (dim == "width") ? this.tr("ширина") : this.tr("высота");
+                    var hdim = (dim == "width") ? this.tr("width") : this.tr("height");
                     var rest = qx.lang.String.trim(ctr.substring(dim.length));
                     var op = rest.charAt(0);
                     var val = parseInt(rest.substring(1));
@@ -230,15 +230,15 @@ qx.Class.define("sm.cms.editor.ImageEditor", {
                     }
                     if (op == "=") {
                         if (features[dim] != val) {
-                            errors.push(hdim + " " + this.tr("изображения не равна") + " " + val);
+                            errors.push(hdim + " " + this.tr("image is not equal") + " " + val);
                         }
                     } else if (op == ">") {
                         if (features[dim] <= val) {
-                            errors.push(hdim + " " + this.tr("изображения меньше чем") + " " + (val + 1));
+                            errors.push(hdim + " " + this.tr("images less than") + " " + (val + 1));
                         }
                     } else if (op == "<") {
                         if (features[dim] >= val) {
-                            errors.push(hdim + " " + this.tr("изображения больше чем") + " " + (val - 1));
+                            errors.push(hdim + " " + this.tr("images more than") + " " + (val - 1));
                         }
                     } else {
                         qx.log.Logger.warn(this, "Invalid constraint: " + qx.lang.Json.stringify(ctr));

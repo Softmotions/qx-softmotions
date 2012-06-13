@@ -29,7 +29,7 @@ qx.Class.define("sm.cms.nav.NewCategoryDlg", {
                     this.save();
                 }
             }, this);
-            this._form.add(category, this.tr("Раздел"), null, "name");
+            this._form.add(category, this.tr("Section"), null, "name");
             category.focus();
         },
 

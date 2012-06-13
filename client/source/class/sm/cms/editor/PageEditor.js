@@ -65,6 +65,13 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         //Horizontal header container
         var hcont = this._grefs["hdr.hcont"] = new qx.ui.container.Composite(new qx.ui.layout.HBox(5));
 
+        //Select page type
+        el = this._grefs["hdr.pagetype"] = new qx.ui.form.SelectBox();
+        el.add(new qx.ui.form.ListItem(this.tr("Section"), null, "0"));
+        el.add(new qx.ui.form.ListItem(this.tr("Page"), null, "1"));
+        this._grefs["hdr.pagetype"].exclude();
+        hcont.add(el, {flex : 0});
+
         //Select template box
         el = this._grefs["hdr.templates"] = new qx.ui.form.SelectBox();
         el.getModelSelection().addListener("change", function(ev) {
@@ -76,15 +83,15 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         }, this);
         hcont.add(el, {flex : 1});
 
-        el = this._grefs["preview"] = new qx.ui.form.Button(this.tr("Предпросмотр"));
+        el = this._grefs["preview"] = new qx.ui.form.Button(this.tr("Preview"));
         el.addListener("execute", this.__previewPage, this);
         hcont.add(el, {flex : 0});
 
         //Save button
-        el = this._grefs["save"] = new qx.ui.form.Button(this.tr("Сохранить"));
+        el = this._grefs["save"] = new qx.ui.form.Button(this.tr("Save"));
         el.addListener("execute", function() {
             this.__savePage(function() {
-                sm.cms.Application.alert(this.tr("Страница была успешно сохранена"));
+                sm.cms.Application.alert(this.tr("Page has been successfully saved"));
                 this.fireDataEvent("pageSaved");
             }, this);
         }, this);
@@ -129,6 +136,13 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             this._pageInfo = pageInfo;
             this._grefs["hdr.pageName"].setValue(pageInfo["name"]);
             this._loadPageTemplates(opts, cb);
+            if (this._pageInfo["_amask_"].indexOf("d") != -1 && (this._pageInfo["type"] == 0 || this._pageInfo["type"] == 1)) {
+                var val = "" + this._pageInfo["type"];
+                this._grefs["hdr.pagetype"].setModelSelection([val]);
+                this._grefs["hdr.pagetype"].show();
+            } else {
+                this._grefs["hdr.pagetype"].exclude();
+            }
         },
 
         setPage : function(pageRef, opts, cb) {
@@ -186,7 +200,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             }
             req.send(function(resp) {
                 tselect.removeAll();
-                tselect.add(new qx.ui.form.ListItem(this.tr("Шаблон не выбран/страница не существует"), null, {}));
+                tselect.add(new qx.ui.form.ListItem(this.tr("Template does not select/page does not exist"), null, {}));
                 var respTemplates = resp.getContent();
                 if (qx.lang.Type.isArray(respTemplates)) {
                     for (var i = 0; i < respTemplates.length; ++i) {
@@ -225,11 +239,11 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
             var form = this._grefs["form"] = new qx.ui.form.Form();
             var vmgr = form.getValidationManager();
-            vmgr.setRequiredFieldMessage(this.tr("Это поле является обязательным"));
+            vmgr.setRequiredFieldMessage(this.tr("This field is required"));
 
             var publishedCb = new qx.ui.form.CheckBox();
             publishedCb.setValue(pageInfo["published"] == true);
-            form.add(publishedCb, this.tr("Опубликовано"), null, "published");
+            form.add(publishedCb, this.tr("Published"), null, "published");
 
             //form.addGroupHeader(this.tr("Основное"));
             if (qx.lang.Type.isObject(templateItem["meta"])) {
@@ -362,7 +376,7 @@ qx.Class.define("sm.cms.editor.PageEditor", {
         __savePage : function(cb, self) {
             var form = this._grefs["form"];
             if (!form || !form.validate()) {
-                sm.cms.Application.alert(this.tr("Пожалуйста, заполните все необходимые поля шаблона страницы"));
+                sm.cms.Application.alert(this.tr("Please complete all required fields of page template"));
                 return;
             }
             var req = new sm.io.Request(sm.cms.Application.ACT.getUrl("page.save"), "POST", "application/json");
@@ -383,6 +397,11 @@ qx.Class.define("sm.cms.editor.PageEditor", {
                         }
                     }
                 }
+            }
+
+            if (!this._grefs["hdr.pagetype"].isExcluded()) {
+                var val = this._grefs["hdr.pagetype"].getModelSelection().getItem(0);
+                req.setParameter("type", val, true);
             }
             this._grefs["save"].setEnabled(false);
             this._grefs["preview"].setEnabled(false);

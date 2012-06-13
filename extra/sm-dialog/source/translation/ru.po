@@ -1,0 +1,27 @@
+# 
+msgid ""
+msgstr ""
+
+#: dialog/Dialog.js:379
+msgid "OK"
+msgstr "OK"
+
+#: dialog/Dialog.js:392
+msgid "Cancel"
+msgstr "Отмена"
+
+#: dialog/Login.js:210
+msgid "Login"
+msgstr "Вход"
+
+#: dialog/Wizard.js:182
+msgid "Back"
+msgstr "Назад"
+
+#: dialog/Wizard.js:191
+msgid "Next"
+msgstr "Далее"
+
+#: dialog/Wizard.js:205
+msgid "Finish"
+msgstr "Закончить"

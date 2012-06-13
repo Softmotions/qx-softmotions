@@ -44,14 +44,14 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
                     res.push({
                         "id" : "news.root",
                         "cont" : false,
-                        "label" : this.tr("Новости").toString(),
+                        "label" : this.tr("News").toString(),
                         "opened" : false
                     });
                     if (req.isUserInRoles("users.admin")) {
                         res.push({
                             "id" : "users.root",
                             "cont" : false,
-                            "label" : this.tr("Пользователи").toString(),
+                            "label" : this.tr("Users").toString(),
                             "opened" : false
                         });
                     }

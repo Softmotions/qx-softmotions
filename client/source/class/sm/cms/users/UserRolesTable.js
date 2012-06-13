@@ -95,17 +95,17 @@ qx.Class.define("sm.cms.users.UserRolesTable", {
                 "title" : "",
                 "columns" : [
                     {
-                        "title" : this.tr("ID роли").toString(),
+                        "title" : this.tr("Role ID").toString(),
                         "id" : "id",
                         "width" : "1*"
                     },
                     {
-                        "title" : this.tr("Название роли").toString(),
+                        "title" : this.tr("Role name").toString(),
                         "id" : "name",
                         "width" : "2*"
                     },
                     {
-                        "title" : this.tr("Назначена").toString(),
+                        "title" : this.tr("Assign to").toString(),
                         "id" : "active",
                         "type" : "boolean",
                         "editable" : true,

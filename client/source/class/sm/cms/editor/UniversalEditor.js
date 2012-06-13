@@ -61,7 +61,7 @@ qx.Class.define("sm.cms.editor.UniversalEditor", {
             }
         };
         activeCheckBox.addListener("changeValue", activeCb, this);
-        form.add(activeCheckBox, this.tr("поле включено"), null, "_active_");
+        form.add(activeCheckBox, this.tr("field is active"), null, "_active_");
 
         for (var fn in fields) {
             var fo = fields[fn];

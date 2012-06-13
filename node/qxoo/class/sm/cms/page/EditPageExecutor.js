@@ -353,61 +353,83 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
 
                 var errCount = 0;
                 var finish = function() {
-                    pmgr.getPageAccessMask(req, doc["_id"], function(err, mask) {
+                    coll.count({"parent": coll.toDBRef(doc["_id"])}, function(err, childCount){
                         if (err) {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        if (mask.indexOf("e") === -1) {
-                            me.handleError(resp, ctx,
-                              me.tr("У вас недостаточно прав для редактирования страницы"),
-                              false, true);
-                            return;
-                        }
-
-                        var doSave = function() {
-                            me.__setupPageKeywords(doc);
-
-                            //perform update
-                            coll.update({_id : ref}, doc, function(err, ret) {
-                                if (err) {
-                                    me.handleError(resp, ctx, err);
-                                    return;
-                                }
-                                if (errCount > 0) {
-                                    me.handleError(resp, ctx, me.tr("При сохранении страницы произошли ошибки"));
-                                    return;
-                                }
-                                try {
-                                    me.writeJSONObject({}, resp, ctx);
-                                } finally {
-                                    var ee = sm.cms.Events.getInstance();
-                                    ee.fireDataEvent("pageSaved", doc);
-                                }
-                            });
-                        };
-
-                        if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
-                            if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
+                        pmgr.getPageAccessMask(req, doc["_id"], function(err, mask) {
+                            if (err) {
+                                me.handleError(resp, ctx, err);
+                                return;
+                            }
+                            if (mask.indexOf("e") === -1) {
                                 me.handleError(resp, ctx,
-                                  me.tr("У вас недостаточно прав для сохранения страницы в выбранном шаблоне"),
+                                  me.tr("You don't have access to edit page"),
                                   false, true);
                                 return;
                             }
-
-                            // check all subscriptions
-                            me.__check_subscriptions(doc["_id"], oldAsm, doc["asm"], ctx, function(err) {
-                                if (err) {
-                                    me.handleError(resp, ctx, err);
+                            var type = req.params["type"];
+                            if (type != null && type != doc["type"]) {
+                                if (mask.indexOf("d") == -1) {
+                                    me.handleError(resp, ctx,
+                                        me.tr("You don't have access for changing type of page"),
+                                        false, true);
                                     return;
                                 }
 
-                                doSave();
-                            });
-                        } else {
-                            doSave();
-                        }
+                                if (childCount > 0) {
+                                    me.handleError(resp, ctx,
+                                        me.tr("Unable to convert section with child into page"),
+                                        false, true);
+                                    return;
+                                }
+                                doc["type"] = type;
+                            }
 
+
+                            var doSave = function() {
+                                me.__setupPageKeywords(doc);
+
+                                //perform update
+                                coll.update({_id : ref}, doc, function(err, ret) {
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
+                                    if (errCount > 0) {
+                                        me.handleError(resp, ctx, me.tr("Error occurred while saving page"));
+                                        return;
+                                    }
+                                    try {
+                                        me.writeJSONObject({}, resp, ctx);
+                                    } finally {
+                                        var ee = sm.cms.Events.getInstance();
+                                        ee.fireDataEvent("pageSaved", doc);
+                                    }
+                                });
+                            };
+
+                            if (oldAsm != doc["asm"]) { //Changed document asm, so check access rights
+                                if ((oldAsm != null && !me._isAllowedAsm(req, oldAsm)) || !me._isAllowedAsm(req, doc["asm"])) {
+                                    me.handleError(resp, ctx,
+                                      me.tr("You don't have access for saving page with selected template"),
+                                      false, true);
+                                    return;
+                                }
+
+                                // check all subscriptions
+                                me.__check_subscriptions(doc["_id"], oldAsm, doc["asm"], ctx, function(err) {
+                                    if (err) {
+                                        me.handleError(resp, ctx, err);
+                                        return;
+                                    }
+                                    doSave();
+                                });
+                            } else {
+                                doSave();
+                            }
+                        });
                     });
                 };
                 if (doc["asm"] == null) { //Removed assembly ref
@@ -685,7 +707,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                   var userId = req.getUserId();
 
                   if ((doc.creator != userId) && !req.isUserInRoles(["users.admin", "structure.admin"])) {
-                      me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для смены владельца страницы"), false, true);
+                      me.handleError(resp, ctx, me.tr("You don't have access to change owner of page"), false, true);
                       return;
                   }
 
@@ -992,7 +1014,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                 return;
             }
             if (into == subj) {
-                me.handleError(resp, ctx, this.tr("Нельзя перенести категорию саму в себя"), false, true);
+                me.handleError(resp, ctx, this.tr("You can't move category to itself"), false, true);
                 return;
             }
 
@@ -1005,7 +1027,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                       return;
                   }
                   if (subjDoc == null) {
-                      me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", subj));
+                      me.handleError(resp, ctx, me.tr("Page not found, id: %1", subj));
                       return;
                   }
                   if (into == "pages.root") {
@@ -1018,11 +1040,11 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                 return;
                             }
                             if (intoDoc == null) {
-                                me.handleError(resp, ctx, me.tr("Страница не найдена, id: %1", into));
+                                me.handleError(resp, ctx, me.tr("Page not found, id: %1", into));
                                 return;
                             }
                             if (intoDoc["type"] != 0) {
-                                me.handleError(resp, ctx, me.tr("Ветка в которую перемещается страница должна быть каталогом"));
+                                me.handleError(resp, ctx, me.tr("Branch where moving page should be directory"));
                                 return;
                             }
                             checkAccess(subjDoc, intoDoc);
@@ -1037,7 +1059,7 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                         return;
                     }
                     if (amask == null || amask.indexOf("e") == -1) {
-                        me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения: %1", subjDoc["name"]));
+                        me.handleError(resp, ctx, me.tr("You don't have access for moving: %1", subjDoc["name"]));
                         return;
                     }
                     if (intoDoc != null) {
@@ -1047,14 +1069,14 @@ qx.Class.define("sm.cms.page.EditPageExecutor", {
                                 return;
                             }
                             if (amask == null || amask.indexOf("e") == -1) {
-                                me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения в: %1", subjDoc["name"]));
+                                me.handleError(resp, ctx, me.tr("You don't have access for moving in: %1", subjDoc["name"]));
                                 return;
                             }
                             applyMove(subjDoc, intoDoc);
                         });
                     } else {
                         if (!req.isUserInRoles(["structure.admin"])) {
-                            me.handleError(resp, ctx, me.tr("Недостаточно прав доступа для перемещения страницы в корень"));
+                            me.handleError(resp, ctx, me.tr("You don't have access for moving in root"));
                             return;
                         }
                         applyMove(subjDoc, null);

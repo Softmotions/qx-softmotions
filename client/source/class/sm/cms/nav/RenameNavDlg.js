@@ -29,7 +29,7 @@ qx.Class.define("sm.cms.nav.RenameNavDlg", {
                     this.save();
                 }
             }, this);
-            this._form.add(name, this.tr("Новое имя"), null, "name");
+            this._form.add(name, this.tr("New name"), null, "name");
             name.focus();
             name.setValue(this.__pnode.label);
         },

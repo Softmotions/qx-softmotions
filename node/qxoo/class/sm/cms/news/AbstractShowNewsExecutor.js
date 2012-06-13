@@ -172,7 +172,6 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                 me.handleError(resp, ctx, err);
                 return;
             }
-
             var finish = function() {
                 var df = sm.cms.util.DateTimeHelper.DDMMYYYY_FMT;
                 for (var i = 0; i < pages.items.length; ++i) {
@@ -198,7 +197,6 @@ qx.Class.define("sm.cms.news.AbstractShowNewsExecutor", {
                 };
                 ctx["pages"] = pages;
                 ctx["news"] = pages.items;
-
 
                 ctx();
             };

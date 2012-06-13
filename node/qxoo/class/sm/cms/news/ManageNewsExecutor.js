@@ -29,13 +29,15 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
                 }
                 if (mask.indexOf("n") == -1) { //Create news
                     me.handleError(resp, ctx,
-                            me.tr("У вас недостаточно прав для создания новостей в данном разделе"),
+                            me.tr("You don't have access to create news in this section"),
                             false, true);
                     return;
                 }
                 var coll = nmgr.getColl();
                 var node = nmgr.buildNewsNode({name : req.params["name"],
                     "refpage" : req.params["refpage"]});
+                if (node["aliasFix"] != "-")
+                    node["alias"] = nmgr.getPageAliasSuffix(node);
                 coll.save(node, function(err, doc) {
                     if (err) {
                         me.handleError(resp, ctx, err);
@@ -160,7 +162,7 @@ qx.Class.define("sm.cms.news.ManageNewsExecutor", {
                         }
                         if (mask.indexOf("n") == -1) {
                             me.handleError(resp, ctx,
-                                    me.tr("У вас недостаточно прав для управления новостями в данном разделе"),
+                                    me.tr("You don't have access to manage news in this section"),
                                     false, true);
                             return;
                         }

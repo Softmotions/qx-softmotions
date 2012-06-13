@@ -29,11 +29,11 @@ qx.Class.define("sm.cms.users.UsersPanel", {
         toolbar.add(mainPart);
 
 
-        var mb = new qx.ui.toolbar.Button(this.tr("Новый пользователь"), "sm/cms/icon/16/actions/user_add.png");
+        var mb = new qx.ui.toolbar.Button(this.tr("New user"), "sm/cms/icon/16/actions/user_add.png");
         mb.addListener("execute", this.__addUser, this);
         mainPart.add(mb);
 
-        var eb = new qx.ui.toolbar.Button(this.tr("Изменить"), "sm/cms/icon/16/actions/user_edit.png").set({enabled : false});
+        var eb = new qx.ui.toolbar.Button(this.tr("Change"), "sm/cms/icon/16/actions/user_edit.png").set({enabled : false});
         eb.addListener("execute", function(ev) {
             var user = this.__uselector.getSelectedUser();
             var ind = this.__uselector.getSelectedUserInd();

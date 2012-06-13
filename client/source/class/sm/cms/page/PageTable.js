@@ -9,13 +9,13 @@ qx.Class.define("sm.cms.page.PageTable", {
     construct : function(useColumns) {
 
         var tm = new sm.model.RemoteVirtualTableModel({
-            "name" : this.tr("Название"),
-            "mdate" : this.tr("Изменена"),
-            "published" : this.tr("Опубликована"),
-            "template" : this.tr("Шаблон"),
-            "refpage" : this.tr("Связана с"),
-            "type" : this.tr("Тип"),
-            "visit_count" : this.tr("Посетило")
+            "name" : this.tr("Name"),
+            "mdate" : this.tr("Changed"),
+            "published" : this.tr("Published"),
+            "template" : this.tr("Template"),
+            "refpage" : this.tr("Reference with"),
+            "type" : this.tr("Type"),
+            "visit_count" : this.tr("Visit")
         })
           .set({
             "useColumns" : useColumns || ["name", "mdate", "template"],
