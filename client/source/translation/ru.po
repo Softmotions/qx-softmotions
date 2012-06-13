@@ -273,7 +273,6 @@ msgstr "Изображение"
 msgid "Location:"
 msgstr "Расположение:"
 
-
 #: sm/cms/banner/BannersEditor.js:86
 msgid "Media category:"
 msgstr "Медиа категория:"
@@ -568,7 +567,7 @@ msgstr "Пароль"
 
 #: sm/cms/users/EditUserDlg.js:85
 msgid "Confirm password"
-mststr "Повторите пароль"
+msgstr "Повторите пароль"
 
 #: sm/cms/users/EditUserDlg.js:56 sm/cms/users/UserTable.js:13
 msgid "Username"
