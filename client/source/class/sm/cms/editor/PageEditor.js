@@ -271,7 +271,6 @@ qx.Class.define("sm.cms.editor.PageEditor", {
             if (mItem.role != null && !sm.cms.Application.userInRoles(mItem.role)) { //Field access
                 return;
             }
-
             var editor = mItem["editor"];
             var edName = qx.lang.Type.isString(editor) ? editor : (editor ? editor["name"] : null);
             var edOptions = (edName == editor || editor == null ? {} : editor);
@@ -280,7 +279,18 @@ qx.Class.define("sm.cms.editor.PageEditor", {
 
             switch (edName) {
                 case "wiki" :
-                    res = new sm.cms.editor.wiki.WikiEditor(edOptions).set({allowGrowX : true, allowGrowY : true, autoSize : true, minimalLineHeight : 6});
+                    var ed = sm.cms.Application.APP_STATE._getStateConstant("editor");
+                    switch (ed) {
+                        case "markdown":
+                            res = new sm.cms.editor.wiki.MarkdownEditor(edOptions);
+                            break;
+                        case "wiki":
+                        default :
+                            res = new sm.cms.editor.wiki.WikiEditor(edOptions);
+                            break;
+                    }
+
+                    res.set({allowGrowX : true, allowGrowY : true, autoSize : true, minimalLineHeight : 6})
                     res.setPageRef(pageInfo["_id"]); //todo remove?
                     break;
                 case "checkbox" :

@@ -11,7 +11,7 @@ Node module
 
 **NKServer**
 
-    npm install connect connect-form cookies formidable crypto jazz
+    npm install connect connect-form cookies formidable crypto softmotions-jazz marked
 
 **Mongo staff**
 

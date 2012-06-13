@@ -11,6 +11,10 @@ qx.Class.define("sm.cms.Env", {
         this.base(arguments, envBase, appBase, options);
         var mcfg = this.getJSONConfig("mongo");
         this.__mongoCfg = new sm.mongo.MongoConfig(mcfg);
+        for (var locale in qx.$$packageData['0'].locales) {
+            qx.locale.Manager.getInstance().addLocale(locale,qx.$$packageData['0'].locales[locale]);
+            qx.locale.Manager.getInstance().addTranslation(locale,qx.$$packageData['0'].translations[locale]);
+        }
     },
 
     members :

@@ -10,9 +10,9 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
     statics :
     {
         CATEGORIES: [
-            {"path": "config", "label": "Конфигурация", "mgr" : sm.cms.nav.ConfigMgr, "roles": ["config.admin"]},
-            {"path": "pages", "label": "Страницы", "mgr" : sm.cms.page.PageMgr},
-            {"path": "media", "label": "Медиа", "mgr" : sm.cms.media.MediaMgr, "roles" : ["config.admin", "media.admin"]}
+            {"path": "config", "label": qx.locale.Manager.tr("Configuration"), "mgr" : sm.cms.nav.ConfigMgr, "roles": ["config.admin"]},
+            {"path": "pages", "label": qx.locale.Manager.tr("Pages"), "mgr" : sm.cms.page.PageMgr},
+            {"path": "media", "label": qx.locale.Manager.tr("Media"), "mgr" : sm.cms.media.MediaMgr, "roles" : ["config.admin", "media.admin"]}
         ]
     },
 
@@ -26,19 +26,17 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
             var me = this;
             var cats = this.self(arguments).CATEGORIES;
             var parent = req.params["parent"];
-
+            var me = this;
             if (!parent) {
                 var nmode = req.params["navMode"];
                 var res = [];
-
                 cats.forEach(function(item) {
                     if (nmode == null || nmode == "all" || nmode == item.path) {
                         if (!item.roles || req.isUserInRoles(item.roles)) {
-                            res.push(item.mgr.buildRootNavItem(item.path, item.label));
+                            res.push(item.mgr.buildRootNavItem(item.path, me.tr(item.label).toString()));
                         }
                     }
                 });
-
                 if (nmode == null || nmode == "all") {
 
                     res.push({

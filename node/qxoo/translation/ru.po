@@ -90,8 +90,8 @@ msgid "Validation error: %1"
 msgstr "Ошибка валидации: %1"
 
 #: sm/util/Validate.js:13
-msgid "%1' is not an IP or hostname."
-msgstr "%1 не ip адрес или имя хоста"
+msgid "'%1' is not an IP or hostname."
+msgstr "'%1' не ip адрес или имя хоста"
 
 #: sm/util/Validate.js:33
 msgid "%1 is not a number."
@@ -105,5 +105,14 @@ msgstr "Поле не может быть пустым."
 msgid "Invalid"
 msgstr "Неверное"
 
+#: sm/cms/nav/EditNavigationExecutor.js:13
+msgid "Configuration"
+msgstr "Кофигурация"
 
+#: sm/cms/nav/EditNavigationExecutor.js:14
+msgid "Pages"
+msgstr "Страницы"
 
+#: sm/cms/nav/EditNavigationExecutor.js:15
+msgid "Media"
+msgstr "Медия"
