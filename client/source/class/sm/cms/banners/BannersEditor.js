@@ -156,13 +156,15 @@ qx.Class.define("sm.cms.banners.BannersEditor", {
                 // для каждого файла строим мета-данные банера
                 for (var i = 0; i < files.length; ++ i) {
                     var file = files[i];
+                    var ob = obanners[file["_id"]];
                     banners.push({
                         id: file["_id"],
                         name: file["name"],
                         // пытаемся смерджить с уже существующими данными
-                        description: obanners[file["_id"]] ? obanners[file["_id"]].description || "" : "",
-                        weight: obanners[file["_id"]] ? obanners[file["_id"]].weight : 1,
-                        link: obanners[file["_id"]] ? obanners[file["_id"]].link || "" : ""
+                        description: ob ? ob.description || "" : "",
+                        weight: ob ? ob.weight : 1,
+                        link: ob ? ob.link || "" : "",
+                        enddate: ob ? new Date(ob.enddate) || "" : ""
                     });
                 }
 //                  обновляем таблицу с банерами

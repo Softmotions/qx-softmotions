@@ -108,6 +108,13 @@ qx.Class.define("sm.cms.banners.BannersTable", {
 
             cmodel.setCellEditorFactory(2, tce);
 
+            // календарик
+            tce = new sm.model.CalendarCellEditor();
+            cmodel.setCellEditorFactory(4, tce);
+            cmodel.setDataCellRenderer(4, new qx.ui.table.cellrenderer.Date().set({
+                dateFormat: new qx.util.format.DateFormat("dd.MM.yyyy")
+            }));
+
             var rr = new sm.table.renderer.CustomRowRenderer();
             rr.setBgColorInterceptor(qx.lang.Function.bind(function(rowInfo) {
                 var rdata = this.getRowData(rowInfo.row);
@@ -217,6 +224,13 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                         "id" : "link",
                         "sortable" : true,
                         "width" : "5*"
+                    },
+                    {
+                        "title" : this.tr("Termination date").toString(),
+                        "id" : "enddate",
+                        "sortable" : true,
+                        "width" : "1*",
+                        "editable" : true
                     }
                 ],
                 "items" : banners
@@ -234,7 +248,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                 var banner = banners[i];
                 if (banner.weight > 0 || this.__options.viewHidden) {
                     items.push([
-                        [banner.name, banner.description, banner.weight, banner.link],
+                        [banner.name, banner.description, banner.weight, banner.link, banner.enddate && new Date(banner.enddate)],
                         banner.id
                     ]);
                 }
@@ -274,6 +288,15 @@ qx.Class.define("sm.cms.banners.BannersTable", {
             }
             contextMenu.add(bt);
 
+            if (this.__banners[bid].enddate) {
+                bt = new qx.ui.menu.Button(this.tr("Unset termination date"));
+                bt.addListener("execute", function(ev) {
+                    this.__banners[bid].enddate = 0;
+                    this.__refresh();
+                }, this);
+                contextMenu.add(bt);
+            }
+
             return true;
         },
 
@@ -287,6 +310,8 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                 this.__banners[bid].description = edata.value;
             } else if (edata.col == 2) {
                 this.__banners[bid].weight = parseInt(edata.value);
+            } else if (edata.col == 4) {
+                this.__banners[bid].enddate = +edata.value;
             }
         },
 
