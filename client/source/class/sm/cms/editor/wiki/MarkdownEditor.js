@@ -219,7 +219,7 @@ qx.Class.define("sm.cms.editor.wiki.MarkdownEditor", {
             return (sEnd == null || sEnd == -1 || sEnd == 0) ? this.__lastSEnd : sEnd;
         },
 
-        __insAdd : function(text) {              var >
+        __insAdd : function(text) {
             var ta = this.__getTextArea();
             var tel = ta.getContentElement();
             var scrollY = tel.getScrollY();
