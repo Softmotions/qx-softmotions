@@ -136,6 +136,16 @@ qx.Class.define("sm.cms.asm.AttrConverter", {
                 opts.page["popupdate"] = +new Date();
             }
             cb(null);
+        },
+
+        /**
+         * Update sort order if user wants it not to be on top
+         */
+        removeNewsFromTop : function(attrVal, attrName, attrMeta, asm, page, cb) {
+            if (attrVal || page["popupdate"] == null) {
+                page["popupdate"] = 0;
+            }
+            cb(null);
         }
     }
 });
