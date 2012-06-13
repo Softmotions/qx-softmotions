@@ -116,3 +116,9 @@ msgstr "Страницы"
 #: sm/cms/nav/EditNavigationExecutor.js:15
 msgid "Media"
 msgstr "Медия"
+
+msgid "Termination date"
+msgstr "Дата окончания"
+
+msgid "Unset termination date"
+msgstr "Отменить дату окончания"
