@@ -14,7 +14,7 @@ qx.Class.define("sm.model.CalendarCellEditor", {
 
         //overriden
         createCellEditor : function(cellInfo) {
-            var chooser =  new qx.ui.control.DateChooser();
+            var chooser = new qx.ui.control.DateChooser();
             var oldval = cellInfo.value;
             if (oldval) {
                 chooser.setValue(oldval);
@@ -28,7 +28,6 @@ qx.Class.define("sm.model.CalendarCellEditor", {
             popup.add(chooser);
 
             var editor = new qx.ui.container.Composite(new qx.ui.layout.HBox());
-
             editor['$$chooser'] = chooser;
             editor.set({
                 focusable: true
@@ -51,6 +50,11 @@ qx.Class.define("sm.model.CalendarCellEditor", {
             // propagate active state
             editor.addListener("activate", function() {
                 chooser.activate();
+            });
+
+            chooser.addListener("execute", function() {
+                popup.hide();
+                cellInfo.table.stopEditing();
             });
 
             return editor;

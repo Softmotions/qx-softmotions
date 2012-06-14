@@ -117,8 +117,3 @@ msgstr "Страницы"
 msgid "Media"
 msgstr "Медия"
 
-msgid "Termination date"
-msgstr "Дата окончания"
-
-msgid "Unset termination date"
-msgstr "Отменить дату окончания"

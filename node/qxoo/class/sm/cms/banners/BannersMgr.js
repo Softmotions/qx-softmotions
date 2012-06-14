@@ -9,6 +9,37 @@
 qx.Class.define("sm.cms.banners.BannersMgr", {
 
     statics : {
+
+        checkActiveBanners : function() {
+            var env = sm.app.Env.getDefault();
+            var bconf = env.getJSONConfig("banners");
+            var cdate = +new Date();
+            var duty = false;
+            for (var bk in bconf) {
+                if (!bconf[bk]) {
+                    qx.log.Logger.error("Invalid or currupted banners config");
+                    continue;
+                }
+                var banners = bconf[bk]["banners"];
+                var dutytype = false;
+                for (var i = 0; banners && i < banners.length; ++i) {
+                    var banner = banners[i];
+                    if (banner["weight"] > 0 && banner["enddate"] > 0 && cdate > banner["enddate"]) {
+                        qx.log.Logger.info("Disabling banner: '" + banner["name"] + "' due to enddate");
+                        banner["weight"] = 0;
+                        duty = dutytype = true;
+                    }
+                }
+                if (dutytype) {
+                    sm.cms.banners.BannersMgr.buildBannerCache(bconf[bk]);
+                }
+            }
+            if (duty) {
+                env.setJSONConfig("banners", bconf);
+            }
+        },
+
+
         /**
          * Get banner configuration by type
          *

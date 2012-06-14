@@ -35,6 +35,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
         table.setContextMenuHandler(1, this.__bannersCtxMenuHandler, this);
         table.setContextMenuHandler(2, this.__bannersCtxMenuHandler, this);
         table.setContextMenuHandler(3, this.__bannersCtxMenuHandler, this);
+        table.setContextMenuHandler(4, this.__bannersCtxMenuHandler, this);
         var caption = ", " + (this.__options.viewHidden ? this.tr("inactive are shown") : this.tr("inactive are hidden"));
         table.setAdditionalStatusBarText(caption);
 
@@ -229,7 +230,7 @@ qx.Class.define("sm.cms.banners.BannersTable", {
                         "title" : this.tr("Termination date").toString(),
                         "id" : "enddate",
                         "sortable" : true,
-                        "width" : "1*",
+                        "width" : "2*",
                         "editable" : true
                     }
                 ],

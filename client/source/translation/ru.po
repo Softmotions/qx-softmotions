@@ -580,3 +580,10 @@ msgstr "Выбор пользователя"
 #: sm/cms/users/UserPanel.js:36
 msgid "Change"
 msgstr "Изменить"
+
+msgid "Termination date"
+msgstr "Дата окончания"
+
+msgid "Unset termination date"
+msgstr "Отменить дату окончания"
+
