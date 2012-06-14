@@ -86,6 +86,8 @@ qx.Class.define("sm.mongo.SessionStore", {
             }
             if (sess != null && sess.lastAccess != null) {
                 s.la = sess.lastAccess;
+            } else {
+                s.la = +new Date();
             }
             this.__coll.update({_id: sid}, s, {upsert: true, safe: true}, function(err, data) {
                 if (cb) {
