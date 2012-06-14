@@ -98,7 +98,7 @@ qx.Class.define("sm.cms.editor.MenuTable", {
 
             mainPart.addSeparator();
 
-            mb = new qx.ui.toolbar.Button(this.tr("Delte"), "icon/16/actions/list-remove.png");
+            mb = new qx.ui.toolbar.Button(this.tr("Delete"), "icon/16/actions/list-remove.png");
             mb.addListener("execute", function(e) {
                 this.removeRowByIndex(this.getSelectedRowIndex());
             }, this);

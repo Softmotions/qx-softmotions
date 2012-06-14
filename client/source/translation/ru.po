@@ -107,11 +107,11 @@ msgstr "Вставить таблицу"
 
 #: sm/cms/editor/wiki/TableDlg.js:45
 msgid "Columns"
-msgstr"Столбцов"
+msgstr "Столбцов"
 
 #: sm/cms/editor/wiki/TableDlg.js:47
 msgid "Rows"
-msgstr"Строк"
+msgstr "Строк"
 
 #: sm/cms/editor/wiki/TableDlg.js:58 sm/cms/news/NewsEditor.js:22 sm/cms/news/NewNewsDlg.js:99 sm/cms/media/MediaLibLinkDlg.js:77 sm/cms/page/PageLinkDlg.js:120 sm/cms/nav/BaseNavPopup.js:22 #: sm/cms/nav/NewMediaDlg.js:40  sm/cms/users/EditUserDlg.js:91 sm/cms/users/UserSelectorDlg.js:60
 msgid "Cancel"
@@ -207,7 +207,7 @@ msgstr "Вы действительно хотите отключить синх
 
 #: sm/cms/editor/MenuTable.js:87
 msgid "New link"
-msgstr"Новая ссылка"
+msgstr "Новая ссылка"
 
 #: sm/cms/editor/MenuTable.js:101 sm/cms/news/NewsWorkplace.js:193 sm/cms/media/AttachDlg:102 sm/cms/media/AttachDlg:268 sm/cms/Application.js:337 sm/cms/Application.js:381
 msgid "Delete"
@@ -586,4 +586,9 @@ msgstr "Дата окончания"
 
 msgid "Unset termination date"
 msgstr "Отменить дату окончания"
+
+msgid "Active"
+msgstr "Активно"
+
+
 
