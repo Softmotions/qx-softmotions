@@ -93,7 +93,6 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                 ctx({"terminated" : true});
 
             } else {
-
                 this.__media_get_internal(req, resp, ctx, fid);
             }
         }
