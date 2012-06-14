@@ -60,6 +60,9 @@ qx.Class.define("sm.mongo.SessionStore", {
                 }
                 var cdate = +new Date();
                 if (sess.expires == null || cdate < sess.expires) {
+                    if (sess.la != null && cdate - sess.la > 1000 * 60) { //More than 1min
+                        me.__coll.update({_id: sid}, {"la" : cdate}, {upsert: true});
+                    }
                     try {
                         cb(null, JSON.parse(sess.session));
                     } catch(e) {
