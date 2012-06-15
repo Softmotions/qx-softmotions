@@ -40,7 +40,17 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                     me.handleError(resp, ctx, err);
                     return;
                 }
-                me.writeHead(resp, ctx, 200, { "Content-Type": gfile.contentType });
+                var headers = { "Content-Type": gfile.contentType };
+                if (gfile.length > 0) {
+                    headers["Content-Length"] = gfile.length;
+                }
+                var inline = !!(gfile.contentType.indexOf("image/") !== -1 ||
+                  gfile.contentType === "application/pdf");
+                var tname = sm.lang.String.translitRussian(gfile.filename); //todo it is hack
+                tname = tname.replace(/\s/g, '_');
+                headers["Content-Disposition"] = (inline ? "inline; " : "attachment; ") + "filename=" + tname;
+
+                me.writeHead(resp, ctx, 200, headers);
                 var stream = gfile.stream(true);
                 io.responseHTTPump(stream, resp, function(err) {
                     if (err) {
