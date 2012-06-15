@@ -27,7 +27,7 @@ qx.Mixin.define("sm.app.MApplyInitable", {
                     var amethodName = "apply" + akey;
                     var amethod = me[amethodName];
                     if (typeof amethod !== "function") {
-                        qx.log.Logger.error(me, "Apply method: " + amethodName + " does not exists");
+                        //qx.log.Logger.error(me, "Apply method: " + amethodName + " does not exists");
                         return;
                     }
                     tasks.push(function(_cb) {

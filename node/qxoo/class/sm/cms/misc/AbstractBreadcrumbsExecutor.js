@@ -100,10 +100,12 @@ qx.Class.define("sm.cms.misc.AbstractBreadcrumbsExecutor", {
                             me.handleError(resp, ctx, err);
                             return;
                         }
-                        ctx["first_breadcrumb"] = {
-                            name : doc["name"],
-                            link : "/exp/p" + doc["_id"]
-                        };
+                        if (doc) {
+                            ctx["first_breadcrumb"] = {
+                                name : doc["name"],
+                                link : "/exp/p" + doc["_id"]
+                            };
+                        }
                         ctx();
                     });
                 } else {
