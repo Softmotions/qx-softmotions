@@ -45,6 +45,10 @@ qx.Class.define("sm.nsrv.NKServer", {
          */
         __server : null,
 
+        __host : null,
+
+        __port : null,
+
         /**
          * Virtual host engines
          */
@@ -93,6 +97,13 @@ qx.Class.define("sm.nsrv.NKServer", {
             return this.getVHE["__default__"];
         },
 
+        getPort : function() {
+            return this.__port;
+        },
+
+        getHost : function() {
+            return this.__host;
+        },
 
         /**
          * Get virtual host engine (sm.nsrv.VHostEngine)
@@ -126,6 +137,9 @@ qx.Class.define("sm.nsrv.NKServer", {
             port = port || 3000;
             host = host || null;
             qx.log.Logger.warn(this, "Starting web server at port: " + port + " on: " + (host || "INADDR_ANY"));
+
+            this.__host = host;
+            this.__port = port;
 
             var filters = opts["filters"];
             var connect = $$node.require("connect");
@@ -196,7 +210,7 @@ qx.Class.define("sm.nsrv.NKServer", {
                 } catch(e) {
                     qx.log.Logger.error(me, e);
                 } finally {
-                    me.__server = null;
+                    me.__server = me.__host = me.__port = null;
                     if (cb) {
                         $$node.process.nextTick(function() {
                             cb();
