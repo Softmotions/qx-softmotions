@@ -352,7 +352,7 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
          * @return {String} normalized keyIdentifier or "Unidentified" if a conversion was not possible
          */
         __normalizeKeyIdentifier : function(keyName) {
-            var KeyHandler = qx.event.handler.Keyboard;
+            var KeyHandler = qx.event.util.Keyboard;
             var keyIdentifier = "Unidentified";
 
             if (KeyHandler.isValidKeyIdentifier(keyName)) {
