@@ -197,7 +197,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 cb(true);
             }
             //File or template on disk?
-            this.__path.exists(this.__path.join(wapp["docRoot"], path), function(exists) {
+            $$node.fs.exists(this.__path.join(wapp["docRoot"], path), function(exists) {
                 cb(exists);
             });
         },
@@ -310,7 +310,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 //check document root
                 var dr = wa["docRoot"];
-                if (!this.__path.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
+                if (!$$node.fs.existsSync(dr) || !$$node.fs.statSync(dr).isDirectory()) {
                     throw new Error("The 'docRoot': " + dr + " is not directory");
                 }
 

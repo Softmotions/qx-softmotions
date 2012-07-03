@@ -50,7 +50,7 @@ if (cAction) {
 
     switch (cAction) {
         case "stop":
-            if (!path.existsSync(config.lockFile)) {
+            if (!fs.existsSync(config.lockFile)) {
                 console.log("Service not running");
                 process.exit(0);
             }
@@ -69,7 +69,7 @@ if (cAction) {
             break;
 
         case "start":
-            if (path.existsSync(config.lockFile)) {
+            if (fs.existsSync(config.lockFile)) {
                 (function() { //Checking process
                     var running = true;
                     try {

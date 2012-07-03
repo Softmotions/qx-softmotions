@@ -215,9 +215,9 @@ qx.Class.define("sm.app.Env", {
             }
             var fname = name + ".json";
             var cpath = this.__envBase + fname;
-            if (!this.__lpath.existsSync(cpath)) {
+            if (!$$node.fs.existsSync(cpath)) {
                 var tpath = this.getTmplDir() + fname;
-                if (this.__lpath.existsSync(tpath)) {
+                if ($$node.fs.existsSync(tpath)) {
                     this.setJSONConfig(name, this._readFileJSONTemplate(tpath), null, true);
                     return this.__jsonConfigCache[name];
                 } else if (!notCheckTemplate) {
@@ -335,7 +335,7 @@ qx.Class.define("sm.app.Env", {
             qx.log.Logger.info(this, this.getAppName(), "Templates dir: " + this.getTmplDir());
 
             //env root checking
-            if (!this.__lpath.existsSync(this.__envBase)) {
+            if (!$$node.fs.existsSync(this.__envBase)) {
                 if (!create) {
                     throw new Error(this.getAppName() + " Env dir: " + this.__envBase + " does not exists");
                 } else {
@@ -347,7 +347,7 @@ qx.Class.define("sm.app.Env", {
             var edirs = this.getEnvSubdirs();
             for (var i = 0; i < edirs.length; ++i) {
                 var ed = this.__envBase + edirs[i];
-                if (!this.__lpath.existsSync(ed)) {
+                if (!$$node.fs.existsSync(ed)) {
                     this.__lfsutils.mkdirsSync(ed);
                 }
             }
