@@ -12,6 +12,8 @@ if (!qxglobal.navigator) qxglobal.navigator = {
 };
 
 if (!qxglobal.qx) qxglobal.qx = {};
+if (!qxglobal.qxvariants) qxvariants = {};
+
 qx.$$start = new Date();
 
 if (!qx.$$environment) qx.$$environment = {};
