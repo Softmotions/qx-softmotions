@@ -11,14 +11,9 @@ qx.Class.define("sm.log.appender.Node", {
 
         __toText : function(entry) {
             var output = [];
-
-            if (entry.object) {
-                var obj = qx.core.ObjectRegistry.fromHashCode(entry.object);
-                if (obj) {
-                    output.push(obj.classname + "[" + obj.$$hash + "]:");
-                }
-            }
-            else if (entry.clazz) {
+            if (entry.object && entry.classname) {
+                output.push(entry.classname + "[" + entry.object + "]:");
+            } else if (entry.clazz) {
                 output.push(entry.clazz.classname + ":");
             }
             var items = entry.items;
