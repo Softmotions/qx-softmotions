@@ -47,6 +47,7 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
 
         findAliasByPage : function(pageId, cb) {
             var me = this;
+            pageId = pageId.toString();
             var alias = this.__p2aliasCache.get(pageId);
             if (alias !== undefined) {
                 cb(null, alias);
@@ -66,33 +67,40 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
 
         findPageByAlias : function(alias, cb) {
             var me = this;
+            alias = alias.toString();
             if (alias === "-") {
                 cb(null, null);
+                alias = cb = null;
                 return;
             }
             var pid = this.__a2pageCache.get(alias);
             if (pid !== undefined) {
                 cb(null, pid);
+                alias = cb = null;
                 return;
             }
             var coll = sm.cms.page.PageMgr.getColl();
             coll.findOne({"alias" : alias}, {"fields" : {"_id" : 1}}, function(err, doc) {
                 if (err) {
                     cb(err);
+                    alias = cb = null;
                     return;
                 }
                 var pid = doc ? doc._id.toString() : null;
                 me.__a2pageCache.set(alias, pid);
                 cb(null, pid);
+                alias = cb = null;
             });
         },
 
         invalidateFor : function(pid, alias) {
             if (alias != null) {
+                alias = alias.toString();
                 this.__a2pageCache.del(alias);
             }
             if (pid != null) {
-                this.__p2aliasCache.del(pid.toString());
+                pid = pid.toString();
+                this.__p2aliasCache.del(pid);
             }
         },
 
@@ -128,6 +136,7 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                     } else {
                         cb(data);
                     }
+                    ctxpath = data = cb = re = out = null; //dereference all
                     return;
                 }
                 var pid = res[2];
