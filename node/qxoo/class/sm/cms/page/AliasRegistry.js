@@ -139,7 +139,8 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                     ctxpath = data = cb = re = out = null; //dereference all
                     return;
                 }
-                var pid = res[2];
+
+                var pid = ("" + res[2]);
                 var alias = me.__p2aliasCache.get(pid);
                 var handleAlias = function(err, alias) {
                     out.push(data.slice(beforeIndex, res.index));
