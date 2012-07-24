@@ -140,14 +140,19 @@ qx.Class.define("sm.cms.page.AliasRegistry", {
                     return;
                 }
 
-                var pid = ("" + res[2]);
+                var pid = new String(res[2]);
                 var alias = me.__p2aliasCache.get(pid);
                 var handleAlias = function(err, alias) {
                     out.push(data.slice(beforeIndex, res.index));
                     if (err || alias == null || alias === "-") {
                         alias = "/p" + pid;
                     }
-                    out.push((res[1] || "") + ctxpath + qx.lang.String.stripTags(alias) + (res[3] || ""));
+                    out.push(
+                      (res[1] ? new String(res[1]) : "") +
+                        ctxpath + qx.lang.String.stripTags(alias) +
+                        (res[3] ? new String(res[3]) : "")
+                    );
+
                     searchNext();
                 };
                 if (alias !== undefined) {
