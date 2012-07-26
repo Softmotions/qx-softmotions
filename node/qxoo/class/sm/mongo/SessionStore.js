@@ -67,6 +67,10 @@ qx.Class.define("sm.mongo.SessionStore", {
                         cb(null, JSON.parse(sess.session));
                     } catch(e) {
                         qx.log.Logger.error(me, e);
+                        try {
+                            qx.log.Logger.error(me, "sess.session=" + sess.session);
+                        } catch(e) {
+                        }
                         cb(e);
                     }
                 } else {
