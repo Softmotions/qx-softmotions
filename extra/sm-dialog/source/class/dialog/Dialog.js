@@ -426,12 +426,7 @@ qx.Class.define("dialog.Dialog",
            * Show the widget. Overriding methods must call this parent method
            */
           show : function() {
-              if (this.isUseBlocker()) {
-                  var root = this.getApplicationRoot();
-                  root.setBlockerOpacity(this.getBlockerOpacity());
-                  root.setBlockerColor(this.getBlockerColor());
-                  root.blockContent(this.getZIndex() - 1);
-              }
+              var root = this.getApplicationRoot();
 
               /*
                * make sure the dialog is above any opened window
@@ -442,7 +437,13 @@ qx.Class.define("dialog.Dialog",
                   var zIndex = windows[i].getZIndex();
                   maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
               }
-              this.setZIndex(maxWindowZIndex + 1);
+              this.setZIndex(maxWindowZIndex + 2);
+
+              if (this.isUseBlocker()) {
+                  root.setBlockerOpacity(this.getBlockerOpacity());
+                  root.setBlockerColor(this.getBlockerColor());
+                  root.blockContent(this.getZIndex() - 1);
+              }
 
               this.setVisibility("visible");
               this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
