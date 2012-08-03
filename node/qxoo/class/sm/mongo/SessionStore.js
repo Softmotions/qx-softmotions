@@ -52,6 +52,7 @@ qx.Class.define("sm.mongo.SessionStore", {
         },
 
         get : function(sid, cb) {
+            //qx.log.Logger.warn("!!!!G=");
             var me = this;
             this.__coll.findOne({_id: sid}, function(err, sess) {
                 if (err || sess == null) {
@@ -67,6 +68,10 @@ qx.Class.define("sm.mongo.SessionStore", {
                         cb(null, JSON.parse(sess.session));
                     } catch(e) {
                         qx.log.Logger.error(me, e);
+                        try {
+                            qx.log.Logger.error(me, "sess.session=" + sess.session);
+                        } catch(e) {
+                        }
                         cb(e);
                     }
                 } else {
@@ -92,6 +97,7 @@ qx.Class.define("sm.mongo.SessionStore", {
             } else {
                 s.la = +new Date();
             }
+            //qx.log.Logger.warn("S=" + JSON.stringify(s));
             this.__coll.update({_id: sid}, s, {upsert: true, safe: true}, function(err, data) {
                 if (cb) {
                     cb(err);
