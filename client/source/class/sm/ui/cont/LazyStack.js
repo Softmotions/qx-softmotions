@@ -59,7 +59,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
          * Return array of widget ids
          */
         getWidgetIds : function() {
-            return Object.keys(this.__slots);
+            return qx.lang.Object.getKeys(this.__slots);
         },
 
         /**
