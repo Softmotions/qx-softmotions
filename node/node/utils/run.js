@@ -1,3 +1,5 @@
+var cScript = null;
+
 (function() {
 
     var daemon = require("daemon");
@@ -8,7 +10,6 @@
     var cAction = null;
     var cAppRoot = null;
     var cVarRoot = null;
-    var cScript = null;
 
     (function() {
         var args = process.argv;
