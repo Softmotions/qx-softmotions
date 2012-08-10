@@ -156,7 +156,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          * @param mainPart {qx.ui.toolbar.ToolBar}
          */
         _createToolbarItems : function(toolbar) {
-            throw new Error("Abstract method call");
+            return toolbar;
         },
 
         _createTableModel : function() {
