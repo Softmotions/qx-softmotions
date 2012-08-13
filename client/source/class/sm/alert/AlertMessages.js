@@ -31,7 +31,7 @@ qx.Class.define("sm.alert.AlertMessages", {
         this.__messages = {};
         this.__container = new qx.ui.container.Composite(new qx.ui.layout.VBox());
         this.add(this.__container);
-        var cancel = new qx.ui.form.Button(this.tr("Close"));
+        var cancel = this.__cancel = new qx.ui.form.Button(this.tr("Close"));
         this.add(cancel);
         cancel.addListener("execute", function() {
             this.close();
@@ -44,6 +44,8 @@ qx.Class.define("sm.alert.AlertMessages", {
 
     members :
     {
+
+        __cancel : null,
 
         __container : null,
 
@@ -64,6 +66,7 @@ qx.Class.define("sm.alert.AlertMessages", {
                 me.setZIndex(maxWindowZIndex + 1);
                 me.setActive(true);
                 me.focus();
+                me.__cancel.focus();
             }, 0);
         },
 
@@ -109,6 +112,5 @@ qx.Class.define("sm.alert.AlertMessages", {
 
     destruct : function() {
         this.resetMessages();
-        this._disposeObjects("__container");
     }
 });
