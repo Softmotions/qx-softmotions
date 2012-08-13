@@ -36,6 +36,7 @@ qx.Class.define("dialog.Alert",
       members :
       {
 
+
           /*
            ---------------------------------------------------------------------------
            WIDGET LAYOUT
@@ -89,6 +90,10 @@ qx.Class.define("dialog.Alert",
               buttonPane.setLayout(bpLayout);
               buttonPane.add(okButton);
               groupboxContainer.add(buttonPane);
+
+              this.addListener("show", function() {
+                  okButton.focus();
+              });
           }
       }
   });

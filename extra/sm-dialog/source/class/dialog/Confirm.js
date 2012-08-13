@@ -178,6 +178,11 @@ qx.Class.define("dialog.Confirm",
               buttonPane.add(cancelButton);
               groupboxContainer.add(buttonPane);
 
+
+               this.addListener("show", function() {
+                  yesButton.focus();
+              });
+
           },
 
           /*

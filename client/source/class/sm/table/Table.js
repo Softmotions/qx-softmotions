@@ -10,7 +10,10 @@
 qx.Class.define("sm.table.Table", {
     extend  : qx.ui.table.Table,
 
-    construct : function(tableModel, custom) {
+    construct : function(tableModel, custom, useContentMenu) {
+        if (useContentMenu) {
+            qx.Class.include(qx.ui.table.Table, qx.ui.table.MTableContextMenu);
+        }
         this.base(arguments, tableModel, custom);
     },
 
