@@ -50,17 +50,21 @@ qx.Class.define("sm.alert.AlertMessages", {
         __messages : null,
 
         ensureOnTop : function() {
-            var root = qx.core.Init.getApplication().getRoot();
-            var maxWindowZIndex = this.getZIndex();
-            var windows = root.getWindows();
-            for (var i = 0; i < windows.length; i++) {
-                if (windows[i] != this) {
-                    var zIndex = windows[i].getZIndex();
-                    maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
-                }
-            }
             var me = this;
-            me.setZIndex(maxWindowZIndex + 1);
+            window.setTimeout(function() {
+                var root = qx.core.Init.getApplication().getRoot();
+                var maxWindowZIndex = me.getZIndex();
+                var windows = root.getWindows();
+                for (var i = 0; i < windows.length; i++) {
+                    if (windows[i] != this) {
+                        var zIndex = windows[i].getZIndex();
+                        maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
+                    }
+                }
+                me.setZIndex(maxWindowZIndex + 1);
+                me.setActive(true);
+                me.focus();
+            }, 0);
         },
 
         open : function() {

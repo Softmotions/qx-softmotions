@@ -281,17 +281,6 @@ qx.Class.define("dialog.Dialog",
           root.add(this);
 
           /*
-           * make sure the dialog is above any opened window
-           */
-          var maxWindowZIndex = 1E5;
-          var windows = root.getWindows();
-          for (var i = 0; i < windows.length; i++) {
-              var zIndex = windows[i].getZIndex();
-              maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
-          }
-          this.setZIndex(maxWindowZIndex + 1);
-
-          /*
            * make it a focus root
            */
           qx.ui.core.FocusHandler.getInstance().addRoot(this);
@@ -416,6 +405,34 @@ qx.Class.define("dialog.Dialog",
               this._message.setVisibility(value ? "visible" : "excluded");
           },
 
+          ensureOnTop : function(cb, cbSelf) {
+              var me = this;
+              window.setTimeout(function() {
+                  var root = qx.core.Init.getApplication().getRoot();
+                  var maxWindowZIndex = me.getZIndex();
+                  var windows = root.getWindows();
+                  for (var i = 0; i < windows.length; i++) {
+                      if (windows[i] != this) {
+                          var zIndex = windows[i].getZIndex();
+                          maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
+                      }
+                  }
+                  me.setZIndex(maxWindowZIndex + 2);
+                  if (me.isUseBlocker()) {
+                      root.setBlockerOpacity(me.getBlockerOpacity());
+                      root.setBlockerColor(me.getBlockerColor());
+                      root.blockContent(me.getZIndex() - 1);
+                  }
+                  me.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
+                  me.setVisibility("visible");
+                  me.focus();
+                  if (cb) {
+                      cb.call(cbSelf);
+                  }
+              }, 0);
+          },
+
+
           /*
            ---------------------------------------------------------------------------
            API METHODS
@@ -426,29 +443,9 @@ qx.Class.define("dialog.Dialog",
            * Show the widget. Overriding methods must call this parent method
            */
           show : function() {
-              var root = this.getApplicationRoot();
-
-              /*
-               * make sure the dialog is above any opened window
-               */
-              var maxWindowZIndex = 1E5;
-              var windows = root.getWindows();
-              for (var i = 0; i < windows.length; i++) {
-                  var zIndex = windows[i].getZIndex();
-                  maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
-              }
-              this.setZIndex(maxWindowZIndex + 2);
-
-              if (this.isUseBlocker()) {
-                  root.setBlockerOpacity(this.getBlockerOpacity());
-                  root.setBlockerColor(this.getBlockerColor());
-                  root.blockContent(this.getZIndex() - 1);
-              }
-
-              this.setVisibility("visible");
-              this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
-              this.focus();
-              this.fireEvent("show");
+              this.ensureOnTop(function() {
+                  this.fireEvent("show");
+              }, this);
           },
 
           /**
