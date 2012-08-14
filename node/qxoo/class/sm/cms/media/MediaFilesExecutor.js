@@ -46,8 +46,7 @@ qx.Class.define("sm.cms.media.MediaFilesExecutor", {
                 }
                 var inline = !!(gfile.contentType.indexOf("image/") !== -1 ||
                   gfile.contentType === "application/pdf");
-                var tname = sm.lang.String.translitRussian(gfile.filename); //todo it is hack
-                tname = tname.replace(/\s/g, '_');
+                var tname =  sm.nsrv.HTTPUtils.toContentDisposition(gfile.filename);
                 headers["Content-Disposition"] = (inline ? "inline; " : "attachment; ") + "filename=" + tname;
 
                 me.writeHead(resp, ctx, 200, headers);

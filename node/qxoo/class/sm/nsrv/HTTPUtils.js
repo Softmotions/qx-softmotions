@@ -14,6 +14,16 @@ qx.Class.define("sm.nsrv.HTTPUtils", {
 
 
         /**
+         * Convert file name to the content disposition header value
+         * format
+         * @param fname {String}
+         */
+        toContentDisposition : function(fname) {
+            fname = sm.lang.String.translitRussian(fname);
+            return fname ? fname.replace(/[^a-zA-z0-9\-]/g, '_') : null;
+        },
+
+        /**
          * List of browser supported ISO 639 alpha-2 language codes
          * @param req Http request
          */

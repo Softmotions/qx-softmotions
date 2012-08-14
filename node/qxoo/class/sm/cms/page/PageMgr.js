@@ -146,7 +146,7 @@ qx.Class.define("sm.cms.page.PageMgr", {
             if (alias === "-") {
                 return alias;
             }
-            return sm.lang.String.translitRussian(alias).replace(/\s+/g, '_').replace(/\W+/g, '').toLocaleLowerCase();
+            return sm.nsrv.HTTPUtils.toContentDisposition(alias).toLocaleLowerCase();
         },
 
         /**
