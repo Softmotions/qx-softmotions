@@ -1296,6 +1296,20 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         },
 
         /**
+         * Returns authenticate filter for webapp
+         */
+        getSecurityFilter : function(req) {
+            return this.__security[this.__getHconfValue(this.__handlers[req.info.pathname], "webapp")].__filter;
+        },
+
+        /**
+         * Returns user provider for webapp
+         */
+        getSecurityUserProvider : function(req) {
+            return this.__security[this.__getHconfValue(this.__handlers[req.info.pathname], "webapp")]._userProvider;
+        },
+
+        /**
          * Handle raw server request
          */
         handle : function(req, res, ctxParams, cb) {
