@@ -24,9 +24,8 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
          */
         __nav : function(req, resp, ctx) {
             var me = this;
-            var cats = this.self(arguments).CATEGORIES;
+            var cats = this._getCategories();
             var parent = req.params["parent"];
-            var me = this;
             if (!parent) {
                 var nmode = req.params["navMode"];
                 var res = [];
@@ -211,13 +210,21 @@ qx.Class.define("sm.cms.nav.EditNavigationExecutor", {
          * @param node {String} Сссылка на элемент дерева
          */
         __getCategoryForNode : function(node) {
-            var cats = this.self(arguments).CATEGORIES;
+            var cats = this._getCategories();
             for (var i = 0; i < cats.length; ++i) {
                 if (node.indexOf(cats[i].path + ".") == 0) {
                     return cats[i];
                 }
             }
             return null;
+        },
+
+
+        /**
+         * Возвращаем конфигурацию категорий (для возможности перегрузки в потомках)
+         */
+        _getCategories : function() {
+            return this.self(arguments).CATEGORIES;
         }
     },
 
