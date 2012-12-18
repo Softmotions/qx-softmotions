@@ -8,11 +8,10 @@
  *
  */
 qx.Class.define("sm.app.Env", {
-    extend  : qx.core.Object,
+    extend : qx.core.Object,
     type : "abstract",
 
-    statics :
-    {
+    statics : {
         /**
          * Default env instance
          */
@@ -39,8 +38,7 @@ qx.Class.define("sm.app.Env", {
 
     },
 
-    events :
-    {
+    events : {
 
         /**
          * Fired if some json configuration changed
@@ -77,8 +75,7 @@ qx.Class.define("sm.app.Env", {
         "published" : "qx.event.type.Data"
     },
 
-    properties :
-    {
+    properties : {
 
         appName : {
             check : "String",
@@ -144,8 +141,7 @@ qx.Class.define("sm.app.Env", {
         this._openEnv(!!this._options["create"]);
     },
 
-    members :
-    {
+    members : {
         /**
          * Env options
          */
@@ -261,8 +257,8 @@ qx.Class.define("sm.app.Env", {
                 if (err) {
                     qx.log.Logger.error(me, "setJSONConfig", err);
                 }
-                if (cb != null) {
-                    cb(err);
+                if (cb) {
+                    cb(err, newConfig, oldConfig);
                 }
             });
         },
@@ -305,7 +301,7 @@ qx.Class.define("sm.app.Env", {
                     var res;
                     try {
                         res = processFdata(fdata);
-                    } catch(e) {
+                    } catch (e) {
                         cb(e);
                         return;
                     }
@@ -320,7 +316,7 @@ qx.Class.define("sm.app.Env", {
             var fdata = this.__lfsutils.readFileLockSync(path, "utf8");
             try {
                 return JSON.parse(fdata);
-            } catch(e) {
+            } catch (e) {
                 qx.log.Logger.error(this, path, e.toString());
                 throw e;
             }
@@ -374,7 +370,7 @@ qx.Class.define("sm.app.Env", {
                     try {
                         var it = new clazz();
                         this.__initables.push(it);
-                    } catch(e) {
+                    } catch (e) {
                         qx.log.Logger.error(this, e);
                     }
                 }
@@ -404,7 +400,7 @@ qx.Class.define("sm.app.Env", {
                             }
                             _cb(err);
                         });
-                    } catch(e) {
+                    } catch (e) {
                         qx.log.Logger.error(me, iname, e);
                         _cb(e);
                     }
