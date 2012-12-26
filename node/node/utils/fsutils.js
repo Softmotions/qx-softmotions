@@ -10,9 +10,7 @@ var l_fs = require("fs-ext");
 var l_path = require("path");
 var l_regexp = require("utils/regexp");
 var l_async = require("utils/async");
-
-const FileSeparator = ["linux", "sunos", "freebsd"].indexOf(process.platform) >= 0 ? '/' : '\\';
-module.exports.FileSeparator = FileSeparator;
+module.exports.FileSeparator = l_path.sep;
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -269,8 +267,8 @@ module.exports.isAbsolutePath = function(path) {
         return false;
     }
     var c = path.charAt(0);
-    if (FileSeparator === '/') {
-        return (c === FileSeparator);
+    if (path.sep === '/') {
+        return (c === path.sep);
     } else {
         var colon = path.indexOf(':');
         return (colon === 1 && c >= 'A' && c <= 'Z');
