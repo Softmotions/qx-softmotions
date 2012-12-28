@@ -441,17 +441,11 @@ AntPathMatcher.prototype.match = function(val, pattern) {
 ///////////////////////////////////////////////////////////////////////////
 
 const DirectoryScanner = function(rootDir, scanSpec) {
-
     this.rootDir = l_path.normalize(rootDir);
     this._paused = false;
-
     this.pathMatcher = new AntPathMatcher(scanSpec);
-
-    this.rootDirArr = this.rootDir.split(FileSeparator);
     this._savedReadDirArgs = [];
-
     this._scannedNodes = {};
-
     this._concurrency = 1;
     this._rdQueue = l_async.stack(function(task, cb) {
         l_fs.readdir(task[0], function(err, files) {
@@ -603,7 +597,7 @@ DirectoryScanner.prototype.scan = function(callback, fcallback) {
             //File is not suffix
             return false;
         }
-        var farr = file.substring(me.rootDir.length + 1).split(FileSeparator);
+        var farr = file.substring(me.rootDir.length + 1).split(l_path.sep);
         var res = me.pathMatcher.voteAll(farr);
         if (res) {
             //todo exception handling?

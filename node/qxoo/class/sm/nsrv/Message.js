@@ -8,19 +8,27 @@
  */
 qx.Class.define("sm.nsrv.Message", {
 
-    extend : sm.lang.BaseError,
+    extend : Error,
 
     /**
      * @param message {String} Comment passed to the assertion call
      * @param error {Boolean?}
      */
     construct : function(message, error) {
-        sm.lang.BaseError.call(this, new Error(message));
+        this.message = message;
         this.__error = !!error;
+        if (this.__error) {
+            var inst = Error.call(this, message);
+            if (inst.stack) {
+                this.stack = inst.stack;
+            }
+            if (inst.stacktrace) {
+                this.stacktrace = inst.stacktrace;
+            }
+        }
     },
 
-    members :
-    {
+    members : {
         __error : false,
 
         /**
@@ -28,6 +36,15 @@ qx.Class.define("sm.nsrv.Message", {
          */
         isError : function() {
             return this.__error;
+        },
+
+        getStackTrace : function() {
+            return this.stacktrace || this.stack;
+        },
+
+        toString : function() {
+            return this.message;
         }
     }
 });
+
