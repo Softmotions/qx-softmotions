@@ -18,13 +18,10 @@ qx.Class.define("sm.nsrv.Message", {
         this.message = message;
         this.__error = !!error;
         if (this.__error) {
-            var inst = Error.call(this, message);
-            if (inst.stack) {
-                this.stack = inst.stack;
-            }
-            if (inst.stacktrace) {
-                this.stacktrace = inst.stacktrace;
-            }
+            var st = qx.dev.StackTrace.getStackTrace();
+            st.shift();
+            st.shift();
+            this.stack  = st.join("\n");
         }
     },
 
@@ -39,7 +36,7 @@ qx.Class.define("sm.nsrv.Message", {
         },
 
         getStackTrace : function() {
-            return this.stacktrace || this.stack;
+            return this.stack;
         },
 
         toString : function() {
