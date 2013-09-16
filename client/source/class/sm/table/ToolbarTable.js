@@ -145,7 +145,7 @@ qx.Class.define("sm.table.ToolbarTable", {
 
         /**
          * Создание экземпляра талицы как widget-та
-         * @param tableModel
+         * @param tableModel {qx.ui.table.ITableModel ? null}
          */
         _createTable : function(tableModel) {
             return new sm.table.Table(tableModel, tableModel.getCustom());

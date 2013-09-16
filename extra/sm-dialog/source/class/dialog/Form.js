@@ -204,9 +204,7 @@ qx.Class.define("dialog.Form",
 
           /**
            * Constructs the form on-the-fly
-           * @param formData
-           * @param old
-           * @return
+           * @param formData {Map}
            */
           _applyFormData : function (formData, old) {
 

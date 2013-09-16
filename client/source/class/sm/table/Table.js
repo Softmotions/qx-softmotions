@@ -37,7 +37,7 @@ qx.Class.define("sm.table.Table", {
 
         /**
          * Associated rowData via JsonTableModel
-         * @param ind
+         * @param ind {Integer}
          */
         getRowData : function(ind) {
             return ind < 0 ? null : this.getTableModel().getRowAssociatedData(ind);

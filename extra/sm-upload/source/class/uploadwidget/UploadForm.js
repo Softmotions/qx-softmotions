@@ -195,7 +195,7 @@ qx.Class.define("uploadwidget.UploadForm",
      * Don't need a src attribute, if it was set to javascript:void we get an insecure
      * objects error in IE.
      *
-     * @type member
+     *
      * @return {void}
      */
     _createIFrameTarget: function()
@@ -234,7 +234,7 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Add parameters as hidden fields to the form.
      *
-     * @type member
+     *
      * @return {object}
      */
     _addFormParameters: function()
@@ -254,7 +254,6 @@ qx.Class.define("uploadwidget.UploadForm",
      * Create an input element of type hidden with the 
      * name ({@link #name}) and value ({@link #value})
      *
-     * @type member
      * @param name {String} name attribute of the created element ({@link #name}).
      * @param value {String} value attribute of the created element ({@link #value}).
      * @return {void}
@@ -276,8 +275,8 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Set a request parameter which is stored as an input type=hidden.
      * 
-     * @param id String identifier of the parameter to add.
-     * @param value String Value of parameter.
+     * @param id {String} identifier of the parameter to add.
+     * @param value {String} Value of parameter.
      * @return {void}
      */
     setParameter: function(id, value)
@@ -294,7 +293,7 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Remove a parameter from the request.
      * 
-     * @param id String identifier of the parameter to remove.
+     * @param id {String} identifier of the parameter to remove.
      * @return {void}
      */
     removeParameter: function(id)
@@ -309,7 +308,7 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get a parameter in the request.
      * 
-     * @param id String identifier of the parameter to get.
+     * @param id {String} identifier of the parameter to get.
      * @return {String}
      */
     getParameter: function(id)
@@ -382,7 +381,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the DOM window object of the target iframe.
      *
-     * @type member
      * @return {DOMWindow} The DOM window object of the iframe.
      */
     getIframeWindow: function()
@@ -393,7 +391,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the DOM document object of the target iframe.
      *
-     * @type member
      * @return {DOMDocument} The DOM document object of the iframe.
      */
     getIframeDocument: function()
@@ -404,7 +401,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the HTML body element of the target iframe.
      *
-     * @type member
      * @return {Element} The DOM node of the <code>body</code> element of the iframe.
      */
     getIframeBody: function()
@@ -415,7 +411,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the target iframe Element.
      *
-     * @type member
      * @return {Element} The DOM element of the iframe.
      */
     getIframeNode: function()
@@ -430,7 +425,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the text content of the target iframe. 
      *
-     * @type member
      * @return {String} The text response of the submit.
      */
     getIframeTextContent: function()
@@ -457,7 +451,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Get the HTML content of the target iframe. 
      *
-     * @type member
      * @return {String} The html response of the submit.
      */
     getIframeHtmlContent: function()
@@ -477,7 +470,6 @@ qx.Class.define("uploadwidget.UploadForm",
      * and &gt; entities are replaces by < and > and
      * the Text is then parsed into a XML-Document instance.
      *
-     * @type member
      * @return {Document} The XML response of the submit.
      */
     getIframeXmlContent: function()
@@ -495,7 +487,7 @@ qx.Class.define("uploadwidget.UploadForm",
       try {
         xmlContent = qx.xml.Document.fromString(newText);
       }
-      catch(ex) {};
+      catch(ex) {}
     
       return xmlContent;
     },
@@ -507,7 +499,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Catch the onreadystatechange event of the target iframe.
      *
-     * @type member
      * @param e {Event}
      * @return {void}
      */
@@ -523,7 +514,6 @@ qx.Class.define("uploadwidget.UploadForm",
     /**
      * Catch the onload event of the target iframe
      *
-     * @type member
      * @param e {Event}
      * @return {void}
      */

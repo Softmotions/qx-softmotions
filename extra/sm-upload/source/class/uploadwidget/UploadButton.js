@@ -21,15 +21,10 @@
 
 ************************************************************************ */
 
-/*
-The 'change' event on the input field requires that this handler be available:
-#use(qx.event.handler.Input)
-*/
-
-
 /**
  * An upload button which allows selection of a file through the browser fileselector.
- *
+ * The 'change' event on the input field requires that this handler be available:
+ * @use(qx.event.handler.Input)
  */
 qx.Class.define("uploadwidget.UploadButton",
 {
@@ -151,7 +146,6 @@ qx.Class.define("uploadwidget.UploadButton",
     /**
      * Modifies the name property of the hidden input type=file element.
      *
-     * @type member
      * @param value {var} Current value
      * @param old {var} Previous value
      */
@@ -169,7 +163,6 @@ qx.Class.define("uploadwidget.UploadButton",
      * As a special case for IE the hidden input element is recreated because
      * setting the value is generally not allowed in IE.
      *
-     * @type member
      * @param value {var} Current value
      * @param old {var} Previous value
      */
@@ -192,7 +185,6 @@ qx.Class.define("uploadwidget.UploadButton",
     /**
      * Apply the enabled property.
      *
-     * @type member
      * @param value {Boolean} Current value
      * @param old {Boolean} Previous value
      */
