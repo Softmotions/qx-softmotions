@@ -3,10 +3,9 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/icons/misc/folder_explore.png)
+/**
+ * @asset(sm/icons/misc/folder_explore.png)
  */
-
 qx.Class.define("sm.cms.editor.ImageEditor", {
     extend : qx.ui.container.Composite,
     implement : [

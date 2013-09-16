@@ -17,15 +17,12 @@
 
  ************************************************************************ */
 
-/* ************************************************************************
- #asset(qx/icon/${qx.icontheme}/22/actions/dialog-cancel.png)
- #asset(qx/icon/${qx.icontheme}/22/actions/dialog-ok.png)
- #asset(qx/icon/${qx.icontheme}/48/status/dialog-information.png)
- ************************************************************************ */
-
-
 /**
- * Base class for dialog widgets
+ * Base class for dialog widgets.
+ *
+ * @asset(qx/icon/${qx.icontheme}/22/actions/dialog-cancel.png)
+ * @asset(qx/icon/${qx.icontheme}/22/actions/dialog-ok.png)
+ * @asset(qx/icon/${qx.icontheme}/48/status/dialog-information.png)
  */
 qx.Class.define("dialog.Dialog",
   {
@@ -42,7 +39,7 @@ qx.Class.define("dialog.Dialog",
           /**
            * Returns a dialog instance by type
            * @param type {String}
-           * @return dialog.Dialog
+           * @return {dialog.Dialog}
            */
           getInstanceByType : function(type) {
               try {
@@ -51,14 +48,6 @@ qx.Class.define("dialog.Dialog",
               catch(e) {
                   this.error(type + " is not a valid dialog type");
               }
-          },
-
-          /**
-           * Initialize the package
-           * @deprecated
-           */
-          init : function() {
-              qx.core.Init.getApplication().warn("Initializing the Dialog package is no longer necessary. Please remove calls to 'dialog.Dialog.init()', which is now deprecated.");
           },
 
           /**
@@ -501,10 +490,17 @@ qx.Class.define("dialog.Dialog",
        DEFERRED ACTION
        *****************************************************************************
        */
+
+      /**
+       * create shortcut methods for backward compatibility
+       * @ignore(dialog.alert)
+       * @ignore(dialog.confirm)
+       * @ignore(dialog.prompt)
+       * @ignore(dialog.select)
+       * @ignore(dialog.form)
+       */
       defer : function() {
-          /*
-           * create shortcut methods for backward compatibility
-           */
+
           dialog.alert = dialog.Dialog.alert;
           dialog.confirm = dialog.Dialog.confirm;
           dialog.prompt = dialog.Dialog.prompt;

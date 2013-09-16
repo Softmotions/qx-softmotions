@@ -8,14 +8,9 @@
 
  ************************************************************************ */
 
-/* ************************************************************************
-
- #asset(collapsablepanel.demo/*)
-
- ************************************************************************ */
-
 /**
  * This is the main application class of your custom application "collapsablepanel"
+ * @asset(collapsablepanel.demo/*)
  */
 qx.Class.define("collapsablepanel.demo.Application",
   {
@@ -172,4 +167,5 @@ qx.Class.define("collapsablepanel.demo.Application",
 
               }
           }
-      });
+      }
+  });

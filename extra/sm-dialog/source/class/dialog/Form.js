@@ -18,14 +18,11 @@
  ************************************************************************ */
 
 
-/* ************************************************************************
- #require(dialog.FormRenderer)
- #require(qx.util.Serializer)
- #require(qx.util.Validate)
- ************************************************************************ */
-
 /**
- * A dialog with a form that is constructed on-the-fly
+ * A dialog with a form that is constructed on-the-fly.
+ * @require(dialog.FormRenderer)
+ * @require(qx.util.Serializer)
+ * @require(qx.util.Validate)
  */
 qx.Class.define("dialog.Form",
   {

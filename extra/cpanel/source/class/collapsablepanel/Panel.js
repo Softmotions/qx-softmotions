@@ -14,10 +14,6 @@
 
  ************************************************************************ */
 
-/* ************************************************************************
- #asset(collapsablepanel/*)
- ************************************************************************ */
-
 /**
  *
  * A collapsable panel with a caption
@@ -52,6 +48,8 @@
  * Documentation of this widget in the qooxdoo wiki.</a>
  *
  * @state opened Whether the panel is currently open
+ *
+ * @asset(collapsablepanel/*)
  */
 qx.Class.define("collapsablepanel.Panel",
   {

@@ -3,8 +3,8 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/wiki/link_add.png)
+/**
+ * @asset(sm/cms/icon/16/wiki/link_add.png)
  */
 qx.Class.define("sm.cms.editor.UniversalEditor", {
     extend : qx.ui.container.Composite,

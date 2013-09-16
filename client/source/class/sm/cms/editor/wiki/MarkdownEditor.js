@@ -3,11 +3,10 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/wiki/*)
- #asset(sm/icons/misc/help16.png)
+/**
+ * @asset(sm/cms/icon/16/wiki/*)
+ * @asset(sm/icons/misc/help16.png)
  */
-
 qx.Class.define("sm.cms.editor.wiki.MarkdownEditor", {
     extend : qx.ui.core.Widget,
     implement : [

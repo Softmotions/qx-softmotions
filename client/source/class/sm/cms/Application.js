@@ -3,9 +3,9 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/icons/misc/help16.png)
- #asset(sm/icons/misc/door_in16.png)
+/**
+ * @asset(sm/icons/misc/help16.png)
+ * @asset(sm/icons/misc/door_in16.png)
  */
 
 qx.Class.define("sm.cms.Application", {

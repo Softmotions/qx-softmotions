@@ -3,14 +3,12 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/actions/newspaper_add.png)
- #asset(sm/cms/icon/16/actions/add.png)
- #asset(sm/cms/icon/16/actions/delete.png)
- */
-
 /**
- * Admin frontend for the news
+ * Admin frontend for the news.
+ *
+ * @asset(sm/cms/icon/16/actions/newspaper_add.png)
+ * @asset(sm/cms/icon/16/actions/add.png)
+ * @asset(sm/cms/icon/16/actions/delete.png)
  */
 qx.Class.define("sm.cms.news.NewsWorkspace", {
     extend  : qx.ui.container.Composite,

@@ -121,7 +121,7 @@ qx.Class.define("sm.ui.split.SplitPane", {
                 return;
             }
             var splitter = this.getChildControl("splitter");
-            var splitterElem = splitter.getContainerElement().getDomElement();
+            var splitterElem = splitter.getContentElement().getDomElement();
             var splitterLoc = qx.bom.element.Location.getPosition(splitterElem);
             var collapsed = false;
             var minForCollapsed = 10;

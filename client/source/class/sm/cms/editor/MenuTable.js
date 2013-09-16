@@ -3,15 +3,12 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(qx/icon/${qx.icontheme}/16/actions/list-add.png)
- #asset(qx/icon/${qx.icontheme}/16/actions/list-remove.png)
- #asset(qx/icon/${qx.icontheme}/16/actions/go-up.png)
- #asset(qx/icon/${qx.icontheme}/16/actions/go-down.png)
- */
-
 /**
- * Menu editor table
+ * Menu editor table.
+ * @asset(qx/icon/${qx.icontheme}/16/actions/list-add.png)
+ * @asset(qx/icon/${qx.icontheme}/16/actions/list-remove.png)
+ * @asset(qx/icon/${qx.icontheme}/16/actions/go-up.png)
+ * @asset(qx/icon/${qx.icontheme}/16/actions/go-down.png)
  */
 qx.Class.define("sm.cms.editor.MenuTable", {
     extend : sm.table.ToolbarLocalTable,

@@ -17,13 +17,12 @@
 
 ************************************************************************ */
 
-/* ************************************************************************
-#asset(qx/icon/${qx.icontheme}/16/actions/document-save.png)
-#asset(qx/icon/${qx.icontheme}/16/actions/dialog-ok.png)
-#asset(qx/icon/${qx.icontheme}/16/actions/document-revert.png)
-************************************************************************ */
 /**
- * uploadWidget Example application
+ * uploadWidget Example application.
+ *
+ * @asset(qx/icon/${qx.icontheme}/16/actions/document-save.png)
+ * @asset(qx/icon/${qx.icontheme}/16/actions/dialog-ok.png)
+ * @asset(qx/icon/${qx.icontheme}/16/actions/document-revert.png)
  */
 qx.Class.define("uploadwidget.demo.Application",
 {

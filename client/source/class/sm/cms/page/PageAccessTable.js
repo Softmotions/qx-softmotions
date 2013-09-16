@@ -3,14 +3,12 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/actions/user.png)
- #asset(sm/cms/icon/16/actions/user_add.png)
- #asset(sm/cms/icon/16/actions/user_delete.png)
- */
-
 /**
- * Page access list
+ * Page access list.
+ *
+ * @asset(sm/cms/icon/16/actions/user.png)
+ * @asset(sm/cms/icon/16/actions/user_add.png)
+ * @asset(sm/cms/icon/16/actions/user_delete.png)
  */
 qx.Class.define("sm.cms.page.PageAccessTable", {
     extend  : sm.table.ToolbarLocalTable,

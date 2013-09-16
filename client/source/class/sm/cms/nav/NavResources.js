@@ -2,8 +2,9 @@
  * Copyright (c) 2011. Softmotions Ltd. (softmotions.com)
  * All Rights Reserved.
  */
-/*
- #asset(sm/cms/icon/16/nav/page-folder.png)
+
+/**
+ * @asset(sm/cms/icon/16/nav/page-folder.png)
  */
 qx.Class.define("sm.cms.nav.NavResources", {
     extend : qx.ui.container.Composite,

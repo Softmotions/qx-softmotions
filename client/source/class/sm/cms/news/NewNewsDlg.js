@@ -3,13 +3,9 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/actions/page_link.png)
-
- */
-
 /**
- * Dialog for creating new news
+ * Dialog for creating new news.
+ * @asset(sm/cms/icon/16/actions/page_link.png)
  */
 qx.Class.define("sm.cms.news.NewNewsDlg", {
     extend  : qx.ui.window.Window,

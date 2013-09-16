@@ -44,7 +44,7 @@ qx.Class.define("sm.ui.split.SplitSliderPane", {
         _onMouseDown : function(e) {
             this._ign_setval = true;
             var eXLocation = e.getDocumentLeft();
-            var el = this.getContainerElement().getDomElement();
+            var el = this.getContentElement().getDomElement();
             var elLocation = qx.bom.element.Location.get(el);
             var len = (elLocation.right - elLocation.left);
             var lenPos = (eXLocation - elLocation.left);

@@ -3,14 +3,12 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/icons/misc/folder_add.png)
- #asset(sm/icons/misc/folder_explore.png)
- #asset(sm/icons/misc/cross16.png)
- */
-
 /**
- * Модифицированная форма uploadwidget.UploadForm
+ * Модифицированная форма uploadwidget.UploadForm.
+ *
+ * @asset(sm/icons/misc/folder_add.png)
+ * @asset(sm/icons/misc/folder_explore.png)
+ * @asset(sm/icons/misc/cross16.png)
  */
 qx.Class.define("sm.ui.form.UploadForm", {
     extend : uploadwidget.UploadForm,

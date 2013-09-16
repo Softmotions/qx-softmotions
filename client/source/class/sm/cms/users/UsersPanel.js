@@ -3,11 +3,10 @@
  * All Rights Reserved.
  */
 
-/*
- #asset(sm/cms/icon/16/actions/user_add.png)
- #asset(sm/cms/icon/16/actions/user_edit.png)
+/**
+ * @asset(sm/cms/icon/16/actions/user_add.png)
+ * @asset(sm/cms/icon/16/actions/user_edit.png)
  */
-
 qx.Class.define("sm.cms.users.UsersPanel", {
     extend : qx.ui.core.Widget,
     include : [ qx.ui.core.MChildrenHandling],
