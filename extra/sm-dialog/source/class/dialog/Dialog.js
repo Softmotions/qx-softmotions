@@ -258,8 +258,8 @@ qx.Class.define("dialog.Dialog",
            * basic settings
            */
           this.set({
-                'visibility' : "hidden",
-                'decorator'  : "shadow-popup"
+                'visibility' : "hidden"
+                /*'decorator'  : "popup"*/
             });
           this.setLayout(new qx.ui.layout.Grow());
 
@@ -443,7 +443,7 @@ qx.Class.define("dialog.Dialog",
           hide : function() {
               this.setVisibility("hidden");
               if (this.isUseBlocker()) {
-                  this.getApplicationRoot().unblockContent();
+                  this.getApplicationRoot().unblock();
               }
               if (this.__previousFocus) {
                   try {
