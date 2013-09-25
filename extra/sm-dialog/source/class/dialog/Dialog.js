@@ -23,6 +23,8 @@
  * @asset(qx/icon/${qx.icontheme}/22/actions/dialog-cancel.png)
  * @asset(qx/icon/${qx.icontheme}/22/actions/dialog-ok.png)
  * @asset(qx/icon/${qx.icontheme}/48/status/dialog-information.png)
+ * @asset(qx/icon/${qx.icontheme}/48/status/dialog-warning.png)
+ * @asset(qx/icon/${qx.icontheme}/48/status/dialog-error.png)
  */
 qx.Class.define("dialog.Dialog", {
     extend : qx.ui.container.Composite,
@@ -61,6 +63,39 @@ qx.Class.define("dialog.Dialog", {
                 "context" : context || null
             })).show();
         },
+
+
+        /**
+         * Shortcut for error dialog
+         * @param message {String} The message to display
+         * @param callback {Function} The callback function
+         * @param context {Object} The context to use with the callback function
+         */
+        error : function(message, callback, context) {
+            (new dialog.Alert({
+                "message" : message,
+                "callback" : callback || null,
+                "context" : context || null,
+                "image" : "icon/48/status/dialog-error.png"
+            })).show();
+        },
+
+
+        /**
+         * Shortcut for warning dialog
+         * @param message {String} The message to display
+         * @param callback {Function} The callback function
+         * @param context {Object} The context to use with the callback function
+         */
+        warning : function(message, callback, context) {
+            (new dialog.Alert({
+                "message" : message,
+                "callback" : callback || null,
+                "context" : context || null,
+                "image" : "icon/48/status/dialog-warning.png"
+            })).show();
+        },
+
 
         /**
          * Shortcut for confirm dialog
@@ -480,6 +515,8 @@ qx.Class.define("dialog.Dialog", {
     /**
      * create shortcut methods for backward compatibility
      * @ignore(dialog.alert)
+     * @ignore(dialog.error)
+     * @ignore(dialog.warning)
      * @ignore(dialog.confirm)
      * @ignore(dialog.prompt)
      * @ignore(dialog.select)
@@ -487,6 +524,8 @@ qx.Class.define("dialog.Dialog", {
      */
     defer : function() {
         dialog.alert = dialog.Dialog.alert;
+        dialog.warning = dialog.Dialog.warning;
+        dialog.error = dialog.Dialog.error;
         dialog.confirm = dialog.Dialog.confirm;
         dialog.prompt = dialog.Dialog.prompt;
         dialog.select = dialog.Dialog.select;
