@@ -43,6 +43,9 @@ qx.Class.define("dialog.Confirm", {
      *****************************************************************************
      */
     properties : {
+        /**
+         * Label used for the "yes button"
+         */
         yesButtonLabel : {
             check : "String",
             nullable : false,
@@ -50,6 +53,9 @@ qx.Class.define("dialog.Confirm", {
             event : "changeYesButtonLabel"
         },
 
+        /**
+         * Icon used for the "yes button"
+         */
         yesButtonIcon : {
             check : "String",
             nullable : true,
@@ -57,6 +63,9 @@ qx.Class.define("dialog.Confirm", {
             event : "changeYesButtonIcon"
         },
 
+        /**
+         * Label used for the "no button"
+         */
         noButtonLabel : {
             check : "String",
             nullable : false,
@@ -64,6 +73,9 @@ qx.Class.define("dialog.Confirm", {
             event : "changeNoButtonLabel"
         },
 
+        /**
+         * Icon used for the "no button"
+         */
         noButtonIcon : {
             check : "String",
             nullable : true,
@@ -71,6 +83,9 @@ qx.Class.define("dialog.Confirm", {
             event : "changeNoButtonIcon"
         },
 
+        /**
+         * This property controls the display of a cancel button
+         */
         allowCancel : {
             refine : true,
             init : false
@@ -132,8 +147,6 @@ qx.Class.define("dialog.Confirm", {
             this._message.setAllowStretchX(true);
             hbox.add(this._message, {flex : 1});
 
-            var _this = this;
-
             /*
              * Yes button
              */
@@ -142,6 +155,7 @@ qx.Class.define("dialog.Confirm", {
             yesButton.addListener("execute", this._handleYes, this);
             this.bind("yesButtonLabel", yesButton, "label");
             this.bind("yesButtonIcon", yesButton, "icon");
+            yesButton.setLabel(this.tr("yes"));
 
             /*
              * No button
@@ -151,6 +165,7 @@ qx.Class.define("dialog.Confirm", {
             noButton.addListener("execute", this._handleNo, this);
             this.bind("noButtonLabel", noButton, "label");
             this.bind("noButtonIcon", noButton, "icon");
+            noButton.setLabel(this.tr("no"));
 
             /*
              * Cancel Button
@@ -169,11 +184,9 @@ qx.Class.define("dialog.Confirm", {
             buttonPane.add(cancelButton);
             groupboxContainer.add(buttonPane);
 
-
             this.addListener("show", function() {
                 yesButton.focus();
             });
-
         },
 
         /*

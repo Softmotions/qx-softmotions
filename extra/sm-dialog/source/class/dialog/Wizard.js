@@ -205,8 +205,7 @@ qx.Class.define("dialog.Wizard", {
         /**
          * Add bindings to the validation manager to control the state of
          * the wizard buttons.
-         * @param form {qx.ui.form.Form}
-         * @return {void}
+         * @param form {qx.ui.form.Form} The form to bind
          */
         _onFormReady : function(form) {
             var _this = this;
@@ -241,8 +240,8 @@ qx.Class.define("dialog.Wizard", {
         /**
          * Apply the page data. This initializes the response
          * data model
-         * @param pageData
-         * @param old
+         * @param pageData {Array} The new page data
+         * @param old {Array} The old page data
          * @return
          */
         _applyPageData : function(pageData, old) {
@@ -276,9 +275,8 @@ qx.Class.define("dialog.Wizard", {
         /**
          * Go to a given wizard page. This recreates the
          * form.
-         * @param page {Integer}
-         * @param old {Integer}
-         * @return
+         * @param page {Integer} The new page
+         * @param old {Integer} The old page
          */
         _applyPage : function(page, old) {
             var pageData = this.getPageData()[ page ];
@@ -351,7 +349,7 @@ qx.Class.define("dialog.Wizard", {
         finish : function() {
             this.hide();
             if (this.getCallback()) {
-                this.getCallback()(qx.util.Serializer.toNativeObject(this.getModel()));
+                this.getCallback().call(this.getContext(), qx.util.Serializer.toNativeObject(this.getModel()));
             }
             this.resetCallback();
         }

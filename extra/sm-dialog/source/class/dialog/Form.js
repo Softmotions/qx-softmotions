@@ -40,37 +40,38 @@ qx.Class.define("dialog.Form", {
          *   ComboBox
          *   SelectBox
          *   RadioGroup
+         *   CheckBox
          *
          * <pre>
          * {
-           *  "username" : {
-           *     'type'  : "TextField",
-           *     'label' : "User Name",
-           *     'value' : ""
-           *   },
-           *   "address" : {
-           *     'type'  : "TextArea",
-           *     'label' : "Address",
-           *     'lines' : 3
-           *   },
-           *   "domain" : {
-           *     'type'  : "SelectBox",
-           *     'label' : "Domain",
-           *     'value' : 1,
-           *     'options' : [
-           *       { 'label' : "Company", 'value' : 0 },
-           *       { 'label' : "Home",    'value' : 1 }
-           *     ]
-           *   },
-           *   "commands" : {
-           *    'type'  : "ComboBox",
-           *     'label' : "Shell command to execute",
-           *     'options' : [
-           *       { 'label' : "ln -s *" },
-           *       { 'label' : "rm -Rf /" }
-           *     ]
-           *   }
-           * }
+         *  "username" : {
+         *     'type'  : "TextField",
+         *     'label' : "User Name",
+         *     'value' : ""
+         *   },
+         *   "address" : {
+         *     'type'  : "TextArea",
+         *     'label' : "Address",
+         *     'lines' : 3
+         *   },
+         *   "domain" : {
+         *     'type'  : "SelectBox",
+         *     'label' : "Domain",
+         *     'value' : 1,
+         *     'options' : [
+         *       { 'label' : "Company", 'value' : 0 },
+         *       { 'label' : "Home",    'value' : 1 }
+         *     ]
+         *   },
+         *   "commands" : {
+         *    'type'  : "ComboBox",
+         *     'label' : "Shell command to execute",
+         *     'options' : [
+         *       { 'label' : "ln -s *" },
+         *       { 'label' : "rm -Rf /" }
+         *     ]
+         *   }
+         * }
          * </pre>
          */
         formData : {
@@ -197,7 +198,10 @@ qx.Class.define("dialog.Form", {
 
         /**
          * Constructs the form on-the-fly
-         * @param formData {Map}
+         * @param formData {Map} The form data map
+         * @param old {Map|null} The old value
+         *
+         * @lint ignoreDeprecated(alert,eval)
          */
         _applyFormData : function(formData, old) {
 
@@ -205,12 +209,20 @@ qx.Class.define("dialog.Form", {
              * remove container content, form, controller
              */
             if (this._formController) {
-                this.getModel().removeAllBindings();
-                this._formController.dispose();
+                // work around a problem with removeAllBindings
+                try {
+                    this.getModel().removeAllBindings();
+                    this._formController.dispose();
+                } catch (e) {
+                }
             }
             if (this._form) {
-                this._form.getValidationManager().removeAllBindings();
-                this._form.dispose();
+                // work around a problem with removeAllBindings
+                try {
+                    this._form.getValidationManager().removeAllBindings();
+                    this._form.dispose();
+                } catch (e) {
+                }
             }
             this._formContainer.removeAll();
 
@@ -275,6 +287,13 @@ qx.Class.define("dialog.Form", {
                         formElement.setLiveUpdate(true);
                         break;
 
+                    case "datefield":
+                        formElement = new qx.ui.form.DateField();
+                        if (fieldData.dateFormat != null) {
+                            formElement.setDateFormat(fieldData.dateFormat);
+                        }
+                        break;
+
                     case "passwordfield":
                         formElement = new qx.ui.form.PasswordField();
                         break;
@@ -299,7 +318,7 @@ qx.Class.define("dialog.Form", {
                         if (fieldData.orientation) {
                             formElement.setUserData("orientation", fieldData.orientation);
                         }
-                        var selected = null;
+                        //var selected = null;
                         fieldData.options.forEach(function(item) {
                             var radioButton = new qx.ui.form.RadioButton(item.label);
                             radioButton.setUserData("value",
@@ -312,6 +331,10 @@ qx.Class.define("dialog.Form", {
                     case "label":
                         formElement = new qx.ui.form.TextField(); // dummy
                         formElement.setUserData("excluded", true);
+                        break;
+
+                    case "checkbox":
+                        formElement = new qx.ui.form.CheckBox(fieldData.label);
                         break;
 
                     default:
@@ -334,6 +357,7 @@ qx.Class.define("dialog.Form", {
                     case "textfield":
                     case "passwordfield":
                     case "combobox":
+                    case "datefield":
                         this._formController.addTarget(
                                 formElement, "value", key, true,
                                 null,
@@ -346,6 +370,14 @@ qx.Class.define("dialog.Form", {
                         );
                         break;
 
+                /**
+                 * checkbox form element
+                 */
+                    case "checkbox":
+                        this._formController.addTarget(
+                                formElement, "value", key, true, null);
+                        break;
+
                     /*
                      * single selection form elements
                      */
@@ -356,7 +388,7 @@ qx.Class.define("dialog.Form", {
                                         var selected = null;
                                         var selectables = this.getSelectables();
                                         selectables.forEach(function(selectable) {
-                                            var key = this.getUserData("key");
+                                            //var key = this.getUserData("key");
                                             //console.warn( key +": '" + value + "' looking at '" + selectable.getLabel() + "' => " +  selectable.getModel().getValue() );
                                             if (selectable.getModel().getValue() === value) {
                                                 //console.warn("Getting value for '" + key +"': " + value + " -> Setting selection to  '" + selectable.getLabel() + "'..");
@@ -373,7 +405,7 @@ qx.Class.define("dialog.Form", {
                                 }, {
                                     "converter" : qx.lang.Function.bind(function(selection) {
                                         var value = selection[0].getModel().getValue();
-                                        var key = this.getUserData("key");
+                                        //var key = this.getUserData("key");
                                         //console.warn("Selection is " + ( selection.length ? selection[0].getLabel() : "none" ) + " -> Setting value for " + key +": " + value );
                                         return value;
                                     }, formElement)
@@ -516,7 +548,7 @@ qx.Class.define("dialog.Form", {
                         try {
                             var func = eval("(" + fieldData.events[type] + ")"); // eval is evil, I know.
                             if (!qx.lang.Type.isFunction(func)) {
-                                throw new Error("");
+                                throw new Error();
                             }
                             formElement.addListener(type, func, formElement);
                         }
@@ -556,11 +588,14 @@ qx.Class.define("dialog.Form", {
          * Default behavior: bind the enabled state of the "OK" button to the
          * validity of the current form.
          *
-         * @param form {qx.ui.form.Form}
-         * @return {void}
+         * @param form {qx.ui.form.Form} The form to bind
          */
         _onFormReady : function(form) {
-            form.getValidationManager().bind("valid", this._okButton, "enabled");
+            form.getValidationManager().bind("valid", this._okButton, "enabled", {
+                converter : function(value) {
+                    return value || false;
+                }
+            });
         },
 
         /*
@@ -576,7 +611,7 @@ qx.Class.define("dialog.Form", {
         _handleOk : function() {
             this.hide();
             if (this.getCallback()) {
-                this.getCallback()(qx.util.Serializer.toNativeObject(this.getModel()));
+                this.getCallback().call(this.getContext(), qx.util.Serializer.toNativeObject(this.getModel()));
             }
             this.resetCallback();
         }

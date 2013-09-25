@@ -18,11 +18,20 @@
  ************************************************************************ */
 
 /**
- * A dialog for authentication and login
+ * A dialog for authentication and login.
+ *
+ * Please note that (since 0.6) the API has changed:
+ *
+ * The "callback" property containing a function is now used no longer  used for
+ * the authentication, but as an (optional) final callback after authentication
+ * has take place. This final callback will be called with an truthy value as
+ * first argument (the error message/object) if authentication has FAILED or with
+ * a falsy value (null/undefined) as first argument, plus with a second optional
+ * argument (that can contain user information) if it was SUCCESSFUL. The
+ * authenticating function must now be stored in the checkCredentials property.
  */
 qx.Class.define("dialog.Login", {
     extend : dialog.Dialog,
-
 
     /*
      *****************************************************************************
@@ -50,8 +59,21 @@ qx.Class.define("dialog.Login", {
             nullable : true,
             init : "bold",
             apply : "_applyTextFont"
-        }
+        },
 
+        /**
+         * An asyncronous function to check the given credentials.
+         * The function signature is (username, password, callback).
+         * In case the login fails, the callback must be called with a string
+         * that can be alerted to the user or the error object if the problem is not
+         * due to authentication itself. If the login succeeds, the argument
+         * must be undefined or null. You can pass a second argument containing
+         * user information.
+         */
+        checkCredentials : {
+            check : "Function",
+            nullable : false
+        }
     },
 
     /*
@@ -63,7 +85,7 @@ qx.Class.define("dialog.Login", {
         /**
          * Event dispatched when login was successful
          */
-        "loginSuccess" : "qx.event.type.Event",
+        "loginSuccess" : "qx.event.type.Data",
 
         /**
          * Data event dispatched when login failed, event data
@@ -93,11 +115,20 @@ qx.Class.define("dialog.Login", {
          ---------------------------------------------------------------------------
          */
 
+        /**
+         * Apply function used by proterty {@link #text}
+         * @param value {String} New value
+         * @param old {String} Old value
+         */
         _applyText : function(value, old) {
             this._text.setValue(value);
             this._text.setVisibility(value ? "visible" : "excluded");
         },
 
+        /**
+         * Apply function used by proterty {@link #textFont}
+         * @param value {String} New value
+         */
         _applyTextFont : function(value) {
             this._text.setFont(value);
         },
@@ -159,7 +190,7 @@ qx.Class.define("dialog.Login", {
             /*
              * Labels
              */
-            var labels = ["Name", "Password"];
+            var labels = [this.tr("Name"), this.tr("Password") ];
             for (var i = 0; i < labels.length; i++) {
                 gridContainer.add(new qx.ui.basic.Label(labels[i]).set({
                     allowShrinkX : false,
@@ -203,7 +234,7 @@ qx.Class.define("dialog.Login", {
              */
             var loginButton = this._loginButton = new qx.ui.form.Button(this.tr("Login"));
             loginButton.setAllowStretchX(false);
-            loginButton.addListener("execute", this._callCallback, this);
+            loginButton.addListener("execute", this._callCheckCredentials, this);
 
             /*
              * Cancel Button
@@ -224,14 +255,16 @@ qx.Class.define("dialog.Login", {
         },
 
         /**
-         * Calls the callback function with the current login data
+         * Calls the checkCredentials callback function with username, password and
+         * the final callback, bound to the context object.
          */
-        _callCallback : function() {
-            this.getCallback()(
+        _callCheckCredentials : function() {
+            this.getCheckCredentials()(
                     this._username.getValue(),
                     this._password.getValue(),
-                    this._handleCheckLogin,
-                    this
+                    typeof Function.prototype.bind === "function" ?
+                    this._handleCheckCredentials.bind(this) :
+                    qx.lang.Function.bind(this._handleCheckCredentials, this)
             );
         },
 
@@ -243,14 +276,17 @@ qx.Class.define("dialog.Login", {
         },
 
         /**
-         * Handler function called with the result of the authentication
-         * process.
-         * @param result {Boolean}
-         * @param message {String|Null} Optional HTML message that might contain
-         * error information, such as "Wrong password".
-         * @return
+         * Handler function called from the function that checks the credentials
+         * with the result of the authentication process.
+         *
+         * @param err {String|Error|null} If null, the authentication was successful
+         * and the "loginSuccess" event is dispatched. If String or Error, the
+         * "loginFailure" event is dispatched with the error message/object. Finally,
+         * the callback function in the callback property is called with null (success)
+         * or the error value.
+         * @param data Optional second argument wich can contain user information
          */
-        _handleCheckLogin : function(result, message) {
+        _handleCheckCredentials : function(err, data) {
             /*
              * clear password field and message label
              */
@@ -260,12 +296,17 @@ qx.Class.define("dialog.Login", {
             /*
              * check result
              */
-            if (result) {
-                this.fireEvent("loginSuccess");
-                this.hide();
+            if (err) {
+                this.fireDataEvent("loginFailure", err);
             }
             else {
-                this.fireDataEvent("loginFailure", message);
+                this.fireDataEvent("loginSuccess", data);
+                this.hide();
+            }
+
+            // Call final callback
+            if (this.getCallback()) {
+                this.getCallback()(err, data);
             }
         },
 

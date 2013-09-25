@@ -95,11 +95,37 @@ qx.Class.define("dialog.Prompt", {
             this._textField.addListener("changeValue", function(e) {
                 this.setValue(e.getData());
             }, this);
-            this.addListener("show", function() {
-                this.setValue("");
+
+            // focus on appear */
+            this._textField.addListener("appear", function(e) {
+                qx.lang.Function.delay(this.focus, 1, this);
+            }, this._textField);
+
+            this._textField.addListener("keyup", function(e) {
+                // Enter key
+                if (e.getKeyCode() == 13) {
+                    return this._handleOk();
+                }
+                // Escape key
+                if (e.getKeyCode() == 27) {
+                    return this._handleCancel();
+                }
             }, this);
+
             groupboxContainer.add(this._textField);
 
+            /*
+             * React on enter
+             */
+            this._textField.addListener("keypress", function(e) {
+                if (e.getKeyIdentifier().toLowerCase() == "enter") {
+                    this.hide();
+                    this.fireEvent("ok");
+                    if (this.getCallback()) {
+                        this.getCallback().call(this.getContext(), this._textField.getValue());
+                    }
+                }
+            }, this);
 
             /*
              * buttons pane

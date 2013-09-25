@@ -32,7 +32,6 @@ qx.Class.define("dialog.Alert", {
      */
     members : {
 
-
         /*
          ---------------------------------------------------------------------------
          WIDGET LAYOUT
@@ -60,7 +59,7 @@ qx.Class.define("dialog.Alert", {
             /*
              * add image
              */
-            this._image = new qx.ui.basic.Image("icon/48/status/dialog-information.png");
+            this._image = new qx.ui.basic.Image(this.getImage() || "icon/48/status/dialog-information.png");
             hbox.add(this._image);
 
             /*
@@ -87,7 +86,10 @@ qx.Class.define("dialog.Alert", {
             buttonPane.add(okButton);
             groupboxContainer.add(buttonPane);
 
-            this.addListener("show", function() {
+            /*
+             * focus OK button on appear
+             */
+            this.addListener("appear", function() {
                 okButton.focus();
             });
         }
