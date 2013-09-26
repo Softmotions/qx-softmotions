@@ -474,7 +474,7 @@ qx.Class.define("dialog.Dialog", {
         ensureOnTop : function(cb, cbSelf) {
             var me = this;
             window.setTimeout(function() {
-                var root = qx.core.Init.getApplication().getRoot();
+                var root = me.getApplicationRoot();
                 var maxWindowZIndex = me.getZIndex();
                 var windows = root.getWindows();
                 for (var i = 0; i < windows.length; i++) {
@@ -483,7 +483,7 @@ qx.Class.define("dialog.Dialog", {
                         maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
                     }
                 }
-                me.setZIndex(maxWindowZIndex + 2);
+                me.setZIndex(maxWindowZIndex + 1);
                 if (me.isUseBlocker()) {
                     root.setBlockerOpacity(me.getBlockerOpacity());
                     root.setBlockerColor(me.getBlockerColor());
@@ -531,13 +531,12 @@ qx.Class.define("dialog.Dialog", {
         hide : function() {
             this.setVisibility("hidden");
             if (this.isUseBlocker()) {
-                this.getApplicationRoot().unblock();
+                this.getApplicationRoot().forceUnblock();
             }
             if (this.__previousFocus) {
                 try {
                     this.__previousFocus.focus();
-                }
-                catch (e) {
+                }catch (e) {
                 }
             }
             this.fireEvent("hide");
