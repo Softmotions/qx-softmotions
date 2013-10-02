@@ -3,8 +3,41 @@
  */
 qx.Class.define("sm.util.Validate", {
 
-    statics :
-    {
+    statics : {
+
+
+
+        compositeValidator : function() {
+            var args = Array.prototype.slice.apply(arguments);
+            return function(value, formItem) {
+                args.forEach(function(v) {
+                    v(value, formItem);
+                })
+            }
+        },
+
+
+        regexpValidator : function(re, errorMessage) {
+            return function(value, formItem) {
+                if (re.test(value == null ? "" : value) === false) {
+                    throw new qx.core.ValidationError("Validation Error", errorMessage);
+                }
+            }
+        },
+
+
+        checkIsAsciiString : function(value, formItem, errorMessage) {
+            if (!sm.lang.String.isAsciiString(value)) {
+                throw new qx.core.ValidationError("Validation Error", errorMessage);
+            }
+        },
+
+
+        asciiAString : function(errorMessage) {
+            return function(value, formItem) {
+                return sm.util.Validate.checkIsAsciiString(value, formItem, errorMessage);
+            }
+        },
 
         /**
          * Checks for IP v4/v6 or for simple hostname
@@ -20,8 +53,8 @@ qx.Class.define("sm.util.Validate", {
         },
 
         IPv4_IPv6_Hostname : function(errorMessage) {
-            return function(value) {
-                return sm.util.Validate.check_IPv4_IPv6_Hostname(value, null, errorMessage);
+            return function(value, formItem) {
+                return sm.util.Validate.check_IPv4_IPv6_Hostname(value, formItem, errorMessage);
             }
         },
 
@@ -40,17 +73,17 @@ qx.Class.define("sm.util.Validate", {
         },
 
         canBeNumber : function(errorMessage) {
-            return function(value) {
-                return sm.util.Validate.checkCanBeNumber(value, null, errorMessage);
+            return function(value, formItem) {
+                return sm.util.Validate.checkCanBeNumber(value, formItem, errorMessage);
             }
         },
 
 
         /**
          * Check if value is not empty
-         * @param value
-         * @param formItem
-         * @param errorMessage
+         * @param value {Object?}
+         * @param formItem {qx.ui.form.IForm?}
+         * @param errorMessage {String?}
          */
         checkNotEmpty : function(value, formItem, errorMessage) {
             errorMessage = errorMessage || qx.locale.Manager.tr("Field cannot be empty.");
@@ -60,18 +93,18 @@ qx.Class.define("sm.util.Validate", {
         },
 
         notEmpty : function(errorMessage) {
-            return function(value) {
-                return sm.util.Validate.checkNotEmpty(value, null, errorMessage);
+            return function(value, formItem) {
+                return sm.util.Validate.checkNotEmpty(value, formItem, errorMessage);
             }
         },
 
 
         /**
          * Invalidate item
-         * @param errorMessage
+         * @param errorMessage {String?}
          */
         setInvalid : function(errorMessage) {
-            return function(value) {
+            return function(value, formItem) {
                 throw new qx.core.ValidationError("Validation Error", errorMessage || this.tr("Invalid"));
             }
         }

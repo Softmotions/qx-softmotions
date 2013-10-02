@@ -17,10 +17,19 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         this._setLayout(new qx.ui.layout.Grow());
         this.__slots = {};
         this.__slotids = [];
+        this.addListener("appear", function() {
+            if (!this.__active && this.__slotids.length > 0) {
+                this.showWidget(this.__slotids[0]);
+            }
+        }, this);
     },
 
-    members :
-    {
+    events : {
+        //Fired if stack switched to a new widget
+        widgetChanged : "qx.event.type.Data"
+    },
+
+    members : {
         /**
          * Widget slots
          */
@@ -55,9 +64,6 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 cached : null
             };
             this.__slotids.push(id);
-            if (!this.__active) {
-                this.showWidget(id);
-            }
         },
 
         /**
@@ -89,6 +95,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             this.getWidget(id, true);
             this.__active = slot;
             slot.cached.show();
+            this.fireDataEvent("widgetChanged", id);
             return slot.cached;
         },
 

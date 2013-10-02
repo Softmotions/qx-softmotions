@@ -8,8 +8,7 @@
  */
 qx.Class.define("sm.lang.String", {
 
-    statics :
-    {
+    statics : {
         ARRAY_EN : [
             "sh", "sch", "y", "ya", "zh", "ch", "yu", "yo",
             "i", "u", "k", "e", "n", "g", "z", "h", "", "f",
@@ -55,12 +54,17 @@ qx.Class.define("sm.lang.String", {
         },
 
 
+        isAsciiString : function(str) {
+            return /^[\x00-\x7F]*$/.test(str);
+        },
+
+
         XML_ENTRY_MAP : {
-            34: "quot", // " - double-quote
-            38: "amp",  // &
-            60: "lt",   // <
-            62: "gt",   // >
-            39: "apos"  // XML apostrophe
+            34 : "quot", // " - double-quote
+            38 : "amp",  // &
+            60 : "lt",   // <
+            62 : "gt",   // >
+            39 : "apos"  // XML apostrophe
         },
 
         /**
