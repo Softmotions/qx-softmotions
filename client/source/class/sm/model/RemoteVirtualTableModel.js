@@ -7,8 +7,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
     extend : qx.ui.table.model.Remote,
 
 
-    properties :
-    {
+    properties : {
         /**
          * Row count request url name
          */
@@ -53,7 +52,6 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
     },
 
 
-
     construct : function(colsMeta, useCols) {
         this.base(arguments);
 
@@ -72,8 +70,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         }, this);
     },
 
-    members :
-    {
+    members : {
         /**
          * Current view spec
          */
@@ -138,7 +135,9 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 if (k === "sortInd" || k === "isAsc") {
                     continue;
                 }
-                req.setParameter(k, this.__vspec[k], false);
+                if (this.__vspec[k] != null) {
+                    req.setParameter(k, this.__vspec[k], false);
+                }
             }
             var sind = this.__vspec["sortInd"];
             if (sind != -1) {
