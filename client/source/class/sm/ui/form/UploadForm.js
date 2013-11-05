@@ -96,6 +96,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
 
         __uploadRows: null,
 
+        __singleUploadField : null,
+
         _addFileItem: function() {
             var formRow = new qx.ui.container.Composite(new qx.ui.layout.HBox());
 
@@ -110,6 +112,8 @@ qx.Class.define("sm.ui.form.UploadForm", {
                     this._removeFileItem(formRow);
                 }, this);
                 formRow.add(delFileItem);
+            } else {
+                this.__singleUploadField = fileField;
             }
 
             this.addBefore(formRow, this.__controlCont);
@@ -148,6 +152,10 @@ qx.Class.define("sm.ui.form.UploadForm", {
                 this.__addButton.setEnabled(true);
             }
             this.fireDataEvent("changeValue", this.__uploadRows.length);
+        },
+
+        getSingleUploadField : function() {
+            return this.__singleUploadField;
         },
 
         /*
