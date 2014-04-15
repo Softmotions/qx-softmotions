@@ -9,10 +9,9 @@
  */
 
 qx.Class.define("sm.conn.Actions", {
-    extend  : qx.core.Object,
+    extend : qx.core.Object,
 
-    members :
-    {
+    members : {
         __actions : null,
 
         _addAction : function(name, url) {
@@ -21,18 +20,43 @@ qx.Class.define("sm.conn.Actions", {
             };
         },
 
+        getRestUrl : function(name, varagrs) {
+            var act = this.__actions[name];
+            if (!act) {
+                throw new Error("Action group: '" + name + "' not found");
+            }
+            var url = act.url;
+            if (varagrs == null) {
+                return url;
+            }
+            var segments = varagrs;
+            if (!Object.isArray(segments)) {
+                segments = arguments;
+            }
+            for (var i = 1; i < segments.length; ++i) {
+                if (url.charAt(url.length - 1) != '/') {
+                    url += '/';
+                }
+                if (segments[i] != null) {
+                    url += encodeURIComponent(segments[i]);
+                }
+            }
+            return url;
+        },
+
         getUrl : function(name, varagrs) {
             var act = this.__actions[name];
             if (!act) {
                 throw new Error("Action group: '" + name + "' not found");
             }
+            var url = act.url;
             if (varagrs) {
                 if (arguments.length === 3) {
-                    return act.url + "?" +
+                    return url + "?" +
                             encodeURIComponent(arguments[1]) + "=" + encodeURIComponent(arguments[2]);
                 } else {
                     var sb = new qx.util.StringBuilder();
-                    sb.add(act.url);
+                    sb.add(url);
                     for (var i = 1; i < arguments.length; i += 2) {
                         sb.add(i > 1 ? "&" : "?");
                         sb.add(encodeURIComponent(arguments[i]));
@@ -41,9 +65,8 @@ qx.Class.define("sm.conn.Actions", {
                     }
                     return sb.join("");
                 }
-            } else {
-                return act.url;
             }
+            return url;
         },
 
         prepareRequest : function(name, params, handler, method, resptype) {
