@@ -30,7 +30,7 @@ qx.Class.define("sm.conn.Actions", {
                 return url;
             }
             var segments = varagrs;
-            if (!Object.isArray(segments)) {
+            if (!Array.isArray(segments)) {
                 segments = arguments;
             }
             for (var i = 1; i < segments.length; ++i) {
