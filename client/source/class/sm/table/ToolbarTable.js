@@ -7,11 +7,10 @@
  * Таблица + тулбар
  */
 qx.Class.define("sm.table.ToolbarTable", {
-    extend  : qx.ui.container.Composite,
+    extend : qx.ui.container.Composite,
     type : "abstract",
 
-    events :
-    {
+    events : {
 
         /**
          * Fired when inner table instance initialized
@@ -19,13 +18,11 @@ qx.Class.define("sm.table.ToolbarTable", {
         "tableInitialized" : "qx.event.type.Event"
     },
 
-    properties :
-    {
+    properties : {
 
-        appearance :
-        {
+        appearance : {
             refine : true,
-            init   : "toolbar-table"
+            init : "toolbar-table"
         }
     },
 
@@ -37,9 +34,8 @@ qx.Class.define("sm.table.ToolbarTable", {
         this.getChildControl("toolbar");
     },
 
-    members :
-    {
-        _table  : null,
+    members : {
+        _table : null,
 
         getTable : function() {
             return this._table;
@@ -58,18 +54,21 @@ qx.Class.define("sm.table.ToolbarTable", {
          * таблицы
          */
         getSelectedRowData : function() {
-            return this.getRowData(this.getTable().getSelectionModel().getAnchorSelectionIndex());
+            var t = this.getTable();
+            return t != null ? this.getRowData(this.getTable().getSelectionModel().getAnchorSelectionIndex()) : null;
         },
 
         getSelectedRowIndex : function() {
-            return this.getTable().getSelectionModel().getAnchorSelectionIndex();
+            var t = this.getTable();
+            return t != null ? t.getSelectionModel().getAnchorSelectionIndex() : -1;
         },
 
         /**
          * Возвращает значение ячейки по номеру столбца в выбранной строке
          */
         getSelectedRowCellValue : function(colInd) {
-            return this.getRowCellValue(colInd, this.getTable().getSelectionModel().getAnchorSelectionIndex());
+            var t = this.getTable();
+            return t != null ? this.getRowCellValue(colInd, this.getTable().getSelectionModel().getAnchorSelectionIndex()) : null;
         },
 
         /**
@@ -79,7 +78,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          * @param ind {int}
          */
         getRowData : function(ind) {
-            if (ind < 0) {
+            if (ind < 0 || this.getTable() == null) {
                 return null;
             }
             return this.getTable().getTableModel().getRowAssociatedData(ind);
@@ -89,7 +88,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Возвращает значение ячейки по номеру столбца и строки
          */
         getRowCellValue : function(colInd, rowInd) {
-            if (colInd < 0 || rowInd < 0) {
+            if (colInd < 0 || rowInd < 0 || this.getTable() == null) {
                 return null;
             }
             return this.getTable().getTableModel().getValue(colInd, rowInd);
@@ -99,7 +98,8 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Get selection ranges
          */
         getSelectionRanges : function() {
-            return this.getTable().getSelectionRanges();
+            var t = this.getTable();
+            return t != null ? t.getSelectionRanges() : [];
         },
 
         /**
