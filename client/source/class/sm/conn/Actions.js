@@ -29,16 +29,25 @@ qx.Class.define("sm.conn.Actions", {
             if (varagrs == null) {
                 return url;
             }
-            var segments = varagrs;
-            if (!Array.isArray(segments)) {
-                segments = arguments;
-            }
-            for (var i = 1; i < segments.length; ++i) {
-                if (url.charAt(url.length - 1) != '/') {
-                    url += '/';
+            if (varagrs instanceof Object && arguments.length == 2) {
+                Object.getOwnPropertyNames(varagrs).forEach(function(k) {
+                    if (varagrs[k] != null) {
+                        var sk = "{" + k + "}";
+                        url = url.replace(sk, varagrs[k]);
+                    }
+                });
+            } else {
+                var segments = varagrs;
+                if (!Array.isArray(segments)) {
+                    segments = arguments;
                 }
-                if (segments[i] != null) {
-                    url += encodeURIComponent(segments[i]);
+                for (var i = 1; i < segments.length; ++i) {
+                    if (url.charAt(url.length - 1) != '/') {
+                        url += '/';
+                    }
+                    if (segments[i] != null) {
+                        url += encodeURIComponent(segments[i]);
+                    }
                 }
             }
             return url;
