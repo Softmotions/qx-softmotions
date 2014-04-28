@@ -8,7 +8,7 @@
  */
 
 qx.Class.define("sm.table.Table", {
-    extend  : qx.ui.table.Table,
+    extend : qx.ui.table.Table,
 
     construct : function(tableModel, custom, useContentMenu) {
         if (useContentMenu) {
@@ -69,6 +69,12 @@ qx.Class.define("sm.table.Table", {
             }
         },
 
+        selectSingleRow : function(ind) {
+            var rc = this.getTableModel().getRowCount();
+            if (ind >= 0 && ind < rc) {
+                this.getSelectionModel().setSelectionInterval(ind, ind);
+            }
+        },
 
         /**
          * Get selection ranges
