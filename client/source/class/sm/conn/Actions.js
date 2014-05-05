@@ -29,7 +29,7 @@ qx.Class.define("sm.conn.Actions", {
             if (varagrs == null) {
                 return url;
             }
-            if (varagrs instanceof Object && arguments.length == 2) {
+            if (arguments.length === 2 && !Array.isArray(varagrs) && (varagrs instanceof Object)) {
                 Object.getOwnPropertyNames(varagrs).forEach(function(k) {
                     if (varagrs[k] != null) {
                         var sk = "{" + k + "}";
@@ -37,11 +37,13 @@ qx.Class.define("sm.conn.Actions", {
                     }
                 });
             } else {
+                var i = 0;
                 var segments = varagrs;
                 if (!Array.isArray(segments)) {
+                    i = 1;
                     segments = arguments;
                 }
-                for (var i = 1; i < segments.length; ++i) {
+                for (; i < segments.length; ++i) {
                     if (url.charAt(url.length - 1) != '/') {
                         url += '/';
                     }
