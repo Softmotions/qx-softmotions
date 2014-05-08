@@ -10,6 +10,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
     },
 
     events : {
+        "completed" : "qx.event.type.Event"
     },
 
     properties : {
@@ -19,10 +20,10 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
      * Files (FileAPI)
      * to be sent via HTTP request.
      *
-     * @param url {String}
+     * @param urlFactory {Function} Url factory accepts file as agrument return request url string.
      * @param files {File}
      */
-    construct : function(url, files) {
+    construct : function(urlFactory, files) {
         this.base(arguments);
         this.setLayout(new qx.ui.layout.HBox(5));
         this.set({
@@ -33,6 +34,8 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
             showClose : false
 
         });
+        this.__urlFactory = urlFactory;
+        this.__files = files;
         this.__progress = new qx.ui.indicator.ProgressBar();
         this.add(this.__progress, {flex : 1});
 
@@ -45,21 +48,58 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
 
     members : {
 
-        __xhr : null,
+        __urlFactory : null,
 
         __progress : null,
 
-        __transfer : function() {
+        __files : null,
 
+        __transfer : function() {
+            var me = this;
+            var tasks = this.__files.length;
+            for (var i = 0; i < this.__files.length; ++i) {
+                var xhr = new XMLHttpRequest();
+                var f = this.__files[i];
+                var url = this.__urlFactory(f);
+                xhr.open("PUT", url, true);
+                if (f.type == null || f.type.length == 0 || f.type == "") {
+                    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+                }
+                xhr.onreadystatechange = function() {
+                    if (this.readyState == this.DONE) {
+                        --tasks;
+                        if (tasks == 0) {
+                            me.__done();
+                        }
+                    }
+                };
+                xhr.send(f);
+            }
+        },
+
+        __done : function() {
+            this.fireEvent("completed");
+        },
+
+        close : function() {
+            this.base(arguments);
+            this.__destroy();
         },
 
         __cancel : function(ev) {
             ev.getTarget().setEnabled(false);
             this.close();
+        },
+
+        __destroy : function() {
+            this.__files = null;
+            this.__progress = null;
+            this.__urlFactory = null;
         }
+
     },
 
     destruct : function() {
-        //this._disposeObjects("__field_name");                                
+        this.__destroy();
     }
 });
