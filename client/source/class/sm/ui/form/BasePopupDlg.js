@@ -1,14 +1,12 @@
 qx.Class.define("sm.ui.form.BasePopupDlg", {
     extend : qx.ui.popup.Popup,
 
-    events :
-    {
+    events : {
         //JSon nav item
         "completed" : "qx.event.type.Data"
     },
 
-    properties :
-    {
+    properties : {
         /**
          * Is this popup is modal
          */
@@ -31,7 +29,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
                 }
             } else {
                 if (this.getModal() == true) {
-                    root.unblockContent();
+                    root.unblock();
                 }
                 //Restore previous focus
                 if (this.__previousFocus) {
@@ -43,7 +41,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
                         if (w != null) {
                             w.focus();
                         }
-                    } catch(e) {
+                    } catch (e) {
                         qx.log.Logger.error(e);
                     }
                     this.__previousFocus = null;
@@ -55,24 +53,24 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
 
         this._setLayout(new qx.ui.layout.VBox());
         this.set({
-            width: 250,
-            padding: [10, 4]
+            width : 250,
+            padding : [10, 4]
         });
 
         this._form = new qx.ui.form.Form();
 
         this._configureForm(this._form);
         this._configureFormButtons(this._form);
-
         var fh = this._createFormRenderer(this._form);
-        this.add(fh);
+        if (fh != null) {
+            this.add(fh);
+        }
 
         this.__closeCmd = new qx.ui.core.Command("Esc");
         this.__closeCmd.addListener("execute", this.hide, this);
     },
 
-    members :
-    {
+    members : {
         __previousFocus : null,
 
         __closeCmd : null,
@@ -101,8 +99,8 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
             }, 0);
         },
 
-        __applyModal : function(val) {
-            if (val == true && this.isVisible()) {
+        __applyModal : function(val, old) {
+            if (val == true && val != old && this.isVisible()) {
                 var root = qx.core.Init.getApplication().getRoot();
                 root.blockContent(this.getZIndex() - 1);
             }
