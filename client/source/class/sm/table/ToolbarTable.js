@@ -153,7 +153,7 @@ qx.Class.define("sm.table.ToolbarTable", {
 
         /**
          * Создание кнопки на тулбаре
-         * @param mainPart {qx.ui.toolbar.ToolBar}
+         * @param toolbar {qx.ui.toolbar.ToolBar}
          */
         _createToolbarItems : function(toolbar) {
             return toolbar;
