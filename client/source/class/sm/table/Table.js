@@ -10,8 +10,13 @@
 qx.Class.define("sm.table.Table", {
     extend : qx.ui.table.Table,
 
+    /**
+     * @param useContentMenu {Boolean}  deprecated!
+     */
     construct : function(tableModel, custom, useContentMenu) {
-        if (useContentMenu) {
+        if (useContentMenu) {  //deprecated
+            qx.log.Logger.error("Using of 'useContentMenu' argument in 'sm.table.Table' is deprecated! Stack: " +
+                    qx.dev.StackTrace.getStackTrace().join("\n"));
             qx.Class.include(qx.ui.table.Table, qx.ui.table.MTableContextMenu);
         }
         this.base(arguments, tableModel, custom);
