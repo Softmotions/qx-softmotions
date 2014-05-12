@@ -7,6 +7,13 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
     extend : qx.ui.table.model.Remote,
 
 
+    events : {
+        /**
+         *  Fired if current viewSpec changed
+         */
+        viewSpecChanged : "qx.event.type.Data"
+    },
+
     properties : {
         /**
          * Row count request url name
@@ -38,16 +45,6 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         useColumns : {
             nullable : false,
             apply : "_applyUseColumns"
-        },
-
-        /**
-         * View specification
-         */
-        viewSpec : {
-            check : "Object",
-            nullable : true,
-            init : null,
-            apply : "_applyViewSpec"
         }
     },
 
@@ -66,6 +63,9 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             if (this.__vspec) {
                 this.__vspec.sortInd = this.getSortColumnIndex();
                 this.__vspec.isAsc = this.isSortAscending();
+                if (this.hasListener("viewSpecChanged")) {
+                    this.fireDataEvent("viewSpecChanged", this.__vspec);
+                }
             }
         }, this);
     },
@@ -75,6 +75,8 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
          * Current view spec
          */
         __vspec : null,
+
+        __constVspec : null,
 
         __cleanup : false,
 
@@ -103,27 +105,53 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             this.setColumns(labels, ids);
         },
 
-        _applyViewSpec : function(spec) {
-            if (spec == null) {
-                this.__vspec = null;
-                return;
+
+        getConstViewSpec : function() {
+            return this.__constVspec;
+        },
+
+        setConstViewSpec : function(cvs) {
+            this.__constVspec = cvs;
+            this.updateViewSpec(cvs || {});
+        },
+
+        getViewSpec : function() {
+            return this.__vspec;
+        },
+
+        setViewSpec : function(spec) {
+            var nspec = {};
+            if (this.__constVspec != null) {
+                qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
             }
-            this.__vspec = spec;
+            if (spec != null) {
+                qx.Bootstrap.objectMergeWith(nspec, spec, false);
+            }
+            this.__vspec = nspec;
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.isAsc = this.isSortAscending();
             this.reloadData();
+            if (this.hasListener("viewSpecChanged")) {
+                this.fireDataEvent("viewSpecChanged", this.__vspec);
+            }
         },
 
         updateViewSpec : function(spec) {
             qx.core.Assert.assertMap(spec);
-            if (this.__vspec) {
-                qx.lang.Object.mergeWith(this.__vspec, spec, true);
-            } else {
-                this.__vspec = spec;
+            var nspec = {};
+            if (this.__constVspec != null) {
+                qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
             }
+            this.__vspec = this.__vspec || {};
+            qx.lang.Object.mergeWith(this.__vspec, spec, true);
+            qx.lang.Object.mergeWith(nspec, this.__vspec, false);
+            this.__vspec = nspec;
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.isAsc = this.isSortAscending();
             this.reloadData();
+            if (this.hasListener("viewSpecChanged")) {
+                this.fireDataEvent("viewSpecChanged", this.__vspec);
+            }
         },
 
         __buildViewSpecRequest : function(url) {
