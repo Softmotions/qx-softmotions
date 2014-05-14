@@ -8,11 +8,10 @@
  */
 
 qx.Class.define("sm.io.Request", {
-    extend  : qx.io.remote.Request,
+    extend : qx.io.remote.Request,
     include : [qx.locale.MTranslation],
 
-    statics :
-    {
+    statics : {
         __ALERT_WND : null,
 
         LOGIN_ACTION : function() {
@@ -21,8 +20,7 @@ qx.Class.define("sm.io.Request", {
         }
     },
 
-    events :
-    {
+    events : {
         /**
          * Fired if request has finished
          * regardless its state
@@ -32,8 +30,7 @@ qx.Class.define("sm.io.Request", {
         "finished" : "qx.event.type.Data"
     },
 
-    properties :
-    {
+    properties : {
 
         /**
          * Если true то Request показывает
@@ -63,8 +60,7 @@ qx.Class.define("sm.io.Request", {
         this.setTimeout(20000);
     },
 
-    members :
-    {
+    members : {
 
         __onsuccess : null,
         __self : null,
@@ -83,7 +79,7 @@ qx.Class.define("sm.io.Request", {
         _onfailed : function(e) {
             this.fireDataEvent("finished", e);
             var got = this.__checkMessages(e);
-            if (this.isShowMessages() == true) {
+            if (this.getShowMessages() == true) {
                 if (!got) {
                     var cerr = this.tr("Connection error with address");
                     this.__addMessages(this.tr("Connection error"),
@@ -119,7 +115,7 @@ qx.Class.define("sm.io.Request", {
                 sm.io.Request.LOGIN_ACTION();
                 return false;
             }
-            if (this.isShowMessages() == false) {
+            if (this.getShowMessages() == false) {
                 return false;
             }
             var errors = [];

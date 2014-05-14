@@ -9,21 +9,19 @@
 qx.Class.define("sm.alert.AlertMessages", {
     extend : qx.ui.window.Window,
 
-    events :
-    {
+    events : {
     },
 
-    properties :
-    {
+    properties : {
     },
 
     construct : function(caption) {
         this.base(arguments, caption);
         this.setLayout(new qx.ui.layout.VBox(10));
         this.set({
-            modal         : true,
-            showMinimize  : false,
-            showMaximize  : false,
+            modal : true,
+            showMinimize : false,
+            showMaximize : false,
             allowMaximize : false,
             width : 390
         });
@@ -40,10 +38,14 @@ qx.Class.define("sm.alert.AlertMessages", {
             this.center();
             cancel.focus();
         }, this);
+
+        this.__closeCmd = new qx.ui.core.Command("Esc");
+        this.__closeCmd.addListener("execute", this.close, this);
     },
 
-    members :
-    {
+    members : {
+
+        __closeCmd : null,
 
         __cancel : null,
 
@@ -63,7 +65,7 @@ qx.Class.define("sm.alert.AlertMessages", {
                         maxWindowZIndex = Math.max(maxWindowZIndex, zIndex);
                     }
                 }
-                me.setZIndex(maxWindowZIndex + 1);
+                me.setZIndex(maxWindowZIndex + 1e8); //including popups
                 me.setActive(true);
                 me.focus();
                 me.__cancel.focus();
@@ -78,9 +80,8 @@ qx.Class.define("sm.alert.AlertMessages", {
 
         close : function() {
             this.base(arguments);
-            this.resetMessages();
+            this.__dispose();
         },
-
 
 
         addMessages : function(caption, messages) {
@@ -98,7 +99,7 @@ qx.Class.define("sm.alert.AlertMessages", {
                 messages = [messages.toString()];
             }
             for (var i = 0; i < messages.length; ++i) {
-                var blb = new qx.ui.basic.Label(messages[i]).set({rich:true});
+                var blb = new qx.ui.basic.Label(messages[i]).set({rich : true});
                 msgs.add(blb);
             }
         },
@@ -107,10 +108,18 @@ qx.Class.define("sm.alert.AlertMessages", {
             this.__container.removeAll();
             this._disposeMap("__messages");
             this.__messages = {};
+        },
+
+        __dispose : function() {
+            if (this.__closeCmd) {
+                this.__closeCmd.setEnabled(false);
+            }
+            this._disposeObjects("__closeCmd");
+            this.resetMessages();
         }
     },
 
     destruct : function() {
-        this.resetMessages();
+        this.__dispose();
     }
 });

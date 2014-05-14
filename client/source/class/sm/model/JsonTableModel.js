@@ -15,7 +15,7 @@
  {"title" : "ФИО", "id" : "fio", "width" : "4*"},
  {"title" : "Email", "id" : "email",  "width" : "3*"},
  {"title" : "Телефон", "id" : "phone", "width" : "1*"},
- {"title" : "Примечание", "id" : "note", "width" : "2*"}],
+ {"title" : "Примечание", "id" : "note", "width" : "2*", "visible" : false}],
  "items" : [
  [[1, "Адаманский Антон Валентинович",  "adamansky@gmail.com", "336-44-01", ""], <ассоциированные со строкой данные>],
  [[2, "Акулова Наталья Владимировна",  "", "", ""],  <ассоциированные со строкой данные>],
@@ -23,7 +23,7 @@
  */
 
 qx.Class.define("sm.model.JsonTableModel", {
-    extend  : qx.ui.table.model.Simple,
+    extend : qx.ui.table.model.Simple,
 
     construct : function() {
         this.base(arguments);
@@ -31,21 +31,18 @@ qx.Class.define("sm.model.JsonTableModel", {
     },
 
 
-    properties :
-    {
+    properties : {
         /**
          * Whether to clear sorting on reload
          */
-        clearSortingOnReload :
-        {
+        clearSortingOnReload : {
             check : "Boolean",
             init : true
         }
     },
 
 
-    members :
-    {
+    members : {
         _columnsInitiated : false,
 
         __custom : null,
@@ -63,7 +60,7 @@ qx.Class.define("sm.model.JsonTableModel", {
             var colsSpec = null;
             if (this._columnsInitiated == false) {
                 colsSpec = data["columns"];
-                if (!colsSpec || !(colsSpec instanceof Array)) {
+                if (!colsSpec || !Array.isArray(colsSpec)) {
                     qx.log.Logger.warn(this, "No columns found or invalid columns type in json data");
                     return;
                 }
@@ -86,7 +83,7 @@ qx.Class.define("sm.model.JsonTableModel", {
             }
 
             var items = data["items"];
-            if (!items || !(items instanceof Array)) {
+            if (!items || !Array.isArray(items)) {
                 qx.log.Logger.warn(this, "No data found or invalid columns type in json data");
                 return;
             }

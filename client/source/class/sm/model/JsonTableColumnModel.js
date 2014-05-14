@@ -4,7 +4,7 @@
  */
 
 qx.Class.define("sm.model.JsonTableColumnModel", {
-    extend  : qx.ui.table.columnmodel.Resize,
+    extend : qx.ui.table.columnmodel.Resize,
 
     construct : function(colsSpec) {
         this.base(arguments, colsSpec);
@@ -85,6 +85,9 @@ qx.Class.define("sm.model.JsonTableColumnModel", {
                     this.setHeaderCellRenderer(i, new qx.ui.table.headerrenderer.Icon("", cs["tooltip"]));
                 }
 
+                if (cs["visible"] == false) {
+                    this.setColumnVisible(i, !!cs["visible"]);
+                }
             }
         }
     },
