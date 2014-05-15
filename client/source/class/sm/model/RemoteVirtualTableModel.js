@@ -80,32 +80,6 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
         __cleanup : false,
 
-        _checkIncludedColumns : function(val) {
-            if (!qx.lang.Type.isArray(val)) {
-                return false;
-            }
-            var cmeta = this.getColumnsMeta();
-            for (var i = 0; i < val.length; ++i) {
-                if (cmeta[val[i]] === undefined) {
-                    return false;
-                }
-            }
-            return true;
-        },
-
-        _applyUseColumns : function(cols) {
-            qx.core.Assert.assertTrue(this._checkIncludedColumns(cols), "Invalid 'useColumns' property value");
-            var cmeta = this.getColumnsMeta();
-            var labels = [];
-            var ids = [];
-            for (var i = 0; i < cols.length; ++i) {
-                ids.push(cols[i]);
-                labels.push(cmeta[cols[i]]);
-            }
-            this.setColumns(labels, ids);
-        },
-
-
         getConstViewSpec : function() {
             return this.__constVspec;
         },
@@ -154,6 +128,68 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
         },
 
+        /**
+         * Update a cached table rows with data produced
+         * by `filterFun` function.
+         * This function accepts (ind, rowdata)  arguments.
+         * If `filterFun` returns not nullable value it will be used to override
+         * the corresponding data model attached to the row and table column values
+         * will be updated accourdingly.
+         *
+         * @param filterFun {Function} Filter function, signature: (ind, rowdata)
+         * @param self {Object?null} This object for the filter function/
+         */
+        updateCachedRows : function(filterFun, self) {
+            this.iterateCachedRows(function(ind, rowdata) {
+                var res = filterFun.call(self, ind, rowdata);
+                if (res != null) {
+                    qx.Bootstrap.objectMergeWith(rowdata, res, true);
+                    Object.keys(res).forEach(function(k) {
+                        var cind = this.getColumnIndexById(k);
+                        if (cind != null) {
+                            this.setValue(cind, ind, res[k]);
+                        }
+                    }, this);
+                    return rowdata;
+                }
+            }, this);
+        },
+
+        cleanup : function() {
+            this.__cleanup = true;
+            try {
+                this.reloadData();
+            } finally {
+                this.__cleanup = false;
+            }
+        },
+
+        _checkIncludedColumns : function(val) {
+            if (!qx.lang.Type.isArray(val)) {
+                return false;
+            }
+            var cmeta = this.getColumnsMeta();
+            for (var i = 0; i < val.length; ++i) {
+                if (cmeta[val[i]] === undefined) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
+        _applyUseColumns : function(cols) {
+            qx.core.Assert.assertTrue(this._checkIncludedColumns(cols), "Invalid 'useColumns' property value");
+            var cmeta = this.getColumnsMeta();
+            var labels = [];
+            var ids = [];
+            for (var i = 0; i < cols.length; ++i) {
+                ids.push(cols[i]);
+                labels.push(cmeta[cols[i]]);
+            }
+            this.setColumns(labels, ids);
+        },
+
+
         __buildViewSpecRequest : function(url) {
             if (url == null || !qx.lang.Type.isObject(this.__vspec)) {
                 return null;
@@ -177,15 +213,6 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 }
             }
             return req;
-        },
-
-        cleanup : function() {
-            this.__cleanup = true;
-            try {
-                this.reloadData();
-            } finally {
-                this.__cleanup = false;
-            }
         },
 
         // overriden - called whenever the table requests the row count
