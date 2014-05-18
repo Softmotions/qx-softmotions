@@ -66,6 +66,29 @@ qx.Class.define("sm.io.Request", {
         __self : null,
 
 
+        /**
+         * Send request
+         *
+         * @param onsuccess {Function} oncomplete callback function
+         * @param self {Object ? null} reference to the 'this' variable inside the callback
+         */
+        send : function(onsuccess, self) {
+            if (onsuccess) {
+                this.__onsuccess = onsuccess;
+                this.__self = (self) ? self : onsuccess;
+            }
+            this.base(arguments);
+        },
+
+        setRequestContentType : function(ctype) {
+            if (ctype != null) {
+                this.setRequestHeader("Content-Type", ctype);
+            } else {
+                this.removeRequestHeader("Content-Type");
+            }
+        },
+
+
         _onaborted : function(e) {
             this.fireDataEvent("finished", e);
             this.base(arguments, e);
@@ -111,7 +134,7 @@ qx.Class.define("sm.io.Request", {
             if (headers == null) {
                 return false;
             }
-            if (headers["Softmotions-Login"] && sm.io.Request.LOGIN_ACTION) {
+            if (headers["X-Softmotions-Login"] && sm.io.Request.LOGIN_ACTION) {
                 sm.io.Request.LOGIN_ACTION();
                 return false;
             }
@@ -120,11 +143,11 @@ qx.Class.define("sm.io.Request", {
             }
             var errors = [];
             var msgs = [];
-            var eh = "Softmotions-Msg-Err";
+            var eh = "X-Softmotions-Err";
             for (var i = 0; headers[eh + i] != undefined; ++i) {
                 errors[errors.length] = "*" + decodeURIComponent(headers[eh + i].replace(/\+/g, ' '));
             }
-            eh = "Softmotions-Msg-Reg";
+            eh = "X-Softmotions-Msg";
             for (var i = 0; headers[eh + i] != undefined; ++i) {
                 msgs[msgs.length] = "*" + decodeURIComponent(headers[eh + i].replace(/\+/g, ' '));
             }
@@ -151,21 +174,6 @@ qx.Class.define("sm.io.Request", {
             } else {
                 awnd.ensureOnTop();
             }
-        },
-
-
-        /**
-         * Send request
-         *
-         * @param onsuccess {Function} oncomplete callback function
-         * @param self {Object ? null} reference to the 'this' variable inside the callback
-         */
-        send : function(onsuccess, self) {
-            if (onsuccess) {
-                this.__onsuccess = onsuccess;
-                this.__self = (self) ? self : onsuccess;
-            }
-            this.base(arguments);
         }
     },
 

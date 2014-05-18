@@ -47,7 +47,7 @@ qx.Class.define("sm.conn.Actions", {
                     if (url.charAt(url.length - 1) != '/') {
                         url += '/';
                     }
-                    if (segments[i] != null) {
+                    if (segments[i] != null && segments[i].length > 0) {
                         url += encodeURIComponent(segments[i]);
                     }
                 }

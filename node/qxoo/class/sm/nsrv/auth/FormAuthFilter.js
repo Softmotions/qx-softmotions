@@ -6,7 +6,7 @@
  * Реализация фильтра авторизации, для авторизации c использованием формы
  */
 qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
-    extend    : sm.nsrv.auth.AAuthFilter,
+    extend : sm.nsrv.auth.AAuthFilter,
     implement : [sm.nsrv.auth.IAuthFilter],
 
     /**
@@ -21,7 +21,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
      * @param userProvider  менеджер пользователей
      * @param securityStore хранилице авторизованных пользователей
      */
-    construct: function(options, userProvider, securityStore) {
+    construct : function(options, userProvider, securityStore) {
         options = options || {};
         this.base(arguments, options, userProvider, securityStore);
 
@@ -48,19 +48,18 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         }
     },
 
-    members:
-    {
-        __formUrl: null,
-        __actionParameter: null,
-        __actionName: null,
-        __loginParameter: null,
-        __passwordParameter: null,
+    members : {
+        __formUrl : null,
+        __actionParameter : null,
+        __actionName : null,
+        __loginParameter : null,
+        __passwordParameter : null,
         __pageOnSuccess : null,
-        __remember: null,
-        __cookies: null,
+        __remember : null,
+        __cookies : null,
         __saveUrlKey : null,
 
-        authenticate: function(req, res, cb) {
+        authenticate : function(req, res, cb) {
             if (this._securityStore.isAuthenticated(req)) {
                 this.success(req, res, cb);
                 return;
@@ -96,7 +95,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
             }
         },
 
-        _tryAutoLogin: function(req, cb) {
+        _tryAutoLogin : function(req, cb) {
             var me = this;
             var cookies = new this.__cookies(req);
             var token = cookies.get(this.__remember.cookie);
@@ -123,7 +122,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
             });
         },
 
-        login: function(req, res, user, cb) {
+        login : function(req, res, user, cb) {
             var me = this;
             if (this.__remember != null && req.params[this.__remember.parameter] == this.__remember.value) {
                 (function() {
@@ -146,7 +145,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
             });
         },
 
-        logout: function(req, res, cb) {
+        logout : function(req, res, cb) {
             if (this.__remember != null) {
                 var cookies = new this.__cookies(req, res);
                 cookies.set(this.__remember.cookie);
@@ -155,23 +154,23 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
             this.base(arguments, req, res, cb);
         },
 
-        commence: function(req, res, err) {
+        commence : function(req, res, err) {
             if (req.session != null &&
                     req.info.href != null &&
                     req.info.pathname != this.__getFormUrl(req.info.pathname)) {
                 this.__setSavedUrl(req, req.info.href);
             }
-            res.sendSCode(302, { "Location" : this.__getFormUrl(req.info.pathname), "Softmotions-Login" : "true"});
+            res.sendSCode(302, { "Location" : this.__getFormUrl(req.info.pathname), "X-Softmotions-Login" : "true"});
         },
 
-        success: function(req, res, cb) {
+        success : function(req, res, cb) {
             if (req.info.pathname != this.__getFormUrl(req.info.pathname)) {
                 this.__setSavedUrl(req, null);
             }
             cb();
         },
 
-        __hash: function(user, validTo, secret) {
+        __hash : function(user, validTo, secret) {
             var crypto = $$node.require("crypto");
             // TODO: надо что-нить хитрое встаивить в серединку хэша.
             return crypto.createHash("md5")
@@ -222,7 +221,7 @@ qx.Class.define("sm.nsrv.auth.FormAuthFilter", {
         }
     },
 
-    destruct: function() {
+    destruct : function() {
         this.__formUrl = this.__remember = this.__saveUrlKey = null;
         this.__actionParameter = this.__actionName = this.__loginParameter = this.__passwordParameter = null;
         this.__cookies = this.__pageOnSuccess = null;

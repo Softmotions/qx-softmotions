@@ -1,7 +1,6 @@
 qx.Class.define("sm.util.Clipboard", {
 
-    statics :
-    {
+    statics : {
         /**
          * tries to copy text to the clipboard of the underlying operating system
          *
@@ -28,9 +27,9 @@ qx.Class.define("sm.util.Clipboard", {
                 try {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                 }
-                catch(e) {
+                catch (e) {
                     alert(
-                            "Because of tight security settings in Mozilla / Firefox you cannot copy " +
+                                    "Because of tight security settings in Mozilla / Firefox you cannot copy " +
                                     "to the system clipboard at the moment. Please open the 'about:config' page " +
                                     "in your browser and change the preference 'signed.applets.codebase_principal_support' to 'true'."
                     );
@@ -42,8 +41,7 @@ qx.Class.define("sm.util.Clipboard", {
                 var trans = Components.classes['@mozilla.org/widget/transferable;1'].createInstance(Components.interfaces.nsITransferable);
                 if (!trans) return;
                 trans.addDataFlavor(flavor);
-                var str = new Object();
-                var len = new Object();
+                var len = {};
                 var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
                 var copytext = text;
                 str.data = copytext;

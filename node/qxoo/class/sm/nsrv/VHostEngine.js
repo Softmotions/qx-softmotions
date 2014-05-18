@@ -7,11 +7,10 @@
  * Virtual host manager
  */
 qx.Class.define("sm.nsrv.VHostEngine", {
-    extend  : qx.core.Object,
+    extend : qx.core.Object,
     include : [qx.locale.MTranslation],
 
-    statics :
-    {
+    statics : {
 
         cleanupRequest : function(req, res) {
             $$node.process.nextTick(function() {
@@ -51,8 +50,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
         this.__applyConfig(config);
     },
 
-    members :
-    {
+    members : {
 
         /**
          * VHE ID
@@ -161,7 +159,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             }
             try {
                 ah(this, ctx, name, cb);
-            } catch(e) {
+            } catch (e) {
                 cb(e, null);
             }
         },
@@ -229,7 +227,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < teArr.length; ++i) { //Process custom template engines
 
                 qx.core.Assert.assertInterface(teArr[i], sm.nsrv.ITemplateEngine,
-                  "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
+                                "Template engine: " + teArr[i].classname + ", must implements sm.nsrv.ITemplateEngine interface");
 
                 if (config["templateOptions"] != null) {
                     var topts = config["templateOptions"];
@@ -339,7 +337,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 return;
             }
             var security = this.__security[wa["id"]] = {};
-            var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key: sconf["securityKey"]});
+            var securityStore = security._securityStore = sm.nsrv.auth.Security.getSecurity({key : sconf["securityKey"]});
             if (!sconf["userProvider"] || !sconf["userProvider"]["type"]) {
                 throw new Error("Missing user provider type in config: " + JSON.stringify(this.__config));
             }
@@ -386,7 +384,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                 failIfNotfound = true;
             }
             var me = this;
-            var wapp = (function () {
+            var wapp = (function() {
                 if (id == null) {
                     id = me.__getDefaultWebappId();
                 }
@@ -489,7 +487,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var asn in this.__assembly) {
                 if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Loaded assembly: '" + asn + "' class: " + k +
-                      " [" + this.__vhostName + "]:[" + wappId + "]");
+                            " [" + this.__vhostName + "]:[" + wappId + "]");
                 }
                 var asm = this.__assembly[asn];
                 asm["_name_"] = asn;
@@ -517,7 +515,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
 
                 if (qx.core.Environment.get("sm.nsrv.debug")) {
                     qx.log.Logger.debug("Assembly '" + asn + "':\n" +
-                      JSON.stringify(asm, true));
+                            JSON.stringify(asm, true));
                 }
             }
             for (var asn in this.__assembly) {
@@ -593,7 +591,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                         hl = (cpath + hl);
                         if (qx.core.Environment.get("sm.nsrv.debug")) {
                             qx.log.Logger.debug("Handler: '" + k + "#" + (hconf["handler"]) +
-                              "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
+                                    "()' attached: [" + this.__vhostName + "]:[" + wappId + "]:" + hl);
                         }
 
                         var reMatching = ("regexp" == hconf["matching"]);
@@ -602,7 +600,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                             var hlSlot = this.__handlers[hl];
                             if (hlSlot) {
                                 qx.log.Logger.warn(this, "Handler: '" + hlSlot["$$class"] + "#" + (hlSlot["handler"]) +
-                                  "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
+                                        "()' replaced by: " + (k + "#" + hconf["handler"] + "()"));
                             }
                             this.__handlers[hl] = hconf;
                         } else {
@@ -768,7 +766,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
                     cb.call(self, err);
                 } else if (reqRoles != null && !req.isUserHasRoles(reqRoles)) {
                     cb.call(self, "Unauthorized to access: '" + req.info.pathname +
-                      "' for roles: " + JSON.stringify(reqRoles));
+                            "' for roles: " + JSON.stringify(reqRoles));
                 } else if (redirect != null) {
                     res.sendSCode(302, {"Location" : redirect});
                 } else {
@@ -884,7 +882,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var callback = function() {
                 try {
                     exec.call(hinst, req, res, ctx);
-                } catch(e) {
+                } catch (e) {
                     var report = true;
                     if (e instanceof sm.nsrv.Message) {
                         report = e.isError();
@@ -942,8 +940,8 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             for (var i = 0; i < res.messages.length; ++i) {
                 var m = res.messages[i];
                 var isErr = m.isError();
-                res.headers[(isErr ? ("Softmotions-Msg-Err" + errC) : ("Softmotions-Msg-Reg" + nerrC))]
-                  = encodeURIComponent(m.getMessage());
+                res.headers[(isErr ? ("X-Softmotions-Err" + errC) : ("X-Softmotions-Msg" + nerrC))]
+                        = encodeURIComponent(m.getMessage());
                 if (isErr) {
                     ++errC;
                 } else {
@@ -981,7 +979,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             if (report && !message) {
                 qx.log.Logger.error(this, err);
             }
-            var headers = { "Content-Type": "text/plain" };
+            var headers = { "Content-Type" : "text/plain" };
             if (errOpts["messagesInHeaders"]) {
                 errC = this.__messageHeaders(req, res); //Collect message headers
             }
@@ -1242,7 +1240,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             var conf = this.__config;
             //Session staff
             var sopts = {
-                secret: "5bb1097b24bd420a82ef4e916e864a48" //todo review it!
+                secret : "5bb1097b24bd420a82ef4e916e864a48" //todo review it!
             };
             if (conf["session"]) {
                 qx.lang.Object.mergeWith(sopts, conf["session"]);
@@ -1280,7 +1278,7 @@ qx.Class.define("sm.nsrv.VHostEngine", {
             };
             //EOF session staff
             var app = this.__connectApp = connect();
-            app.use(function (req, res, next) {
+            app.use(function(req, res, next) {
                 if (req.internal === true) {
                     next()
                 } else {
