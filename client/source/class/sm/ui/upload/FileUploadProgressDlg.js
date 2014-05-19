@@ -54,30 +54,54 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
 
         __files : null,
 
+        __transferRequests : null,
+
         __transfer : function() {
             var me = this;
             var tasks = this.__files.length;
+            var total = 0;
+            var current = 0;
+            for (var i = 0; this.__files[i]; ++i) {
+                total += this.__files[i].size;
+            }
+            this.__transferRequests = [];
+            this.__progress.setMaximum(total);
+            var updateProgress = function(delta) {
+                current += delta;
+                me.__progress.setValue(current);
+            };
+
             for (var i = 0; i < this.__files.length; ++i) {
-                var xhr = new XMLHttpRequest();
-                var f = this.__files[i];
-                var url = this.__urlFactory(f);
-                xhr.open("PUT", url, true);
-                if (f.type == null || f.type.length == 0 || f.type == "") {
-                    xhr.setRequestHeader("Content-Type", "application/octet-stream");
-                }
-                xhr.onreadystatechange = function() {
-                    if (this.readyState == this.DONE) {
-                        --tasks;
-                        if (tasks == 0) {
-                            me.__done();
-                        }
+                (function(f, url) {
+                    var xhr = new XMLHttpRequest();
+                    me.__transferRequests.push(xhr);
+                    var uploaded = 0;
+                    if (f.type == null || f.type.length == 0 || f.type == "") {
+                        xhr.setRequestHeader("Content-Type", "application/octet-stream");
                     }
-                };
-                xhr.send(f);
+                    xhr.onreadystatechange = function() {
+                        if (this.readyState == this.DONE) {
+                            --tasks;
+                            if (tasks == 0) {
+                                me.__done();
+                            }
+                        }
+                    };
+                    xhr.upload.onprogress = function(evt) {
+                        var delta = evt.loaded - uploaded;
+                        if (delta > 0) {
+                            updateProgress(delta);
+                        }
+                        uploaded = evt.loaded;
+                    };
+                    xhr.open("PUT", url, true);
+                    xhr.send(f);
+                })(this.__files[i], this.__urlFactory(this.__files[i]));
             }
         },
 
         __done : function() {
+            this.__transferRequests = [];
             this.fireEvent("completed");
         },
 
@@ -88,6 +112,16 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
 
         __cancel : function(ev) {
             ev.getTarget().setEnabled(false);
+            if (this.__transferRequests != null) {
+                this.__transferRequests.forEach(function(r) {
+                    try {
+                        r.abort();
+                    } catch (e) {
+                        ;
+                    }
+                });
+                this.__transferRequests = null;
+            }
             this.close();
         },
 
@@ -95,6 +129,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
             this.__files = null;
             this.__progress = null;
             this.__urlFactory = null;
+            this.__transferRequests = null;
         }
 
     },
