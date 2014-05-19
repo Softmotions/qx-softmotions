@@ -74,6 +74,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
             for (var i = 0; i < this.__files.length; ++i) {
                 (function(f, url) {
                     var xhr = new XMLHttpRequest();
+                    xhr.open("PUT", url, true);
                     me.__transferRequests.push(xhr);
                     var uploaded = 0;
                     if (f.type == null || f.type.length == 0 || f.type == "") {
@@ -94,7 +95,6 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
                         }
                         uploaded = evt.loaded;
                     };
-                    xhr.open("PUT", url, true);
                     xhr.send(f);
                 })(this.__files[i], this.__urlFactory(this.__files[i]));
             }
