@@ -1,5 +1,5 @@
 /**
- * Exteneded virrual tree item
+ * Exteneded virtrual tree item
  */
 qx.Class.define("sm.ui.tree.ExtendedVirtualTreeItem", {
     extend : qx.ui.tree.VirtualTreeItem,
