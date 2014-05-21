@@ -7,7 +7,7 @@ qx.Class.define("sm.event.Broadcaster", {
     statics : {
 
         /**
-         * Spec is JSON object describes set of
+         * Spec is a JSON object describes set of
          * broadcasted event properties.
          * Eg.
          *   <pre>
@@ -16,7 +16,7 @@ qx.Class.define("sm.event.Broadcaster", {
          *         enabled : false
          *       }
          *   </pre>
-         * @param spec
+         * @param spec {JSON}
          */
         create : function(spec) {
             var m = qx.data.marshal.Json.createModel(spec, true);
