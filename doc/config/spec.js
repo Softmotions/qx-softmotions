@@ -39,7 +39,7 @@ config = [
         formdiableOptions : { //options for formidable nodejs module (https://github.com/felixge/node-formidable)
             keepExtensions : true,
             uploadDir : "/tmp",
-            maxFieldsSize :  2 * 1024 * 1024 //2MB
+            maxFieldsSize : 2 * 1024 * 1024 //2MB
         }
     },
 

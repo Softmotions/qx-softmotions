@@ -1,70 +1,61 @@
 {
-    "name"    : "qx-softmotions-node",
-    "include" :
-            [
-                {
-                    "path" : "${QOOXDOO_PATH}/tool/data/config/application.json"
-                }
-            ],
+    "name" : "qx-softmotions-node",
+    "include" : [
+        {
+            "path" : "${QOOXDOO_PATH}/tool/data/config/application.json"
+        }
+    ],
 
-    "let" :
-    {
-        "APPLICATION"  : "qx-softmotions-node",
+    "let" : {
+        "APPLICATION" : "qx-softmotions-node",
         "QOOXDOO_PATH" : "@@QOOXDOO_PATH@@",
-        "API_EXCLUDE"  : ["qx.legacy.*","qx.test.*"],
-        "LOCALES"      : [ "ru", "en" ],
-        "CACHE"        : "${TMPDIR}/qxserver${QOOXDOO_VERSION}/cache"
+        "API_EXCLUDE" : ["qx.legacy.*", "qx.test.*"],
+        "LOCALES" : [ "ru", "en" ],
+        "CACHE" : "${TMPDIR}/qxserver${QOOXDOO_VERSION}/cache"
     },
 
-    "jobs":
-    {
+    "jobs" : {
 
-        "qx-softmotions-base" :
-        {
+        "qx-softmotions-base" : {
             "cache" : {
                 "compile" : "${CACHE}"
             },
 
-            "library" :
-                    [
-                        {
-                            "manifest" : "./Manifest.json",
-                            "uri" : "./"
-                        },
+            "library" : [
+                {
+                    "manifest" : "./Manifest.json",
+                    "uri" : "./"
+                },
 
-                        {
-                            "manifest" : "${QOOXDOO_PATH}/framework/Manifest.json",
-                            "uri" : "${QOOXDOO_PATH}/framework"
-                        }
-                    ],
+                {
+                    "manifest" : "${QOOXDOO_PATH}/framework/Manifest.json",
+                    "uri" : "${QOOXDOO_PATH}/framework"
+                }
+            ],
 
-            "exclude" :
-                    [
-                        "qx.core.Init"
-                    ],
+            "exclude" : [
+                "qx.core.Init"
+            ],
 
-            "include" :
-                    [
-                        "qx.Class",
-                        "qx.Mixin",
-                        "qx.Interface",
-                        "qx.core.*",
+            "include" : [
+                "qx.Class",
+                "qx.Mixin",
+                "qx.Interface",
+                "qx.core.*",
 
-                        "sm.lang.*",
-                        "sm.log.*",
-                        "sm.app.*",
-                        "sm.nsrv.*",
-                        "sm.test.*"
-                    ],
+                "sm.lang.*",
+                "sm.log.*",
+                "sm.app.*",
+                "sm.nsrv.*",
+                "sm.test.*"
+            ],
 
-            "environment" :
-            {
+            "environment" : {
                 "qx.debug" : true,
                 "qx.aspects" : false
             },
 
-            "settings" :
-            {
+            "settings" : {
                 "qx.globalErrorHandling" : "off"
             },
 
@@ -72,48 +63,39 @@
                 "type" : "build"
             },
 
-            "compile-options" :
-            {
-                "paths" :
-                {
+            "compile-options" : {
+                "paths" : {
                     "loader-template" : "@@SRC_ROOT@@/../data/qxoo.loader.tmpl.txt",
                     "file" : "output/script/qx-softmotions.js"
                 },
-                "uris" :
-                {
-                    "script"   : ".",
+                "uris" : {
+                    "script" : ".",
                     "resource" : "."
                 },
-                "code" :
-                {
-                    "format"   : true,
+                "code" : {
+                    "format" : true,
                     "=optimize" : [],
                     "node_includes" : true
                 }
             }
         },
 
-        "nkserver" :
-        {
+        "nkserver" : {
             "extend" : [ "qx-softmotions-base" ],
             "desc" : "NKServer",
 
-            "include" :
-                    [
-                        "sm.nsrv.*"
-                    ],
+            "include" : [
+                "sm.nsrv.*"
+            ],
 
-            "environment" :
-            {
+            "environment" : {
                 "sm.nsrv.debug" : true,
                 "sm.nsrv.access-control-allow" : true,
                 "sm.nsrv.security.suppress" : false
             },
 
-            "compile-options" :
-            {
-                "paths" :
-                {
+            "compile-options" : {
+                "paths" : {
                     "file" : "@@OUTPUT_DIR@@/nkserver-qxoo.js"
                 }
             }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="qx-softmotions"
-         xmlns:vpp="http://vpp.sourceforge.net">
+        >
 
     <dirname property="common.current" file="${ant.file.qx-softmotions}"/>
     <property environment="env"/>

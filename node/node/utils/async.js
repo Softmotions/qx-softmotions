@@ -8,8 +8,8 @@ var async = require("async");
 // additional async utilities
 
 // it is a copy of async.queue with another task receiving strategy
-var stack = module.exports.stack = function (worker, concurrency) {
-    var _forEach = function (arr, iterator) {
+var stack = module.exports.stack = function(worker, concurrency) {
+    var _forEach = function(arr, iterator) {
         if (arr.forEach) {
             return arr.forEach(iterator);
         }
@@ -20,19 +20,19 @@ var stack = module.exports.stack = function (worker, concurrency) {
 
     var workers = 0;
     var q = {
-        tasks: [],
-        concurrency: concurrency,
-        saturated: null,
-        empty: null,
-        drain: null,
-        push: function (data, callback) {
+        tasks : [],
+        concurrency : concurrency,
+        saturated : null,
+        empty : null,
+        drain : null,
+        push : function(data, callback) {
             if (data.constructor !== Array) {
                 data = [data];
             }
             _forEach(data, function(task) {
                 q.tasks.push({
-                    data: task,
-                    callback: typeof callback === 'function' ? callback : null
+                    data : task,
+                    callback : typeof callback === 'function' ? callback : null
                 });
                 if (q.saturated && q.tasks.length == concurrency) {
                     q.saturated();
@@ -40,7 +40,7 @@ var stack = module.exports.stack = function (worker, concurrency) {
                 async.nextTick(q.process);
             });
         },
-        process: function () {
+        process : function() {
             if (workers < q.concurrency && q.tasks.length) {
                 // task receiving strategy changed
                 var task = q.tasks.pop();
@@ -48,7 +48,7 @@ var stack = module.exports.stack = function (worker, concurrency) {
                     q.empty();
                 }
                 workers += 1;
-                worker(task.data, function () {
+                worker(task.data, function() {
                     workers -= 1;
                     if (task.callback) {
                         task.callback.apply(task, arguments);
@@ -60,10 +60,10 @@ var stack = module.exports.stack = function (worker, concurrency) {
                 });
             }
         },
-        length: function () {
+        length : function() {
             return q.tasks.length;
         },
-        running: function () {
+        running : function() {
             return workers;
         }
     };

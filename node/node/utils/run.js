@@ -70,12 +70,12 @@ var cScript = null;
                     var running = true;
                     try {
                         process.kill(parseInt(fs.readFileSync(config.lockFile)), 0);
-                    } catch(e) {
+                    } catch (e) {
                         if (e.code == "ESRCH") { //No such process
                             running = false;
                             try {
                                 fs.unlinkSync(config.lockFile);
-                            } catch(e) {
+                            } catch (e) {
                             }
                         }
                     }

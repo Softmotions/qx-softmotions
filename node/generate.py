@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-################################################################################
+# !/usr/bin/env python
+# ###############################################################################
 #
 #  qooxdoo - the new era of web development
 #
@@ -22,27 +22,32 @@
 # This is a stub proxy for the real generator.py
 ##
 
-import sys, os, re, subprocess
+import sys
+import os
+import re
+import subprocess
 
 CMD_PYTHON = sys.executable
 QOOXDOO_PATH = 'home/adam/JavaSoft/qooxdoo-trunk/qooxdoo'
+
 
 def getQxPath():
     path = QOOXDOO_PATH
     # try updating from config file
     if os.path.exists('config.json'):
         # "using QOOXDOO_PATH from config.json"
-        qpathr=re.compile(r'"QOOXDOO_PATH"\s*:\s*"([^"]*)"\s*,?')
+        qpathr = re.compile(r'"QOOXDOO_PATH"\s*:\s*"([^"]*)"\s*,?')
         conffile = open('config.json')
         aconffile = conffile.readlines()
         for line in aconffile:
             mo = qpathr.search(line)
             if mo:
                 path = mo.group(1)
-                break # assume first occurrence is ok
+                break  # assume first occurrence is ok
     path = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), path))
 
     return path
+
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))  # switch to skeleton dir
 qxpath = getQxPath()
@@ -57,9 +62,9 @@ argList.append(CMD_PYTHON)
 argList.append(REAL_GENERATOR)
 argList.extend(sys.argv[1:])
 if sys.platform == "win32":
-    argList1=[]
+    argList1 = []
     for arg in argList:
-        if arg.find(' ')>-1:
+        if arg.find(' ') > -1:
             argList1.append('"%s"' % arg)
         else:
             argList1.append(arg)

@@ -35,7 +35,7 @@ module.exports.responseHTTPump = function(readStream, writeStream, callback) {
         len += chunk.length;
         try {
             writeStream.write(chunk); //removed if (writeStream.write(chunk) === false) readStream.pause();
-        } catch(e) { //we can get: Error: Socket.end() called already; cannot write
+        } catch (e) { //we can get: Error: Socket.end() called already; cannot write
             writeStream.emit('error', e);
         }
     });
