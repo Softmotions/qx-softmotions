@@ -40,22 +40,18 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             nullable : true
         },
 
-        /**
-         * If true hidden widgets will be excluded from layout
-         */
-        excludeWidgets : {
-            check : "Boolean",
-            nullable : false,
-            init : false
-        },
 
         /**
-         * If true hidden widgets will be disposed.
+         * Hide widgets policy:
+         *
+         *   - hide: Widget exclusion by calling qx.ui.core.Widget#hide()
+         *   - exclude: Widget exclusion by calling qx.ui.core.Widget#exclude()
+         *   - destroy: Inactive widgets will be destroyed immediately by calling qx.ui.core.Widget#destroy()
          */
-        noCache : {
-            check : "Boolean",
+        widgetsHidePolicy : {
+            check : ["hide", "exclude", "destroy"],
             nullable : false,
-            init : false
+            init : "hide"
         }
     },
 
@@ -125,7 +121,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 if (slot.cached == this.__active.cached) { //this widget active already
                     return slot.cached;
                 }
-                this.__hideWidget(this.__active, this.getNoCache());
+                this.__hideWidget(this.__active, (this.getWidgetsHidePolicy() === "destroy"));
             }
             this.getWidget(id, true);
             this.__active = slot;
@@ -197,7 +193,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 w.destroy();
                 return;
             }
-            if (this.getExcludeWidgets()) {
+            if (this.getWidgetsHidePolicy() === "exclude") {
                 w.exclude();
             } else {
                 w.hide();
