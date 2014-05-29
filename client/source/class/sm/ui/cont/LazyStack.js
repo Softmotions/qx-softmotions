@@ -30,6 +30,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
     },
 
     properties : {
+
         /**
          * On-demand widget factory function
          * provider.
@@ -37,6 +38,24 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         onDemandFactoryFunctionProvider : {
             check : "Function",
             nullable : true
+        },
+
+        /**
+         * If true hidden widgets will be excluded from layout
+         */
+        excludeWidgets : {
+            check : "Boolean",
+            nullable : false,
+            init : false
+        },
+
+        /**
+         * If true hidden widgets will be disposed.
+         */
+        noCache : {
+            check : "Boolean",
+            nullable : false,
+            init : false
         }
     },
 
@@ -106,7 +125,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                 if (slot.cached == this.__active.cached) { //this widget active already
                     return slot.cached;
                 }
-                this.__active.cached.hide();
+                this.__hideWidget(this.__active, this.getNoCache());
             }
             this.getWidget(id, true);
             this.__active = slot;
@@ -167,14 +186,38 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             qx.core.Assert.assertObject(widget, "Factory function returns invalid widget");
             this._add(widget);
             slot.cached = widget;
-            widget.hide();
+            this.__hideWidget(slot);
             return widget;
+        },
+
+        __hideWidget : function(slot, destroy) {
+            var w = slot.cached;
+            if (destroy) {
+                slot.cached = null;
+                w.destroy();
+                return;
+            }
+            if (this.getExcludeWidgets()) {
+                w.exclude();
+            } else {
+                w.hide();
+            }
         }
     },
 
     destruct : function() {
-        this.__slots = null;
+        if (this.__slots) {
+            for (var k in this.__slots) {
+                var s = this.__slots[k];
+                var cached = s["cached"];
+                if (cached != null && typeof cached.dispose === "function") {
+                    cached.dispose();
+                }
+            }
+            this.__slots = null;
+        }
         this.__slotids = null;
         this.__active = false;
+
     }
 });
