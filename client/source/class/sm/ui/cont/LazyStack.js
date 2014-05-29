@@ -29,6 +29,17 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         widgetChanged : "qx.event.type.Data"
     },
 
+    properties : {
+        /**
+         * On-demand widget factory function
+         * provider.
+         */
+        onDemandFactoryFunctionProvider : {
+            check : "Function",
+            nullable : true
+        }
+    },
+
     members : {
         /**
          * Widget slots
@@ -84,6 +95,11 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         showWidget : function(id) {
             var slot = this.__slots[id];
             if (!slot) {
+                var ffp = this.getOnDemandFactoryFunctionProvider();
+                if (ffp != null) {
+                    this.registerWidget(id, ffp(id));
+                    return this.showWidget(id);
+                }
                 throw new Error("Widget with id: '" + id + "' not registered");
             }
             if (this.__active) {
@@ -135,6 +151,11 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             var slot = this.__slots[id];
             if (!slot) {
                 if (create) {
+                    var ffp = this.getOnDemandFactoryFunctionProvider();
+                    if (ffp != null) {
+                        this.registerWidget(id, ffp(id));
+                        return this.getWidget(id, create);
+                    }
                     throw new Error("Widget with id: '" + id + "' not registered");
                 }
                 return null;

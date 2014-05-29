@@ -207,7 +207,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
 
     destruct : function() {
         //this._disposeObjects("__field_name");
-        this.__label = this.__icon = null;
+        this.__label = this.__icon = this.__button = null;
     }
 });
 

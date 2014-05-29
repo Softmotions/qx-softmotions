@@ -4,7 +4,7 @@
  */
 
 qx.Class.define("sm.ui.form.FlexFormRenderer", {
-    extend  : qx.ui.form.renderer.Single,
+    extend : qx.ui.form.renderer.Single,
 
 
     construct : function(form) {
@@ -17,9 +17,14 @@ qx.Class.define("sm.ui.form.FlexFormRenderer", {
         //this._setLayout(layout);
     },
 
-    members :
-    {
+    members : {
 
+        /**
+         * Set last form row be vertical flexible.
+         */
+        setLastRowFlexible : function() {
+            this._getLayout().setRowFlex(this._row - 1, 1)
+        }
     },
 
     destruct : function() {

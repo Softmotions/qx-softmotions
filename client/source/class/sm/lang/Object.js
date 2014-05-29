@@ -23,6 +23,41 @@ qx.Class.define("sm.lang.Object", {
                 return obj;
             }
             return JSON.parse(JSON.stringify(obj));
+        },
+
+
+        /**
+         * Creates new object instance for specified qooxdoo class instance.
+         *
+         * @param constructor {Object} Qooxdoo class instance
+         * @param args {Array?null} Optional constructor arguments.
+         * @returns new Instance of constructed object.
+         */
+        newInstance : function(constructor, args) {
+            function F() {
+                return constructor.apply(this, args);
+            }
+
+            F.prototype = constructor.prototype;
+            return new F();
+        },
+
+
+        /**
+         * Scan available global qxoodoo classes,
+         * calls `cb` callback with single class argument;
+         *
+         * @param cb {Function} Class acceptor callback with single class argument.
+         * @param self {Object?null} Optional self context for  `cb`
+         */
+        forEachClass : function(cb, self) {
+            for (var k in qx.Bootstrap.$$registry) {
+                var clazz = qx.Bootstrap.$$registry[k];
+                if (!clazz || !clazz.prototype) {
+                    continue;
+                }
+                cb.call(self, clazz);
+            }
         }
     }
 });
