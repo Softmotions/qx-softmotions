@@ -139,6 +139,10 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             return this.__active ? this.__active["id"] : null;
         },
 
+        getActiveWidget : function() {
+            return this.__active ? this.__active["cached"] : null;
+        },
+
         getNextWidgetId : function() {
             return this.__slotids[this.getActiveWidgetPosition() + 1];
         },
@@ -154,6 +158,20 @@ qx.Class.define("sm.ui.cont.LazyStack", {
 
         isRegisteredWidget : function(id) {
             return !!this.__slots[id];
+        },
+
+        /**
+         * @return {qx.ui.core.Widget[]} Activated widgets
+         */
+        getActivatedWidgets : function() {
+            var ret = [];
+            for (var k in this.__slots) {
+                var s = this.__slots[k];
+                if (s.cached != null) {
+                    ret.push(s.cached);
+                }
+            }
+            return ret;
         },
 
         /**
@@ -210,9 +228,9 @@ qx.Class.define("sm.ui.cont.LazyStack", {
                     cached.dispose();
                 }
             }
-            this.__slots = null;
+            this.__slots = [];
         }
-        this.__slotids = null;
+        this.__slotids = [];
         this.__active = false;
 
     }
