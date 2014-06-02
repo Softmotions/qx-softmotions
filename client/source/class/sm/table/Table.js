@@ -41,6 +41,24 @@ qx.Class.define("sm.table.Table", {
         },
 
         /**
+         * Swap keyboard focus to table with auto selection focused or first row
+         */
+        handleFocus : function() {
+            if (this.getTableModel().getRowCount() > 0) {
+                var focusedCol = this.getFocusedColumn() == null ? 0 : this.getFocusedColumn();
+                var focusedRow = this.getFocusedRow() == null ? 0 : this.getFocusedRow();
+                this.setFocusedCell(focusedCol, focusedRow, true);
+                this.getSelectionModel().setSelectionInterval(focusedRow, focusedRow);
+                this.focus();
+            }
+        },
+
+        resetSelection : function() {
+            this.resetCellFocus();
+            this.getSelectionModel().resetSelection();
+        },
+
+        /**
          * Associated rowData via JsonTableModel
          * @param ind {Integer}
          */
