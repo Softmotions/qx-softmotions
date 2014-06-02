@@ -47,6 +47,9 @@ qx.Class.define("sm.lang.Object", {
          * Scan available global qxoodoo classes,
          * calls `cb` callback with single class argument;
          *
+         * Class iteration process will be aborted
+         * if `cb` function return `false` boolean value.
+         *
          * @param cb {Function} Class acceptor callback with single class argument.
          * @param self {Object?null} Optional self context for  `cb`
          */
@@ -56,7 +59,9 @@ qx.Class.define("sm.lang.Object", {
                 if (!clazz || !clazz.prototype) {
                     continue;
                 }
-                cb.call(self, clazz);
+                if (cb.call(self, clazz) === false) { //abort iteration
+                    return;
+                }
             }
         }
     }
