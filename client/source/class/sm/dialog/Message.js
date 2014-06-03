@@ -84,6 +84,8 @@ qx.Class.define("sm.dialog.Message", {
 
         this._applyOptions(options);
 
+        this._excludeChildControl("captionbar");
+
         this.getChildControl("button-close").addListener("execute", function() {
             this.close();
         }, this);
@@ -124,7 +126,7 @@ qx.Class.define("sm.dialog.Message", {
 
                 case "message" :
                     control = new qx.ui.basic.Label();
-                    control.set({rich : true, selectable : true, allowStretchX : true});
+                    control.set({rich : true, selectable : true, maxWidth: 350, wrap: true});
                     control.setValue(this.getMessage());
                     this.getChildControl("general-container").add(control);
                     break;
