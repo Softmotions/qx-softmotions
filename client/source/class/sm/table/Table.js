@@ -45,8 +45,8 @@ qx.Class.define("sm.table.Table", {
          */
         handleFocus : function() {
             if (this.getTableModel().getRowCount() > 0) {
-                var focusedCol = this.getFocusedColumn() == null ? 0 : this.getFocusedColumn();
-                var focusedRow = this.getFocusedRow() == null ? 0 : this.getFocusedRow();
+                var focusedCol = (this.getFocusedColumn() == null) ? 0 : this.getFocusedColumn();
+                var focusedRow = (this.getFocusedRow() == null) ? 0 : this.getFocusedRow();
                 this.setFocusedCell(focusedCol, focusedRow, true);
                 this.getSelectionModel().setSelectionInterval(focusedRow, focusedRow);
                 this.focus();
