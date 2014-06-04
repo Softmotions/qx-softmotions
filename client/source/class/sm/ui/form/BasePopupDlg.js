@@ -57,8 +57,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
             padding : [10, 4]
         });
 
-        this._form = new qx.ui.form.Form();
-
+        this._form = new sm.ui.form.ExtendedForm();
         this._configureForm(this._form);
         this._configureFormButtons(this._form);
         var fh = this._createFormRenderer(this._form);
@@ -67,7 +66,8 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
         }
 
         this.__closeCmd = new qx.ui.core.Command("Esc");
-        this.__closeCmd.addListener("execute", this.hide, this);
+        this.__closeCmd.addListener("execute", this.destroy, this);
+        this.addListener("disappear", this.destroy, this);
     },
 
     members : {
@@ -80,11 +80,6 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
         show : function() {
             this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
             this.base(arguments);
-        },
-
-        hide : function() {
-            this.base(arguments);
-            this._disposeFields();
         },
 
         save : function() {

@@ -18,7 +18,7 @@ qx.Class.define("sm.ui.form.BaseSavePopupDlg", {
             form.addButton(ok);
 
             var cancel = new qx.ui.form.Button(this.tr("Cancel"));
-            cancel.addListener("execute", this.hide, this);
+            cancel.addListener("execute", this.destroy, this);
             form.addButton(cancel);
         }
     }
