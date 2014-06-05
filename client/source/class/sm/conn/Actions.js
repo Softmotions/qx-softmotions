@@ -33,7 +33,7 @@ qx.Class.define("sm.conn.Actions", {
                 Object.getOwnPropertyNames(varagrs).forEach(function(k) {
                     if (varagrs[k] != null) {
                         var sk = "{" + k + "}";
-                        url = url.replace(sk, varagrs[k]);
+                        url = url.replace(sk, varagrs[k].toString());
                     }
                 });
             } else {
@@ -47,8 +47,11 @@ qx.Class.define("sm.conn.Actions", {
                     if (url.charAt(url.length - 1) != '/') {
                         url += '/';
                     }
-                    if (segments[i] != null && segments[i].length > 0) {
-                        url += encodeURIComponent(segments[i]);
+                    if (segments[i] != null) {
+                        var segment = segments[i].toString();
+                        if (segment.length > 0) {
+                            url += encodeURIComponent(segment);
+                        }
                     }
                 }
             }
