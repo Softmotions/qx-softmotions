@@ -19,6 +19,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
     ],
 
     events : {
+
         /** Fired when the value was modified */
         "changeValue" : "qx.event.type.Data",
 
@@ -74,6 +75,16 @@ qx.Class.define("sm.ui.form.ButtonField", {
             init : false,
             nullable : false,
             apply : "__applyShowResetButton"
+        },
+
+        /**
+         * Whenever to show main button.
+         */
+        showMainButton : {
+            check : "Boolean",
+            init : false,
+            nullable : false,
+            apply : "__applyShowMainButton"
         }
     },
 
@@ -189,7 +200,6 @@ qx.Class.define("sm.ui.form.ButtonField", {
             return control || this.base(arguments, id);
         },
 
-
         __ensureControls : function() {
             this.getChildControl("text");
             this.getChildControl("reset");
@@ -202,6 +212,18 @@ qx.Class.define("sm.ui.form.ButtonField", {
             } else {
                 this._excludeChildControl("reset");
             }
+        },
+
+        __applyShowMainButton : function(val) {
+            if (val) {
+                this._showChildControl("button");
+            } else {
+                this._excludeChildControl("button");
+            }
+        },
+
+        setMainButtonEnabled : function(val) {
+            this.getChildControl("button", true).setEnabled(!!val);
         }
     },
 

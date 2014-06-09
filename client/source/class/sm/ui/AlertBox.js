@@ -39,6 +39,10 @@ qx.Class.define("sm.ui.AlertBox", {
 
         setIcon : function(icon) {
             this.__atom.setIcon(icon);
+        },
+
+        getLabelWidget : function() {
+            return this.__atom.getChildControl("label");
         }
     },
 
