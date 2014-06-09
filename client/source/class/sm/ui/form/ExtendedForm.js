@@ -6,15 +6,6 @@
 qx.Class.define("sm.ui.form.ExtendedForm", {
     extend : qx.ui.form.Form,
 
-    statics : {
-    },
-
-    events : {
-    },
-
-    properties : {
-    },
-
     construct : function() {
         this.base(arguments);
     },
@@ -26,16 +17,25 @@ qx.Class.define("sm.ui.form.ExtendedForm", {
          * Only items with provided `getValue` function are supported.
          * Every item value is saved under item form key.
          *
-         * @param obj {{}} Resulted JSON object.
-         * @returns {{}}
+         * @param obj {Object?} Resulted JSON object.
+         * @param asStrings {Boolean?false} Populate form values as strings
+         * @param notNulls {Boolean?false} Save only not null values
+         * @returns {Object}
          */
-        populateJSONObject : function(obj) {
+        populateJSONObject : function(obj, asStrings, notNulls) {
             obj = obj || {};
             var items = this.getItems();
             for (var k in items) {
                 var item = items[k];
                 if (typeof item.getValue === "function") {
-                    obj[k] = item.getValue();
+                    var val = item.getValue();
+                    if (val != null && asStrings) {
+                        val = val.toString();
+                    }
+                    if (val == null && notNulls) {
+                        continue;
+                    }
+                    obj[k] = val;
                 }
 
             }

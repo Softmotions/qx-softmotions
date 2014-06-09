@@ -15,7 +15,8 @@ qx.Class.define("sm.ui.form.ButtonField", {
     ],
     include : [
         qx.ui.form.MForm,
-        qx.ui.core.MChildrenHandling
+        qx.ui.core.MChildrenHandling,
+        sm.event.MForwardEvent
     ],
 
     events : {
@@ -23,22 +24,13 @@ qx.Class.define("sm.ui.form.ButtonField", {
         /** Fired when the value was modified */
         "changeValue" : "qx.event.type.Data",
 
+        /** Text field input event */
+        "input" : "qx.event.type.Data",
+
         /**
          * Fired when user data changed
          */
         "changeUserData" : "qx.event.type.Data",
-
-        /** Fired when the enabled state was modified */
-        "changeEnabled" : "qx.event.type.Data",
-
-        /** Fired when the valid state was modified */
-        "changeValid" : "qx.event.type.Data",
-
-        /** Fired when the invalidMessage was modified */
-        "changeInvalidMessage" : "qx.event.type.Data",
-
-        /** Fired when the required was modified */
-        "changeRequired" : "qx.event.type.Data",
 
         /** Execute search, press ENTER ot button pressed */
         "execute" : "qx.event.type.Event",
@@ -108,20 +100,6 @@ qx.Class.define("sm.ui.form.ButtonField", {
 
         _forwardStates : {
             invalid : true
-        },
-
-        // overridden
-        addListener : function(type, listener, self, capture) {
-            switch (type) {
-                case "execute":
-                case "reset":
-                    this.base(arguments, type, listener, self, capture);
-                    break;
-                default:
-                    this.__ensureControls();
-                    this.getChildControl("text").addListener(type, listener, self, capture);
-                    break;
-            }
         },
 
         getTextField : function() {
@@ -194,6 +172,8 @@ qx.Class.define("sm.ui.form.ButtonField", {
                             this.fireEvent("execute");
                         }
                     }, this);
+                    control.addListener("changeValue", this.forwardEvent, this);
+                    control.addListener("input", this.forwardEvent, this);
                     this._add(control, {flex : 1});
                     break;
             }
@@ -228,7 +208,6 @@ qx.Class.define("sm.ui.form.ButtonField", {
     },
 
     destruct : function() {
-        //this._disposeObjects("__field_name");
         this.__label = this.__icon = this.__button = null;
     }
 });
