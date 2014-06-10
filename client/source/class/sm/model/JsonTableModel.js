@@ -11,7 +11,7 @@
  {
  "title" : "группа 8722",
  "columns" : [
- {"title" : "№", "id" : "number", "width" : 35, "flex" : 0},
+ {"title" : "№", "id" : "number", "width" : 35, "flex" : 0, "sortable" : false},
  {"title" : "ФИО", "id" : "fio", "width" : "4*"},
  {"title" : "Email", "id" : "email",  "width" : "3*"},
  {"title" : "Телефон", "id" : "phone", "width" : "1*"},
