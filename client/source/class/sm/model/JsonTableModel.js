@@ -91,7 +91,7 @@ qx.Class.define("sm.model.JsonTableModel", {
             for (var i = 0; i < items.length; ++i) {
                 var rData = null;
                 var rArr = items[i];
-                if (rArr.length == 2 && (rArr[0] instanceof Array)) {
+                if (rArr.length == 2 && Array.isArray(rArr[0])) {
                     rData = rArr[1];
                     rArr = rArr[0];
                 }
