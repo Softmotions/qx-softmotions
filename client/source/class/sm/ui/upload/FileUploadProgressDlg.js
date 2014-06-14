@@ -7,6 +7,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
     extend : qx.ui.window.Window,
 
     statics : {
+        __ALERT_WND : null
     },
 
     events : {
@@ -82,6 +83,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
                     }
                     xhr.onreadystatechange = function() {
                         if (this.readyState == this.DONE) {
+                            me.__parseMessageHeaders(this);
                             --tasks;
                             if (tasks == 0) {
                                 me.__done();
@@ -130,8 +132,43 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
             this.__progress = null;
             this.__urlFactory = null;
             this.__transferRequests = null;
-        }
+        },
 
+        __parseMessageHeaders : function(xhr) {
+            var errors = [];
+            var msgs = [];
+            var eh = "X-Softmotions-Err";
+            for (var i = 0; xhr.getResponseHeader(eh + i) != undefined; ++i) {
+                errors[errors.length] = "*" + decodeURIComponent(xhr.getResponseHeader(eh + i).replace(/\+/g, ' '));
+            }
+            eh = "X-Softmotions-Msg";
+            for (var i = 0; xhr.getResponseHeader(eh + i) != undefined; ++i) {
+                msgs[msgs.length] = "*" + decodeURIComponent(xhr.getResponseHeader(eh + i).replace(/\+/g, ' '));
+            }
+            if (errors.length > 0) {
+                this.__addMessages(this.tr("Errors"), errors);
+            }
+            if (msgs.length > 0) {
+                this.__addMessages(this.tr("Messages"), msgs);
+            }
+        },
+
+        __addMessages : function(caption, msgs) {
+            var self = this.self(arguments);
+            var awnd = self.__ALERT_WND;
+            if (awnd == null) {
+                awnd = self.__ALERT_WND = new sm.alert.AlertMessages(this.tr("System messages"));
+                awnd.addListener("close", function() {
+                    self.__ALERT_WND = null;
+                }, this);
+            }
+            awnd.addMessages(caption, msgs);
+            if (!awnd.isVisible()) {
+                awnd.open();
+            } else {
+                awnd.ensureOnTop();
+            }
+        }
     },
 
     destruct : function() {
