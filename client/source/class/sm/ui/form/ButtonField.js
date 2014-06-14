@@ -81,16 +81,26 @@ qx.Class.define("sm.ui.form.ButtonField", {
     },
 
 
-    construct : function(label, icon) {
+    /**
+     *
+     * @param label {String} Button label
+     * @param icon {String} Button icon path
+     * @param revese {Boolean?false}
+     *                Show child controls in referce order:
+     *                button -> reset button -> text field
+     */
+    construct : function(label, icon, revese) {
         this.base(arguments);
-        this._setLayout(new qx.ui.layout.HBox(2).set({alignY : "middle"}));
+        this._setLayout(new qx.ui.layout.HBox(4).set({alignY : "middle"}));
         this.__label = label;
         this.__icon = icon;
-        this.__ensureControls();
+        this.__ensureControls(!!revese);
         this.setShowResetButton(false);
     },
 
     members : {
+
+
         __label : null,
 
         __icon : null,
@@ -137,8 +147,8 @@ qx.Class.define("sm.ui.form.ButtonField", {
         _applyEnabled : function(value, old) {
             this.base(arguments, value, old);
             this.getChildControl("text").setEnabled(value);
-            this.getChildControl("button").setEnabled(value);
             this.getChildControl("reset").setEnabled(value);
+            this.getChildControl("button").setEnabled(value);
         },
 
         _createChildControlImpl : function(id, hash) {
@@ -172,6 +182,11 @@ qx.Class.define("sm.ui.form.ButtonField", {
                             this.fireEvent("execute");
                         }
                     }, this);
+                    control.addListener("dblclick", function(ev) {
+                        if (control.hasState("readonly")) {
+                            this.fireEvent("execute");
+                        }
+                    }, this);
                     control.addListener("changeValue", this.forwardEvent, this);
                     control.addListener("input", this.forwardEvent, this);
                     this._add(control, {flex : 1});
@@ -180,10 +195,14 @@ qx.Class.define("sm.ui.form.ButtonField", {
             return control || this.base(arguments, id);
         },
 
-        __ensureControls : function() {
-            this.getChildControl("text");
-            this.getChildControl("reset");
-            this.getChildControl("button");
+        __ensureControls : function(reverse) {
+            var names = ["text", "reset", "button"];
+            if (reverse) {
+                names.reverse();
+            }
+            names.forEach(function(n) {
+                this.getChildControl(n);
+            }, this);
         },
 
         __applyShowResetButton : function(val) {
