@@ -31,19 +31,5 @@ qx.Mixin.define("sm.ui.form.MStringForm", {
     },
 
     members : {
-
-        /* // overridden
-         setValue : function(value) {
-         this.fireDataEvent("changeValue", value);
-         },
-
-         // overridden
-         resetValue : function() {
-         },
-
-         // overridden
-         getValue : function() {
-         return null;
-         }*/
     }
 });
