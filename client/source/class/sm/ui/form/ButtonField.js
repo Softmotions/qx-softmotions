@@ -27,11 +27,6 @@ qx.Class.define("sm.ui.form.ButtonField", {
         /** Text field input event */
         "input" : "qx.event.type.Data",
 
-        /**
-         * Fired when user data changed
-         */
-        "changeUserData" : "qx.event.type.Data",
-
         /** Execute search, press ENTER ot button pressed */
         "execute" : "qx.event.type.Event",
 
@@ -49,14 +44,6 @@ qx.Class.define("sm.ui.form.ButtonField", {
         focusable : {
             refine : true,
             init : true
-        },
-
-        /**
-         * Custom user data
-         */
-        userData : {
-            nullable : true,
-            event : "changeUserData"
         },
 
         /**
