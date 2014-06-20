@@ -69,7 +69,7 @@ qx.Class.define("sm.model.JsonTableModel", {
                 for (var i = 0; i < colsSpec.length; ++i) {
                     var cs = colsSpec[i];
                     columns[i] = cs["title"];
-                    columnsData[i] = cs["id"] ? cs["id"] : new String(i);
+                    columnsData[i] = cs["id"] ? cs["id"] : String(i);
                 }
                 this.setColumns(columns, columnsData);
 

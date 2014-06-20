@@ -124,6 +124,16 @@ qx.Class.define("sm.table.Table", {
             }
 
             return sranges;
+        },
+
+
+        getCellValue : function(rowIndex, columnIndex) {
+            this.getTableModel().getValue(columnIndex, rowIndex);
+        },
+
+
+        setCellValue : function(rowIndex, columnIndex, value) {
+            this.getTableModel().setValue(columnIndex, rowIndex, value);
         }
 
 

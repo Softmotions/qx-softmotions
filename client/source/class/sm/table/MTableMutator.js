@@ -15,8 +15,7 @@
  */
 qx.Mixin.define("sm.table.MTableMutator", {
 
-    members :
-    {
+    members : {
 
         addRow : function(rowData, rowSpec, dataSpec) {
             var tm = this.getTableModel();
@@ -24,7 +23,7 @@ qx.Mixin.define("sm.table.MTableMutator", {
             var found = false;
             for (var i = 0; i < data.length; ++i) {
                 var di = data[i];
-                if ((typeof rowData) == "function") {
+                if (typeof rowData === "function") {
                     if (rowData(di.rowData) == true) {
                         found = true;
                         data[i] = qx.lang.Array.clone(rowSpec);
@@ -42,7 +41,7 @@ qx.Mixin.define("sm.table.MTableMutator", {
             }
             if (!found) {
                 var di = qx.lang.Array.clone(rowSpec);
-                di.rowData = ((dataSpec != null || (typeof rowData) == "function") ? dataSpec : rowData);
+                di.rowData = ((dataSpec != null || (typeof rowData === "function")) ? dataSpec : rowData);
                 data.push(di);
             }
             tm.setData(data);
@@ -54,7 +53,7 @@ qx.Mixin.define("sm.table.MTableMutator", {
             var ind = -1;
             for (var i = 0; i < data.length; ++i) {
                 var di = data[i];
-                if ((typeof rowData) == "function") {
+                if (typeof rowData === "function") {
                     if (rowData(di.rowData) == true) {
                         ind = i;
                         break;
@@ -75,22 +74,26 @@ qx.Mixin.define("sm.table.MTableMutator", {
         },
 
         moveRow : function(rowData, direction, moveSelection) {
-            if (direction != -1 && direction != 1) {
+            if (direction !== -1 && direction !== 1) {
                 throw new Error("Direction argument must be either: -1 or 1");
             }
             var tm = this.getTableModel();
             var data = tm.getData();
             var ind = -1;
-            for (var i = 0; i < data.length; ++i) {
-                if ((typeof rowData) == "function") {
-                    if (rowData(data[i].rowData) == true) {
-                        ind = i;
-                        break;
-                    }
-                } else {
-                    if (data[i].rowData == rowData) {
-                        ind = i;
-                        break;
+            if (typeof rowData === "number") {
+                ind = rowData;
+            } else {
+                for (var i = 0; i < data.length; ++i) {
+                    if (typeof rowData === "function") {
+                        if (rowData(data[i].rowData) == true) {
+                            ind = i;
+                            break;
+                        }
+                    } else {
+                        if (data[i].rowData == rowData) {
+                            ind = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -98,28 +101,28 @@ qx.Mixin.define("sm.table.MTableMutator", {
         },
 
         moveRowByIndex : function(ind, direction, moveSelection) {
-            if (direction != -1 && direction != 1) {
+            if (direction !== -1 && direction !== 1) {
                 throw new Error("Direction argument must be either: -1 or 1");
+            }
+            //trivial case
+            if (ind === null || ind === -1) {
+                return;
             }
             var tm = this.getTableModel();
             var data = tm.getData();
             //trivial case
-            if (ind == null || ind == -1) {
+            if (direction === 1 && ind >= data.length - 1) {
                 return;
             }
             //trivial case
-            if (direction == 1 && ind == data.length - 1) {
+            if (direction === -1 && ind <= 0) {
                 return;
             }
-            //trivial case
-            if (direction == -1 && ind == 0) {
-                return;
-            }
+
             var tmp = data[ind + direction];
             data[ind + direction] = data[ind];
             data[ind] = tmp;
             tm.setData(data);
-
             if (moveSelection) {
                 var sm = this.getSelectionModel();
                 sm.setSelectionInterval(ind + direction, ind + direction);

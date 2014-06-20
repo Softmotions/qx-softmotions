@@ -12,7 +12,7 @@ qx.Class.define("sm.event.Broadcaster", {
          * Eg.
          *   <pre>
          *       {
-         *         labe : "title",
+         *         label : "title",
          *         enabled : false
          *       }
          *   </pre>

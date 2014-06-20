@@ -63,12 +63,16 @@ qx.Class.define("sm.table.ToolbarTable", {
             return t != null ? t.getSelectionModel().getAnchorSelectionIndex() : -1;
         },
 
+        getRowCount : function() {
+            return this.getTableModel().getRowCount();
+        },
+
         /**
          * Возвращает значение ячейки по номеру столбца в выбранной строке
          */
         getSelectedRowCellValue : function(colInd) {
             var t = this.getTable();
-            return t != null ? this.getRowCellValue(colInd, this.getTable().getSelectionModel().getAnchorSelectionIndex()) : null;
+            return t != null ? this.getCellValue(this.getTable().getSelectionModel().getAnchorSelectionIndex(), colInd) : null;
         },
 
         /**
@@ -86,12 +90,22 @@ qx.Class.define("sm.table.ToolbarTable", {
 
         /**
          * Возвращает значение ячейки по номеру столбца и строки
+         * @deprecated
          */
         getRowCellValue : function(colInd, rowInd) {
             if (colInd < 0 || rowInd < 0 || this.getTable() == null) {
                 return null;
             }
             return this.getTable().getTableModel().getValue(colInd, rowInd);
+        },
+
+        getCellValue : function(rowIndex, columnIndex) {
+            return this.getTable().getTableModel().getValue(columnIndex, rowIndex);
+        },
+
+
+        setCellValue : function(rowIndex, columnIndex, value) {
+            this.getTable().getTableModel().setValue(columnIndex, rowIndex, value);
         },
 
         /**
