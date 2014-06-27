@@ -157,6 +157,17 @@ qx.Theme.define("sm.Appearance", {
                     margin : 0
                 };
             }
+        },
+
+
+        "toolbar-table-menubutton" : {
+            alias : "toolbar-menubutton",
+            include : "toolbar-menubutton",
+            style : function(states) {
+                return {
+                    margin : 0
+                };
+            }
         }
     }
 
