@@ -82,6 +82,14 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
             this.base(arguments);
         },
 
+        close : function() {
+            this.destroy();
+        },
+
+        open : function() {
+            this.show();
+        },
+
         save : function() {
             var vmgr = this._form.getValidationManager();
             vmgr.validate();
