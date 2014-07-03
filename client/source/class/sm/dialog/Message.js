@@ -93,6 +93,9 @@ qx.Class.define("sm.dialog.Message", {
             this.center();
             this.getChildControl("button-close").focus();
         }, this);
+
+        var cmd  = this.createCommand("Esc");
+        cmd.addListener("execute", this.close, this);
     },
 
     members : {

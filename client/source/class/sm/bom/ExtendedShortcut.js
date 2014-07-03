@@ -302,9 +302,11 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
                     ) {
                 return false;
             }
+
             if (key == e.getKeyIdentifier()) {
                 return true;
             }
+
             return false;
         },
 
@@ -352,10 +354,10 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
          * @return {String} normalized keyIdentifier or "Unidentified" if a conversion was not possible
          */
         __normalizeKeyIdentifier : function(keyName) {
-            var KeyHandler = qx.event.util.Keyboard;
+            var kbUtil = qx.event.util.Keyboard;
             var keyIdentifier = "Unidentified";
 
-            if (KeyHandler.isValidKeyIdentifier(keyName)) {
+            if (kbUtil.isValidKeyIdentifier(keyName)) {
                 return keyName;
             }
 
@@ -364,9 +366,9 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
             }
 
             keyName = keyName.toLowerCase();
-            var keyIdentifier = this.__oldKeyNameToKeyIdentifierMap[keyName] || qx.lang.String.firstUp(keyName);
+            keyIdentifier = this.__oldKeyNameToKeyIdentifierMap[keyName] || qx.lang.String.firstUp(keyName);
 
-            if (KeyHandler.isValidKeyIdentifier(keyIdentifier)) {
+            if (kbUtil.isValidKeyIdentifier(keyIdentifier)) {
                 return keyIdentifier;
             } else {
                 return "Unidentified";

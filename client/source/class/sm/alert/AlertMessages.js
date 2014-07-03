@@ -9,12 +9,6 @@
 qx.Class.define("sm.alert.AlertMessages", {
     extend : qx.ui.window.Window,
 
-    events : {
-    },
-
-    properties : {
-    },
-
     construct : function(caption) {
         this.base(arguments, caption);
         this.setLayout(new qx.ui.layout.VBox(10));
@@ -39,13 +33,11 @@ qx.Class.define("sm.alert.AlertMessages", {
             cancel.focus();
         }, this);
 
-        this.__closeCmd = new qx.ui.core.Command("Esc");
-        this.__closeCmd.addListener("execute", this.close, this);
+        var cmd = this.createCommand("Esc");
+        cmd.addListener("execute", this.close, this);
     },
 
     members : {
-
-        __closeCmd : null,
 
         __cancel : null,
 
@@ -111,10 +103,6 @@ qx.Class.define("sm.alert.AlertMessages", {
         },
 
         __dispose : function() {
-            if (this.__closeCmd) {
-                this.__closeCmd.setEnabled(false);
-            }
-            this._disposeObjects("__closeCmd");
             this.resetMessages();
         }
     },
