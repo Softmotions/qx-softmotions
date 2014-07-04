@@ -10,9 +10,11 @@ qx.Mixin.define("sm.event.MForwardEvent", {
          * @param ev {qx.event.type.Event} The original event
          */
         forwardEvent : function(ev) {
-            var clonedEvent = ev.clone();
-            clonedEvent.setTarget(this);
-            this.dispatchEvent(clonedEvent);
+            if (this.hasListener(ev.getType())) {
+                var clonedEvent = ev.clone();
+                clonedEvent.setTarget(this);
+                this.dispatchEvent(clonedEvent);
+            }
         }
 
     }
