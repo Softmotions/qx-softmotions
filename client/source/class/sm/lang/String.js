@@ -88,6 +88,10 @@ qx.Class.define("sm.lang.String", {
                 result.push(entity);
             }
             return result.join("");
+        },
+
+        lastChar : function(str) {
+            return (str != null && str.length > 0) ? str.charAt(str.length - 1) : null;
         }
 
     },
