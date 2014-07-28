@@ -27,16 +27,24 @@ qx.Class.define("sm.ui.form.ExtendedForm", {
             var items = this.getItems();
             for (var k in items) {
                 var item = items[k];
+                var val;
                 if (typeof item.getValue === "function") {
-                    var val = item.getValue();
-                    if (val != null && asStrings) {
-                        val = val.toString();
+                    val = item.getValue();
+                } else if (typeof item.getModelSelection === "function") {
+                    var ms = item.getModelSelection();
+                    if (ms && ms.length === 1) {
+                        val = ms.getItem(0);
                     }
-                    if (val == null && notNulls) {
-                        continue;
-                    }
-                    obj[k] = val;
+                } else {
+                    continue;
                 }
+                if (val != null && asStrings) {
+                    val = val.toString();
+                }
+                if (val == null && notNulls) {
+                    continue;
+                }
+                obj[k] = val;
 
             }
             return obj;
