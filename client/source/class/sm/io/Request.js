@@ -27,7 +27,12 @@ qx.Class.define("sm.io.Request", {
          *
          * data: error or null
          */
-        "finished" : "qx.event.type.Data"
+        "finished" : "qx.event.type.Data",
+
+        /**
+         * Error condition including `abort`, `cancel`, `fail`
+         */
+        "error" : "qx.event.type.Event"
     },
 
     properties : {
@@ -88,19 +93,27 @@ qx.Class.define("sm.io.Request", {
             }
         },
 
-
         _onaborted : function(e) {
             this.fireDataEvent("finished", e);
+            if (this.hasListener("error")) {
+               this.fireEvent("error");
+            }
             this.base(arguments, e);
         },
 
         _ontimeout : function(e) {
             this.fireDataEvent("finished", e);
+            if (this.hasListener("error")) {
+                this.fireEvent("error");
+            }
             this.base(arguments, e);
         },
 
         _onfailed : function(e) {
             this.fireDataEvent("finished", e);
+            if (this.hasListener("error")) {
+                this.fireEvent("error");
+            }
             var got = this.__checkMessages(e);
             if (this.getShowMessages() == true) {
                 if (!got) {
