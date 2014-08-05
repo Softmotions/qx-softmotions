@@ -17,8 +17,7 @@ qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
         this.base(arguments, form);
     },
 
-    members :
-    {
+    members : {
         _buttonRow : null,
 
         //overriden
@@ -40,7 +39,7 @@ qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
 
                 // store the names for translation
                 if (qx.core.Environment.get("qx.dynlocale")) {
-                    this._names.push({name: names[i], label: label, item: items[i]});
+                    this._names.push({name : names[i], label : label, item : items[i]});
                 }
             }
         },
@@ -69,7 +68,7 @@ qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
         _createLabel : function(name, item) {
             var label = new qx.ui.basic.Label(this._createLabelText(name, item));
             label.setRich(true);
-            label.setMarginTop(2);
+            label.setMarginTop(10);
             return label;
         },
 
@@ -79,7 +78,7 @@ qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
                 required = " <span style='color:red'>*</span> ";
             }
             // Create the label. Append a colon only if there's text to display.
-            return name + required;
+            return qx.bom.String.escape(name) + required;
         },
 
         _createHeader : function(title) {
