@@ -120,21 +120,11 @@ qx.Class.define("sm.ui.embed.ScaledIframe", {
                     width : qx.bom.Document.getWidth(win),
                     height : qx.bom.Document.getHeight(win)
                 };
-                sz.width += 20; //todo duty hack
+                sz.width += 30; //todo duty hack
                 return sz;
             } catch (e) {
                 return null;
             }
-        },
-
-        _createBlockerElement : function() {
-            var el = new qx.html.Blocker();
-            el.setStyles({
-                "zIndex" : 1e8,
-                "display" : "block"
-            });
-
-            return el;
         }
     },
 
