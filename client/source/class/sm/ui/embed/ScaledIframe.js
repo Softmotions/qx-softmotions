@@ -41,6 +41,8 @@ qx.Class.define("sm.ui.embed.ScaledIframe", {
 
         __originalSz : null,
 
+        __currentRatio : null,
+
         __applyFitWidth : function() {
             this.__onload();
         },
@@ -54,38 +56,7 @@ qx.Class.define("sm.ui.embed.ScaledIframe", {
             if (iframeDom == null || iframeDom.contentDocument.documentElement == null) {
                 return;
             }
-            var iframeDoc = iframeDom.contentDocument.documentElement;
-            var paneSz = this.getInnerSize();
-            var originalSz = this.__originalSz = this._getIframeSize();
-            var szRatio = (paneSz.width / originalSz.width);
-            if (szRatio < 1.0) {
-                var scale = "scale(" + szRatio + ")";
-                var origin = "top left";
-                qx.core.Environment.select("engine.name", {
-                    "gecko" : function() {
-                        iframeDoc.style.MozTransform = scale;
-                        iframeDoc.style.MozTransformOrigin = origin;
-                    },
-                    "webkit" : function() {
-                        iframeDoc.style.webkitTransform = scale;
-                        iframeDoc.style.webkitTransformOrigin = origin;
-                    },
-                    "mshtml" : function() {
-                        iframeDoc.style.msTransform = scale;
-                        iframeDoc.style.msTransformOrigin = origin;
-                    },
-                    "opera" : function() {
-                        iframeDoc.style.webkitTransform = scale;
-                        iframeDoc.style.webkitTransformOrigin = origin;
-                        iframeDoc.style.oTransform = scale;
-                        iframeDoc.style.oTransformOrigin = origin;
-                    },
-                    "default" : function() {
-                        iframeDoc.style.transform = scale;
-                        iframeDoc.style.transformOrigin = origin;
-                    }
-                })();
-            }
+            this.__originalSz = this._getIframeSize();
             this.__syncScale();
         },
 
@@ -106,42 +77,51 @@ qx.Class.define("sm.ui.embed.ScaledIframe", {
             if (szRatio > 1.0) {
                 szRatio = 1.0;
             }
-            var scale = "scale(" + szRatio + ")";
+            this._scale(iframeDoc, szRatio);
+        },
+
+        _scale : function(el, ratio) {
+            if (this.__currentRatio === ratio) {
+                return;
+            }
+            var scale = "scale(" + ratio + ")";
             var origin = "top left";
             qx.core.Environment.select("engine.name", {
-
                 "gecko" : function() {
-                    iframeDoc.style.MozTransform = scale;
-                    iframeDoc.style.MozTransformOrigin = origin;
+                    el.style.MozTransform = scale;
+                    el.style.MozTransformOrigin = origin;
                 },
-
                 "webkit" : function() {
-                    iframeDoc.style.webkitTransform = scale;
-                    iframeDoc.style.webkitTransformOrigin = origin;
+                    el.style.webkitTransform = scale;
+                    el.style.webkitTransformOrigin = origin;
                 },
-
+                "mshtml" : function() {
+                    el.style.msTransform = scale;
+                    el.style.msTransformOrigin = origin;
+                },
                 "opera" : function() {
-                    iframeDoc.style.webkitTransform = scale;
-                    iframeDoc.style.webkitTransformOrigin = origin;
-                    iframeDoc.style.oTransform = scale;
-                    iframeDoc.style.oTransformOrigin = origin;
+                    el.style.webkitTransform = scale;
+                    el.style.webkitTransformOrigin = origin;
+                    el.style.oTransform = scale;
+                    el.style.oTransformOrigin = origin;
                 },
-
                 "default" : function() {
-                    iframeDoc.style.zoom = szRatio;
+                    el.style.transform = scale;
+                    el.style.transformOrigin = origin;
                 }
-
             })();
-
+            this.__currentRatio = ratio;
         },
 
         _getIframeSize : function() {
             try {
                 var win = this._getIframeElement().getWindow();
-                return {
+                var sz = {
                     width : qx.bom.Document.getWidth(win),
                     height : qx.bom.Document.getHeight(win)
                 };
+                sz.width += 20; //todo duty hack
+                return sz;
             } catch (e) {
                 return null;
             }
