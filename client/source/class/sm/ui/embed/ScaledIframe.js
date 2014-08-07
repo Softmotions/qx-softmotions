@@ -34,7 +34,6 @@ qx.Class.define("sm.ui.embed.ScaledIframe", {
         this.setScrollbar("auto");
         this.addListener("resize", this.__syncScale, this);
         this.addListener("load", this.__onload, this);
-        this.setDecorator("main");
     },
 
     members : {
