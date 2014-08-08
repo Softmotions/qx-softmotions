@@ -84,9 +84,11 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return this.__constVspec;
         },
 
-        setConstViewSpec : function(cvs) {
+        setConstViewSpec : function(cvs, noupdate) {
             this.__constVspec = cvs;
-            this.updateViewSpec(cvs || {});
+            if (!noupdate) {
+                this.updateViewSpec(cvs || {});
+            }
         },
 
         getViewSpec : function() {

@@ -32,6 +32,22 @@ qx.Class.define("sm.ui.tree.ExtendedVirtualTree", {
                 }
             }
             return null;
+        },
+
+
+        /**
+         * Iterate over all cached tree nodes.
+         *
+         * @param fn {Function} Iterator callback. if it returns {@code true} iteration will be terminated.
+         * @param ctx {Object?} Iterator callback context.
+         */
+        iterateOverCachedNodes : function(fn, ctx) {
+            var lt = this.getLookupTable();
+            for (var i = 0, l = lt.length; i < l; ++i) {
+                if (fn.call(ctx, lt.getItem(i)) === true) {
+                    return;
+                }
+            }
         }
     },
 
