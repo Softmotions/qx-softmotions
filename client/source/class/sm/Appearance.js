@@ -64,7 +64,8 @@ qx.Theme.define("sm.Appearance", {
                 }
                 return {
                     decorator : decorator,
-                    padding : padding
+                    padding : padding,
+                    margin : [0, 0, 2, 0]
                 };
             }
         },
