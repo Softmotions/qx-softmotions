@@ -130,6 +130,14 @@ qx.Class.define("sm.ui.form.ButtonField", {
             this.getChildControl("text").setPlaceholder(text);
         },
 
+        getMainButton : function() {
+            return this.getChildControl("button", true);
+        },
+
+        getResetButton : function() {
+            return this.getChildControl("reset", true);
+        },
+
         //overriden
         _applyEnabled : function(value, old) {
             this.base(arguments, value, old);
