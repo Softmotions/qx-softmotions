@@ -122,7 +122,7 @@ qx.Class.define("sm.ui.form.SearchField", {
 
         // overridden
         resetValue : function() {
-            this.getChildControl("text").resetValue();
+            this.getChildControl("text").setValue("");
         },
 
         // overridden
@@ -175,11 +175,14 @@ qx.Class.define("sm.ui.form.SearchField", {
                     control.addListener("input", valueWatch, this);
                     control.addListener("changeValue", valueWatch, this);
                     control.addListener("keydown", function(ev) {
-                        if (ev.getKeyCode() == 13) {
+                        if (ev.getKeyCode() === 13) {
                             ev.stop();
                             this.fireEvent("execute");
+                        } else if (ev.getKeyIdentifier() === "Escape") {
+                            this.resetValue();
                         }
                     }, this);
+
                     this._add(control, {"flex" : 1});
                     break;
                 case "clear" : //clear icon
@@ -187,7 +190,7 @@ qx.Class.define("sm.ui.form.SearchField", {
                     this._add(control);
                     control.hide();
                     control.addListener("click", function(ev) {
-                        this.setValue("");
+                        this.resetValue();
                     }, this);
                     break;
             }

@@ -206,7 +206,8 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 }
             }
             var sind = this.__vspec["sortInd"];
-            if (sind != -1) {
+            if (sind != -1 &&
+                    (this.__vspec["sortAsc"] == null && this.__vspec["sortDesc"] == null)) {
                 var columnId = this.getColumnId(sind);
                 if (this.__vspec["isAsc"]) {
                     req.setParameter("sortAsc", columnId)
