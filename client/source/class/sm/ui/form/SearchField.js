@@ -198,7 +198,13 @@ qx.Class.define("sm.ui.form.SearchField", {
         //overriden
         _applyEnabled : function(value, old) {
             this.base(arguments, value, old);
-            this.getChildControl("text").setEnabled(value);
+            ["clear", "text"].forEach(function(name) {
+                var el = this.getChildControl(name, true);
+                if (el) {
+                    el.setEnabled(value);
+                }
+            }, this);
+
         }
     },
 

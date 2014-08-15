@@ -65,7 +65,8 @@ qx.Theme.define("sm.Appearance", {
                 return {
                     decorator : decorator,
                     padding : padding,
-                    margin : [0, 0, 2, 0]
+                    margin : [0, 0, 2, 0],
+                    backgroundColor : states.disabled ? "background-disabled" : undefined
                 };
             }
         },

@@ -141,9 +141,12 @@ qx.Class.define("sm.ui.form.ButtonField", {
         //overriden
         _applyEnabled : function(value, old) {
             this.base(arguments, value, old);
-            this.getChildControl("text").setEnabled(value);
-            this.getChildControl("reset").setEnabled(value);
-            this.getChildControl("button").setEnabled(value);
+            ["button", "reset", "text"].forEach(function(name) {
+                var el = this.getChildControl(name, true);
+                if (el) {
+                    el.setEnabled(value);
+                }
+            }, this);
         },
 
         _createChildControlImpl : function(id, hash) {
