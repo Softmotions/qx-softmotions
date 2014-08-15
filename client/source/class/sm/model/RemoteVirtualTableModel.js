@@ -186,7 +186,8 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             var ids = [];
             for (var i = 0; i < cols.length; ++i) {
                 ids.push(cols[i]);
-                labels.push(cmeta[cols[i]]);
+                var c = cmeta[cols[i]];
+                labels.push((typeof c["title"] === "string") ? c["title"] : String(c));
             }
             this.setColumns(labels, ids);
         },

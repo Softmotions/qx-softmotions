@@ -32,8 +32,11 @@ qx.Class.define("sm.model.JsonTableColumnModel", {
             // Call our superclass
             this.base(arguments, numColumns, table);
 
-            for (var i = 0; i < this._colsSpec.length; ++i) {
+            for (var i = 0; i < this._colsSpec.length && i < numColumns; ++i) {
                 var cs = this._colsSpec[i];
+                if (cs == null) {
+                    continue;
+                }
                 if (cs["width"] != null) {
                     scb.setWidth(i, cs["width"], cs["flex"]);
                 }
