@@ -42,7 +42,7 @@ qx.Class.define("sm.ui.form.ExtendedDoubleFormRenderer", {
                         this._row++;
                     }
                 }
-                if (options[i]["flex"] != null) {
+                if (options[i] && options[i]["flex"] != null) {
                     this._getLayout().setColumnFlex(col, options[i]["flex"]);
                 }
 
