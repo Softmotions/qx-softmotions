@@ -208,7 +208,12 @@ qx.Class.define("sm.ui.form.SearchField", {
                 }
             }, this);
 
+        },
+
+        focus : function() {
+            this.getChildControl("text").focus();
         }
+
     },
 
     destruct : function() {
