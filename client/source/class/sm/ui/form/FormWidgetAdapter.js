@@ -48,6 +48,16 @@ qx.Class.define("sm.ui.form.FormWidgetAdapter", {
                 this.removeState("readonly");
                 this.setFocusable(true);
             }
+            if (this.__wrapped && typeof this.__wrapped.setReadOnly === "function") {
+                this.__wrapped.setReadOnly(value);
+            }
+        },
+
+        _applyEnabled : function(value, old) {
+            this.base(arguments, value);
+            if (this.__wrapped && typeof this.__wrapped.setEnabled === "function") {
+                this.__wrapped.setEnabled(value);
+            }
         }
     },
 
