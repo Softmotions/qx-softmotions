@@ -1,7 +1,7 @@
 /**
  * General message window. Contains optional image, message and one button (close)
  *
- * Available options for dialog^
+ * Available options for dialog
  *  - caption {String|null} - caption on window
  *  - image {String|null} - image to show on window
  *  - message {String} - message to show
@@ -14,6 +14,7 @@
  * @childControl message {qx.ui.basic.Label}
  * @childControl buttons-container {qx.ui.container.Composite}
  * @childControl button-close {qx.ui.form.Button}
+ * @childControl checkbox {qx.ui.form.CheckBox}
  *
  * @asset(qx/icon/${qx.icontheme}/48/status/dialog-information.png)
  */
@@ -24,6 +25,12 @@ qx.Class.define("sm.dialog.Message", {
     },
 
     properties : {
+
+        appearance : {
+            refine : true,
+            init : "sm-message"
+        },
+
         /**
          * Image/logo that is displayed
          */
@@ -49,7 +56,7 @@ qx.Class.define("sm.dialog.Message", {
          */
         "closeButtonLabel" : {
             check : "String",
-            init :qx.locale.Manager.tr("Close"),
+            init : qx.locale.Manager.tr("Close"),
             nullable : false
         },
 
@@ -94,7 +101,7 @@ qx.Class.define("sm.dialog.Message", {
             this.getChildControl("button-close").focus();
         }, this);
 
-        var cmd  = this.createCommand("Esc");
+        var cmd = this.createCommand("Esc");
         cmd.addListener("execute", this.close, this);
     },
 
@@ -109,6 +116,9 @@ qx.Class.define("sm.dialog.Message", {
             this.setImage(options["image"] !== undefined ? options["image"] : this.getImage());
             this.setMessage(options["message"]);
 
+            if (options["checkbox"]) {
+                this.getChildControl("checkbox");
+            }
             this.setCallback(options["callback"]);
             this.setContext(options["context"]);
         },
@@ -129,14 +139,22 @@ qx.Class.define("sm.dialog.Message", {
 
                 case "message" :
                     control = new qx.ui.basic.Label();
-                    control.set({rich : true, selectable : true, maxWidth: 350, wrap: true});
+                    control.set({rich : true, selectable : true, maxWidth : 350, wrap : true});
                     control.setValue(this.getMessage());
                     this.getChildControl("general-container").add(control);
                     break;
 
+                case "checkbox" :
+                    var cbo = this._options["checkbox"];
+                    control = new qx.ui.form.CheckBox(cbo["label"]);
+                    control.setValue(!!cbo["value"]);
+                    this.addAfter(control, this.getChildControl("general-container"));
+                    break;
+
                 case "buttons-container":
                     control = new qx.ui.container.Composite(new qx.ui.layout.HBox(10, "center"));
-                    this.addAfter(control, this.getChildControl("general-container"));
+                    //this.addAfter(control, this.getChildControl("general-container"));
+                    this.add(control);
                     break;
 
                 case "button-close":

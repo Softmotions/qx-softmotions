@@ -22,7 +22,7 @@ qx.Class.define("sm.dialog.Confirm", {
         },
 
         "closeButtonLabel" : {
-            init :qx.locale.Manager.tr("No"),
+            init : qx.locale.Manager.tr("No"),
             refine : true
         },
 
@@ -31,14 +31,13 @@ qx.Class.define("sm.dialog.Confirm", {
          */
         "okButtonLabel" : {
             check : "String",
-            init :qx.locale.Manager.tr("Yes"),
+            init : qx.locale.Manager.tr("Yes"),
             nullable : false
         }
     },
 
     construct : function(options) {
         this.base(arguments, options);
-
         this.getChildControl("button-ok").addListener("execute", function() {
             this._handleOk();
         }, this);
@@ -46,9 +45,8 @@ qx.Class.define("sm.dialog.Confirm", {
 
     members : {
         _createChildControlImpl : function(id, hash) {
-          var control;
-
-            switch(id) {
+            var control;
+            switch (id) {
                 case "button-ok":
                     control = new qx.ui.form.Button(this.getOkButtonLabel());
                     this.getChildControl("buttons-container").addBefore(control, this.getChildControl("button-close"));
@@ -60,7 +58,8 @@ qx.Class.define("sm.dialog.Confirm", {
 
         _handleOk : function() {
             if (this.getCallback()) {
-                this.getCallback().call(this.getContext() || this, true);
+                var cbox = this.getChildControl("checkbox", true);
+                this.getCallback().call(this.getContext() || this, true, (cbox != null ? cbox.getValue() : null));
             }
             this.resetCallback();
             this.close();

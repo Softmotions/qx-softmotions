@@ -43,6 +43,14 @@ qx.Theme.define("sm.Appearance", {
             }
         },
 
+        "sm-message" : "window",
+
+        "sm-message/checkbox" : "checkbox",
+
+        "sm-message/image" : "image",
+
+        "sm-message/button" : "button",
+
         //------------------ Search field widget (sm.ui.form.SearchField)
 
         "sm-search-field" : {
