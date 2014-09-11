@@ -5,8 +5,6 @@ qx.Class.define("sm.util.Validate", {
 
     statics : {
 
-
-
         compositeValidator : function() {
             var args = Array.prototype.slice.apply(arguments);
             return function(value, formItem) {
@@ -67,7 +65,7 @@ qx.Class.define("sm.util.Validate", {
             if (typeof value === "number") {
                 return;
             }
-            if (isNaN(parseInt(value))) {
+            if (isNaN(Number(value))) {
                 throw new qx.core.ValidationError("Validation Error", errorMessage);
             }
         },
@@ -75,6 +73,29 @@ qx.Class.define("sm.util.Validate", {
         canBeNumber : function(errorMessage) {
             return function(value, formItem) {
                 return sm.util.Validate.checkCanBeNumber(value, formItem, errorMessage);
+            }
+        },
+
+
+        checkCanBeRangeNumber : function(value, formItem, min, max) {
+            value = Number(value);
+            if (isNaN(value)) {
+                throw new qx.core.ValidationError("Validation Error",
+                        qx.locale.Manager.tr("%1 is not a number.", (value || "")));
+            }
+            if (min != null && value < min) {
+                throw new qx.core.ValidationError("Validation Error",
+                        qx.locale.Manager.tr("%1 cannot be lesser than %2.", (value || ""), min));
+            }
+            if (max != null && value > max) {
+                throw new qx.core.ValidationError("Validation Error",
+                        qx.locale.Manager.tr("%1 cannot be greater than %2.", (value || ""), max));
+            }
+        },
+
+        canBeRangeNumber : function(min, max) {
+            return function(value, formItem) {
+                return sm.util.Validate.checkCanBeRangeNumber(value, formItem, min, max);
             }
         },
 
