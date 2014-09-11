@@ -4,7 +4,7 @@
  */
 
 qx.Class.define("sm.table.ToolbarLocalTable", {
-    extend  : sm.table.ToolbarTable,
+    extend : sm.table.ToolbarTable,
 
 
     construct : function() {
@@ -12,8 +12,26 @@ qx.Class.define("sm.table.ToolbarLocalTable", {
 
     },
 
-    members :
-    {
+    members : {
+
+        removeSelected : function() {
+            var tm = this._table.getTableModel();
+            if (tm == null) {
+                return;
+            }
+            var data = tm.getData();
+            var sel = [];
+            this._table.getSelectionModel().iterateSelection(function(ind) {
+                if (data[ind] != null) {
+                    sel.push(data[ind]);
+                }
+            });
+            var ndata = tm.getData().filter(function(item) {
+                return (sel.indexOf(item) === -1);
+            });
+            tm.setData(ndata);
+        },
+
 
         //overriden
         _createTableModel : function() {
@@ -41,6 +59,7 @@ qx.Class.define("sm.table.ToolbarLocalTable", {
         _setJsonTableData : function(tm, data) {
             throw new Error("Abstract method call");
         }
+
     }
 
 });
