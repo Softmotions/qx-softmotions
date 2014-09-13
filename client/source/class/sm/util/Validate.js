@@ -77,7 +77,10 @@ qx.Class.define("sm.util.Validate", {
         },
 
 
-        checkCanBeRangeNumber : function(value, formItem, min, max) {
+        checkCanBeRangeNumber : function(value, formItem, min, max, allowEmpty) {
+            if (allowEmpty && sm.lang.String.isEmpty(value)) {
+                return;
+            }
             value = Number(value);
             if (isNaN(value)) {
                 throw new qx.core.ValidationError("Validation Error",
@@ -93,9 +96,9 @@ qx.Class.define("sm.util.Validate", {
             }
         },
 
-        canBeRangeNumber : function(min, max) {
+        canBeRangeNumber : function(min, max, allowEmpty) {
             return function(value, formItem) {
-                return sm.util.Validate.checkCanBeRangeNumber(value, formItem, min, max);
+                return sm.util.Validate.checkCanBeRangeNumber(value, formItem, min, max, allowEmpty);
             }
         },
 
