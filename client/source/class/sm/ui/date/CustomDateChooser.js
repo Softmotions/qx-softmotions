@@ -37,8 +37,8 @@ qx.Class.define("sm.ui.date.CustomDateChooser", {
                     control.setAllowGrowX(true);
                     control.setAllowGrowY(true);
                     control.setCursor("default");
-                    control.addListener("mousedown", this._onDayClicked, this);
-                    control.addListener("dblclick", this._onDayDblClicked, this);
+                    control.addListener("pointerdown", this._onDayTap, this);
+                    control.addListener("dbltap", this._onDayDblTap, this);
                     control.addListener("changeValue", this._dayLabelChanged, this);
                     this.__customDayLabelArr.push(control);
                     break;
