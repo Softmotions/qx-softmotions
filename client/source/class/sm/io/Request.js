@@ -45,6 +45,18 @@ qx.Class.define("sm.io.Request", {
             nullable : false,
             check : "Boolean",
             init : true
+        },
+
+        /**
+         * Кастомное отображение ошибок запроса.
+         * Функция вида: function(isError, messages), где
+         *  - isError - являются ли сообщения ошибками (boolean)
+         *  - messages - сообщения указанного типа (string[])
+         */
+        messageHandler : {
+            nullable : true,
+            check: "Function",
+            init : true
         }
     },
 
@@ -165,15 +177,20 @@ qx.Class.define("sm.io.Request", {
                 msgs[msgs.length] = "*" + decodeURIComponent(headers[eh + i].replace(/\+/g, ' '));
             }
             if (errors.length > 0) {
-                this.__addMessages(this.tr("Errors"), errors);
+                this.__addMessages(true, errors);
             }
             if (msgs.length > 0) {
-                this.__addMessages(this.tr("Messages"), msgs);
+                this.__addMessages(false, msgs);
             }
             return (errors.length > 0);
         },
 
-        __addMessages : function(caption, msgs) {
+        __addMessages : function(isError, msgs) {
+            if (this.getMessageHandler()) {
+                this.getMessageHandler().call(this, isError, msgs);
+                return;
+            }
+
             var awnd = sm.io.Request.__ALERT_WND;
             if (awnd == null) {
                 awnd = sm.io.Request.__ALERT_WND = new sm.alert.AlertMessages(this.tr("System messages"));
@@ -181,6 +198,7 @@ qx.Class.define("sm.io.Request", {
                     sm.io.Request.__ALERT_WND = null;
                 }, this);
             }
+            var caption = isError ? this.tr("Errors") : this.tr("Messages");
             awnd.addMessages(caption, msgs);
             if (!awnd.isVisible()) {
                 awnd.open();
