@@ -10,6 +10,7 @@ qx.Class.define("sm.ui.form.ExtendedDoubleFormRenderer", {
 
     construct : function(form) {
         this.base(arguments, form);
+        var layout = this._getLayout();
     },
 
     members : {

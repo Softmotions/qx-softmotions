@@ -28,7 +28,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
         "input" : "qx.event.type.Data",
 
         /** Execute search, press ENTER ot button pressed */
-        "execute" : "qx.event.type.Event",
+        "execute" : "qx.event.type.Data",
 
         /** Reset field event */
         "reset" : "qx.event.type.Event"
@@ -75,11 +75,14 @@ qx.Class.define("sm.ui.form.ButtonField", {
      * @param revese {Boolean?false}
      *                Show child controls in referce order:
      *                button -> reset button -> text field
+     * @param menuspec {Array?null} Array of [label, value]
+     *
      */
-    construct : function(label, icon, revese) {
+    construct : function(label, icon, revese, menuspec) {
         this.base(arguments);
         this._setLayout(new qx.ui.layout.HBox(4).set({alignY : "middle"}));
         this.__label = label;
+        this.__menuspec = Array.isArray(menuspec) ? menuspec : null;
         this.__icon = icon;
         this.__ensureControls(!!revese);
         this.setShowResetButton(false);
@@ -92,7 +95,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
 
         __icon : null,
 
-        __button : null,
+        __menuspec : null,
 
 
         _forwardStates : {
@@ -153,10 +156,27 @@ qx.Class.define("sm.ui.form.ButtonField", {
             var control;
             switch (id) {
                 case "button" :
-                    control = new qx.ui.form.Button(this.__label, this.__icon);
-                    control.addListener("execute", function(ev) {
-                        this.fireEvent("execute");
-                    }, this);
+                    if (this.__menuspec != null && this.__menuspec.length > 1) {
+                        var menu = new qx.ui.menu.Menu();
+                        this.__menuspec.forEach(function(ms) {
+                            var mbt = new qx.ui.menu.Button(ms[0]);
+                            mbt.setUserData("model", ms[1]);
+                            mbt.addListener("execute", function(ev) {
+                                var mbt = ev.getTarget();
+                                this.fireDataEvent("execute", mbt.getUserData("model"));
+                            }, this);
+                            menu.add(mbt);
+                        }, this);
+                        control = new qx.ui.form.MenuButton(this.__label, this.__icon, menu);
+                    } else {
+                        control = new qx.ui.form.Button(this.__label, this.__icon);
+                        if (this.__menuspec != null && this.__menuspec.length === 1) {
+                            this.setUserData("model", this.__menuspec[0][1]);
+                        }
+                        control.addListener("execute", function(ev) {
+                            this.fireDataEvent("execute", this.getUserData("model"));
+                        }, this);
+                    }
                     this._add(control);
                     break;
                 case "reset":
@@ -177,12 +197,12 @@ qx.Class.define("sm.ui.form.ButtonField", {
                     control.addListener("keydown", function(ev) {
                         if (ev.getKeyCode() == 13) {
                             ev.stop();
-                            this.fireEvent("execute");
+                            this.fireDataEvent("execute", this.getUserData("model"));
                         }
                     }, this);
                     control.addListener("dblclick", function(ev) {
                         if (control.hasState("readonly")) {
-                            this.fireEvent("execute");
+                            this.fireDataEvent("execute", this.getUserData("model"));
                         }
                     }, this);
                     control.addListener("changeValue", this.forwardEvent, this);
@@ -225,7 +245,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
     },
 
     destruct : function() {
-        this.__label = this.__icon = this.__button = null;
+        this.__label = this.__icon;
     }
 });
 

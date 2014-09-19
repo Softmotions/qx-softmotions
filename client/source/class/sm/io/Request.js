@@ -55,8 +55,8 @@ qx.Class.define("sm.io.Request", {
          */
         messageHandler : {
             nullable : true,
-            check: "Function",
-            init : true
+            check : "Function",
+            init : null
         }
     },
 
@@ -209,6 +209,7 @@ qx.Class.define("sm.io.Request", {
     },
 
     destruct : function() {
+        this.setMessageHandler(null);
         this.__onsuccess = this.__self = null;
     }
 });
