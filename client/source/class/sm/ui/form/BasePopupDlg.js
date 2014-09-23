@@ -53,7 +53,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
 
         this._setLayout(new qx.ui.layout.VBox());
         this.set({
-            width : 250,
+            width : 300,
             padding : [10, 4]
         });
 
