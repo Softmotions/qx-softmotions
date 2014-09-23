@@ -33,7 +33,7 @@
         "QOOXDOO_PATH" : "../../../../qooxdoo/trunk",
         "QXTHEME"      : "collapsablepanel.demo.theme.Theme",
         "API_EXCLUDE"  : ["qx.test.*"],
-        "LOCALES"      : [ "en" ],
+        "LOCALES"      : [ ],
         "CACHE"        : "${TMPDIR}/cache",
         "ROOT"         : "."
     },

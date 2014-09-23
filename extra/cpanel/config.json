@@ -35,7 +35,7 @@
         //"QXTHEME"      : "collapsablepanel.theme.modern.Theme",
         "QXTHEME"      : "qx.theme.Modern",
         "API_EXCLUDE"  : ["qx.test.*", "collapsablepanel.demo.*"],
-        "LOCALES"      : [ "en" ],
+        "LOCALES"      : [ ],
         "CACHE"        : "${TMPDIR}/cache",
         "ROOT"         : "."
     }

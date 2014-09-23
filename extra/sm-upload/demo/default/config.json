@@ -33,7 +33,7 @@
     "APPLICATION"  : "uploadwidget.demo",
     "QOOXDOO_PATH" : "../../../../qooxdoo/1.5",
     "API_EXCLUDE"  : ["qx.test.*", "${APPLICATION}.theme.*", "${APPLICATION}.test.*"],
-    "LOCALES"      : [ "en" ],
+    "LOCALES"      : [ ],
     "CACHE"        : "${TMPDIR}/qooxoo-cache",
     "ROOT"         : "."
   },
