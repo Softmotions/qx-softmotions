@@ -15,7 +15,7 @@ qx.Class.define("sm.io.Request", {
         __ALERT_WND : null,
 
         LOGIN_ACTION : function() {
-            alert(qx.locale.Manager.tr("Your user session expired! Please login again"));
+            window.alert(qx.locale.Manager.tr("Your user session expired! Please login again"));
             window.location.reload(true);
         }
     },
