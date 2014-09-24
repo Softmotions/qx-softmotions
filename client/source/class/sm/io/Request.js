@@ -126,9 +126,13 @@ qx.Class.define("sm.io.Request", {
             if (this.hasListener("error")) {
                 this.fireDataEvent("error", e);
             }
-            var got = this.__checkMessages(e);
+            var err = this.__checkMessages(e);
+            if (err === "abort") {
+                this.dispose();
+                return;
+            }
             if (this.getShowMessages() == true) {
-                if (!got) {
+                if (!err) {
                     var cerr = this.tr("Connection error with address");
                     this.__addMessages(this.tr("Connection error"),
                             [cerr + ":<br/>" + this.getUrl()]);
@@ -140,6 +144,10 @@ qx.Class.define("sm.io.Request", {
         _oncompleted : function(e) {
             try {
                 var err = this.__checkMessages(e);
+                if (err === "abort") {
+                    this.dispose();
+                    return;
+                }
                 if (err == false && this.__onsuccess != null) {
                     this.__onsuccess.call(this.__self, e);
                 }
@@ -152,16 +160,18 @@ qx.Class.define("sm.io.Request", {
         /**
          *
          * @param resp {qx.io.remote.Response}alert
-         * @return {Boolean} True если пришло сообщение об ошибке
+         * @return {Boolean|String} True если пришло сообщение об ошибке
          */
         __checkMessages : function(resp) {
             var headers = resp.getResponseHeaders();
             if (headers == null) {
                 return false;
             }
-            if (headers["X-Softmotions-Login"] && sm.io.Request.LOGIN_ACTION) {
-                sm.io.Request.LOGIN_ACTION();
-                return false;
+            if (headers["X-Softmotions-Login"]) {
+                if (typeof sm.io.Request.LOGIN_ACTION === "function") {
+                    sm.io.Request.LOGIN_ACTION();
+                }
+                return "abort";
             }
             if (this.getShowMessages() == false) {
                 return false;
