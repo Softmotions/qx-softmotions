@@ -28,7 +28,7 @@ qx.Class.define("sm.util.Clipboard", {
                     netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
                 }
                 catch (e) {
-                    alert(
+                    window.alert(
                                     "Because of tight security settings in Mozilla / Firefox you cannot copy " +
                                     "to the system clipboard at the moment. Please open the 'about:config' page " +
                                     "in your browser and change the preference 'signed.applets.codebase_principal_support' to 'true'."
@@ -51,7 +51,7 @@ qx.Class.define("sm.util.Clipboard", {
                 clip.setData(trans, null, clipid.kGlobalClipboard);
                 return true;
             } else {
-                alert("Your browser does not support copying to the clipboard!");
+                window.alert("Your browser does not support copying to the clipboard!");
             }
         }
     }
