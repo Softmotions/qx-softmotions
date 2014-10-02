@@ -77,6 +77,8 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
 
         _form : null,
 
+        _saveBt : null,
+
         show : function() {
             this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
             this.base(arguments);
@@ -123,7 +125,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
         },
 
         _configureFormButtons : function(form) {
-            var ok = new qx.ui.form.Button(this.tr("Ok"));
+            var ok = this._saveBt = new qx.ui.form.Button(this.tr("Ok"));
             ok.addListener("execute", this.save, this);
             form.addButton(ok);
 
@@ -139,5 +141,6 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
 
     destruct : function() {
         this._disposeFields();
+        this._saveBt = null;
     }
 });
