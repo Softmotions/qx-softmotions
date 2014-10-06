@@ -45,12 +45,13 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
      *    Examples: Alt+F1, Control+C, Control+Alt+Delete
      * @param dontstop {Boolean} If true, keyboard event will not be stopped on handling. Default: false
      */
-    construct : function(shortcut, dontstop) {
+    construct : function(shortcut, dontstop, target) {
         this.base(arguments);
 
         this.__modifier = {};
         this.__key = null;
         this.__dontstop = !!dontstop;
+        this.__target = target || document.documentElement;
 
         if (shortcut != null) {
             this.setShortcut(shortcut);
@@ -129,6 +130,7 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
         __modifier : "",
         __key : "",
         __dontstop : false,
+        __target : null,
 
 
         /*
@@ -192,11 +194,11 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
         // property apply
         _applyEnabled : function(value, old) {
             if (value) {
-                qx.event.Registration.addListener(document.documentElement, "keydown", this.__onKeyDown, this);
-                qx.event.Registration.addListener(document.documentElement, "keypress", this.__onKeyPress, this);
+                qx.event.Registration.addListener(this.__target, "keydown", this.__onKeyDown, this);
+                qx.event.Registration.addListener(this.__target, "keypress", this.__onKeyPress, this);
             } else {
-                qx.event.Registration.removeListener(document.documentElement, "keydown", this.__onKeyDown, this);
-                qx.event.Registration.removeListener(document.documentElement, "keypress", this.__onKeyPress, this);
+                qx.event.Registration.removeListener(this.__target, "keydown", this.__onKeyDown, this);
+                qx.event.Registration.removeListener(this.__target, "keypress", this.__onKeyPress, this);
             }
         },
 
@@ -424,6 +426,6 @@ qx.Class.define("sm.bom.ExtendedShortcut", {
         // this will remove the event listener
         this.setEnabled(false);
 
-        this.__modifier = this.__key = null;
+        this.__modifier = this.__key = this.__target = null;
     }
 });
