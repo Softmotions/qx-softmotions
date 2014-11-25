@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <modules>
+        <module>client</module>
+    </modules>
+
+    <parent>
+        <groupId>softmotions</groupId>
+        <artifactId>softmotions-base-pom</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>qx-base</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>qx-base</name>
+    <description>QX Softmotions</description>
+    <inceptionYear>2014</inceptionYear>
+
+    <developers>
+        <developer>
+            <name>Anton Adamansky</name>
+            <email>adamansky@gmail.com</email>
+            <organization>Sofmotions Ltd.</organization>
+        </developer>
+        <developer>
+            <name>Vyacheslav Tyutynkov</name>
+            <email>tyutyunkov@gmail.com</email>
+            <organization>Sofmotions Ltd.</organization>
+        </developer>
+    </developers>
+
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+        <qooxdoo.sdk.version>4.0.1</qooxdoo.sdk.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jaxion_repository</id>
+            <url>http://jaxion.org/mvn/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+    <build>
+
+    </build>
+</project>

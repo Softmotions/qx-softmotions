@@ -1,0 +1,89 @@
+# 
+msgid ""
+msgstr ""
+
+#: sm/dialog/Message.js:59 sm/alert/AlertMessages.js:26
+msgid "Close"
+msgstr "Закрыть"
+
+#: sm/dialog/Confirm.js:25
+msgid "No"
+msgstr "Нет"
+
+#: sm/dialog/Confirm.js:34
+msgid "Yes"
+msgstr "Да"
+
+#: sm/io/Request.js:18
+msgid "Your user session expired! Please login again"
+msgstr "Время вашей сессии законечено пожолуйста войдите заново"
+
+#: sm/io/Request.js:136
+msgid "Connection error with address"
+msgstr "Ошибка соединения с"
+
+#: sm/io/Request.js:137
+msgid "Connection error"
+msgstr "Ошибка соединения"
+
+#: sm/io/Request.js:206 sm/ui/upload/FileUploadProgressDlg.js:160
+msgid "System messages"
+msgstr "Системные сообщения"
+
+#: sm/io/Request.js:211 sm/ui/upload/FileUploadProgressDlg.js:149
+msgid "Errors"
+msgstr "Ошибки"
+
+#: sm/io/Request.js:211 sm/ui/upload/FileUploadProgressDlg.js:152
+msgid "Messages"
+msgstr "Сообщения"
+
+#: sm/ui/form/SimplePromptPopupDlg.js:69 sm/ui/form/BasePopupDlg.js:128
+msgid "Ok"
+msgstr "Да"
+
+#: sm/ui/form/SimplePromptPopupDlg.js:73 sm/ui/form/BasePopupDlg.js:132
+#: sm/ui/form/BaseSavePopupDlg.js:20 sm/ui/upload/FileUploadProgressDlg.js:43
+#: sm/ui/progress/ProgressPopup.js:202
+msgid "Cancel"
+msgstr "Отменить"
+
+#: sm/ui/form/SimplePromptPopupDlg.js:35 sm/ui/form/BaseSavePopupDlg.js:11
+msgid "This field is required"
+msgstr "Это поле является обязательным"
+
+#: sm/ui/form/BaseSavePopupDlg.js:16
+msgid "Save"
+msgstr "Сохранить"
+
+#: sm/ui/form/SearchField.js:164
+msgid "Search"
+msgstr "Поиск"
+
+#: sm/ui/form/UploadForm.js:52
+msgid "Add file"
+msgstr "Добавить файл"
+
+#: sm/util/Validate.js:44
+msgid "'%1' is not an IP or hostname."
+msgstr "'%1'не является IP адресом или именем машины."
+
+#: sm/util/Validate.js:64 sm/util/Validate.js:87
+msgid "%1 is not a number."
+msgstr "%1 не является числом."
+
+#: sm/util/Validate.js:91
+msgid "%1 cannot be lesser than %2."
+msgstr "%1 не может быть меньше чем %2."
+
+#: sm/util/Validate.js:95
+msgid "%1 cannot be greater than %2."
+msgstr "%1 не может быть больше чем %2."
+
+#: sm/util/Validate.js:113
+msgid "Field cannot be empty."
+msgstr "Поле не может быть пустым"
+
+#: sm/util/Validate.js:132
+msgid "Invalid"
+msgstr "Неправильный формат поля"

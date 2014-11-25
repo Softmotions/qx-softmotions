@@ -1,0 +1,47 @@
+{
+    "name" : "${qooxdoo.application.name}",
+
+    "include" : [
+        {
+            "path" : "${QOOXDOO_PATH}/tool/data/config/application.json"
+        }
+    ],
+
+    "let" : {
+        "APPLICATION" : "${qooxdoo.application.namespace}",
+        "MODULES_PATH" : "${qooxdoo.modules.cacheDirectory}",
+        "QOOXDOO_PATH" : "${MODULES_PATH}/qooxdoo-sdk",
+        "API_EXCLUDE" : ["qx.test.*", "${APPLICATION}.theme.*", "${APPLICATION}.test.*", "${APPLICATION}.simulation.*"],
+        "LOCALES" : [ "ru" ],
+        "CACHE" : "${qooxdoo.application.cacheDirectory}",
+        "ROOT" : "${qooxdoo.application.outputDirectory}/${qooxdoo.application.namespace}",
+        "SOURCE_PATH" : "${qooxdoo.application.outputDirectory}/${qooxdoo.application.namespace}/siteroot",
+        "BUILD_PATH" : "${qooxdoo.application.outputDirectory}/${qooxdoo.application.namespace}/siteroot"
+    },
+
+    "jobs" : {
+
+        "build-files" : {
+            "=copy-files" : {
+                "files" : []
+            }
+        },
+
+        "sm-common" : {
+            "library" : [
+                {
+                    "manifest" : "./Manifest.json",
+                    "uri" : "./"
+                },
+                {
+                    "manifest" : "${QOOXDOO_PATH}/framework/Manifest.json",
+                    "uri" : "${QOOXDOO_PATH}/framework"
+                }
+            ]
+        },
+
+        "=build" : {
+            "extend" : ["translation"]
+        }
+    }
+}
