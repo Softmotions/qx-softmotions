@@ -21,25 +21,6 @@
 
     "jobs" : {
 
-        "build-files" : {
-            "=copy-files" : {
-                "files" : []
-            }
-        },
-
-        "sm-common" : {
-            "library" : [
-                {
-                    "manifest" : "./Manifest.json",
-                    "uri" : "./"
-                },
-                {
-                    "manifest" : "${QOOXDOO_PATH}/framework/Manifest.json",
-                    "uri" : "${QOOXDOO_PATH}/framework"
-                }
-            ]
-        },
-
         "=build" : {
             "extend" : ["translation"]
         }
