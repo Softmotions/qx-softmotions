@@ -16,7 +16,7 @@ msgstr "Да"
 
 #: sm/io/Request.js:18
 msgid "Your user session expired! Please login again"
-msgstr "Время вашей сессии законечено пожолуйста войдите заново"
+msgstr "Время вашей сессии закончено пожалуйста войдите заново"
 
 #: sm/io/Request.js:136
 msgid "Connection error with address"
