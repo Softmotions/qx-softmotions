@@ -19,7 +19,7 @@
 
     <name>qx-base</name>
     <description>QX Softmotions</description>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2009</inceptionYear>
 
     <developers>
         <developer>
@@ -36,7 +36,7 @@
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
-        <qooxdoo.sdk.version>4.0.1</qooxdoo.sdk.version>
+        <qooxdoo.sdk.version>4.1</qooxdoo.sdk.version>
     </properties>
 
     <repositories>
