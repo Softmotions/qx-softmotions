@@ -20,6 +20,7 @@
  */
 qx.Class.define("sm.dialog.Message", {
     extend : qx.ui.window.Window,
+    include : [sm.ui.window.MExtendedWindow],
 
     events : {
     },

@@ -20,9 +20,26 @@
     },
 
     "jobs" : {
+        "sm-common" : {
+            "library" : [
+                {
+                    "manifest" : "./Manifest.json",
+                    "uri" : "./"
+                },
+                {
+                    "manifest" : "${QOOXDOO_PATH}/framework/Manifest.json",
+                    "uri" : "${QOOXDOO_PATH}/framework"
+                },
+                {
+                    "manifest" : "${MODULES_PATH}/qx-sm-upload/Manifest.json",
+                    "uri" : "${MODULES_PATH}/qx-sm-upload"
+                }
+
+            ]
+        },
 
         "=build" : {
-            "extend" : ["translation"]
+            "extend" : ["translation", "sm-common"]
         }
     }
 }

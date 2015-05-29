@@ -1,0 +1,20 @@
+{
+    "info" : {
+        "name" : "${qooxdoo.application.name}",
+        "summary" : "${qooxdoo.application.summary}",
+        "description" : "${qooxdoo.application.description}",
+        "homepage" : "http://qooxdoo.org/documentation/contrib/contributions#uploadwidget",
+        "license" : "LGPL/EPL",
+        "version" : "trunk",
+        "qooxdoo-versions" : ["${qooxdoo.sdk.version}"]
+    },
+
+    "provides" : {
+        "namespace" : "${qooxdoo.application.namespace}",
+        "encoding" : "${qooxdoo.build.sourceEncoding}",
+        "class" : "${qooxdoo.application.sourcesDirectory}",
+        "resource" : "${qooxdoo.application.resourcesDirectory}",
+        "translation" : "${qooxdoo.application.translationDirectory}",
+        "type" : "library"
+    }
+}

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>qx-client</artifactId>
+    <artifactId>qx-sm-upload</artifactId>
     <packaging>qooxdoo-jar</packaging>
     <version>1.0-SNAPSHOT</version>
 
@@ -15,7 +15,7 @@
     </parent>
 
     <properties>
-        <qooxdoo.application.name>sm</qooxdoo.application.name>
+        <qooxdoo.application.name>uploadwidget</qooxdoo.application.name>
         <qooxdoo.application.summary>${project.name}</qooxdoo.application.summary>
         <qooxdoo.application.description>${project.description}</qooxdoo.application.description>
     </properties>
@@ -38,8 +38,8 @@
                 <configuration>
                     <buildJob>build</buildJob>
                     <namespace>${qooxdoo.application.name}</namespace>
-                    <modulesCacheDirectory>${project.basedir}/../.cache</modulesCacheDirectory>
-                    <cacheDirectory>${project.basedir}/../.cache/.qx</cacheDirectory>
+                    <modulesCacheDirectory>${project.basedir}/../../.cache</modulesCacheDirectory>
+                    <cacheDirectory>${project.basedir}/../../.cache/.qx</cacheDirectory>
                 </configuration>
             </plugin>
 
@@ -66,13 +66,6 @@
             <groupId>org.qooxdoo</groupId>
             <artifactId>qooxdoo-sdk</artifactId>
             <version>${qooxdoo.sdk.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>softmotions</groupId>
-            <artifactId>qx-sm-upload</artifactId>
-            <classifier>sources</classifier>
-            <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
