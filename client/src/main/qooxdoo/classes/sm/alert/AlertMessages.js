@@ -8,6 +8,7 @@
  */
 qx.Class.define("sm.alert.AlertMessages", {
     extend : qx.ui.window.Window,
+    include : [sm.ui.window.MExtendedWindow],
 
     construct : function(caption) {
         this.base(arguments, caption);

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 
-#: sm/dialog/Message.js:59 sm/alert/AlertMessages.js:26
+#: sm/dialog/Message.js:60 sm/alert/AlertMessages.js:27
 msgid "Close"
 msgstr "Закрыть"
 
@@ -12,6 +12,18 @@ msgstr "Нет"
 
 #: sm/dialog/Confirm.js:34
 msgid "Yes"
+msgstr "Да"
+
+#: sm/ui/progress/ProgressPopup.js:202
+#: sm/ui/upload/FileUploadProgressDlg.js:43
+#: sm/ui/form/SimplePromptPopupDlg.js:73 sm/dialog/Prompt.js:25
+#: sm/ui/form/BasePopupDlg.js:132 sm/ui/form/BaseSavePopupDlg.js:20
+msgid "Cancel"
+msgstr "Отменить"
+
+#: sm/ui/form/SimplePromptPopupDlg.js:69 sm/dialog/Prompt.js:31
+#: sm/ui/form/BasePopupDlg.js:128
+msgid "Ok"
 msgstr "Да"
 
 #: sm/io/Request.js:18
@@ -26,27 +38,17 @@ msgstr "Ошибка соединения с"
 msgid "Connection error"
 msgstr "Ошибка соединения"
 
-#: sm/io/Request.js:206 sm/ui/upload/FileUploadProgressDlg.js:160
+#: sm/ui/upload/FileUploadProgressDlg.js:160 sm/io/Request.js:206
 msgid "System messages"
 msgstr "Системные сообщения"
 
-#: sm/io/Request.js:211 sm/ui/upload/FileUploadProgressDlg.js:149
+#: sm/ui/upload/FileUploadProgressDlg.js:149 sm/io/Request.js:211
 msgid "Errors"
 msgstr "Ошибки"
 
-#: sm/io/Request.js:211 sm/ui/upload/FileUploadProgressDlg.js:152
+#: sm/ui/upload/FileUploadProgressDlg.js:152 sm/io/Request.js:211
 msgid "Messages"
 msgstr "Сообщения"
-
-#: sm/ui/form/SimplePromptPopupDlg.js:69 sm/ui/form/BasePopupDlg.js:128
-msgid "Ok"
-msgstr "Да"
-
-#: sm/ui/form/SimplePromptPopupDlg.js:73 sm/ui/form/BasePopupDlg.js:132
-#: sm/ui/form/BaseSavePopupDlg.js:20 sm/ui/upload/FileUploadProgressDlg.js:43
-#: sm/ui/progress/ProgressPopup.js:202
-msgid "Cancel"
-msgstr "Отменить"
 
 #: sm/ui/form/SimplePromptPopupDlg.js:35 sm/ui/form/BaseSavePopupDlg.js:11
 msgid "This field is required"

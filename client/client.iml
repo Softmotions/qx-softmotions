@@ -9,6 +9,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.qooxdoo:qooxdoo-sdk:4.1" level="project" />
+    <orderEntry type="module" module-name="sm-upload" scope="PROVIDED" />
   </component>
 </module>
 
