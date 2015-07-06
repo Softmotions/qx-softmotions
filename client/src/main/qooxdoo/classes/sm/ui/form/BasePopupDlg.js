@@ -65,7 +65,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
             this.add(fh);
         }
 
-        this.__closeCmd = new qx.ui.core.Command("Esc");
+        this.__closeCmd = new qx.ui.command.Command("Esc");
         this.__closeCmd.addListener("execute", this.destroy, this);
         this.addListener("disappear", this.destroy, this);
     },

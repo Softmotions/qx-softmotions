@@ -4,7 +4,7 @@
  * for event handling
  */
 qx.Class.define("sm.ui.core.ExtendedCommand", {
-    extend : qx.ui.core.Command,
+    extend : qx.ui.command.Command,
 
     /**
      * @param shortcut {String} Shortcuts can be composed of optional modifier

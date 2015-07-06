@@ -1,6 +1,6 @@
 /**
  * Window manager with extended features:
- *   1. Automatic enabling/disabling commands (qx.ui.core.Command)
+ *   1. Automatic enabling/disabling commands (qx.ui.command.Command)
  *   created by <code>sm.ui.window.MExtendedWindow.createCommand()</code>
  *
  *
