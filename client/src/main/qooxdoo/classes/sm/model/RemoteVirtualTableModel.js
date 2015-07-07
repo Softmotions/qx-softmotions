@@ -31,6 +31,18 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             init : null
         },
 
+
+        rowdataFn : {
+            check : "Function",
+            init : null,
+            apply : ""
+        },
+
+        rowcountFn : {
+            check : "Function",
+            init : null
+        },
+
         /**
          * Columns metainfo
          */
@@ -62,6 +74,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         this.addListener("metaDataChanged", function() {
             if (this.__vspec) {
                 this.__vspec.sortInd = this.getSortColumnIndex();
+                this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
                 this.__vspec.isAsc = this.isSortAscending();
                 if (this.hasListener("viewSpecChanged")) {
                     this.fireDataEvent("viewSpecChanged", this.__vspec);
@@ -79,6 +92,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         __constVspec : null,
 
         __cleanup : false,
+
 
         getConstViewSpec : function() {
             return this.__constVspec;
@@ -105,6 +119,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
             this.__vspec = nspec;
             this.__vspec.sortInd = this.getSortColumnIndex();
+            this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
             this.reloadData();
             if (this.hasListener("viewSpecChanged")) {
@@ -119,10 +134,11 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
             }
             this.__vspec = this.__vspec || {};
-            qx.lang.Object.mergeWith(this.__vspec, spec, true);
-            qx.lang.Object.mergeWith(nspec, this.__vspec, false);
+            qx.Bootstrap.objectMergeWith(this.__vspec, spec, true);
+            qx.Bootstrap.objectMergeWith(nspec, this.__vspec, false);
             this.__vspec = nspec;
             this.__vspec.sortInd = this.getSortColumnIndex();
+            this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
             this.reloadData();
             if (this.hasListener("viewSpecChanged")) {
@@ -193,7 +209,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         },
 
 
-        __buildViewSpecRequest : function(url) {
+        _buildViewSpecRequest : function(url) {
             if (url == null || !qx.lang.Type.isObject(this.__vspec)) {
                 return null;
             }
@@ -219,13 +235,42 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return req;
         },
 
-        // overriden - called whenever the table requests the row count
         _loadRowCount : function() {
+            if (this.__vspec == null) {
+                this._onRowCountLoaded(0);
+                return;
+            }
+            if (this.getRowcountUrl() != null) {
+                return this._loadRowCountUrl();
+            } else if (this.getRowcountFn() != null) {
+                return this.getRowcountFn().call(this);
+            } else {
+                var msg = "You must set either 'rowcountUrl' or 'rowcountFn' model properties";
+                qx.log.Logger.error(msg);
+                throw new Error(msg);
+            }
+        },
+
+        _loadRowData : function(firstRow, lastRow) {
+            if (this.getRowdataUrl() != null) {
+                return this._loadRowDataUrl(firstRow, lastRow);
+            } else if (this.getRowdataFn() != null) {
+                return this.getRowdataFn().call(this, firstRow, lastRow);
+            } else {
+                var msg = "You must set either 'rowdataUrl' or 'rowdataFn' model properties";
+                qx.log.Logger.error(msg);
+                throw new Error(msg);
+            }
+        },
+
+
+        // overriden - called whenever the table requests the row count
+        _loadRowCountUrl : function() {
             if (this.__cleanup == true) {
                 this._onRowCountLoaded(0);
                 return;
             }
-            var req = this.__buildViewSpecRequest(this.getRowcountUrl());
+            var req = this._buildViewSpecRequest(this.getRowcountUrl());
             if (!req) {
                 return 0;
             }
@@ -242,12 +287,12 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         },
 
         // overriden
-        _loadRowData : function(firstRow, lastRow) {
+        _loadRowDataUrl : function(firstRow, lastRow) {
             if (this.__cleanup == true) {
                 this._onRowDataLoaded([]);
                 return;
             }
-            var req = this.__buildViewSpecRequest(this.getRowdataUrl());
+            var req = this._buildViewSpecRequest(this.getRowdataUrl());
             if (!req) {
                 return;
             }
