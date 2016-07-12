@@ -7,37 +7,37 @@
  * Analog of qx.ui.container.Stack
  */
 qx.Class.define("sm.ui.cont.LazyStack", {
-    extend : qx.ui.core.Widget,
-    include : [
+    extend: qx.ui.core.Widget,
+    include: [
         qx.ui.core.MChildrenHandling
     ],
 
-    construct : function() {
+    construct: function () {
         this.base(arguments);
         this._setLayout(new qx.ui.layout.Grow());
         this.__slots = {};
         this.__slotids = [];
-        this.addListener("appear", function() {
+        this.addListener("appear", function () {
             if (!this.__active && this.__slotids.length > 0) {
                 this.showWidget(this.__slotids[0]);
             }
         }, this);
     },
 
-    events : {
+    events: {
         //Fired if stack switched to a new widget
-        widgetChanged : "qx.event.type.Data"
+        widgetChanged: "qx.event.type.Data"
     },
 
-    properties : {
+    properties: {
 
         /**
          * On-demand widget factory function
          * provider.
          */
-        onDemandFactoryFunctionProvider : {
-            check : "Function",
-            nullable : true
+        onDemandFactoryFunctionProvider: {
+            check: "Function",
+            nullable: true
         },
 
 
@@ -48,46 +48,46 @@ qx.Class.define("sm.ui.cont.LazyStack", {
          *   - exclude: Widget exclusion by calling qx.ui.core.Widget#exclude()
          *   - destroy: Inactive widgets will be destroyed immediately by calling qx.ui.core.Widget#destroy()
          */
-        widgetsHidePolicy : {
-            check : ["hide", "exclude", "destroy"],
-            nullable : false,
-            init : "hide"
+        widgetsHidePolicy: {
+            check: ["hide", "exclude", "destroy"],
+            nullable: false,
+            init: "hide"
         }
     },
 
-    members : {
+    members: {
         /**
          * Widget slots
          */
-        __slots : null,
+        __slots: null,
 
         /**
          * Ordered list or identifier of registered widgets
          */
-        __slotids : null,
+        __slotids: null,
 
         /**
          * Currently active slot
          */
-        __active : null,
+        __active: null,
 
         /**
          * Register widget in this stack.
          *
          * @param id {String} Unique id of widget
          * @param factoryFunc {function} Factory function(id, opts) used to create widget instance.
-         * @param opts {Map?null} Options. Keys: cache {Boolean?true} whenever to cache
+         * @param opts {Map?null} Options passed to a widget factory function.
          * created widget for subsequent accesses
          * @param self {Object?factoryFunc} Self object for factoryFunc
          */
-        registerWidget : function(id, factoryFunc, opts, self) {
+        registerWidget: function (id, factoryFunc, opts, self) {
             qx.core.Assert.assertFunction(factoryFunc);
             this.__slots[id] = {
-                id : id,
-                factory : factoryFunc,
-                opts : opts || {},
-                self : self || factoryFunc,
-                cached : null
+                id: id,
+                factory: factoryFunc,
+                opts: opts || {},
+                self: self || factoryFunc,
+                cached: null
             };
             this.__slotids.push(id);
         },
@@ -95,11 +95,11 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         /**
          * Return array of widget ids
          */
-        getWidgetIds : function() {
+        getWidgetIds: function () {
             return [].concat(this.__slotids);
         },
 
-        getWidgetCount : function() {
+        getWidgetCount: function () {
             return this.__slotids.length;
         },
 
@@ -107,7 +107,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
          * Show widget with given id on top of the stack
          * @param id {String} widget id
          */
-        showWidget : function(id) {
+        showWidget: function (id) {
             var slot = this.__slots[id];
             if (!slot) {
                 var ffp = this.getOnDemandFactoryFunctionProvider();
@@ -131,39 +131,39 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         },
 
 
-        isActiveWidget : function(id) {
+        isActiveWidget: function (id) {
             return (this.__slots[id] && this.__slots[id] === this.__active);
         },
 
-        getActiveWidgetId : function() {
+        getActiveWidgetId: function () {
             return this.__active ? this.__active["id"] : null;
         },
 
-        getActiveWidget : function() {
+        getActiveWidget: function () {
             return this.__active ? this.__active["cached"] : null;
         },
 
-        getNextWidgetId : function() {
+        getNextWidgetId: function () {
             return this.__slotids[this.getActiveWidgetPosition() + 1];
         },
 
-        getPrevWidgetId : function() {
+        getPrevWidgetId: function () {
             return this.__slotids[this.getActiveWidgetPosition() - 1];
         },
 
-        getActiveWidgetPosition : function() {
+        getActiveWidgetPosition: function () {
             var wid = this.getActiveWidgetId();
             return wid != null ? this.__slotids.indexOf(wid) : -1;
         },
 
-        isRegisteredWidget : function(id) {
+        isRegisteredWidget: function (id) {
             return !!this.__slots[id];
         },
 
         /**
          * @return {qx.ui.core.Widget[]} Activated widgets
          */
-        getActivatedWidgets : function() {
+        getActivatedWidgets: function () {
             var ret = [];
             for (var k in this.__slots) {
                 var s = this.__slots[k];
@@ -180,7 +180,7 @@ qx.Class.define("sm.ui.cont.LazyStack", {
          * @param create {Boolean?false} If true widget instance will be created
          * @return {Widget|null}
          */
-        getWidget : function(id, create) {
+        getWidget: function (id, create) {
             var slot = this.__slots[id];
             if (!slot) {
                 if (create) {
@@ -204,7 +204,28 @@ qx.Class.define("sm.ui.cont.LazyStack", {
             return widget;
         },
 
-        __hideWidget : function(slot, destroy) {
+        /**
+         * Dispose a cached widget.
+         * Note: Active widget will not be disposed.
+         * @param id {Number} Widget id
+         */
+        disposeWidget: function(id) {
+            var slot = this.__slots[id];
+            if (!slot || !slot.cached || this.getActiveWidgetId() == id) {
+                return;
+            }
+            var cached = slot.cached;
+            slot.cached = null;
+            if (cached != null && typeof cached.dispose === "function") {
+                try {
+                    cached.dispose();
+                } catch (e) {
+                    qx.log.Logger.error(e);
+                }
+            }
+        },
+
+        __hideWidget: function (slot, destroy) {
             var w = slot.cached;
             if (destroy) {
                 slot.cached = null;
@@ -219,13 +240,17 @@ qx.Class.define("sm.ui.cont.LazyStack", {
         }
     },
 
-    destruct : function() {
+    destruct: function () {
         if (this.__slots) {
             for (var k in this.__slots) {
                 var s = this.__slots[k];
                 var cached = s["cached"];
                 if (cached != null && typeof cached.dispose === "function") {
-                    cached.dispose();
+                    try {
+                        cached.dispose();
+                    } catch (e) {
+                        qx.log.Logger.error(e);
+                    }
                 }
             }
             this.__slots = [];
