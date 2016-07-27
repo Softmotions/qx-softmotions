@@ -223,11 +223,13 @@ qx.Class.define("sm.ui.form.ButtonField", {
             }, this);
 
             var text = this.getChildControl("text");
+            var reset = this.getChildControl("reset");
             function enabledReset() {
-                this.getChildControl("reset").setEnabled(!sm.lang.String.isEmpty(text.getValue()));
+                reset.setEnabled(!sm.lang.String.isEmpty(text.getValue()));
             }
-            text.addListener("input", enabledReset, this);
-            text.addListener("changeValue", enabledReset, this);
+            text.addListener("input", enabledReset);
+            text.addListener("changeValue", enabledReset);
+            enabledReset();
         },
 
         __applyShowResetButton: function (val) {
