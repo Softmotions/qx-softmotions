@@ -8,62 +8,62 @@
  */
 
 qx.Class.define("sm.ui.form.ButtonField", {
-    extend : qx.ui.core.Widget,
-    implement : [
+    extend: qx.ui.core.Widget,
+    implement: [
         qx.ui.form.IStringForm,
         qx.ui.form.IForm
     ],
-    include : [
+    include: [
         qx.ui.form.MForm,
         qx.ui.core.MChildrenHandling,
         sm.event.MForwardEvent
     ],
 
-    events : {
+    events: {
 
         /** Fired when the value was modified */
-        "changeValue" : "qx.event.type.Data",
+        "changeValue": "qx.event.type.Data",
 
         /** Text field input event */
-        "input" : "qx.event.type.Data",
+        "input": "qx.event.type.Data",
 
         /** Execute search, press ENTER ot button pressed */
-        "execute" : "qx.event.type.Data",
+        "execute": "qx.event.type.Data",
 
         /** Reset field event */
-        "reset" : "qx.event.type.Event"
+        "reset": "qx.event.type.Event"
     },
 
-    properties : {
+    properties: {
 
-        appearance : {
-            init : "sm-bt-field",
-            refine : true
+        appearance: {
+            init: "sm-bt-field",
+            refine: true
         },
 
-        focusable : {
-            refine : true,
-            init : true
+        focusable: {
+            refine: true,
+            init: true
         },
 
         /**
          * Whenever to show reset button.
          */
-        showResetButton : {
-            check : "Boolean",
-            init : false,
-            nullable : false,
-            apply : "__applyShowResetButton"
+        showResetButton: {
+            check: "Boolean",
+            init: false,
+            nullable: false,
+            apply: "__applyShowResetButton"
         },
 
         /**
          * Whenever to show main button.
          */
-        showMainButton : {
-            check : "Boolean",
-            init : false,
-            nullable : false,
-            apply : "__applyShowMainButton"
+        showMainButton: {
+            check: "Boolean",
+            init: false,
+            nullable: false,
+            apply: "__applyShowMainButton"
         }
     },
 
@@ -78,9 +78,9 @@ qx.Class.define("sm.ui.form.ButtonField", {
      * @param menuspec {Array?null} Array of [label, value]
      *
      */
-    construct : function(label, icon, revese, menuspec) {
+    construct: function (label, icon, revese, menuspec) {
         this.base(arguments);
-        this._setLayout(new qx.ui.layout.HBox(4).set({alignY : "middle"}));
+        this._setLayout(new qx.ui.layout.HBox(4).set({alignY: "middle"}));
         this.__label = label;
         this.__menuspec = Array.isArray(menuspec) ? menuspec : null;
         this.__icon = icon;
@@ -88,63 +88,63 @@ qx.Class.define("sm.ui.form.ButtonField", {
         this.setShowResetButton(false);
     },
 
-    members : {
+    members: {
 
 
-        __label : null,
+        __label: null,
 
-        __icon : null,
+        __icon: null,
 
-        __menuspec : null,
+        __menuspec: null,
 
 
-        _forwardStates : {
-            invalid : true
+        _forwardStates: {
+            invalid: true
         },
 
-        getTextField : function() {
+        getTextField: function () {
             return this.getChildControl("text");
         },
 
-        setReadOnly : function(val) {
+        setReadOnly: function (val) {
             return this.getChildControl("text").setReadOnly(val);
         },
 
-        getReadOnly : function() {
+        getReadOnly: function () {
             return this.getChildControl("text").getReadOnly();
         },
 
         // overridden
-        setValue : function(value) {
+        setValue: function (value) {
             this.getChildControl("text").setValue(value);
         },
 
         // overridden
-        resetValue : function() {
+        resetValue: function () {
             this.getChildControl("text").resetValue();
         },
 
         // overridden
-        getValue : function() {
+        getValue: function () {
             return this.getChildControl("text").getValue();
         },
 
-        setPlaceholder : function(text) {
+        setPlaceholder: function (text) {
             this.getChildControl("text").setPlaceholder(text);
         },
 
-        getMainButton : function() {
+        getMainButton: function () {
             return this.getChildControl("button", true);
         },
 
-        getResetButton : function() {
+        getResetButton: function () {
             return this.getChildControl("reset", true);
         },
 
         //overriden
-        _applyEnabled : function(value, old) {
+        _applyEnabled: function (value, old) {
             this.base(arguments, value, old);
-            ["button", "reset", "text"].forEach(function(name) {
+            ["button", "reset", "text"].forEach(function (name) {
                 var el = this.getChildControl(name, true);
                 if (el) {
                     el.setEnabled(value);
@@ -152,16 +152,16 @@ qx.Class.define("sm.ui.form.ButtonField", {
             }, this);
         },
 
-        _createChildControlImpl : function(id, hash) {
+        _createChildControlImpl: function (id, hash) {
             var control;
             switch (id) {
                 case "button" :
                     if (this.__menuspec != null && this.__menuspec.length > 1) {
                         var menu = new qx.ui.menu.Menu();
-                        this.__menuspec.forEach(function(ms) {
+                        this.__menuspec.forEach(function (ms) {
                             var mbt = new qx.ui.menu.Button(ms[0]);
                             mbt.setUserData("model", ms[1]);
-                            mbt.addListener("execute", function(ev) {
+                            mbt.addListener("execute", function (ev) {
                                 var mbt = ev.getTarget();
                                 this.fireDataEvent("execute", mbt.getUserData("model"));
                             }, this);
@@ -173,7 +173,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
                         if (this.__menuspec != null && this.__menuspec.length === 1) {
                             this.setUserData("model", this.__menuspec[0][1]);
                         }
-                        control.addListener("execute", function(ev) {
+                        control.addListener("execute", function (ev) {
                             this.fireDataEvent("execute", this.getUserData("model"));
                         }, this);
                     }
@@ -181,49 +181,56 @@ qx.Class.define("sm.ui.form.ButtonField", {
                     break;
                 case "reset":
                     control = new qx.ui.form.Button();
-                    control.addListener("execute", function(ev) {
+                    control.addListener("execute", function (ev) {
                         this.fireEvent("reset");
                     }, this);
                     this._add(control);
                     break;
                 case "text" : //text field
                     control = new qx.ui.form.TextField();
-                    control.addListener("focusin", function(ev) {
+                    control.addListener("focusin", function (ev) {
                         this.addState("focused");
                     }, this);
-                    control.addListener("focusout", function(ev) {
+                    control.addListener("focusout", function (ev) {
                         this.removeState("focused");
                     }, this);
-                    control.addListener("keydown", function(ev) {
+                    control.addListener("keydown", function (ev) {
                         if (ev.getKeyCode() == 13) {
                             ev.stop();
                             this.fireDataEvent("execute", this.getUserData("model"));
                         }
                     }, this);
-                    control.addListener("dblclick", function(ev) {
+                    control.addListener("dblclick", function (ev) {
                         if (control.hasState("readonly")) {
                             this.fireDataEvent("execute", this.getUserData("model"));
                         }
                     }, this);
                     control.addListener("changeValue", this.forwardEvent, this);
                     control.addListener("input", this.forwardEvent, this);
-                    this._add(control, {flex : 1});
+                    this._add(control, {flex: 1});
                     break;
             }
             return control || this.base(arguments, id);
         },
 
-        __ensureControls : function(reverse) {
+        __ensureControls: function (reverse) {
             var names = ["text", "reset", "button"];
             if (reverse) {
                 names.reverse();
             }
-            names.forEach(function(n) {
+            names.forEach(function (n) {
                 this.getChildControl(n);
             }, this);
+
+            var text = this.getChildControl("text");
+            function enabledReset() {
+                this.getChildControl("reset").setEnabled(!sm.lang.String.isEmpty(text.getValue()));
+            }
+            text.addListener("input", enabledReset, this);
+            text.addListener("changeValue", enabledReset, this);
         },
 
-        __applyShowResetButton : function(val) {
+        __applyShowResetButton: function (val) {
             if (val) {
                 this._showChildControl("reset");
             } else {
@@ -231,7 +238,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
             }
         },
 
-        __applyShowMainButton : function(val) {
+        __applyShowMainButton: function (val) {
             if (val) {
                 this._showChildControl("button");
             } else {
@@ -239,13 +246,15 @@ qx.Class.define("sm.ui.form.ButtonField", {
             }
         },
 
-        setMainButtonEnabled : function(val) {
+        setMainButtonEnabled: function (val) {
             this.getChildControl("button", true).setEnabled(!!val);
         }
     },
 
-    destruct : function() {
-        this.__label = this.__icon;
+    destruct: function () {
+        this.__label = null;
+        this.__icon = null;
+        this.__menuspec = null;
     }
 });
 
