@@ -11,7 +11,13 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         /**
          *  Fired if current viewSpec changed
          */
-        viewSpecChanged : "qx.event.type.Data"
+        viewSpecChanged : "qx.event.type.Data",
+
+
+        /**
+         * Fired if rows data loaded
+         */
+        "rowsDataLoaded": "qx.event.type.Event"
     },
 
     properties : {
@@ -302,6 +308,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 var rarr = resp.getContent();
                 qx.core.Assert.assertArray(rarr);
                 this._onRowDataLoaded(rarr);
+                this.fireEvent("rowsDataLoaded");
             }, this);
         }
     }
