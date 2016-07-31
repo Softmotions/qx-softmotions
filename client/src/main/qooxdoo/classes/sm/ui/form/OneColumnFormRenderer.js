@@ -21,22 +21,18 @@ qx.Class.define("sm.ui.form.OneColumnFormRenderer", {
         _buttonRow : null,
 
         //overriden
-        addItems : function(items, names, title) {
+        addItems : function(items, names, title, options) {
             if (title != null) {
                 this._add(this._createHeader(title), {});
             }
             for (var i = 0; i < items.length; i++) {
-
+                var opts = options[i] || {};
                 var label = this._createLabel(names[i], items[i]);
                 this._add(label, {});
-
                 var item = items[i];
                 label.setBuddy(item);
-
-                this._add(item, {});
-
+                this._add(item, opts);
                 this._connectVisibility(item, label);
-
                 // store the names for translation
                 if (qx.core.Environment.get("qx.dynlocale")) {
                     this._names.push({name : names[i], label : label, item : items[i]});
