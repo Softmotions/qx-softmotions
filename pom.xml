@@ -12,7 +12,7 @@
     <parent>
         <groupId>softmotions</groupId>
         <artifactId>softmotions-base-pom</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
     </parent>
 
     <artifactId>qx-base</artifactId>
@@ -51,8 +51,8 @@
             </snapshots>
         </repository>
         <repository>
-            <id>jaxion_repository</id>
-            <url>http://jaxion.org/mvn/</url>
+            <id>softmotions_repository</id>
+            <url>https://repo.softmotions.com/repository/softmotions-public</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
