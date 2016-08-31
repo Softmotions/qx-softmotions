@@ -157,7 +157,7 @@ qx.Class.define("sm.ui.upload.FileUploadProgressDlg", {
             var self = this.self(arguments);
             var awnd = self.__ALERT_WND;
             if (awnd == null) {
-                awnd = self.__ALERT_WND = new sm.alert.AlertMessages(this.tr("System messages"));
+                awnd = self.__ALERT_WND = new sm.alert.DefaultAlertMessages(this.tr("System messages"));
                 awnd.addListener("close", function() {
                     self.__ALERT_WND = null;
                 }, this);

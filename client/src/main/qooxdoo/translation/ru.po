@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 
-#: sm/dialog/Message.js:60 sm/alert/AlertMessages.js:27
+#: sm/dialog/Message.js:60 sm/alert/DefaultAlertMessages.js:28
 msgid "Close"
 msgstr "Закрыть"
 
@@ -26,27 +26,27 @@ msgstr "Отменить"
 msgid "Ok"
 msgstr "Да"
 
-#: sm/io/Request.js:18
+#: sm/io/Request.js:22
 msgid "Your user session expired! Please login again"
 msgstr "Время вашей сессии закончено пожалуйста войдите заново"
 
-#: sm/io/Request.js:136
+#: sm/io/Request.js:140
 msgid "Connection error with address"
 msgstr "Ошибка соединения с"
 
-#: sm/io/Request.js:137
+#: sm/io/Request.js:141
 msgid "Connection error"
 msgstr "Ошибка соединения"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:160 sm/io/Request.js:206
+#: sm/ui/upload/FileUploadProgressDlg.js:160 sm/io/Request.js:214
 msgid "System messages"
 msgstr "Системные сообщения"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:149 sm/io/Request.js:211
+#: sm/ui/upload/FileUploadProgressDlg.js:149 sm/io/Request.js:219
 msgid "Errors"
 msgstr "Ошибки"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:152 sm/io/Request.js:211
+#: sm/ui/upload/FileUploadProgressDlg.js:152 sm/io/Request.js:219
 msgid "Messages"
 msgstr "Сообщения"
 

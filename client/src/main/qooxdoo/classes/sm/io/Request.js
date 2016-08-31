@@ -8,43 +8,47 @@
  */
 
 qx.Class.define("sm.io.Request", {
-    extend : qx.io.remote.Request,
-    include : [qx.locale.MTranslation],
+    extend: qx.io.remote.Request,
+    include: [qx.locale.MTranslation],
 
-    statics : {
-        __ALERT_WND : null,
+    statics: {
 
-        LOGIN_ACTION : function() {
+        __ALERT_WND: null,
+
+        // Implementation of sm.alert.IAlertMessages interface
+        ALERT_WND_IMPL: sm.alert.DefaultAlertMessages,
+
+        LOGIN_ACTION: function () {
             window.alert(qx.locale.Manager.tr("Your user session expired! Please login again"));
             window.location.reload(true);
         }
     },
 
-    events : {
+    events: {
         /**
          * Fired if request has finished
          * regardless its state
          *
          * data: error or null
          */
-        "finished" : "qx.event.type.Data",
+        "finished": "qx.event.type.Data",
 
         /**
          * Error condition including `abort`, `cancel`, `fail`
          */
-        "error" : "qx.event.type.Data"
+        "error": "qx.event.type.Data"
     },
 
-    properties : {
+    properties: {
 
         /**
          * Если true то Request показывает
          * ошибки HTTP запроса
          */
-        showMessages : {
-            nullable : false,
-            check : "Boolean",
-            init : true
+        showMessages: {
+            nullable: false,
+            check: "Boolean",
+            init: true
         },
 
         /**
@@ -53,10 +57,10 @@ qx.Class.define("sm.io.Request", {
          *  - isError - являются ли сообщения ошибками (boolean)
          *  - messages - сообщения указанного типа (string[])
          */
-        messageHandler : {
-            nullable : true,
-            check : "Function",
-            init : null
+        messageHandler: {
+            nullable: true,
+            check: "Function",
+            init: null
         }
     },
 
@@ -72,15 +76,15 @@ qx.Class.define("sm.io.Request", {
      * @param vResponseType {String}
      *   The mime type of the response. Default is text/plain.
      */
-    construct : function(vUrl, vMethod, vResponseType) {
+    construct: function (vUrl, vMethod, vResponseType) {
         this.base(arguments, vUrl, vMethod, vResponseType);
         this.setTimeout(20000);
     },
 
-    members : {
+    members: {
 
-        __onsuccess : null,
-        __self : null,
+        __onsuccess: null,
+        __self: null,
 
 
         /**
@@ -89,7 +93,7 @@ qx.Class.define("sm.io.Request", {
          * @param onsuccess {Function} oncomplete callback function
          * @param self {Object ? null} reference to the 'this' variable inside the callback
          */
-        send : function(onsuccess, self) {
+        send: function (onsuccess, self) {
             if (onsuccess) {
                 this.__onsuccess = onsuccess;
                 this.__self = (self) ? self : onsuccess;
@@ -97,7 +101,7 @@ qx.Class.define("sm.io.Request", {
             this.base(arguments);
         },
 
-        setRequestContentType : function(ctype) {
+        setRequestContentType: function (ctype) {
             if (ctype != null) {
                 this.setRequestHeader("Content-Type", ctype);
             } else {
@@ -105,15 +109,7 @@ qx.Class.define("sm.io.Request", {
             }
         },
 
-        _onaborted : function(e) {
-            this.fireDataEvent("finished", e);
-            if (this.hasListener("error")) {
-               this.fireDataEvent("error", e);
-            }
-            this.base(arguments, e);
-        },
-
-        _ontimeout : function(e) {
+        _onaborted: function (e) {
             this.fireDataEvent("finished", e);
             if (this.hasListener("error")) {
                 this.fireDataEvent("error", e);
@@ -121,7 +117,15 @@ qx.Class.define("sm.io.Request", {
             this.base(arguments, e);
         },
 
-        _onfailed : function(e) {
+        _ontimeout: function (e) {
+            this.fireDataEvent("finished", e);
+            if (this.hasListener("error")) {
+                this.fireDataEvent("error", e);
+            }
+            this.base(arguments, e);
+        },
+
+        _onfailed: function (e) {
             this.fireDataEvent("finished", e);
             if (this.hasListener("error")) {
                 this.fireDataEvent("error", e);
@@ -135,13 +139,13 @@ qx.Class.define("sm.io.Request", {
                 if (!err) {
                     var cerr = this.tr("Connection error with address");
                     this.__addMessages(this.tr("Connection error"),
-                            [cerr + ":<br/>" + this.getUrl()]);
+                        [cerr + ":<br/>" + this.getUrl()]);
                 }
             }
             this.base(arguments, e);
         },
 
-        _oncompleted : function(e) {
+        _oncompleted: function (e) {
             try {
                 var err = this.__checkMessages(e);
                 if (err === "abort") {
@@ -162,7 +166,7 @@ qx.Class.define("sm.io.Request", {
          * @param resp {qx.io.remote.Response}alert
          * @return {Boolean|String} True если пришло сообщение об ошибке
          */
-        __checkMessages : function(resp) {
+        __checkMessages: function (resp) {
             var headers = resp.getResponseHeaders();
             if (headers == null) {
                 return false;
@@ -192,33 +196,32 @@ qx.Class.define("sm.io.Request", {
             if (msgs.length > 0) {
                 this.__addMessages(false, msgs);
             }
+            var awnd = sm.io.Request.__ALERT_WND;
+            if (awnd) {
+                eh = headers["X-Softmotions"]; // Extra messages mode
+                awnd.activate(eh != null && eh.indexOf("notification") !== -1);
+            }
             return (errors.length > 0);
         },
 
-        __addMessages : function(isError, msgs) {
+        __addMessages: function (isError, msgs) {
             if (this.getMessageHandler()) {
                 this.getMessageHandler().call(this, isError, msgs);
                 return;
             }
-
             var awnd = sm.io.Request.__ALERT_WND;
             if (awnd == null) {
-                awnd = sm.io.Request.__ALERT_WND = new sm.alert.AlertMessages(this.tr("System messages"));
-                awnd.addListener("close", function() {
+                awnd = sm.io.Request.__ALERT_WND = new sm.io.Request.ALERT_WND_IMPL(this.tr("System messages"));
+                awnd.addListener("close", function () {
                     sm.io.Request.__ALERT_WND = null;
                 }, this);
             }
             var caption = isError ? this.tr("Errors") : this.tr("Messages");
-            awnd.addMessages(caption, msgs);
-            if (!awnd.isVisible()) {
-                awnd.open();
-            } else {
-                awnd.ensureOnTop();
-            }
+            awnd.addMessages(caption, msgs, isError);
         }
     },
 
-    destruct : function() {
+    destruct: function () {
         this.setMessageHandler(null);
         this.__onsuccess = this.__self = null;
     }

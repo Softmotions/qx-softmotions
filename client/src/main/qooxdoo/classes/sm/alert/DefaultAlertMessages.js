@@ -6,19 +6,20 @@
 /**
  * Алерт
  */
-qx.Class.define("sm.alert.AlertMessages", {
-    extend : qx.ui.window.Window,
-    include : [sm.ui.window.MExtendedWindow],
+qx.Class.define("sm.alert.DefaultAlertMessages", {
+    extend: qx.ui.window.Window,
+    include: [sm.ui.window.MExtendedWindow],
+    implement: [sm.alert.IAlertMessages],
 
-    construct : function(caption) {
+    construct: function (caption) {
         this.base(arguments, caption);
         this.setLayout(new qx.ui.layout.VBox(10));
         this.set({
-            modal : true,
-            showMinimize : false,
-            showMaximize : false,
-            allowMaximize : false,
-            width : 390
+            modal: true,
+            showMinimize: false,
+            showMaximize: false,
+            allowMaximize: false,
+            width: 390
         });
 
         this.__messages = {};
@@ -26,10 +27,10 @@ qx.Class.define("sm.alert.AlertMessages", {
         this.add(this.__container);
         var cancel = this.__cancel = new qx.ui.form.Button(this.tr("Close"));
         this.add(cancel);
-        cancel.addListener("execute", function() {
+        cancel.addListener("execute", function () {
             this.close();
         }, this);
-        this.addListenerOnce("resize", function() {
+        this.addListenerOnce("resize", function () {
             this.center();
             cancel.focus();
         }, this);
@@ -38,17 +39,17 @@ qx.Class.define("sm.alert.AlertMessages", {
         cmd.addListener("execute", this.close, this);
     },
 
-    members : {
+    members: {
 
-        __cancel : null,
+        __cancel: null,
 
-        __container : null,
+        __container: null,
 
-        __messages : null,
+        __messages: null,
 
-        ensureOnTop : function() {
+        ensureOnTop: function () {
             var me = this;
-            window.setTimeout(function() {
+            window.setTimeout(function () {
                 var root = qx.core.Init.getApplication().getRoot();
                 var maxWindowZIndex = me.getZIndex();
                 var windows = root.getWindows();
@@ -65,19 +66,19 @@ qx.Class.define("sm.alert.AlertMessages", {
             }, 0);
         },
 
-        open : function() {
+        open: function () {
             this.base(arguments);
             this.ensureOnTop();
         },
 
 
-        close : function() {
+        close: function () {
             this.base(arguments);
             this.__dispose();
         },
 
 
-        addMessages : function(caption, messages) {
+        addMessages: function (caption, messages) {
             if (!messages || messages.length == 0) {
                 return;
             }
@@ -92,23 +93,31 @@ qx.Class.define("sm.alert.AlertMessages", {
                 messages = [messages.toString()];
             }
             for (var i = 0; i < messages.length; ++i) {
-                var blb = new qx.ui.basic.Label(messages[i]).set({rich : true});
+                var blb = new qx.ui.basic.Label(messages[i]).set({rich: true});
                 msgs.add(blb);
             }
         },
 
-        resetMessages : function() {
+        activate: function (isNotification) {
+            if (!this.isVisible()) {
+                this.open();
+            } else {
+                this.ensureOnTop();
+            }
+        },
+
+        resetMessages: function () {
             this.__container.removeAll();
             this._disposeMap("__messages");
             this.__messages = {};
         },
 
-        __dispose : function() {
+        __dispose: function () {
             this.resetMessages();
         }
     },
 
-    destruct : function() {
+    destruct: function () {
         this.__dispose();
     }
 });
