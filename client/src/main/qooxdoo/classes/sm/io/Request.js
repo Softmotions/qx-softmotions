@@ -184,11 +184,11 @@ qx.Class.define("sm.io.Request", {
             var msgs = [];
             var eh = "X-Softmotions-Err";
             for (var i = 0; headers[eh + i] != undefined; ++i) {
-                errors[errors.length] = "*" + decodeURIComponent(headers[eh + i].replace(/\+/g, ' '));
+                errors.push(decodeURIComponent(headers[eh + i].replace(/\+/g, ' ')));
             }
             eh = "X-Softmotions-Msg";
             for (var i = 0; headers[eh + i] != undefined; ++i) {
-                msgs[msgs.length] = "*" + decodeURIComponent(headers[eh + i].replace(/\+/g, ' '));
+                msgs.push(decodeURIComponent(headers[eh + i].replace(/\+/g, ' ')));
             }
             if (errors.length > 0) {
                 this.__addMessages(true, errors);
