@@ -197,7 +197,7 @@ qx.Class.define("sm.io.Request", {
                 this.__addMessages(false, msgs);
             }
             var awnd = sm.io.Request.__ALERT_WND;
-            if (awnd) {
+            if (awnd && (errors.length > 0 || msgs.length > 0)) {
                 eh = headers["X-Softmotions"]; // Extra messages mode
                 awnd.activate(eh != null && eh.indexOf("notification") !== -1);
             }
