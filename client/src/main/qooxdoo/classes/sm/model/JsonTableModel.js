@@ -23,36 +23,39 @@
  */
 
 qx.Class.define("sm.model.JsonTableModel", {
-    extend : qx.ui.table.model.Simple,
+    extend: qx.ui.table.model.Simple,
 
-    construct : function() {
+    construct: function () {
         this.base(arguments);
         this._columnsInitiated = false;
     },
 
-
-    properties : {
+    properties: {
         /**
          * Whether to clear sorting on reload
          */
-        clearSortingOnReload : {
-            check : "Boolean",
-            init : true
+        clearSortingOnReload: {
+            check: "Boolean",
+            init: true
         }
     },
 
+    members: {
 
-    members : {
-        _columnsInitiated : false,
+        _columnsInitiated: false,
 
-        __custom : null,
+        __custom: null,
 
-        setJsonData : function(data) {
+        reset: function () {
+            this._columnsInitiated = false;
+            this.__custom = null;
+        },
+
+        setJsonData: function (data) {
             this._applyJsonData(data);
         },
 
-
-        _applyJsonData : function(data) {
+        _applyJsonData: function (data) {
             if (data == null) {
                 qx.log.Logger.warn(this, "No data found in json model");
                 return;
@@ -72,10 +75,9 @@ qx.Class.define("sm.model.JsonTableModel", {
                     columnsData[i] = cs["id"] ? cs["id"] : String(i);
                 }
                 this.setColumns(columns, columnsData);
-
                 var tcm = new sm.model.JsonTableColumnModel(colsSpec);
                 this.__custom = {
-                    tableColumnModel : function(obj) {
+                    tableColumnModel: function (obj) {
                         return tcm;
                     }
                 };
@@ -101,14 +103,18 @@ qx.Class.define("sm.model.JsonTableModel", {
             this.setData(ditems, this.getClearSortingOnReload());
         },
 
-        getRowAssociatedData : function(rowIndex) {
+        getRowAssociatedData: function (rowIndex) {
             var data = this.getData();
             var row = data[rowIndex];
             return (row != null && row.rowData != undefined) ? row.rowData : null;
         },
 
-        getCustom : function() {
+        getCustom: function () {
             return this.__custom;
         }
+    },
+
+    destruct: function () {
+        this.__custom = null;
     }
 });

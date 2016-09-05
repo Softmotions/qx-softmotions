@@ -7,26 +7,26 @@
  * Таблица + тулбар
  */
 qx.Class.define("sm.table.ToolbarTable", {
-    extend : qx.ui.container.Composite,
-    type : "abstract",
+    extend: qx.ui.container.Composite,
+    type: "abstract",
 
-    events : {
+    events: {
 
         /**
          * Fired when inner table instance initialized
          */
-        "tableInitialized" : "qx.event.type.Event"
+        "tableInitialized": "qx.event.type.Event"
     },
 
-    properties : {
+    properties: {
 
-        appearance : {
-            refine : true,
-            init : "toolbar-table"
+        appearance: {
+            refine: true,
+            init: "toolbar-table"
         }
     },
 
-    construct : function() {
+    construct: function () {
         this.base(arguments);
         var layout = new qx.ui.layout.VBox();
         this.setLayout(layout);
@@ -34,18 +34,18 @@ qx.Class.define("sm.table.ToolbarTable", {
         this.getChildControl("toolbar");
     },
 
-    members : {
-        _table : null,
+    members: {
+        _table: null,
 
-        getTable : function() {
+        getTable: function () {
             return this._table;
         },
 
-        getTableModel : function() {
+        getTableModel: function () {
             return this.getTable().getTableModel();
         },
 
-        getSelectionModel : function() {
+        getSelectionModel: function () {
             return this.getTable().getSelectionModel();
         },
 
@@ -53,26 +53,27 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Возвращает произвольные данные ассоциированные с выбранной строкой
          * таблицы
          */
-        getSelectedRowData : function() {
+        getSelectedRowData: function () {
             var t = this.getTable();
             return t != null ? this.getRowData(this.getTable().getSelectionModel().getAnchorSelectionIndex()) : null;
         },
 
-        getSelectedRowIndex : function() {
+        getSelectedRowIndex: function () {
             var t = this.getTable();
             return t != null ? t.getSelectionModel().getAnchorSelectionIndex() : -1;
         },
 
-        getRowCount : function() {
+        getRowCount: function () {
             return this.getTableModel().getRowCount();
         },
 
         /**
          * Возвращает значение ячейки по номеру столбца в выбранной строке
          */
-        getSelectedRowCellValue : function(colInd) {
+        getSelectedRowCellValue: function (colInd) {
             var t = this.getTable();
-            return t != null ? this.getCellValue(this.getTable().getSelectionModel().getAnchorSelectionIndex(), colInd) : null;
+            return t != null ? this.getCellValue(this.getTable().getSelectionModel().getAnchorSelectionIndex(),
+                colInd) : null;
         },
 
         /**
@@ -81,7 +82,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          *
          * @param ind {int}
          */
-        getRowData : function(ind) {
+        getRowData: function (ind) {
             if (ind < 0 || this.getTable() == null) {
                 return null;
             }
@@ -92,26 +93,26 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Возвращает значение ячейки по номеру столбца и строки
          * @deprecated {4.0}
          */
-        getRowCellValue : function(colInd, rowInd) {
+        getRowCellValue: function (colInd, rowInd) {
             if (colInd < 0 || rowInd < 0 || this.getTable() == null) {
                 return null;
             }
             return this.getTable().getTableModel().getValue(colInd, rowInd);
         },
 
-        getCellValue : function(rowIndex, columnIndex) {
+        getCellValue: function (rowIndex, columnIndex) {
             return this.getTable().getTableModel().getValue(columnIndex, rowIndex);
         },
 
 
-        setCellValue : function(rowIndex, columnIndex, value) {
+        setCellValue: function (rowIndex, columnIndex, value) {
             this.getTable().getTableModel().setValue(columnIndex, rowIndex, value);
         },
 
         /**
          * Get selection ranges
          */
-        getSelectionRanges : function() {
+        getSelectionRanges: function () {
             var t = this.getTable();
             return t != null ? t.getSelectionRanges() : [];
         },
@@ -119,7 +120,7 @@ qx.Class.define("sm.table.ToolbarTable", {
         /**
          * Создаем запрос для загрузки таблица
          */
-        _createRequest : function(data) {
+        _createRequest: function (data) {
             return null;
         },
 
@@ -128,14 +129,14 @@ qx.Class.define("sm.table.ToolbarTable", {
          * добавления дополнительных
          * widget-ов перед toolbar элементом и таблицей
          */
-        _initPrecedingWidgets : function() {
+        _initPrecedingWidgets: function () {
 
         },
 
         /**
          * Перезагружаем содержимое таблицы
          */
-        _reload : function(data) {
+        _reload: function (data) {
             var req = this._createRequest(data);
             if (this._table == null) {
                 var tm = this._createTableModel();
@@ -144,7 +145,7 @@ qx.Class.define("sm.table.ToolbarTable", {
                 }
                 this._table = this._createTable(tm);
                 this.fireEvent("tableInitialized");
-                this.add(this._table, {flex : 1})
+                this.add(this._table, {flex: 1})
             } else {
                 if (this._table.isEditing()) {
                     this._table.stopEditing();
@@ -161,7 +162,7 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Создание экземпляра талицы как widget-та
          * @param tableModel {qx.ui.table.ITableModel ? null}
          */
-        _createTable : function(tableModel) {
+        _createTable: function (tableModel) {
             return new sm.table.Table(tableModel, tableModel.getCustom());
         },
 
@@ -169,15 +170,15 @@ qx.Class.define("sm.table.ToolbarTable", {
          * Создание кнопки на тулбаре
          * @param toolbar {qx.ui.toolbar.ToolBar}
          */
-        _createToolbarItems : function(toolbar) {
+        _createToolbarItems: function (toolbar) {
             return toolbar;
         },
 
-        _createTableModel : function() {
+        _createTableModel: function () {
             return new sm.model.JsonRequestTableModel();
         },
 
-        _createChildControlImpl : function(id) {
+        _createChildControlImpl: function (id) {
             var control;
             switch (id) {
                 case "toolbar":
@@ -190,7 +191,7 @@ qx.Class.define("sm.table.ToolbarTable", {
         }
     },
 
-    destruct : function() {
+    destruct: function () {
         this._disposeObjects("_table");
     }
 });
