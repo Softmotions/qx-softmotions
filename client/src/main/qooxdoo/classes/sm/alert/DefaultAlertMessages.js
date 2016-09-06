@@ -93,6 +93,12 @@ qx.Class.define("sm.alert.DefaultAlertMessages", {
                 messages = [messages.toString()];
             }
             for (var i = 0; i < messages.length; ++i) {
+                var gc = msgs.getChildren();
+                for (var j = 0; j < gc.length; ++j) {
+                    if (gc[j].getValue() == messages[i]) {
+                        return;
+                    }
+                }
                 var blb = new qx.ui.basic.Label(messages[i]).set({rich: true});
                 msgs.add(blb);
             }
