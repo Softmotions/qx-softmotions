@@ -67,6 +67,7 @@ qx.Class.define("sm.ui.form.SimplePromptPopupDlg", {
             var opts = this.__options;
 
             var ok = new qx.ui.form.Button(opts["okLabel"] || this.tr("Ok"));
+            this._broadcaster.attach(ok, "enabledSave", "enabled");
             ok.addListener("execute", this.save, this);
             form.addButton(ok);
 
@@ -75,7 +76,8 @@ qx.Class.define("sm.ui.form.SimplePromptPopupDlg", {
             form.addButton(cancel);
         },
 
-        _save : function() {
+        _save : function(cb) {
+            cb();
             this.fireDataEvent("completed", this._form.getItems()["text"].getValue());
         }
     }
