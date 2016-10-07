@@ -11,7 +11,6 @@ qx.Interface.define("sm.alert.IAlertMessages", {
     members: {
 
         addMessages: function (caption, messages, isError) {
-            this.assertTrue(messages == null || Array.isArray(messages));
         },
 
         activate: function (isNotification) {
