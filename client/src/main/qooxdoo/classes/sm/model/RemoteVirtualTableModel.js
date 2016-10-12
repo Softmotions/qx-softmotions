@@ -296,6 +296,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         _loadRowDataUrl : function(firstRow, lastRow) {
             if (this.__cleanup == true) {
                 this._onRowDataLoaded([]);
+                this.fireEvent("rowsDataLoaded");
                 return;
             }
             var req = this._buildViewSpecRequest(this.getRowdataUrl());
