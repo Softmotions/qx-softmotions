@@ -274,6 +274,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         _loadRowCountUrl : function() {
             if (this.__cleanup == true) {
                 this._onRowCountLoaded(0);
+                this.fireEvent("rowsDataLoaded");
                 return;
             }
             var req = this._buildViewSpecRequest(this.getRowcountUrl());
@@ -283,6 +284,9 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             var rc = 0;
             req.addListener("finished", function() {
                 this._onRowCountLoaded(rc);
+                if (rc == 0) {
+                    this.fireEvent("rowsDataLoaded");
+                }
             }, this);
             req.send(function(resp) {
                 rc = resp.getContent();
