@@ -99,7 +99,7 @@ qx.Class.define("sm.alert.DefaultAlertMessages", {
                         return;
                     }
                 }
-                var blb = new qx.ui.basic.Label(messages[i]).set({rich: true});
+                var blb = new qx.ui.basic.Label(messages[i]).set({rich: true, selectable: true});
                 msgs.add(blb);
             }
         },
