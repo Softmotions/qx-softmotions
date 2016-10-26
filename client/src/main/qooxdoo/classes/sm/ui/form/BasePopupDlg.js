@@ -41,13 +41,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
                 //Restore previous focus
                 if (this.__previousFocus) {
                     try {
-                        var w = this.__previousFocus;
-                        while (w != null && w.getFocusable() == false) {
-                            w = w.getLayoutParent();
-                        }
-                        if (w != null) {
-                            w.focus();
-                        }
+                        this.__previousFocus.focus();
                     } catch (e) {
                         qx.log.Logger.error(e);
                     }
@@ -90,11 +84,12 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
         __closeCmd: null,
 
         show: function () {
-            this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getActiveWidget();
+            this.__previousFocus = qx.ui.core.FocusHandler.getInstance().getFocusedWidget();
             this.base(arguments);
         },
 
         close: function () {
+            this.hide();
             this.destroy();
         },
 

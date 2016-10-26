@@ -16,13 +16,13 @@ msgstr "Да"
 
 #: sm/ui/upload/FileUploadProgressDlg.js:43
 #: sm/ui/form/SimplePromptPopupDlg.js:74 sm/dialog/Prompt.js:26
-#: sm/ui/form/BasePopupDlg.js:152 sm/ui/progress/ProgressPopup.js:202
+#: sm/ui/form/BasePopupDlg.js:147 sm/ui/progress/ProgressPopup.js:202
 #: sm/ui/form/BaseSavePopupDlg.js:21
 msgid "Cancel"
 msgstr "Отменить"
 
 #: sm/ui/form/SimplePromptPopupDlg.js:69 sm/dialog/Prompt.js:32
-#: sm/ui/form/BasePopupDlg.js:147
+#: sm/ui/form/BasePopupDlg.js:142
 msgid "Ok"
 msgstr "Да"
 
