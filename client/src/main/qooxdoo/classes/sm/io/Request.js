@@ -15,12 +15,23 @@ qx.Class.define("sm.io.Request", {
 
         __ALERT_WND: null,
 
+        __SEND_INTERCEPTORS: [],
+
         // Implementation of sm.alert.IAlertMessages interface
         ALERT_WND_IMPL: sm.alert.DefaultAlertMessages,
 
         LOGIN_ACTION: function () {
             window.alert(qx.locale.Manager.tr("Your user session expired! Please login again"));
             window.location.reload(true);
+        },
+
+        registerSendInterceptor: function (fn, self) {
+            if (typeof fn === "function") {
+                if (self != null) {
+                    fn = fn.bind(self);
+                }
+                sm.io.Request.__SEND_INTERCEPTORS.push(fn);
+            }
         }
     },
 
@@ -85,6 +96,7 @@ qx.Class.define("sm.io.Request", {
 
         __onsuccess: null,
         __self: null,
+        __interceptorsAttached: false,
 
 
         /**
@@ -97,6 +109,12 @@ qx.Class.define("sm.io.Request", {
             if (onsuccess) {
                 this.__onsuccess = onsuccess;
                 this.__self = (self) ? self : onsuccess;
+            }
+            if (!this.__interceptorsAttached) {
+                this.__interceptorsAttached = true;
+                sm.io.Request.__SEND_INTERCEPTORS.forEach(function (si) {
+                    si(this);
+                }, this);
             }
             this.base(arguments);
         },
