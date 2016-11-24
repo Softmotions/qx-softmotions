@@ -30,6 +30,9 @@ qx.Class.define("sm.ui.form.ButtonField", {
         /** Execute search, press ENTER ot button pressed */
         "execute": "qx.event.type.Data",
 
+        /** Extra button pressed **/
+        "extra": "qx.event.type.Data",
+
         /** Reset field event */
         "reset": "qx.event.type.Event"
     },
@@ -57,16 +60,25 @@ qx.Class.define("sm.ui.form.ButtonField", {
         },
 
         /**
+         * Whenever to show extra button.
+         */
+        showExtraButton: {
+            check: "Boolean",
+            init: false,
+            nullable: false,
+            apply: "__applyShowExtraButton"
+        },
+
+        /**
          * Whenever to show main button.
          */
         showMainButton: {
             check: "Boolean",
-            init: false,
+            init: true,
             nullable: false,
             apply: "__applyShowMainButton"
         }
     },
-
 
     /**
      *
@@ -76,20 +88,26 @@ qx.Class.define("sm.ui.form.ButtonField", {
      *                Show child controls in referce order:
      *                button -> reset button -> text field
      * @param menuspec {Array?null} Array of [label, value]
+     * @param opts {Object?null}
+     *        extraButtonLabel: {String?} Extra button label
+     *        extraButtonIcon:  {String?} Extra button icon path
      *
      */
-    construct: function (label, icon, revese, menuspec) {
+    construct: function (label, icon, revese, menuspec, opts) {
+        this.__opts = opts || {};
         this.base(arguments);
-        this._setLayout(new qx.ui.layout.HBox(4).set({alignY: "middle"}));
+        this._setLayout(new qx.ui.layout.HBox().set({alignY: "middle"}));
         this.__label = label;
         this.__menuspec = Array.isArray(menuspec) ? menuspec : null;
         this.__icon = icon;
         this.__ensureControls(!!revese);
         this.setShowResetButton(false);
+        this.setShowExtraButton(false);
     },
 
     members: {
 
+        __opts: null,
 
         __label: null,
 
@@ -141,10 +159,14 @@ qx.Class.define("sm.ui.form.ButtonField", {
             return this.getChildControl("reset", true);
         },
 
+        getExtraButton: function () {
+            return this.getChildControl("extra", true);
+        },
+
         //overriden
         _applyEnabled: function (value, old) {
             this.base(arguments, value, old);
-            ["button", "reset", "text"].forEach(function (name) {
+            ["button", "extra", "reset", "text"].forEach(function (name) {
                 var el = this.getChildControl(name, true);
                 if (el) {
                     el.setEnabled(value);
@@ -155,7 +177,17 @@ qx.Class.define("sm.ui.form.ButtonField", {
         _createChildControlImpl: function (id, hash) {
             var control;
             switch (id) {
-                case "button" :
+                case "extra":
+                    control = new qx.ui.form.Button(
+                        this.__opts["extraButtonLabel"] || null,
+                        this.__opts["extraButtonIcon"] || null);
+                    control.addListener("execute", function (ev) {
+                        this.fireDataEvent("extra", this.getUserData("model"));
+                    }, this);
+                    this._add(control);
+                    this.__synState();
+                    break;
+                case "button":
                     if (this.__menuspec != null && this.__menuspec.length > 1) {
                         var menu = new qx.ui.menu.Menu();
                         this.__menuspec.forEach(function (ms) {
@@ -178,6 +210,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
                         }, this);
                     }
                     this._add(control);
+                    this.__synState();
                     break;
                 case "reset":
                     control = new qx.ui.form.Button();
@@ -185,6 +218,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
                         this.fireEvent("reset");
                     }, this);
                     this._add(control);
+                    this.__synState();
                     break;
                 case "text" : //text field
                     control = new qx.ui.form.TextField();
@@ -208,25 +242,27 @@ qx.Class.define("sm.ui.form.ButtonField", {
                     control.addListener("changeValue", this.forwardEvent, this);
                     control.addListener("input", this.forwardEvent, this);
                     this._add(control, {flex: 1});
+                    this.__synState();
                     break;
             }
             return control || this.base(arguments, id);
         },
 
         __ensureControls: function (reverse) {
-            var names = ["text", "reset", "button"];
+            var names = ["text", "reset", "extra", "button"];
             if (reverse) {
                 names.reverse();
             }
             names.forEach(function (n) {
                 this.getChildControl(n);
             }, this);
-
             var text = this.getChildControl("text");
             var reset = this.getChildControl("reset");
+
             function enabledReset() {
                 reset.setEnabled(!sm.lang.String.isEmpty(text.getValue()));
             }
+
             text.addListener("input", enabledReset);
             text.addListener("changeValue", enabledReset);
             enabledReset();
@@ -238,6 +274,16 @@ qx.Class.define("sm.ui.form.ButtonField", {
             } else {
                 this._excludeChildControl("reset");
             }
+            this.__synState();
+        },
+
+        __applyShowExtraButton: function (val) {
+            if (val) {
+                this._showChildControl("extra");
+            } else {
+                this._excludeChildControl("extra");
+            }
+            this.__synState();
         },
 
         __applyShowMainButton: function (val) {
@@ -246,14 +292,54 @@ qx.Class.define("sm.ui.form.ButtonField", {
             } else {
                 this._excludeChildControl("button");
             }
+            this.__synState();
         },
 
+        __synState: function () {
+            var allVisible = this.getChildrenContainer().getChildren().filter(function (child) {
+                return child.getVisibility() === "visible";
+            });
+            var children = allVisible.filter(function (child) {
+                return child instanceof qx.ui.form.Button;
+            });
+            for (var i = 0, l = children.length; i < l; ++i) {
+                if (i == 0 && i != children.length - 1) { // if its the first child
+                    children[i].addState("left");
+                    children[i].removeState("middle");
+                    children[i].removeState("right");
+
+                } else if (i == children.length - 1 && i != 0) { // if its the last child
+                    children[i].removeState("left");
+                    children[i].removeState("middle");
+                    children[i].addState("right");
+
+                } else if (i == 0 && i == children.length - 1) { // if there is only one child
+                    children[i].removeState("left");
+                    children[i].removeState("middle");
+                    children[i].removeState("right");
+                } else {
+                    children[i].removeState("left");
+                    children[i].addState("middle");
+                    children[i].removeState("right");
+                }
+            }
+            if (allVisible[0] instanceof qx.ui.form.TextField) {
+                allVisible[0].set({marginLeft: 0, marginRight: 5});
+            } else if (allVisible[allVisible.length - 1] instanceof qx.ui.form.TextField) {
+                allVisible[allVisible.length - 1].set({marginLeft: 5, marginRight: 0});
+            }
+        },
         setMainButtonEnabled: function (val) {
             this.getChildControl("button", true).setEnabled(!!val);
+        },
+
+        setExtraButtonEnabled: function (val) {
+            this.getChildControl("extra", true).setEnabled(!!val);
         }
     },
 
     destruct: function () {
+        this.__opts = null;
         this.__label = null;
         this.__icon = null;
         this.__menuspec = null;
