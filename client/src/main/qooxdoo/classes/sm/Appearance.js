@@ -33,15 +33,10 @@ qx.Theme.define("sm.Appearance", {
                 } else if (states.middle) {
                     decorator += "-middle";
                 }
-                // set the margin
-                var margin = [0, 0];
-                if (states.left || states.middle || states.right) {
-                    margin = [0, 0];
-                }
                 return {
                     cursor: states.disabled ? undefined : "pointer",
                     decorator: decorator,
-                    margin: margin,
+                    margin: [0, 0],
                     padding: [3, 5]
                 };
             }
