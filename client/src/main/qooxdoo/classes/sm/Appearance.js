@@ -37,7 +37,8 @@ qx.Theme.define("sm.Appearance", {
                     cursor: states.disabled ? undefined : "pointer",
                     decorator: decorator,
                     margin: [0, 0],
-                    padding: [3, 5]
+                    padding: [3, 5],
+                    center: true
                 };
             }
         },
@@ -45,6 +46,7 @@ qx.Theme.define("sm.Appearance", {
         "sm-bt-field": {},
 
         "sm-bt-field/button": {
+            alias: "button",
             include: "sm-jointed-button",
             style: function (states) {
                 return {}
@@ -52,6 +54,7 @@ qx.Theme.define("sm.Appearance", {
         },
 
         "sm-bt-field/reset": {
+            alias: "button",
             include: "sm-jointed-button",
             style: function (states) {
                 return {
@@ -61,6 +64,7 @@ qx.Theme.define("sm.Appearance", {
         },
 
         "sm-bt-field/extra": {
+            alias: "button",
             include: "sm-jointed-button",
             style: function (states) {
                 return {
