@@ -67,7 +67,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
         }
 
         this.__closeCmd = new qx.ui.command.Command("Esc");
-        this.__closeCmd.addListener("execute", this.destroy, this);
+        this.__closeCmd.addListener("execute", this.close, this);
         this.addListener("disappear", this.destroy, this);
     },
 
@@ -155,6 +155,7 @@ qx.Class.define("sm.ui.form.BasePopupDlg", {
     },
 
     destruct: function () {
+        qx.ui.core.FocusHandler.getInstance().removeRoot(this);
         this._disposeFields();
         this._saveBt = null;
     }
