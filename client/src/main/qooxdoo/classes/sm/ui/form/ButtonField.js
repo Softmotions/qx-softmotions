@@ -100,7 +100,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
         this.__label = label;
         this.__menuspec = Array.isArray(menuspec) ? menuspec : null;
         this.__icon = icon;
-        this.__ensureControls(!!revese);
+        this.__ensureControls(revese);
         this.setShowResetButton(false);
         this.setShowExtraButton(false);
     },
@@ -166,7 +166,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
         //overriden
         _applyEnabled: function (value, old) {
             this.base(arguments, value, old);
-            ["button", "extra", "reset", "text"].forEach(function (name) {
+            ["button", "text"].forEach(function (name) {
                 var el = this.getChildControl(name, true);
                 if (el) {
                     el.setEnabled(value);
@@ -217,6 +217,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
                     control.addListener("execute", function (ev) {
                         this.fireEvent("reset");
                     }, this);
+                    control.setEnabled(false);
                     this._add(control);
                     this.__synState();
                     break;
@@ -256,16 +257,12 @@ qx.Class.define("sm.ui.form.ButtonField", {
             names.forEach(function (n) {
                 this.getChildControl(n);
             }, this);
-            var text = this.getChildControl("text");
-            var reset = this.getChildControl("reset");
-
-            function enabledReset() {
-                reset.setEnabled(!sm.lang.String.isEmpty(text.getValue()));
-            }
-
-            text.addListener("input", enabledReset);
-            text.addListener("changeValue", enabledReset);
-            enabledReset();
+            var me = this;
+            this.getChildControl("text").bind("value", this.getChildControl("reset"), "enabled", {
+                converter: function (v) {
+                    return me.getEnabled() && v != null && v != "" && v.length > 0;
+                }
+            })
         },
 
         __applyShowResetButton: function (val) {
@@ -329,6 +326,7 @@ qx.Class.define("sm.ui.form.ButtonField", {
                 allVisible[allVisible.length - 1].set({marginLeft: 5, marginRight: 0});
             }
         },
+
         setMainButtonEnabled: function (val) {
             this.getChildControl("button", true).setEnabled(!!val);
         },
