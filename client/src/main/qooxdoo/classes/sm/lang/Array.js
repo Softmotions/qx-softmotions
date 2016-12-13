@@ -57,7 +57,13 @@ qx.Class.define("sm.lang.Array", {
          */
         binaryStringSearch: function (ar, el) {
             return sm.lang.Array.binarySearch(ar, el, function (e1, e2) {
-                return e1 > e2 ? 1 : (e2 < e1 ? -1 : 0)
+                if (e1 == null) {
+                    return e2 == null ? 0 : -1;
+                } else if (e2 == null) {
+                    return 1;
+                } else {
+                    return e1.localeCompare(e2);
+                }
             })
         }
     }
