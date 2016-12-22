@@ -37,7 +37,7 @@
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
-        <qooxdoo.sdk.version>5.0.1</qooxdoo.sdk.version>
+        <qooxdoo.sdk.version>5.0.2</qooxdoo.sdk.version>
     </properties>
 
     <repositories>
