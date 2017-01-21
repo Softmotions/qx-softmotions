@@ -9,6 +9,17 @@ qx.Theme.define("sm.Appearance", {
 
     appearances: {
 
+        //------------------ sm.alert.Alerts popup theme
+
+        "sm-info-popup": {
+            style: function (states) {
+                return {
+                    padding: [5, 10, 10, 10],
+                    maxWidth: 350,
+                    backgroundColor: "#FFFFBF"
+                }
+            }
+        },
 
         //------------------ Button field widget (sm.ui.form.ButtonField)
 
@@ -67,8 +78,7 @@ qx.Theme.define("sm.Appearance", {
             alias: "button",
             include: "sm-jointed-button",
             style: function (states) {
-                return {
-                }
+                return {}
             }
         },
 
@@ -217,5 +227,4 @@ qx.Theme.define("sm.Appearance", {
             }
         }
     }
-
 });
