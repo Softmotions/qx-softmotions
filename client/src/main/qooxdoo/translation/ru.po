@@ -38,15 +38,15 @@ msgstr "Ошибка соединения с"
 msgid "Connection error"
 msgstr "Ошибка соединения"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:160 sm/io/Request.js:232
+#: sm/ui/upload/FileUploadProgressDlg.js:173 sm/io/Request.js:232
 msgid "System messages"
 msgstr "Системные сообщения"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:149 sm/io/Request.js:237
+#: sm/ui/upload/FileUploadProgressDlg.js:162 sm/io/Request.js:237
 msgid "Errors"
 msgstr "Ошибки"
 
-#: sm/ui/upload/FileUploadProgressDlg.js:152 sm/io/Request.js:237
+#: sm/ui/upload/FileUploadProgressDlg.js:165 sm/io/Request.js:237
 msgid "Messages"
 msgstr "Сообщения"
 
