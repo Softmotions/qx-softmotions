@@ -104,10 +104,10 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return this.__constVspec;
         },
 
-        setConstViewSpec : function(cvs, noupdate) {
+        setConstViewSpec : function(cvs, noupdate, table) {
             this.__constVspec = cvs;
             if (!noupdate) {
-                this.updateViewSpec(cvs || {});
+                this.updateViewSpec(cvs || {}, table);
             }
         },
 
@@ -115,7 +115,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return this.__vspec;
         },
 
-        setViewSpec : function(spec) {
+        setViewSpec : function(spec, table) {
             var nspec = {};
             if (this.__constVspec != null) {
                 qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
@@ -127,13 +127,13 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
-            this.reloadData();
+            this.reloadData(table);
             if (this.hasListener("viewSpecChanged")) {
                 this.fireDataEvent("viewSpecChanged", this.__vspec);
             }
         },
 
-        updateViewSpec : function(spec) {
+        updateViewSpec : function(spec, table) {
             qx.core.Assert.assertMap(spec);
             var nspec = {};
             if (this.__constVspec != null) {
@@ -146,9 +146,24 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
-            this.reloadData();
+            this.reloadData(table);
             if (this.hasListener("viewSpecChanged")) {
                 this.fireDataEvent("viewSpecChanged", this.__vspec);
+            }
+        },
+
+        /**
+         * Extended reload data function.
+         * If table is defined and resetSelection is true - call reset selection on table after `rowsDataLoaded` event
+         *
+         * @param table {Object}
+         * @param resetSelection {Boolean?true}
+         */
+        reloadData : function (table, resetSelection) {
+            this.base(arguments);
+            resetSelection = (resetSelection === undefined) ? true : resetSelection;
+            if (table !== undefined && resetSelection) {
+                table.getTableModel().addListenerOnce("rowsDataLoaded", table.getSelectionModel().resetSelection);
             }
         },
 
