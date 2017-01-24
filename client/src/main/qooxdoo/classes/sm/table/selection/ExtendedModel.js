@@ -31,10 +31,7 @@ qx.Class.define("sm.table.selection.ExtendedModel", {
         _fireChangeSelection : function () {
             this.base(arguments);
 
-            if (this.hasBatchMode()) {
-                // In batch mode, remember event but do not throw (yet)
-                this.__hadChangeEventInBatchMode = true;
-            } else {
+            if (!this.hasBatchMode()) {
                 var curSelectionIndex = this.getAnchorSelectionIndex();
                 this.fireDataEvent("changeSingleSelection", {prev: this.__prevSelectedIndex, cur: curSelectionIndex});
                 this.__prevSelectedIndex = curSelectionIndex;
