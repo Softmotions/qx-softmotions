@@ -99,15 +99,27 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
         __cleanup : false,
 
+        __table : null,
+
+        /**
+         * Set table.
+         * If table is set, {@link #reloadData} will call reset selection on this table after data loaded
+         *
+         * @param table {Object}
+         */
+        setTable : function (table) {
+            this.__table = table;
+
+        },
 
         getConstViewSpec : function() {
             return this.__constVspec;
         },
 
-        setConstViewSpec : function(cvs, noupdate, table) {
+        setConstViewSpec : function(cvs, noupdate) {
             this.__constVspec = cvs;
             if (!noupdate) {
-                this.updateViewSpec(cvs || {}, table);
+                this.updateViewSpec(cvs || {});
             }
         },
 
@@ -115,7 +127,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return this.__vspec;
         },
 
-        setViewSpec : function(spec, table) {
+        setViewSpec : function(spec) {
             var nspec = {};
             if (this.__constVspec != null) {
                 qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
@@ -127,13 +139,13 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
-            this.reloadData(table);
+            this.reloadData();
             if (this.hasListener("viewSpecChanged")) {
                 this.fireDataEvent("viewSpecChanged", this.__vspec);
             }
         },
 
-        updateViewSpec : function(spec, table) {
+        updateViewSpec : function(spec) {
             qx.core.Assert.assertMap(spec);
             var nspec = {};
             if (this.__constVspec != null) {
@@ -146,7 +158,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             this.__vspec.sortInd = this.getSortColumnIndex();
             this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
             this.__vspec.isAsc = this.isSortAscending();
-            this.reloadData(table);
+            this.reloadData();
             if (this.hasListener("viewSpecChanged")) {
                 this.fireDataEvent("viewSpecChanged", this.__vspec);
             }
@@ -154,16 +166,15 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
         /**
          * Extended reload data function.
-         * If table is defined and resetSelection is true - call reset selection on table after `rowsDataLoaded` event
+         * If table is defined by setTable and resetSelection is true - call reset selection on table after `rowsDataLoaded` event
          *
-         * @param table {Object}
          * @param resetSelection {Boolean?true}
          */
-        reloadData : function (table, resetSelection) {
+        reloadData : function (resetSelection) {
             this.base(arguments);
-            resetSelection = (resetSelection === undefined) ? true : resetSelection;
-            if (table !== undefined && resetSelection) {
-                table.getTableModel().addListenerOnce("rowsDataLoaded", table.getSelectionModel().resetSelection);
+            resetSelection = (resetSelection == null) ? true : resetSelection;
+            if (this.__table != null && resetSelection) {
+                this.__table.getTableModel().addListenerOnce("rowsDataLoaded", this.__table.getSelectionModel().resetSelection);
             }
         },
 
@@ -331,6 +342,10 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 this.fireEvent("rowsDataLoaded");
             }, this);
         }
+    },
+
+    destruct: function () {
+        this._disposeObjects("__table");
     }
 });
 
