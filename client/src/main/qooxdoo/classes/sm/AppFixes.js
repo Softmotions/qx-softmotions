@@ -9,8 +9,8 @@ qx.Class.define("sm.AppFixes", {
             // Location of UI based on `navigator.languages[0]` instead of `navigator.language`
             // todo review it for IE/EDGE
             var browser = qx.core.Environment.get("browser.name");
-            if (browser !== "ie" && browser !== "edge") { // Fix locale
-                navigator.userLanguage = navigator.languages[0] || navigator.language || "";
+            if (browser !== "ie" && browser !== "edge" && window.navigator) { // Fix locale
+                navigator.userLanguage =  (navigator.languages && navigator.languages[0]) || navigator.language || "";
                 var locale = navigator.userLanguage;
                 var ind = locale.indexOf("-");
                 if (ind !== -1) {
