@@ -167,14 +167,14 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
         /**
          * Extended reload data function.
-         * If table is defined by setTable and resetSelection is true - call reset selection on table after `rowsDataLoaded` event
+         * If table is defined by setTable and resetSelection is true - call
+         * reset selection on table after `rowsDataLoaded` event
          *
          * @param resetSelection {Boolean?true}
          */
         reloadData: function (resetSelection) {
             if (this.__table != null && ((resetSelection == null) ? true : resetSelection)) {
-                this.__table.getTableModel()
-                .addListenerOnce("rowsDataLoaded", this.__table.getSelectionModel().resetSelection);
+                this.addListenerOnce("rowsDataLoaded", this.__table.getSelectionModel().resetSelection);
             }
             this.base(arguments);
         },
