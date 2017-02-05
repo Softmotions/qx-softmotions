@@ -68,15 +68,15 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
 
     construct: function (colsMeta, useCols, table) {
-        this.base(arguments);
-        qx.core.Assert.assertMap(colsMeta, "colsMeta constructor argument must be specified");
-        this.setColumnsMeta(colsMeta);
         this.__table = table;
 
+        this.base(arguments);
+
+        qx.core.Assert.assertMap(colsMeta, "colsMeta constructor argument must be specified");
+        this.setColumnsMeta(colsMeta);
         if (useCols) {
             this.setUseColumns(useCols);
         }
-
         this.addListener("metaDataChanged", function () {
             if (this.__vspec) {
                 this.__vspec.sortInd = this.getSortColumnIndex();
@@ -174,7 +174,9 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
          */
         reloadData: function (resetSelection) {
             if (this.__table != null && ((resetSelection == null) ? true : resetSelection)) {
-                this.addListenerOnce("rowsDataLoaded", this.__table.getSelectionModel().resetSelection);
+                this.addListenerOnce("rowsDataLoaded", function () {
+                    this.getSelectionModel().resetSelection();
+                }, this.__table);
             }
             this.base(arguments);
         },
