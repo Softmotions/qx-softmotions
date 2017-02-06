@@ -8,29 +8,29 @@
  */
 
 qx.Class.define("sm.table.Table", {
-    extend : qx.ui.table.Table,
+    extend: qx.ui.table.Table,
 
     /**
      * @param useContentMenu {Boolean}  deprecated!
      */
-    construct : function(tableModel, custom, useContentMenu) {
+    construct: function (tableModel, custom, useContentMenu) {
         if (useContentMenu) {  //deprecated
             qx.log.Logger.error("Using of 'useContentMenu' argument in 'sm.table.Table' is deprecated! Stack: " +
-                    qx.dev.StackTrace.getStackTrace().join("\n"));
+                qx.dev.StackTrace.getStackTrace().join("\n"));
             qx.Class.include(qx.ui.table.Table, qx.ui.table.MTableContextMenu);
         }
         this.base(arguments, tableModel, custom);
     },
 
-    members : {
+    members: {
 
-        __preventEditNextLine : null,
+        __preventEditNextLine: null,
 
-        setPreventEditNextLine : function(val) {
+        setPreventEditNextLine: function (val) {
             this.__preventEditNextLine = val;
         },
 
-        _onKeyPress : function(evt) {
+        _onKeyPress: function (evt) {
             var identifier = evt.getKeyIdentifier();
             if (this.__preventEditNextLine && this.isEditing() && evt.getModifiers() == 0 && 'Enter' == identifier) {
                 this.stopEditing();
@@ -43,7 +43,7 @@ qx.Class.define("sm.table.Table", {
         /**
          * Swap keyboard focus to table with auto selection focused or first row
          */
-        handleFocus : function() {
+        handleFocus: function () {
             if (this.getTableModel().getRowCount() > 0) {
                 var focusedCol = (this.getFocusedColumn() == null) ? 0 : this.getFocusedColumn();
                 var focusedRow = (this.getFocusedRow() == null) ? 0 : this.getFocusedRow();
@@ -53,7 +53,7 @@ qx.Class.define("sm.table.Table", {
             }
         },
 
-        resetSelection : function() {
+        resetSelection: function () {
             this.resetCellFocus();
             this.getSelectionModel().resetSelection();
         },
@@ -62,11 +62,11 @@ qx.Class.define("sm.table.Table", {
          * Associated rowData via JsonTableModel
          * @param ind {Integer}
          */
-        getRowData : function(ind) {
+        getRowData: function (ind) {
             return ind < 0 ? null : this.getTableModel().getRowAssociatedData(ind);
         },
 
-        getSelectedRowData : function() {
+        getSelectedRowData: function () {
             return this.getRowData(this.getSelectionModel().getAnchorSelectionIndex());
         },
 
@@ -74,39 +74,40 @@ qx.Class.define("sm.table.Table", {
         /**
          * Row data as getTableModel().getRowData(ind);
          */
-        getRowData2 : function(ind) {
+        getRowData2: function (ind) {
             return ind < 0 ? null : this.getTableModel().getRowData(ind);
         },
 
         /**
          * Fist selected row data as getTableModel().getRowData(ind) at first anchor selection index
          */
-        getSelectedRowData2 : function() {
+        getSelectedRowData2: function () {
             return this.getRowData2(this.getSelectionModel().getAnchorSelectionIndex());
         },
 
-        updateRowStyles : function(onlyRow) {
+        updateRowStyles: function (onlyRow) {
             var scrollerArr = this._getPaneScrollerArr();
             for (var i = 0; i < scrollerArr.length; i++) {
                 scrollerArr[i].getTablePane()._updateRowStyles(onlyRow);
             }
         },
 
-        selectSingleRow : function(ind) {
+        selectSingleRow: function (ind) {
             var rc = this.getTableModel().getRowCount();
             if (ind >= 0 && ind < rc) {
                 this.getSelectionModel().setSelectionInterval(ind, ind);
+                this.resetCellFocus();
             }
         },
 
         /**
          * Get selection ranges
          */
-        getSelectionRanges : function() {
+        getSelectionRanges: function () {
             var sranges = [];
             var lastInd = -1;
             var sr = null;
-            this.getSelectionModel().iterateSelection(function(ind) {
+            this.getSelectionModel().iterateSelection(function (ind) {
                 if (lastInd + 1 != ind && sr) {
                     sranges.push(sr);
                     sr = null;
@@ -127,12 +128,12 @@ qx.Class.define("sm.table.Table", {
         },
 
 
-        getCellValue : function(rowIndex, columnIndex) {
+        getCellValue: function (rowIndex, columnIndex) {
             this.getTableModel().getValue(columnIndex, rowIndex);
         },
 
 
-        setCellValue : function(rowIndex, columnIndex, value) {
+        setCellValue: function (rowIndex, columnIndex, value) {
             this.getTableModel().setValue(columnIndex, rowIndex, value);
         }
 

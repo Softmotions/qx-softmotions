@@ -73,7 +73,7 @@ qx.Class.define("sm.table.ToolbarTable", {
         getSelectedRowCellValue: function (colInd) {
             var t = this.getTable();
             return t != null ? this.getCellValue(this.getTable().getSelectionModel().getAnchorSelectionIndex(),
-                colInd) : null;
+                                 colInd) : null;
         },
 
         /**
@@ -152,18 +152,17 @@ qx.Class.define("sm.table.ToolbarTable", {
                 }
                 this._table.getSelectionModel().resetSelection();
                 if (req) {
-                    var tm = this._table.getTableModel();
-                    tm.setRequest(req);
+                    this._table.getTableModel().setRequest(req);
                 }
             }
         },
 
         /**
          * Создание экземпляра талицы как widget-та
-         * @param tableModel {qx.ui.table.ITableModel ? null}
+         * @param tableModel {sm.model.JsonTableModel ? null}
          */
         _createTable: function (tableModel) {
-            return new sm.table.Table(tableModel, tableModel.getCustom());
+            return new sm.table.Table(tableModel, (tableModel.getCustom && tableModel.getCustom()));
         },
 
         /**

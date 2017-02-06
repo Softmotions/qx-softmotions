@@ -79,6 +79,9 @@ qx.Class.define("sm.model.JsonTableModel", {
                 this.__custom = {
                     tableColumnModel: function (obj) {
                         return tcm;
+                    },
+                    selectionModel: function () {
+                        return new sm.table.selection.ExtendedSelectionModel();
                     }
                 };
                 this._columnsInitiated = true;
