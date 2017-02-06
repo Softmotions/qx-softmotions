@@ -29,6 +29,18 @@ qx.Class.define("sm.table.selection.ExtendedSelectionModel", {
             this.__lastToIndex = toIndex;
         },
 
+        removeSelectionInterval : function(fromIndex, toIndex) {
+            this.__lastFromIndex = null;
+            this.__lastToIndex = null;
+            this.base(arguments, fromIndex, toIndex);
+        },
+
+        _resetSelection : function() {
+            this.__lastFromIndex = null;
+            this.__lastToIndex = null;
+            this.base(arguments);
+        },
+
         _fireChangeSelection: function () {
             if (this.hasBatchMode()) {
                 this.base(arguments);
