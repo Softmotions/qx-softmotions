@@ -4,14 +4,14 @@
  */
 
 qx.Class.define("sm.model.RemoteVirtualTableModel", {
-    extend : qx.ui.table.model.Remote,
+    extend: qx.ui.table.model.Remote,
 
 
-    events : {
+    events: {
         /**
          *  Fired if current viewSpec changed
          */
-        viewSpecChanged : "qx.event.type.Data",
+        viewSpecChanged: "qx.event.type.Data",
 
 
         /**
@@ -20,64 +20,64 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         "rowsDataLoaded": "qx.event.type.Event"
     },
 
-    properties : {
+    properties: {
         /**
          * Row count request url name
          */
-        rowcountUrl : {
-            check : "String",
-            init : null
+        rowcountUrl: {
+            check: "String",
+            init: null
         },
 
         /**
          * Row data request url name
          */
-        rowdataUrl : {
-            check : "String",
-            init : null
+        rowdataUrl: {
+            check: "String",
+            init: null
         },
 
 
-        rowdataFn : {
-            check : "Function",
-            init : null,
-            apply : ""
+        rowdataFn: {
+            check: "Function",
+            init: null,
+            apply: ""
         },
 
-        rowcountFn : {
-            check : "Function",
-            init : null
+        rowcountFn: {
+            check: "Function",
+            init: null
         },
 
         /**
          * Columns metainfo
          */
-        columnsMeta : {
-            check : "Object",
-            init : {}
+        columnsMeta: {
+            check: "Object",
+            init: {}
         },
 
         /**
          * List of included columns
          */
-        useColumns : {
-            nullable : false,
-            apply : "_applyUseColumns"
+        useColumns: {
+            nullable: false,
+            apply: "_applyUseColumns"
         }
     },
 
 
-    construct : function(colsMeta, useCols) {
+    construct: function (colsMeta, useCols, table) {
+        this.__table = table;
+
         this.base(arguments);
 
         qx.core.Assert.assertMap(colsMeta, "colsMeta constructor argument must be specified");
         this.setColumnsMeta(colsMeta);
-
         if (useCols) {
             this.setUseColumns(useCols);
         }
-
-        this.addListener("metaDataChanged", function() {
+        this.addListener("metaDataChanged", function () {
             if (this.__vspec) {
                 this.__vspec.sortInd = this.getSortColumnIndex();
                 this.__vspec.sortCol = this.getColumnId(this.__vspec.sortInd);
@@ -89,33 +89,46 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         }, this);
     },
 
-    members : {
+    members: {
         /**
          * Current view spec
          */
-        __vspec : null,
+        __vspec: null,
 
-        __constVspec : null,
+        __constVspec: null,
 
-        __cleanup : false,
+        __cleanup: false,
 
+        __table: null,
 
-        getConstViewSpec : function() {
+        /**
+         * Set table.
+         * If table is set, {@link #reloadData}
+         * will call reset selection on this table after data loaded
+         *
+         * @param table {Object}
+         */
+        setTable: function (table) {
+            this.__table = table;
+
+        },
+
+        getConstViewSpec: function () {
             return this.__constVspec;
         },
 
-        setConstViewSpec : function(cvs, noupdate) {
+        setConstViewSpec: function (cvs, noupdate) {
             this.__constVspec = cvs;
             if (!noupdate) {
                 this.updateViewSpec(cvs || {});
             }
         },
 
-        getViewSpec : function() {
+        getViewSpec: function () {
             return this.__vspec;
         },
 
-        setViewSpec : function(spec) {
+        setViewSpec: function (spec) {
             var nspec = {};
             if (this.__constVspec != null) {
                 qx.Bootstrap.objectMergeWith(nspec, this.__constVspec, false);
@@ -133,7 +146,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
         },
 
-        updateViewSpec : function(spec) {
+        updateViewSpec: function (spec) {
             qx.core.Assert.assertMap(spec);
             var nspec = {};
             if (this.__constVspec != null) {
@@ -153,6 +166,22 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         },
 
         /**
+         * Extended reload data function.
+         * If table is defined by setTable and resetSelection is true - call
+         * reset selection on table after `rowsDataLoaded` event
+         *
+         * @param resetSelection {Boolean?true}
+         */
+        reloadData: function (resetSelection) {
+            if (this.__table != null && ((resetSelection == null) ? true : resetSelection)) {
+                this.addListenerOnce("rowsDataLoaded", function () {
+                    this.getSelectionModel().resetSelection();
+                }, this.__table);
+            }
+            this.base(arguments);
+        },
+
+        /**
          * Update a cached table rows with data produced
          * by `filterFun` function.
          * This function accepts (ind, rowdata)  arguments.
@@ -163,12 +192,12 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
          * @param filterFun {Function} Filter function, signature: (ind, rowdata)
          * @param self {Object?null} This object for the filter function/
          */
-        updateCachedRows : function(filterFun, self) {
-            this.iterateCachedRows(function(ind, rowdata) {
+        updateCachedRows: function (filterFun, self) {
+            this.iterateCachedRows(function (ind, rowdata) {
                 var res = filterFun.call(self, ind, rowdata);
                 if (res != null) {
                     qx.Bootstrap.objectMergeWith(rowdata, res, true);
-                    Object.keys(res).forEach(function(k) {
+                    Object.keys(res).forEach(function (k) {
                         var cind = this.getColumnIndexById(k);
                         if (cind != null) {
                             this.setValue(cind, ind, res[k]);
@@ -179,7 +208,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }, this);
         },
 
-        cleanup : function() {
+        cleanup: function () {
             this.__cleanup = true;
             try {
                 this.reloadData();
@@ -188,7 +217,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
         },
 
-        _checkIncludedColumns : function(val) {
+        _checkIncludedColumns: function (val) {
             if (!qx.lang.Type.isArray(val)) {
                 return false;
             }
@@ -201,7 +230,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return true;
         },
 
-        _applyUseColumns : function(cols) {
+        _applyUseColumns: function (cols) {
             qx.core.Assert.assertTrue(this._checkIncludedColumns(cols), "Invalid 'useColumns' property value");
             var cmeta = this.getColumnsMeta();
             var labels = [];
@@ -215,7 +244,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         },
 
 
-        _buildViewSpecRequest : function(url) {
+        _buildViewSpecRequest: function (url) {
             if (url == null || !qx.lang.Type.isObject(this.__vspec)) {
                 return null;
             }
@@ -230,7 +259,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
             var sind = this.__vspec["sortInd"];
             if (sind != -1 &&
-                    (this.__vspec["sortAsc"] == null && this.__vspec["sortDesc"] == null)) {
+                (this.__vspec["sortAsc"] == null && this.__vspec["sortDesc"] == null)) {
                 var columnId = this.getColumnId(sind);
                 if (this.__vspec["isAsc"]) {
                     req.setParameter("sortAsc", columnId)
@@ -241,7 +270,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             return req;
         },
 
-        _loadRowCount : function() {
+        _loadRowCount: function () {
             if (this.__vspec == null) {
                 this._onRowCountLoaded(0);
                 return;
@@ -257,7 +286,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
         },
 
-        _loadRowData : function(firstRow, lastRow) {
+        _loadRowData: function (firstRow, lastRow) {
             if (this.getRowdataUrl() != null) {
                 return this._loadRowDataUrl(firstRow, lastRow);
             } else if (this.getRowdataFn() != null) {
@@ -271,7 +300,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
 
 
         // overriden - called whenever the table requests the row count
-        _loadRowCountUrl : function() {
+        _loadRowCountUrl: function () {
             if (this.__cleanup == true) {
                 this._onRowCountLoaded(0);
                 this.fireEvent("rowsDataLoaded");
@@ -282,13 +311,13 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
                 return 0;
             }
             var rc = 0;
-            req.addListener("finished", function() {
+            req.addListener("finished", function () {
                 this._onRowCountLoaded(rc);
                 if (rc == 0) {
                     this.fireEvent("rowsDataLoaded");
                 }
             }, this);
-            req.send(function(resp) {
+            req.send(function (resp) {
                 rc = resp.getContent();
                 if (isNaN(rc)) {
                     rc = 0;
@@ -297,7 +326,7 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
         },
 
         // overriden
-        _loadRowDataUrl : function(firstRow, lastRow) {
+        _loadRowDataUrl: function (firstRow, lastRow) {
             if (this.__cleanup == true) {
                 this._onRowDataLoaded([]);
                 this.fireEvent("rowsDataLoaded");
@@ -309,13 +338,16 @@ qx.Class.define("sm.model.RemoteVirtualTableModel", {
             }
             req.setParameter("firstRow", firstRow);
             req.setParameter("lastRow", lastRow);
-            req.send(function(resp) {
+            req.send(function (resp) {
                 var rarr = resp.getContent();
                 qx.core.Assert.assertArray(rarr);
                 this._onRowDataLoaded(rarr);
                 this.fireEvent("rowsDataLoaded");
             }, this);
         }
+    },
+
+    destruct: function () {
+        this.__table = null;
     }
 });
-
